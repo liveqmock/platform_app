@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:demoapp="http://schemas.android.com/apk/res/com.apalya.myplex"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#FFFFFF"
+    android:orientation="vertical" >
+
+    <!-- Editext for Search -->
+
+    <HorizontalScrollView
+        android:id="@+id/selectionscroll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:orientation="horizontal"
+            android:paddingBottom="5dp"
+            android:paddingLeft="@dimen/layoutleftpadding"
+            android:paddingTop="5dp" >
+
+            <LinearLayout
+                android:id="@+id/spannable"
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:layout_weight="0.8"
+                android:orientation="horizontal" >
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/inputSearch"
+                android:layout_width="fill_parent"
+                android:layout_height="35dp"
+                android:background="#FFFFFF"
+                android:drawableLeft="@drawable/search16px"
+                android:drawablePadding="10dp"
+                android:hint="Search..."
+                android:inputType="textVisiblePassword" />
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <com.apalya.myplex.views.CustomFastScrollView
+        android:id="@+id/fast_scroll_view"
+        android:layout_width="wrap_content"
+        android:layout_height="0px"
+        android:layout_weight="1"
+        demoapp:overlayHeight="110dp"
+        demoapp:overlayScrollThumbWidth="60dp"
+        demoapp:overlayTextSize="24dp"
+        demoapp:overlayWidth="225dp" >
+
+        <com.apalya.myplex.views.PinnedSectionListView
+            android:id="@+id/list_view"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:divider="@null"
+            android:fadingEdgeLength="0dp"
+            android:footerDividersEnabled="false"
+            android:headerDividersEnabled="false"
+            android:listSelector="@android:color/transparent" >
+        </com.apalya.myplex.views.PinnedSectionListView>
+    </com.apalya.myplex.views.CustomFastScrollView>
+
+</LinearLayout>

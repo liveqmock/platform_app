@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#e6e6e6" >
+
+    <RelativeLayout
+        android:id="@+id/slideinmenulayout"
+        android:layout_width="@dimen/slidemenugap"
+        android:layout_height="match_parent" >
+
+        <ListView
+            android:id="@+id/slideinmenulistbox"
+            android:layout_width="@dimen/slidemenugap"
+            android:layout_height="match_parent"
+            android:dividerHeight="2dp"
+            android:scrollbars="none" >
+        </ListView>
+    </RelativeLayout>
+
+    <com.apalya.myplex.views.NewCardView
+        android:id="@+id/framelayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="12dp" >
+    </com.apalya.myplex.views.NewCardView>
+
+    <RelativeLayout
+        android:id="@+id/slidenotificationlayout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/slidenotification"
+        android:background="#FF8C00" >
+
+        <TextView
+            android:id="@+id/slidenotificationtextview"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/slidenotification"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:gravity="center"
+            android:singleLine="true"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/carddetailsview" android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="12dp" >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/cardvideosize" >
+
+            <RelativeLayout
+                android:id="@+id/card_preview_large_layout"
+                android:layout_width="fill_parent" android:visibility="invisible"
+                android:layout_height="@dimen/cardvideosize"
+                android:background="#000000" >
+
+                <ImageView
+                    android:id="@+id/card_preview_large_image"
+                    android:layout_width="fill_parent" 
+                    android:layout_height="fill_parent"
+                    android:scaleType="centerInside" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/card_preview_small_layout"
+                android:layout_width="fill_parent"
+                android:layout_height="@dimen/cardplayheight"
+                android:layout_marginTop="@dimen/cardtitleheight"
+                android:background="#000000" >
+
+                <ImageView
+                    android:id="@+id/card_preview_small_image"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:scaleType="centerInside" />
+            </RelativeLayout>
+        </RelativeLayout>
+    </RelativeLayout>
+
+</RelativeLayout>

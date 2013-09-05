@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/cardvideosize"
+    android:background="@drawable/card_background" >
+
+    <RelativeLayout
+        android:id="@+id/card_title_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/cardtitleheight"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/card_background" >
+
+        <LinearLayout
+            android:id="@+id/card_title_delete"
+            android:layout_width="@dimen/cardtitleheight"
+            android:layout_height="@dimen/cardtitleheight"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dp" >
+
+            <ImageView
+               android:layout_gravity="center_vertical"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/card_delete" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/card_title_fav"
+            android:layout_width="@dimen/cardtitleheight"
+            android:layout_height="@dimen/cardtitleheight"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="5dp" >
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"  android:layout_gravity="center_vertical"
+                android:src="@drawable/card_fav" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/card_title_name"
+            android:layout_width="fill_parent"
+            android:layout_height="@dimen/cardtitleheight"
+            android:layout_centerInParent="true"
+            android:layout_marginLeft="32dp"
+            android:layout_marginRight="32dp"
+            android:gravity="center"
+            android:singleLine="true"
+            android:text=""
+            android:textColor="#6b6b6b"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/card_preview_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/cardplayheight"
+        android:layout_below="@+id/card_title_layout"
+        android:background="#000000" >
+
+        <ImageView
+            android:id="@+id/card_preview_image"
+            android:layout_width="fill_parent"
+            android:layout_height="@dimen/cardplayheight"
+            android:scaleType="centerInside" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/card_status_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/cardstatusheight"
+        android:layout_below="@+id/card_preview_layout" >
+
+        <ImageView
+            android:id="@+id/card_status_comments"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="5dp"
+            android:src="@drawable/card_comments" />
+
+        <TextView
+            android:id="@+id/card_status_comments_text"
+            android:layout_width="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_height="@dimen/cardstatusheight"
+            android:layout_alignBottom="@+id/card_status_comments"
+            android:layout_marginLeft="7dp"
+            android:layout_toRightOf="@+id/card_status_comments"
+            android:singleLine="true"
+            android:text="5,514"
+            android:textColor="#f57242"
+            android:textSize="14sp" />
+
+        <ImageView
+            android:id="@+id/card_status_people"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="5dp"
+            android:src="@drawable/card_people" />
+
+        <TextView
+            android:id="@+id/card_status_people_text"
+            android:layout_width="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_height="@dimen/cardstatusheight"
+            android:layout_alignBottom="@+id/card_status_people"
+            android:layout_marginRight="7dp"
+            android:layout_toLeftOf="@+id/card_status_people"
+            android:singleLine="true"
+            android:text="13,514"
+            android:textColor="#f57242"
+            android:textSize="14sp" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/card_info_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/cardmoreinfoheight"
+ 		android:layout_below="@+id/card_status_layout"
+        android:orientation="vertical" >
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1dp"
+            android:background="#D8D8D8" />
+
+        <LinearLayout
+            android:layout_width="fill_parent" android:layout_gravity="center" 
+            android:layout_height="@dimen/cardmoreinfoheight"
+            android:orientation="horizontal" >
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/cardmoreinfoheight"
+                android:layout_gravity="center" android:layout_marginLeft="5dp"
+                android:layout_weight="1" >
+
+                <ImageView
+                    android:id="@+id/card_info_rent"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/card_rent" />
+
+                <TextView
+                    android:id="@+id/card_info_rent_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginLeft="7dp"
+                    android:singleLine="true"
+                    android:text="Rent or Purchase"
+                    android:textColor="#6b6b6b"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="@dimen/cardmoreinfoheight"
+                android:background="#D8D8D8" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/cardmoreinfoheight"
+                android:layout_gravity="center" android:layout_marginLeft="5dp"
+                android:layout_weight="1" > 
+
+                <ImageView
+                    android:id="@+id/card_info_more"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    
+                    android:src="@drawable/card_info" />
+
+                <TextView
+                    android:id="@+id/card_info_info_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="7dp"
+                    android:singleLine="true"
+                    android:text="More information"
+                    android:textColor="#6b6b6b"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>

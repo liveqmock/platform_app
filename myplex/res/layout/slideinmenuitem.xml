@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent" android:orientation="horizontal"
+    android:layout_height="match_parent" >
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginLeft="50dp"
+        android:src="@drawable/social_send_now" />
+
+    <TextView
+        android:id="@+id/slideinmenuitemtxt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="5dp"
+        android:singleLine="true"
+        android:text=""
+        android:textColor="#8CFFFFFF"
+        android:textSize="16sp" />
+
+</LinearLayout>

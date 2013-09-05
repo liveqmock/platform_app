@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="actionbarheight">48dp</dimen>
+    <dimen name="cardtitleheight">35dp</dimen>
+    <dimen name="cardstatusheight">30dp</dimen>
+    <dimen name="cardmoreinfoheight">36dp</dimen>
+    <dimen name="cardplayheight">152dp</dimen>
+    <dimen name="cardvideosize">249dp</dimen> <!-- total of cardtitleheight,cardstatusheight,cardmoreinfoheight,cardplayheight  -->
+    <dimen name="cardmargin">12dp</dimen>
+    <dimen name="cardpartialvisibleheight">50dp</dimen>
+    <dimen name="slidemenugap">250dp</dimen>
+    <dimen name="slidenotification">32dp</dimen>
+    
+    
+    
+<!-- dimenesion for search layout -->
+	<dimen name="layoutleftpadding">15dp</dimen>
+    <dimen name="buttonpadding">30dp</dimen>
+<!-- dimenesion for search layout -->
+
+
+      <!-- LOGIN SCREEN VALUES -->
+    
+    <dimen name="fieldwidth">280dp</dimen>
+    <dimen name="fieldheight">50dp</dimen>
+    <dimen name="editfieldheight">146dp</dimen>
+    <dimen name="buttonwidth">112dp</dimen>
+    <dimen name="titlewidth">240dp</dimen>
+    <dimen name="titleheight">72dp</dimen>
+    
+    <!-- SPACING VALUES -->
+    
+    <dimen name="height">36dp</dimen>
+    <dimen name="logobottommargin">96dp</dimen>
+    <dimen name="margin">16dp</dimen>
+    <dimen name="fieldmargin">2dp</dimen>
+    <dimen name="fieldspacing">6dp</dimen>
+    <dimen name="buttonspacing">6dp</dimen>
+    <dimen name="bottomspacing">22dp</dimen>
+    <dimen name="buttonmargin">14dp</dimen>
+    <dimen name="editmargin">12dp</dimen>
+    
+    <!-- TEXT SIZE VALUES -->
+    
+    <dimen name="titletextsize">20sp</dimen>
+    <dimen name="buttontextsize">14sp</dimen>
+    <dimen name="normaltextsize">13sp</dimen>
+    <dimen name="editfieldsize">14sp</dimen>
+    
+    
+    <!-- LOGIN SCREEN VALUES -->
+
+</resources>

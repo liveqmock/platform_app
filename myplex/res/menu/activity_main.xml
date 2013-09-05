@@ -1,0 +1,41 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+       
+        android:icon="@drawable/abs__ic_search"
+        android:orderInCategory="10"
+        android:actionViewClass="android.support.v7.widget.SearchView" 
+        android:showAsAction="always">
+    </item>
+    <item
+        android:id="@+id/menu_settings"
+        android:icon="@drawable/abs__ic_menu_moreoverflow_normal_holo_dark"
+        android:menuCategory="alternative"
+        android:orderInCategory="50"
+        android:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/loadmore50"
+                android:icon="@drawable/social_send_now"
+                android:title="add 50 "/>
+            <item
+                android:id="@+id/loadmore100"
+                android:icon="@drawable/social_send_now"
+                android:title="add 100 "/>
+            <item
+                android:id="@+id/loadmore500"
+                android:icon="@drawable/social_send_now"
+                android:title="add 500 "/>
+            <item
+                android:id="@+id/share"
+                android:actionProviderClass="android.widget.ShareActionProvider"
+                android:icon="@drawable/social_share"
+                android:title="Share"/>
+            <item
+                android:id="@+id/settings"
+                android:icon="@drawable/action_settings"
+                android:title="Settings"/>
+        </menu>
+    </item>
+
+</menu>
