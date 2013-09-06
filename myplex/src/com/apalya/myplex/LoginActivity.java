@@ -23,11 +23,13 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.IntentSender.SendIntentException;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
@@ -44,52 +46,79 @@ ConnectionCallbacks, OnConnectionFailedListener, OnClickListener {
 	private PlusClient mPlusClient;
 	private ConnectionResult mConnectionResult;
 	private EditText mEmailField,mPwdField;
-	private Button mFacebookButton,mSignup;
-	//private MainFragment mainFragment;
-
+	private Button mFacebookButton,mSignup,mLogin;
+	private RelativeLayout mTitle,mSocialLogins;
+	private TextView mLetMeIn,mText;
+	
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.loginscreen);
 
+		
+		
 		mEmailField = (EditText)findViewById(R.id.editEmail);
-		
-		
-
-		TextView letMeIn=(TextView)findViewById(R.id.letmeinMsg);
-		letMeIn.setOnClickListener(new OnClickListener() {
+		findViewById(R.id.googlelogin).setOnClickListener(this);
+		mFacebookButton = (Button) findViewById(R.id.fblogin);
+		mSignup = (Button) findViewById(R.id.signup);
+		mFacebookButton.setOnClickListener(this);
+		mText=(TextView)findViewById(R.id.Msg);
+		mLetMeIn=(TextView)findViewById(R.id.letmeinMsg);
+		mLetMeIn.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
+				launchActivity(CardExplorer.class,LoginActivity.this , null);
 				
-				Map<String, String> intentBundle = new HashMap<String, String>();
-				String intentParam1 = "username";
-				String intentParam2 = "userpwd";
-				intentBundle.put(intentParam1,"srikanthy" );
-				intentBundle.put(intentParam2, "pwedr");
-				launchActivity(CardExplorer.class,LoginActivity.this , intentBundle);
-				
-//				Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
-//				startActivity(intent);
 			}
 		});
+
+		mTitle=(RelativeLayout) findViewById(R.id.titleLayout);
+		mSocialLogins=(RelativeLayout)findViewById(R.id.sociallogins);
+		
+		final View root= findViewById(R.id.rootlayout);  
+	       root.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+	        @Override
+	        public void onGlobalLayout() {
+	            int heightDiff = root.getRootView().getHeight() - root.getHeight();
+
+	            Rect rectgle= new Rect();
+	            Window window= getWindow();
+	            window.getDecorView().getWindowVisibleDisplayFrame(rectgle);
+	            int contentViewTop= 
+	                window.findViewById(Window.ID_ANDROID_CONTENT).getTop();
+
+	            if(heightDiff <= contentViewTop){
+	                //Soft KeyBoard Hidden
+	            	
+	            	mTitle.setVisibility(View.VISIBLE);
+					mSocialLogins.setVisibility(View.VISIBLE);
+					mLetMeIn.setVisibility(View.VISIBLE);
+					mText.setVisibility(View.VISIBLE);
+	            }else{
+	                //Soft KeyBoard Shown
+	            	
+	            	
+	            	mTitle.setVisibility(View.GONE);
+					mSocialLogins.setVisibility(View.GONE);
+					mLetMeIn.setVisibility(View.GONE);
+					mText.setVisibility(View.GONE);
+	            }
+
+
+	         }
+	    });
+		
 		
 		mPwdField =(EditText) findViewById(R.id.editPassword);
-		mPwdField.clearFocus();
-
-		mFacebookButton = (Button) findViewById(R.id.fblogin);
-		mSignup = (Button) findViewById(R.id.signup);
-		mFacebookButton.setOnClickListener(this);
-
-
 		mPlusClient = new PlusClient.Builder(this, this, this)
 		.setVisibleActivities("http://schemas.google.com/AddActivity", "http://schemas.google.com/BuyActivity")
 		.build();
 		// Progress bar to be displayed if the connection failure is not resolved.
 		mConnectionProgressDialog = new ProgressDialog(this);
 		mConnectionProgressDialog.setMessage("Signing in...");
-				findViewById(R.id.googlelogin).setOnClickListener(this);
 
 
 		Settings.addLoggingBehavior(LoggingBehavior.INCLUDE_ACCESS_TOKENS);
@@ -113,20 +142,81 @@ ConnectionCallbacks, OnConnectionFailedListener, OnClickListener {
 		}
 
 
+		mLogin = (Button) findViewById(R.id.login);
+		mLogin.setOnClickListener(new OnClickListener() {
 
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				if( mEmailField.getText().toString().length() == 0 )
+					mEmailField.setError( "Username is required!" );
+				if( mPwdField.getText().toString().length() == 0 )
+					mPwdField.setError( "Password is required!" );
+
+				if(mEmailField.getText().toString().length() > 0 &&  mPwdField.getText().toString().length()>0)
+				{
+					if(mEmailField.getText().toString().contains("@"))
+					{
+
+						Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
+						startActivity(intent);	
+					}
+					else
+					{
+						mPwdField.clearFocus();
+						mEmailField.requestFocus();
+						mEmailField.setError( "Enter Valid Email!" );
+					}
+
+				}
+			}
+		});
 
 		mSignup.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
-				startActivity(intent);
+				
+				
+
+				if(mEmailField.getText().toString().length() > 0 &&  mEmailField.getText().toString().length()>0)
+				{
+					if(mEmailField.getText().toString().contains("@"))
+					{
+
+						Map<String, String> intentBundle = new HashMap<String, String>();
+						String intentParam1 = "username";
+						String intentParam2 = "userpwd";
+						intentBundle.put(intentParam1,mEmailField.getText().toString() );
+						intentBundle.put(intentParam2,  mEmailField.getText().toString());
+						launchActivity(SignUpActivity.class,LoginActivity.this , intentBundle);
+
+						/*Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
+						startActivity(intent);*/	
+					}
+					else
+					{
+						launchActivity(SignUpActivity.class,LoginActivity.this , null);
+					}
+
+				}
+				else
+				{
+					launchActivity(SignUpActivity.class,LoginActivity.this , null);	
+				}
+				
+				
+				
+				
+				
+				/*Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
+				startActivity(intent);*/
 
 			}
 		});
 
-		mPwdField.setOnKeyListener(new View.OnKeyListener() {
+		/*mPwdField.setOnKeyListener(new View.OnKeyListener() {
 			public boolean onKey(View v, int keyCode, KeyEvent event) {
 				if (event.getAction() == KeyEvent.ACTION_DOWN) 
 					if ((keyCode == KeyEvent.KEYCODE_ENTER)) {
@@ -140,7 +230,7 @@ ConnectionCallbacks, OnConnectionFailedListener, OnClickListener {
 						{
 							if(mEmailField.getText().toString().contains("@"))
 							{
-								
+
 								Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
 								startActivity(intent);	
 							}
@@ -156,9 +246,11 @@ ConnectionCallbacks, OnConnectionFailedListener, OnClickListener {
 					}
 				return false;
 			}
-		});
+		});*/
 
 	}
+	
+	
 
 	@Override
 	protected void onStart() {
@@ -198,54 +290,50 @@ ConnectionCallbacks, OnConnectionFailedListener, OnClickListener {
 		// Save the result and resolve the connection failure upon a user click.
 		mConnectionResult = result;
 	}
-	
+
 	private void sendRequestDialog() {
-	    Bundle params = new Bundle();
-	    
-	    params.putString("message", "Learn how to make your Android apps social");
-	    params.putString("data",
-	            "{\"badge_of_awesomeness\":\"1\"," +
-	            "\"social_karma\":\"5\"}");
-	    WebDialog requestsDialog = (
-	        new WebDialog.RequestsDialogBuilder(LoginActivity.this,
-	            Session.getActiveSession(),
-	            params))
-	            .setOnCompleteListener(new OnCompleteListener() {
+		Bundle params = new Bundle();
 
-					@Override
-					public void onComplete(Bundle values,
-							FacebookException error) {
+		params.putString("message", "Learn how to make your Android apps social");
+		params.putString("data",
+				"{\"badge_of_awesomeness\":\"1\"," +
+				"\"social_karma\":\"5\"}");
+		WebDialog requestsDialog = (
+				new WebDialog.RequestsDialogBuilder(LoginActivity.this,
+						Session.getActiveSession(),
+						params))
+						.setOnCompleteListener(new OnCompleteListener() {
 
-	                    if (error != null) {
-	                        if (error instanceof FacebookOperationCanceledException) {
-	                            Toast.makeText(LoginActivity.this.getApplicationContext(), 
-	                                "Request cancelled", 
-	                                Toast.LENGTH_SHORT).show();
-	                        } else {
-	                            Toast.makeText(LoginActivity.this.getApplicationContext(), 
-	                                "Network Error", 
-	                                Toast.LENGTH_SHORT).show();
-	                        }
-	                    } else {
-	                        final String requestId = values.getString("request");
-	                        if (requestId != null) {
-	                            Toast.makeText(LoginActivity.this.getApplicationContext(), 
-	                                "Request sent",  
-	                                Toast.LENGTH_SHORT).show();
-	                        } else {
-	                            Toast.makeText(LoginActivity.this.getApplicationContext(), 
-	                                "Request cancelled", 
-	                                Toast.LENGTH_SHORT).show();
-	                        }
-	                    }   
-	                
-						
-					}
+							@Override
+							public void onComplete(Bundle values,
+									FacebookException error) {
+								if (error != null) {
+									if (error instanceof FacebookOperationCanceledException) {
+										Toast.makeText(LoginActivity.this.getApplicationContext(), 
+												"Request cancelled", 
+												Toast.LENGTH_SHORT).show();
+									} else {
+										Toast.makeText(LoginActivity.this.getApplicationContext(), 
+												"Network Error", 
+												Toast.LENGTH_SHORT).show();
+									}
+								} else {
+									final String requestId = values.getString("request");
+									if (requestId != null) {
+										Toast.makeText(LoginActivity.this.getApplicationContext(), 
+												"Request sent",  
+												Toast.LENGTH_SHORT).show();
+									} else {
+										Toast.makeText(LoginActivity.this.getApplicationContext(), 
+												"Request cancelled", 
+												Toast.LENGTH_SHORT).show();
+									}
+								}   
+							}
 
-
-	            })
-	            .build();
-	    requestsDialog.show();
+						})
+						.build();
+		requestsDialog.show();
 	}
 
 	@Override
@@ -271,10 +359,19 @@ ConnectionCallbacks, OnConnectionFailedListener, OnClickListener {
 		if (session.isOpened()) {
 
 			mFacebookButton.setText("Invite Friends");
-			       
+			launchActivity(CardExplorer.class,LoginActivity.this , null);
+			/*       textInstructionsOrLink.setText(URL_PREFIX_FRIENDS + session.getAccessToken());
+            buttonLoginLogout.setText(R.string.logout);
+            buttonLoginLogout.setOnClickListener(new OnClickListener() {
+                public void onClick(View view) { onClickLogout(); }
+            });*/
 		} else {
 			mFacebookButton.setText("LogIn with Facebook");
-			
+			/* textInstructionsOrLink.setText(R.string.instructions);
+            buttonLoginLogout.setText(R.string.login);
+            buttonLoginLogout.setOnClickListener(new OnClickListener() {
+                public void onClick(View view) { onClickLogin(); }
+            });*/
 		}
 	}
 
@@ -283,6 +380,7 @@ ConnectionCallbacks, OnConnectionFailedListener, OnClickListener {
 		mConnectionProgressDialog.dismiss();
 		String accountName = mPlusClient.getAccountName();
 		Toast.makeText(this, accountName + " is connected.", Toast.LENGTH_LONG).show();
+		launchActivity(CardExplorer.class,LoginActivity.this , null);
 	}
 
 	@Override
@@ -301,12 +399,12 @@ ConnectionCallbacks, OnConnectionFailedListener, OnClickListener {
 		}
 	}
 
-	private void onClickLogout() {
+	/*private void onClickLogout() {
 		Session session = Session.getActiveSession();
 		if (!session.isClosed()) {
 			session.closeAndClearTokenInformation();
 		}
-	}
+	}*/
 
 	private class SessionStatusCallback implements Session.StatusCallback {
 		@Override
@@ -329,7 +427,7 @@ ConnectionCallbacks, OnConnectionFailedListener, OnClickListener {
 			{
 				onClickLogin();				
 			}
-/*			Intent intent = new Intent(LoginActivity.this, FacebookLoginFragment.class);
+			/*Intent intent = new Intent(LoginActivity.this, FacebookLoginFragment.class);
 			startActivity(intent);*/
 		}
 		if (view.getId() == R.id.googlelogin && !mPlusClient.isConnected()) {
@@ -345,6 +443,24 @@ ConnectionCallbacks, OnConnectionFailedListener, OnClickListener {
 				}
 			}
 		}
+		/*if(view.getId() == R.id.sign_out_button){
+			Log.d(TAG,"Sign Out cliked");
+			if (mPlusClient.isConnected()) {
+				Log.d(TAG,"Sign Out Done");
+				mPlusClient.clearDefaultAccount();
+				mPlusClient.revokeAccessAndDisconnect(new OnAccessRevokedListener() {
+					@Override
+					public void onAccessRevoked(ConnectionResult status) {
+						// mPlusClient is now disconnected and access has been revoked.
+						// Trigger app logic to comply with the developer policies
+					}
+				});
+
+				mPlusClient.disconnect();
+				//mPlusClient.connect();
+			}
+
+		}*/
 
 	}
 	public static void launchActivity(
@@ -360,5 +476,4 @@ ConnectionCallbacks, OnConnectionFailedListener, OnClickListener {
 		launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		currentActivity.startActivity(launchIntent);
 	}
-
 }
