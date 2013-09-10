@@ -23,14 +23,14 @@ public class FadeInNetworkImageView extends NetworkImageView {
         super(context, attrs, defStyle);
     }
 
-//    @Override
-//    public void setImageBitmap(Bitmap bm) {
-//        TransitionDrawable td = new TransitionDrawable(new Drawable[]{
-//                new ColorDrawable(android.R.color.transparent),
-//                new BitmapDrawable(getContext().getResources(), bm)
-//        });
-//
-//        setImageDrawable(td);
-//        td.startTransition(FADE_IN_TIME_MS);
-//    }
+    @Override
+    public void setImageBitmap(Bitmap bm) {
+        TransitionDrawable td = new TransitionDrawable(new Drawable[]{
+                new ColorDrawable(android.R.color.transparent),
+                new BitmapDrawable(getContext().getResources(), bm)
+        });
+
+        setImageDrawable(td);
+        td.startTransition(FADE_IN_TIME_MS);
+    }
 }

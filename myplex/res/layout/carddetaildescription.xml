@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" 
+    android:layout_height="wrap_content" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:layout_marginRight="10dp"
+        android:background="@drawable/card_background" >
+
+        <TextView
+            android:id="@+id/carddetaildesc_movename"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="5dp"
+            android:singleLine="true"
+            android:text="Riddick"
+            android:textColor="#6b6b6b"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <RatingBar
+            android:id="@+id/carddetaildesc_setRating"
+            style="?android:attr/ratingBarStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="8dp" />
+
+        <TextView
+            android:id="@+id/carddetaildesc_ratingText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/carddetaildesc_description"
+            android:layout_below="@+id/carddetaildesc_movename"
+            android:layout_marginTop="5dp"
+            android:singleLine="true"
+            android:text="PG-13"
+            android:textColor="#6b6b6b"
+            android:textSize="13sp"
+            android:textStyle="normal" />
+
+        <TextView
+            android:id="@+id/carddetaildesc_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/carddetaildesc_ratingText"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            android:text=""
+            android:textColor="#6b6b6b"
+            android:textSize="10sp" />
+
+        <LinearLayout
+            android:id="@+id/carddetaildesc_loadmoretext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/carddetaildesc_description"
+            android:layout_marginRight="16dp" >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/loadmore" />
+        </LinearLayout>
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -5,7 +5,8 @@
     <dimen name="cardstatusheight">30dp</dimen>
     <dimen name="cardmoreinfoheight">36dp</dimen>
     <dimen name="cardplayheight">152dp</dimen>
-    <dimen name="cardvideosize">249dp</dimen> <!-- total of cardtitleheight,cardstatusheight,cardmoreinfoheight,cardplayheight  -->
+    <dimen name="cardvideosize">200dp</dimen> <!-- total of cardtitleheight,cardstatusheight,cardmoreinfoheight,cardplayheight  -->
+    <dimen name="cardHeight">249dp</dimen> <!-- total of cardtitleheight,cardstatusheight,cardmoreinfoheight,cardplayheight  -->
     <dimen name="cardmargin">12dp</dimen>
     <dimen name="cardpartialvisibleheight">50dp</dimen>
     <dimen name="slidemenugap">250dp</dimen>
@@ -54,5 +55,5 @@
     
     
     <!-- LOGIN SCREEN VALUES -->
-
+        <dimen name="rbm_item_padding_topbottom">16dp</dimen>    <dimen name="rbm_item_padding_leftright">8dp</dimen>        <dimen name="rbm_item_image_height">24dp</dimen>    <dimen name="rbm_item_image_width">24dp</dimen>        <dimen name="rbm_item_text_size">16sp</dimen>    <dimen name="rbm_item_text_padding_left">10dp</dimen>        <dimen name="fast_scroll_overllaywidth">290dp</dimen>    <dimen name="fast_scroll_overllayheight">90dp</dimen>        <dimen name="fast_scroll_overllaythumb">60dp</dimen>    <dimen name="fast_scroll_overllaytextsize">26dp</dimen>        <dimen name="carddetailmultimediathumnnailmargin">5dp</dimen>
 </resources>

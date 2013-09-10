@@ -63,11 +63,11 @@
         android:layout_below="@+id/card_title_layout"
         android:background="#000000" >
 
-        <ImageView
+        <com.android.volley.toolbox.NetworkImageView
             android:id="@+id/card_preview_image"
-            android:layout_width="fill_parent"
+            android:layout_width="fill_parent" 
             android:layout_height="@dimen/cardplayheight"
-            android:scaleType="centerInside" />
+            android:scaleType="fitCenter" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -169,13 +169,14 @@
                 android:background="#D8D8D8" />
 
             <LinearLayout
+                 android:id="@+id/card_info_more"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/cardmoreinfoheight"
                 android:layout_gravity="center" android:layout_marginLeft="5dp"
                 android:layout_weight="1" > 
 
                 <ImageView
-                    android:id="@+id/card_info_more"
+                   
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_gravity="center"

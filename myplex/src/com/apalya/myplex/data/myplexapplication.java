@@ -14,6 +14,6 @@ public class myplexapplication extends Application {
 	}
 
 	private void init() {
-		//MyVolley.init(this);
+		MyVolley.init(this);
 	}
 }

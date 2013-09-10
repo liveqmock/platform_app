@@ -19,6 +19,7 @@ import android.animation.ObjectAnimator;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ApplicationErrorReport.CrashInfo;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -30,6 +31,7 @@ import android.os.Looper;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.SearchViewCompat;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -55,12 +57,13 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.apalya.myplex.data.CardData;
+import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.slidemenudata;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
-import com.apalya.myplex.views.CardView;
 import com.apalya.myplex.views.FliterMenu;
 import com.apalya.myplex.views.NewCardView;
+import com.apalya.myplex.views.NewCardView.OnLoadMoreListener;
 import com.apalya.myplex.views.NewCardView.OnPlayListener;
 import com.apalya.myplex.views.slidemenuadapter;
 
@@ -71,6 +74,7 @@ public class CardExplorer extends BaseActivity implements OnPlayListener{
 	private static final int RESULTS_PAGE_SIZE = 20;
 	private boolean mHasData = false;
 	private boolean mInError = false;
+	private int mStartIndex = 0;
 	private ArrayList<CardData> mEntries = new ArrayList<CardData>();
 
 	@Override
@@ -82,82 +86,52 @@ public class CardExplorer extends BaseActivity implements OnPlayListener{
 		prepareSlideNotifiation();
 //		prepareFilterMenu();
 		mCardView = (NewCardView) findViewById(R.id.framelayout);
-		mCardDetailsView = (RelativeLayout)findViewById(R.id.carddetailsview);
+//		mCardDetailsView = (RelativeLayout)findViewById(R.id.carddetailsview);
 		// mCardView.setActionBarHeight(actionBar.getHeight());
 		mCardView.setContext(this);
 		mCardView.setOnPlayListener(this);
+		mCardView.setOnLoadMoreListener(new  OnLoadMoreListener() {
+			
+			@Override
+			public void loadmore(int value) {
+//				mStartIndex = value;
+//				loadPage();
+			}
+		});
 		// prepareData();
 		// this.setProgressBarIndeterminate(true);
 
-		Timer t = new Timer();
-		t.schedule(new TimerTask() {
-
-			@Override
-			public void run() {
-				prepareData(50);
-
-			}
-		}, 1000);
+//		Timer t = new Timer();
+//		t.schedule(new TimerTask() {
+//
+//			@Override
+//			public void run() {
+//				prepareData(50);
+//
+//			}
+//		}, 1000);
+//		fillFilterMenuData();
 //		enableDownFilter();
 		// mCardView.show();
 	}
-	
-//	private void prepareFilterMenu(){
-//		
-//		mFilterMenuToggleButton = (ImageView)getActionBar().getCustomView().findViewById(R.id.fliterinmenu);
-//		mFilterMenuToggleButton.setOnClickListener(new OnClickListener() {
-//			
-//			@Override
-//			public void onClick(View v) {
-//				if(!mFilterMenuToggle){
-//					mFilterMenuToggleButton.setImageResource(R.drawable.navigation_collapse);
-//					mFliterMenu.show();
-//				}else{
-//					mFilterMenuToggleButton.setImageResource(R.drawable.navigation_expand);
-//					mFliterMenu.hide();
-//				}
-//				mFilterMenuToggle = !mFilterMenuToggle;
-//			}
-//		});
-//		mFilterMenuCloseButton = (ImageView)findViewById(R.id.filtermenuclose);
-//		mFilterMenuCloseButton.setOnClickListener(new OnClickListener() {
-//			
-//			@Override
-//			public void onClick(View v) {
-//				mFliterMenu.hide();
-//				mFilterMenuToggle = false;
-//			}
-//		});
-//		;
-//		mFliterMenu = (FliterMenu)findViewById(R.id.flitermenulayout);
-//		mFliterMenu.init(this);
-//		
-//		mFliterListView = (ListView)findViewById(R.id.fliterlistbox);
-//		mFliterMenuAdapter = new slidemenuadapter(this);
-//		mFliterListView.setAdapter(mFliterMenuAdapter);
-//		fillFilterMenuData();
-//	}
-//	private void fillFilterMenuData(){
-//		List<slidemenudata> data = new ArrayList<slidemenudata>();
-//		data.add(new slidemenudata("Recommended", "", R.drawable.social_send_now));
-//		data.add(new slidemenudata("Movies", "", R.drawable.social_send_now));
-//		data.add(new slidemenudata("Tv Shows", "", R.drawable.social_send_now));
-//		data.add(new slidemenudata("Special Programming", "", R.drawable.social_send_now));
-//		data.add(new slidemenudata("Popular", "", R.drawable.social_send_now));
-//		data.add(new slidemenudata("Trending", "", R.drawable.social_send_now));
-//		data.add(new slidemenudata("Recent", "", R.drawable.social_send_now));
-//		data.add(new slidemenudata("New", "", R.drawable.social_send_now));
-//		data.add(new slidemenudata("Sports", "", R.drawable.social_send_now));
-//		data.add(new slidemenudata("Spotlight", "", R.drawable.social_send_now));
-//		data.add(new slidemenudata("Featured", "", R.drawable.social_send_now));
-//		data.add(new slidemenudata("Beauty & Fashion", "", R.drawable.social_send_now));
-//		data.add(new slidemenudata("Science & Education", "", R.drawable.social_send_now));
-//		data.add(new slidemenudata("Cooking & Health", "", R.drawable.social_send_now));
-//		data.add(new slidemenudata("News & Politics", "", R.drawable.social_send_now));
-//		data.add(new slidemenudata("Lifestyle", "", R.drawable.social_send_now));
-//		data.add(new slidemenudata("Purchase", "", R.drawable.social_send_now));
-//		mFliterMenuAdapter.setData(data);
-//	}
+
+	private void fillFilterMenuData(){
+		List<FilterMenudata> mMenuList = new ArrayList<FilterMenudata>();
+		for(int i = 0;i < 50;i++){
+			FilterMenudata data;
+			if(i % 8 == 0){
+				data = new FilterMenudata(FilterMenudata.SECTION, "Parent "+i, i);
+			}else{
+				data = new FilterMenudata(FilterMenudata.ITEM, "child", i);
+			}
+			mMenuList.add(data);
+		}
+		setFilterData(mMenuList);
+	}
+	@Override
+	public void onFilterMenuItemSelected(FilterMenudata data) {
+		super.onFilterMenuItemSelected(data);
+	}
 	private int mSlideNotifcationHeight;
 	private TextView mSlideNotificationText;
 	private void prepareSlideNotifiation() {
@@ -181,31 +155,25 @@ public class CardExplorer extends BaseActivity implements OnPlayListener{
 		animate(0,-mSlideNotifcationHeight, mSlideNotificationLayout,false,2);
 	}
 	
-
-	
-	
-	private ImageView mFilterMenuToggleButton;
-	private ImageView mFilterMenuCloseButton;
-	
 	
 	@Override
 	protected void onResume() {
 		super.onResume();
 		if (!mHasData && !mInError) {
-//			 loadPage();
+			 loadPage();
 		}
 	}
-
+/*https://picasaweb.google.com/data/feed/api/all?q=movie&max-results="
++ RESULTS_PAGE_SIZE + "&thumbsize=160&alt=json"
++ "&start-index="*/ 
 	private void loadPage() {
 		RequestQueue queue = MyVolley.getRequestQueue();
-
-		int startIndex = 1 + mEntries.size();
+		
 		JsonObjectRequest myReq = new JsonObjectRequest(Method.GET,
-				"https://picasaweb.google.com/data/feed/api/all?q=movie&max-results="
-						+ RESULTS_PAGE_SIZE + "&thumbsize=160&alt=json"
-						+ "&start-index=" + startIndex, null,
+				"http://106.186.115.151:8888/content/v2/search/?startIndex="+ mStartIndex, null,
 				createMyReqSuccessListener(), createMyReqErrorListener());
 
+		Log.d("pref","Request results for "+"http://106.186.115.151:8888/content/v2/search/?startIndex="+ mStartIndex);
 		queue.add(myReq);
 	}
 
@@ -214,30 +182,31 @@ public class CardExplorer extends BaseActivity implements OnPlayListener{
 			@Override
 			public void onResponse(JSONObject response) {
 				try {
-					JSONObject feed = response.getJSONObject("feed");
-					JSONArray entries = feed.getJSONArray("entry");
+					JSONObject feed = response.getJSONObject("results");
+					JSONArray entries = feed.getJSONArray("values");
 					JSONObject entry;
+					mEntries.clear();
 					for (int i = 0; i < entries.length(); i++) {
+						CardData data = new CardData("", "", 0);
+						
 						entry = entries.getJSONObject(i);
-
 						String url = null;
-
-						JSONObject media = entry.getJSONObject("media$group");
-						if (media != null && media.has("media$thumbnail")) {
-							JSONArray thumbs = media
-									.getJSONArray("media$thumbnail");
-							if (thumbs != null && thumbs.length() > 0) {
-								url = thumbs.getJSONObject(0).getString("url");
-							}
+						JSONObject content = entry.getJSONObject("content");
+						data.title = content.getString("title");
+						JSONObject images = entry.getJSONObject("images");
+						JSONArray thumbnail  = images.getJSONArray("cover");
+						if(thumbnail.length()> 0){
+							data.imageUrl = thumbnail.getJSONObject(0).getString("link");	
 						}
-
-						mEntries.add(new CardData(entry.getJSONObject("title")
-								.getString("$t"), url, 0));
+						
+						mEntries.add(data);
 					}
 					mCardView.addData(mEntries);
 					 mCardView.show();
+						Log.d("pref","Request found "+mEntries.size());
 				} catch (JSONException e) {
-					showErrorDialog();
+					e.printStackTrace();
+//					showErrorDialog();
 				}
 			}
 		};
@@ -254,7 +223,7 @@ public class CardExplorer extends BaseActivity implements OnPlayListener{
 		return new Response.ErrorListener() {
 			@Override
 			public void onErrorResponse(VolleyError error) {
-				showErrorDialog();
+//				showErrorDialog();
 			}
 		};
 	}
@@ -342,98 +311,70 @@ public class CardExplorer extends BaseActivity implements OnPlayListener{
 			}
 		});
 	}
-	private RelativeLayout mCardDetailPreviewLayoutLarge;
-	private RelativeLayout mCardDetailPreviewLayoutSmall;
-	private ImageView mCardDetailPreviewImageLarge;
-	private ImageView mCardDetailPreviewImageSmall;
+	private RelativeLayout mCardDetailPreviewLayout;
+	private ImageView mCardDetailPreviewImage;
+	private RelativeLayout mCardDetailPreviewTitle;
+	private RelativeLayout mCardDetailPreviewBottom;
+	private TextView mCardDetailPreviewTitleText;
+	
+	public interface AnimationComplete{
+		public void OnAnimationComplete();
+	}
+	private void DelayedCallback(final AnimationComplete listener){
+		Handler h = new Handler(Looper.getMainLooper());
+		h.post(new Runnable() {
+			
+			@Override
+			public void run() {
+				if(listener != null){
+					listener.OnAnimationComplete();
+				}
+			}
+		});
+	}
 	@Override
 	public void play(CardData data) {
+		startActivity(new Intent(this,CardDetails.class));
 		
-		mCardDetailPreviewLayoutLarge = (RelativeLayout)findViewById(R.id.card_preview_large_layout);
-		mCardDetailPreviewLayoutSmall = (RelativeLayout)findViewById(R.id.card_preview_small_layout);
-		mCardDetailPreviewImageLarge = (ImageView)findViewById(R.id.card_preview_large_image);
-		mCardDetailPreviewImageSmall = (ImageView)findViewById(R.id.card_preview_small_image);
-		
-//		Toast.makeText(this, data.title, Toast.LENGTH_SHORT).show();
-		mCardDetailPreviewLayoutLarge.setVisibility(View.INVISIBLE);
-		mCardDetailPreviewImageLarge.setVisibility(View.INVISIBLE);
-		
-		mCardDetailPreviewLayoutSmall.setVisibility(View.VISIBLE);
-		mCardDetailPreviewImageSmall.setVisibility(View.VISIBLE);
-		
-		mCardDetailPreviewImageSmall.setImageResource(data.resId);
-		mCardDetailPreviewImageLarge.setImageResource(data.resId);
-		
-		mCardDetailsView.setVisibility(View.VISIBLE);
-		fadeCardView();
-		zoomImageFromThumb(mCardDetailPreviewImageSmall,data.resId);
-//		rotate();
-//		startActivity(new Intent(CardExplorer.this,CardDetails.class));
-	}
-	@Override
-	public void onBackPressed() {
-		if(mCardDetailsView.getVisibility() == View.VISIBLE){
-			mCardDetailsView.setVisibility(View.GONE);
-			mCardView.setVisibility(View.VISIBLE);
-			AnimatorSet set = new AnimatorSet();
-			set.play(ObjectAnimator.ofFloat(mCardView, View.ALPHA, 0, 1));
-			set.setDuration(1000);
-			set.setInterpolator(new DecelerateInterpolator());
-			set.start();
-		}else{
-			super.onBackPressed();
-		}
-	}
-	private void zoomImageFromThumb(final View thumbView, int imageResId) {
-	    // If there's an animation in progress, cancel it
-	    // immediately and proceed with this one.
-	    if (mCurrentAnimator != null) {
-	        mCurrentAnimator.cancel();
-	    }
-
-	    // Load the high-resolution "zoomed-in" image.
-	    mCardDetailPreviewImageLarge.setImageResource(imageResId);
-	    Rect rect = new Rect();
-	    thumbView.getGlobalVisibleRect(rect);
-	    mCardDetailPreviewLayoutSmall.getGlobalVisibleRect(rect);
-	    thumbView.setAlpha(0f);
-	    mCardDetailPreviewImageLarge.setVisibility(View.VISIBLE);
-
-	    // Set the pivot point for SCALE_X and SCALE_Y transformations
-	    // to the top-left corner of the zoomed-in view (the default
-	    // is the center of the view).
-//	    mCardDetailPreviewImageLarge.setPivotX(0f);
-//	    mCardDetailPreviewImageLarge.setPivotY(0f);
-
-	    // Construct and run the parallel animation of the four translation and
-	    // scale properties (X, Y, SCALE_X, and SCALE_Y).
-//	    AnimatorSet set = new AnimatorSet();
-//	    set
-//	            .play(ObjectAnimator.ofFloat(mCardDetailPreviewImageLarge, View.X,
-//	                    startBounds.left, finalBounds.left))
-//	            .with(ObjectAnimator.ofFloat(mCardDetailPreviewImageLarge, View.Y,
-//	                    startBounds.top, finalBounds.top))
-//	            .with(ObjectAnimator.ofFloat(mCardDetailPreviewImageLarge, View.SCALE_X,
-//	            startScale, 1f)).with(ObjectAnimator.ofFloat(mCardDetailPreviewImageLarge,
-//	                    View.SCALE_Y, startScale, 1f));
-//	    set.setDuration(2000);
-//	    set.setInterpolator(new DecelerateInterpolator());
-//	    set.addListener(new AnimatorListenerAdapter() {
-//	        @Override
-//	        public void onAnimationEnd(Animator animation) {
-//	            mCurrentAnimator = null;
-//	        }
+//		mCardDetailPreviewLayout = (RelativeLayout)findViewById(R.id.dummy_card_preview);
+//		mCardDetailPreviewImage = (ImageView)findViewById(R.id.dummy_card_preview_image);
+//		mCardDetailPreviewTitle = (RelativeLayout)findViewById(R.id.dummy_card_title_layout);
+//		mCardDetailPreviewTitleText = (TextView)findViewById(R.id.dummy_card_title_name);
+//		mCardDetailPreviewBottom = (RelativeLayout)findViewById(R.id.dummy_card_preview_bottom_layout);
 //
-//	        @Override
-//	        public void onAnimationCancel(Animator animation) {
-//	            mCurrentAnimator = null;
-//	        }
-//	    });
-//	    set.start();
-//	    mCurrentAnimator = set;
-
+//		mCardDetailPreviewLayout.setVisibility(View.VISIBLE);
+//		mCardDetailPreviewTitle.setVisibility(View.VISIBLE);
+//		mCardDetailPreviewBottom.setVisibility(View.VISIBLE);
+//		
+//		mCardDetailPreviewImage.setImageResource(data.resId);
+//		mCardDetailPreviewTitleText.setText(data.title);
+//		
+//		mCardDetailsView.setVisibility(View.VISIBLE);
+//		fadeCardView(mCardView,new  AnimationComplete() {
+//			
+//			@Override
+//			public void OnAnimationComplete() {
+////				fadeCardView(mCardDetailPreviewTitle, null);
+////				fadeCardView(mCardDetailPreviewBottom, null);
+//			}
+//		});
+		
 	}
-	private void fadeCardView(){
+//	@Override
+//	public void onBackPressed() {
+//		if(mCardDetailsView.getVisibility() == View.VISIBLE){
+//			mCardDetailsView.setVisibility(View.GONE);
+//			mCardView.setVisibility(View.VISIBLE);
+//			AnimatorSet set = new AnimatorSet();
+//			set.play(ObjectAnimator.ofFloat(mCardView, View.ALPHA, 0, 1));
+//			set.setDuration(1000);
+//			set.setInterpolator(new DecelerateInterpolator());
+//			set.start();
+//		}else{
+//			super.onBackPressed();
+//		}
+//	}
+	private void fadeCardView(final View v,final AnimationComplete listener){
 		AnimatorSet set = new AnimatorSet();
 		set.play(ObjectAnimator.ofFloat(mCardView, View.ALPHA, 1, 0));
 		set.setDuration(1000);
@@ -453,7 +394,8 @@ public class CardExplorer extends BaseActivity implements OnPlayListener{
 			@Override
 			public void onAnimationEnd(Animator arg0) {
 				// TODO Auto-generated method stub
-				mCardView.setVisibility(View.GONE);
+				v.setVisibility(View.GONE);
+				DelayedCallback(listener);
 			}
 			
 			@Override

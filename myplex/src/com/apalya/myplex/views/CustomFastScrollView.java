@@ -1,7 +1,8 @@
 package com.apalya.myplex.views;
 
-
 import com.apalya.myplex.R;
+import com.apalya.myplex.R.drawable;
+import com.apalya.myplex.R.styleable;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -117,10 +118,15 @@ public class CustomFastScrollView extends FrameLayout
                     R.styleable.CustomFastScrollView_overlayScrollThumbWidth, 0);
 
         }
-
         // Get both the scrollbar states drawables
         final Resources res = context.getResources();
-        Drawable thumbDrawable = res.getDrawable(R.drawable.scrollbarhandle);
+        mOverlayHeight = (int) res.getDimension(R.dimen.fast_scroll_overllayheight);
+        mOverlayWidth= (int) res.getDimension(R.dimen.fast_scroll_overllaywidth);
+        mOverlayTextSize= (int) res.getDimension(R.dimen.fast_scroll_overllaytextsize);
+        mOverlayScrollThumbWidth = (int) res.getDimension(R.dimen.fast_scroll_overllaythumb);
+        
+  
+        Drawable thumbDrawable = res.getDrawable(R.drawable.scrollbar_handle_accelerated_anim2);
         useThumbDrawable(thumbDrawable);
 
         mOverlayDrawable = res.getDrawable(android.R.drawable.alert_dark_frame);
@@ -200,7 +206,7 @@ public class CustomFastScrollView extends FrameLayout
         final RectF pos = mOverlayPos;
         pos.left = (w - mOverlayWidth) / 2;
         pos.right = pos.left + mOverlayWidth;
-        pos.top = h / 30; // 10% from top
+        pos.top = h / 10; // 10% from top
         pos.bottom = pos.top + mOverlayHeight;
         mOverlayDrawable.setBounds((int) pos.left, (int) pos.top,
                 (int) pos.right, (int) pos.bottom);
@@ -269,6 +275,7 @@ public class CustomFastScrollView extends FrameLayout
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
+    	int width = getWidth();
         if (mThumbVisible && ev.getAction() == MotionEvent.ACTION_DOWN) {
             if (ev.getX() > getWidth() - mThumbW && ev.getY() >= mThumbY &&
                     ev.getY() <= mThumbY + mThumbH) {

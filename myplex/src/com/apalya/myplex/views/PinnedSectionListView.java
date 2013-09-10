@@ -16,7 +16,6 @@
 
 package com.apalya.myplex.views;
 
-
 import com.apalya.myplex.BuildConfig;
 
 import android.content.Context;
@@ -158,7 +157,11 @@ public class PinnedSectionListView extends ListView {
 	};
 
 	//-- class methods
-
+	 public PinnedSectionListView(Context context) {
+	        super(context);
+	        initView();
+	    }
+	
     public PinnedSectionListView(Context context, AttributeSet attrs) {
         super(context, attrs);
         initView();
@@ -176,49 +179,45 @@ public class PinnedSectionListView extends ListView {
 	/** Create shadow wrapper with a pinned view for a view at given position */
 	private void createPinnedShadow(int position) {
 
-		try {
-			// try to recycle shadow
-			PinnedViewShadow pinnedShadow = mRecycleShadow;
-			mRecycleShadow = null;
+		// try to recycle shadow
+		PinnedViewShadow pinnedShadow = mRecycleShadow;
+		mRecycleShadow = null;
 
-			// create new shadow, if needed
-			if (pinnedShadow == null) pinnedShadow = new PinnedViewShadow();
-			// request new view using recycled view, if such
-			View pinnedView = getAdapter().getView(position, pinnedShadow.view, PinnedSectionListView.this);
+		// create new shadow, if needed
+		if (pinnedShadow == null) pinnedShadow = new PinnedViewShadow();
+		// request new view using recycled view, if such
+		View pinnedView = getAdapter().getView(position, pinnedShadow.view, PinnedSectionListView.this);
 
-			// read layout parameters
-			LayoutParams layoutParams = (LayoutParams) pinnedView.getLayoutParams();
+		// read layout parameters
+		LayoutParams layoutParams = (LayoutParams) pinnedView.getLayoutParams();
 
-			int heightMode, heightSize;
-			if (layoutParams == null) { // take care for missing layout parameters
-				heightMode = MeasureSpec.AT_MOST;
-				heightSize = getHeight();
-			} else {
-				heightMode = MeasureSpec.getMode(layoutParams.height);
-				heightSize = MeasureSpec.getSize(layoutParams.height);
-			}
-
-			if (heightMode == MeasureSpec.UNSPECIFIED) heightMode = MeasureSpec.EXACTLY;
-
-			int maxHeight = getHeight() - getListPaddingTop() - getListPaddingBottom();
-			if (heightSize > maxHeight) heightSize = maxHeight;
-
-			// measure & layout
-			int ws = MeasureSpec.makeMeasureSpec(getWidth() - getListPaddingLeft() - getListPaddingRight(), MeasureSpec.EXACTLY);
-			int hs = MeasureSpec.makeMeasureSpec(heightSize, heightMode);
-			pinnedView.measure(ws, hs);
-			pinnedView.layout(0, 0, pinnedView.getMeasuredWidth(), pinnedView.getMeasuredHeight());
-			mTranslateY = 0;
-
-			// initialize pinned shadow
-			pinnedShadow.position = position;
-			pinnedShadow.view = pinnedView;
-
-			// store pinned shadow
-			mPinnedShadow = pinnedShadow;
-		} catch (Exception e) {
-			e.printStackTrace();
+		int heightMode, heightSize;
+		if (layoutParams == null) { // take care for missing layout parameters
+			heightMode = MeasureSpec.AT_MOST;
+			heightSize = getHeight();
+		} else {
+			heightMode = MeasureSpec.getMode(layoutParams.height);
+			heightSize = MeasureSpec.getSize(layoutParams.height);
 		}
+
+		if (heightMode == MeasureSpec.UNSPECIFIED) heightMode = MeasureSpec.EXACTLY;
+
+		int maxHeight = getHeight() - getListPaddingTop() - getListPaddingBottom();
+		if (heightSize > maxHeight) heightSize = maxHeight;
+
+		// measure & layout
+		int ws = MeasureSpec.makeMeasureSpec(getWidth() - getListPaddingLeft() - getListPaddingRight(), MeasureSpec.EXACTLY);
+		int hs = MeasureSpec.makeMeasureSpec(heightSize, heightMode);
+		pinnedView.measure(ws, hs);
+		pinnedView.layout(0, 0, pinnedView.getMeasuredWidth(), pinnedView.getMeasuredHeight());
+		mTranslateY = 0;
+
+		// initialize pinned shadow
+		pinnedShadow.position = position;
+		pinnedShadow.view = pinnedView;
+
+		// store pinned shadow
+		mPinnedShadow = pinnedShadow;
 	}
 
 	/** Destroy shadow wrapper for currently pinned view */
@@ -301,13 +300,6 @@ public class PinnedSectionListView extends ListView {
 	public void setAdapter(ListAdapter adapter) {
 
 	    // assert adapter in debug mode
-		if (BuildConfig.DEBUG && adapter != null) {
-			if (!(adapter instanceof PinnedSectionListAdapter))
-				throw new IllegalArgumentException("Does your adapter implement PinnedSectionListAdapter?");
-			if (adapter.getViewTypeCount() < 2)
-				throw new IllegalArgumentException("Does your adapter handle at least two types of views - items and sections?");
-		}
-
 		// unregister observer at old adapter and register on new one
 		ListAdapter currentAdapter = getAdapter();
 		if (currentAdapter != null) currentAdapter.unregisterDataSetObserver(mDataSetObserver);
