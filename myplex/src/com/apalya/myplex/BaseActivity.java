@@ -1,13 +1,29 @@
 package com.apalya.myplex;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.slidemenudata;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.views.FliterMenu;
 import com.apalya.myplex.views.slidemenuadapter;
+import com.facebook.FacebookException;
+import com.facebook.FacebookOperationCanceledException;
+import com.facebook.Session;
+import com.facebook.widget.WebDialog;
+import com.facebook.widget.WebDialog.OnCompleteListener;
+import com.google.android.gms.auth.GoogleAuthException;
+import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.auth.UserRecoverableAuthException;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
+import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
+import com.google.android.gms.plus.PlusClient;
+import com.google.android.gms.plus.PlusClient.OnAccessRevokedListener;
 
 import android.animation.Animator;
 import android.animation.AnimatorSet;
@@ -15,19 +31,30 @@ import android.animation.ObjectAnimator;
 import android.animation.Animator.AnimatorListener;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentSender.SendIntentException;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TextView;
 
-public class BaseActivity extends Activity {
+public class BaseActivity extends Activity implements
+ConnectionCallbacks, OnConnectionFailedListener{
 	private boolean mSlideInMenuToggle = false;
 	private boolean mFilterMenuToggle = false,mSearchToggle = false;;
 	private slidemenuadapter mSlidemenuAdapter;
@@ -35,11 +62,18 @@ public class BaseActivity extends Activity {
 	private RelativeLayout mSlideMenuLayout;
 	private ListView mSlideMenuList;
 	private View mContentView;
-	private RelativeLayout mRightFilterLayout, mDownFilterLayout;
-	private TextView mRightFilterTitle, mDownFilterTitle;
-	private ImageView mRightFilterButton, mDownFilterButton;
-
+	private RelativeLayout mRightFilterLayout,mDownFilterLayout;
+	private TextView mRightFilterTitle,mDownFilterTitle;
+	private ImageView mRightFilterButton,mDownFilterButton;
+	protected PlusClient mPlusClient;
+	protected ProgressDialog mConnectionProgressDialog;
+	protected ConnectionResult mConnectionResult;
 	private FliterMenu mFliterMenuLayout;
+	private ListView mFliterListView;
+	private slidemenuadapter mFliterMenuAdapter;
+
+	private static final String TAG = "BaseActivity";
+	protected static final int REQUEST_CODE_RESOLVE_ERR = 9000;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +101,15 @@ public class BaseActivity extends Activity {
 		
 		ImageView searchButton = (ImageView)getActionBar().getCustomView().findViewById(R.id.menu_search);
 
+		mPlusClient = new PlusClient.Builder(this, this, this)
+		.setVisibleActivities("http://schemas.google.com/AddActivity", "http://schemas.google.com/BuyActivity")
+		.build();
+		
+
+		// Progress bar to be displayed if the connection failure is not resolved.
+		mConnectionProgressDialog = new ProgressDialog(this);
+		mConnectionProgressDialog.setMessage("Signing in...");
+
 		mRightFilterTitle.setTypeface(FontUtil.Roboto_Medium);
 		mDownFilterTitle.setTypeface(FontUtil.Roboto_Medium);
 
@@ -86,11 +129,12 @@ public class BaseActivity extends Activity {
 
 			}
 		});
+
 		searchButton.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
-				
+
 				if(!mSearchToggle)
 				{
 					mSearchToggle = true;
@@ -158,8 +202,7 @@ public class BaseActivity extends Activity {
 		}
 		mFliterMenuLayout.init(this);
 	}
-
-	public OnClickListener mFliterClickListener = new OnClickListener() {
+	public OnClickListener mFliterClickListener =  new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {
@@ -176,16 +219,14 @@ public class BaseActivity extends Activity {
 						.setImageResource(R.drawable.navigation_expand);
 				mFliterMenuLayout.hide();
 			}
-			mFilterMenuToggle = !mFilterMenuToggle;
+			mFilterMenuToggle = !mFilterMenuToggle;		
 		}
 	};
-
-	public void enableSideFilter() {
+	public void enableSideFilter(){
 		mRightFilterLayout.setVisibility(View.VISIBLE);
 		mDownFilterLayout.setVisibility(View.GONE);
 	}
-
-	public void enableDownFilter() {
+	public void enableDownFilter(){
 		mRightFilterLayout.setVisibility(View.GONE);
 		mDownFilterLayout.setVisibility(View.VISIBLE);
 	}
@@ -275,7 +316,7 @@ public class BaseActivity extends Activity {
 
 			@Override
 			public void onAnimationEnd(Animator arg0) {
-				if (showlist) {
+				if(showlist){
 					fillSlideMenuData();
 				}
 			}
@@ -288,8 +329,7 @@ public class BaseActivity extends Activity {
 		});
 		set.start();
 	}
-
-	public void setContentView(View v) {
+	public void setContentView(View v){
 		mContentView = v;
 	}
 
@@ -313,6 +353,7 @@ public class BaseActivity extends Activity {
 		animate(0, mSlideInMenuWidth, mContentView, false, 1);
 
 	}
+
 	@Override
 	public void onBackPressed() {
 		// TODO Auto-generated method stub
@@ -320,4 +361,248 @@ public class BaseActivity extends Activity {
 		if(mSearchToggle)
 			mSearchToggle = false;
 	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		Session session = Session.getActiveSession();
+		Session.saveSession(session, outState);
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {     
+		super.onCreateOptionsMenu(menu);   
+		MenuInflater inflater=getMenuInflater();
+		inflater.inflate(R.menu.optmenu, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onPrepareOptionsMenu (Menu menu) {
+		if (!Session.getActiveSession().isOpened())
+			menu.getItem(0).setEnabled(false);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch(item.getItemId())
+		{
+		case R.id.invite:
+			sendRequestDialog();
+			break;
+		case R.id.logout:
+
+			if(mPlusClient.isConnected() || Session.getActiveSession().isOpened())
+			{
+				if(mPlusClient.isConnected())
+				{
+					
+					//getGooglePlusToken();
+					
+					
+					mPlusClient.clearDefaultAccount();
+					mPlusClient.revokeAccessAndDisconnect(new OnAccessRevokedListener() {
+						@Override
+						public void onAccessRevoked(ConnectionResult status) {
+							// mPlusClient is now disconnected and access has been revoked.
+							// Trigger app logic to comply with the developer policies
+						}
+					});
+					mPlusClient.disconnect();
+				}
+				else if(Session.getActiveSession().isOpened())
+				{
+					onClickLogout();
+				}
+
+				//mPlusClient.connect();
+			}
+			finish();
+			launchActivity(LoginActivity.class,this , null);
+
+			break;
+
+		}
+		return true;
+	}
+
+	public void showToast(CharSequence aMsg){
+
+		Toast.makeText(BaseActivity.this.getApplicationContext(), 
+				aMsg, 
+				Toast.LENGTH_SHORT).show();
+	}
+
+	private void sendRequestDialog() {
+		Bundle params = new Bundle();
+
+		params.putString("message", "Learn how to make your Android apps social");
+		params.putString("data",
+				"{\"badge_of_awesomeness\":\"1\"," +
+				"\"social_karma\":\"5\"}");
+		WebDialog requestsDialog = (
+				new WebDialog.RequestsDialogBuilder(BaseActivity.this,
+						Session.getActiveSession(),
+						params))
+						.setOnCompleteListener(new OnCompleteListener() {
+
+							@Override
+							public void onComplete(Bundle values,
+									FacebookException error) {
+								if (error != null) {
+									if (error instanceof FacebookOperationCanceledException) {
+										Toast.makeText(BaseActivity.this.getApplicationContext(), 
+												"Request cancelled", 
+												Toast.LENGTH_SHORT).show();
+									} else {
+										Toast.makeText(BaseActivity.this.getApplicationContext(), 
+												"Network Error", 
+												Toast.LENGTH_SHORT).show();
+									}
+								} else {
+									final String requestId = values.getString("request");
+									if (requestId != null) {
+										Toast.makeText(BaseActivity.this.getApplicationContext(), 
+												"Request sent",  
+												Toast.LENGTH_SHORT).show();
+									} else {
+										Toast.makeText(BaseActivity.this.getApplicationContext(), 
+												"Request cancelled", 
+												Toast.LENGTH_SHORT).show();
+									}
+								}   
+							}
+
+						})
+						.build();
+		requestsDialog.show();
+	}
+
+	
+
+	private void onClickLogout() {
+		Session session = Session.getActiveSession();
+		if (!session.isClosed()) {
+			session.closeAndClearTokenInformation();
+			finish();
+			launchActivity(LoginActivity.class,this , null);
+		}
+	}
+	public void getGooglePlusToken()
+	{
+		String accountName=mPlusClient.getAccountName();
+		Bundle bundle = new Bundle();
+	     bundle.putString(mPlusClient.KEY_REQUEST_VISIBLE_ACTIVITIES,
+	              "http://schemas.google.com/AddActivity http://schemas.google.com/BuyActivity");
+	     //Scopes SCOPES=Scopes.PLUS_PROFILE;
+	     
+	     String accessToken = null;
+	     try {
+	       accessToken = GoogleAuthUtil.getToken(this,
+	         mPlusClient.getAccountName(),"oauth2: https://www.googleapis.com/auth/plus.login https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/plus.me https://www.googleapis.com/auth/userinfo.email");
+	     } catch (IOException transientEx) {
+	       // network or server error, the call is expected to succeed if you try again later.
+	       // Don't attempt to call again immediately - the request is likely to
+	       // fail, you'll hit quotas or back-off.
+	       
+	       return;
+	     } catch (UserRecoverableAuthException e) {
+	            // Recover
+	            accessToken = null;
+	     } catch (GoogleAuthException authEx) {
+	       // Failure. The call is not expected to ever succeed so it should not be
+	       // retried.
+	       return;
+	     } catch (Exception e) {
+	       throw new RuntimeException(e);
+	     }
+
+		Log.d(TAG, accessToken);
+		Toast.makeText(this, accountName + " is connected. Token: "+accessToken, Toast.LENGTH_LONG).show();
+	}
+	@Override
+	public void onConnected(Bundle connectionHint) {
+
+
+	}
+
+	@Override
+	protected void onStart() {
+		super.onStart();
+		if(mPlusClient.isConnected() || mPlusClient.isConnecting())
+		{
+			//Nothing to implement
+		}
+		else
+		{
+			mPlusClient.connect();	
+		}
+
+
+
+	}
+
+
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+		if(mPlusClient.isConnected())
+			mPlusClient.disconnect();
+
+	}
+
+	@Override
+	public void onDisconnected() {
+		Log.d(TAG, "disconnected");
+		boolean status = mPlusClient.isConnected();
+		Toast.makeText(this, status + " is disconnected.", Toast.LENGTH_LONG).show();
+	}
+
+	@Override
+	public void onConnectionFailed(ConnectionResult result) {
+		if (mConnectionProgressDialog.isShowing()) {
+			// The user clicked the sign-in button already. Start to resolve
+			// connection errors. Wait until onConnected() to dismiss the
+			// connection dialog.
+			if (result.hasResolution()) {
+				try {
+					result.startResolutionForResult(this, REQUEST_CODE_RESOLVE_ERR);
+				} catch (SendIntentException e) {
+					if(!mPlusClient.isConnected())
+						mPlusClient.connect();
+				}
+			}
+		}
+		// Save the result and resolve the connection failure upon a user click.
+		mConnectionResult = result;
+	}
+	@Override
+	protected void onActivityResult(int requestCode, int responseCode, Intent intent) {
+		if (requestCode == REQUEST_CODE_RESOLVE_ERR && responseCode == RESULT_OK) {
+			mConnectionResult = null;
+			if(!mPlusClient.isConnected())
+				mPlusClient.connect();
+		}else
+		{
+			Session.getActiveSession().onActivityResult(this, requestCode, responseCode, intent);
+		}
+	}
+
+	public static void launchActivity(
+			Class<? extends Activity> nextActivityClass,
+			Activity currentActivity, Map<String, String> extrasMap) {
+		Intent launchIntent = new Intent(currentActivity, nextActivityClass);
+		if (extrasMap != null && extrasMap.size() > 0) {
+			Set<String> keys = extrasMap.keySet();
+			for (String key : keys) {
+				launchIntent.putExtra(key, extrasMap.get(key));
+			}
+		}
+		launchIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		currentActivity.startActivity(launchIntent);
+	}
+
+
 }

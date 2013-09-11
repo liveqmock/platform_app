@@ -44,12 +44,13 @@
 
         <EditText
             android:id="@+id/editFullName"
-            android:layout_width="wrap_content"
+            android:layout_width="48dp"
             android:layout_height="wrap_content"
             android:layout_alignLeft="@+id/editsPassword"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
-            android:layout_marginBottom="14dp"
+            android:layout_below="@+id/sep"
+            android:layout_centerVertical="true"
             android:background="@drawable/rounded"
             android:ems="10"
             android:inputType="textPersonName"
@@ -61,14 +62,18 @@
             android:layout_height="wrap_content"
             android:layout_above="@+id/sep"
             android:layout_alignParentRight="true"
-            android:layout_marginBottom="15dp"
-            android:layout_marginLeft="21dp"
+            android:layout_alignParentTop="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="14dp"
             android:layout_toRightOf="@+id/fullname"
             android:background="@drawable/rounded"
             android:ems="10"
-            android:hint="required"
+            android:hint="@string/required"
             android:inputType="textPassword"
-            android:textSize="@dimen/editfieldsize" />
+            android:textSize="@dimen/editfieldsize" >
+
+            <requestFocus />
+        </EditText>
 
     </RelativeLayout>
 
@@ -92,46 +97,26 @@
             android:layout_centerVertical="true"
             android:background="@android:color/black"/>
 
-        <ToggleButton
+        <Switch
             android:id="@+id/toggleButton1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_above="@+id/toggleButton2"
+            android:paddingBottom="14dp"
             android:layout_alignParentRight="true"
             android:layout_marginRight="20dp"
-            android:text="ToggleButton" />
+            android:text="@string/msgUpdate" />
 
-        <ToggleButton
+        <Switch
             android:id="@+id/toggleButton2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingTop="14dp"
             android:layout_alignLeft="@+id/toggleButton1"
             android:layout_below="@+id/sep1"
-            android:text="ToggleButton" />
+            android:text="@string/mailUpdate" />
 
-        <TextView
-            android:id="@+id/mailUpdate"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/toggleButton1"
-            android:layout_alignBottom="@+id/toggleButton1"
-            android:layout_alignParentLeft="true"
-            android:paddingLeft="@dimen/margin"
-            android:paddingRight="78dp"
-            android:text="@string/mailUpdate"
-            android:textSize="@dimen/normaltextsize" />
-
-        <TextView
-            android:id="@+id/smsUpdates"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/toggleButton2"
-            android:layout_alignBottom="@+id/toggleButton2"
-            android:layout_alignRight="@+id/mailUpdate"
-            android:paddingLeft="@dimen/margin"
-            android:paddingRight="75dp"
-            android:text="@string/msgUpdate"
-            android:textSize="@dimen/normaltextsize" />
+        
 
     </RelativeLayout>
 
@@ -185,11 +170,13 @@
             android:id="@+id/enterPhone"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
             android:layout_below="@id/ortxt"
+            android:layout_marginLeft="12dp"
             android:layout_toRightOf="@+id/semailId"
             android:background="@drawable/rounded"
             android:ems="10"
-            android:inputType="textEmailAddress" />
+            android:inputType="phone" />
 
         <TextView
             android:id="@+id/sphone"
@@ -197,7 +184,6 @@
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@id/enterPhone"
             android:paddingLeft="@dimen/margin"
-            android:paddingRight="30dp"
             android:text="@string/phone"
             android:textSize="@dimen/normaltextsize" />
 
@@ -207,6 +193,7 @@
             android:layout_height="@dimen/fieldheight"
             android:layout_above="@+id/ortxt"
             android:layout_alignParentRight="true"
+            android:layout_toRightOf="@+id/semailId"
             android:background="@drawable/rounded"
             android:ems="10"
             android:inputType="textEmailAddress" />
@@ -217,9 +204,7 @@
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@+id/enterEmail"
             android:layout_alignBottom="@+id/enterEmail"
-            android:layout_alignParentLeft="true"
             android:paddingLeft="@dimen/margin"
-            android:paddingRight="15dp"
             android:text="@string/email"
             android:textSize="@dimen/normaltextsize" />
 

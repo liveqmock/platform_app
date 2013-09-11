@@ -20,7 +20,7 @@
 <!-- dimenesion for search layout -->
 
 
-     <!-- LOGIN SCREEN VALUES -->
+      <!-- LOGIN SCREEN VALUES -->
     
     <dimen name="fieldwidth">280dp</dimen>
     
@@ -33,16 +33,17 @@
     
      <dimen name="margin">16dp</dimen>
     <dimen name="fieldheight">48dp</dimen>
-    <dimen name="fieldspacing">48dp</dimen>
+    <dimen name="fieldspacing">54dp</dimen>
+    <dimen name="bottomspacing">32dp</dimen>
     <dimen name="centerspacing">14dp</dimen>
-    <dimen name="titlebottomspacing">32dp</dimen>
+    <dimen name="titlebottomspacing">54dp</dimen>
     
     <dimen name="height">72dp</dimen>
     <dimen name="logobottommargin">96dp</dimen>
     <dimen name="fieldmargin">2dp</dimen>
     
     <dimen name="buttonspacing">6dp</dimen>
-    <dimen name="bottomspacing">22dp</dimen>
+    
     <dimen name="buttonmargin">14dp</dimen>
     <dimen name="editmargin">12dp</dimen>
     

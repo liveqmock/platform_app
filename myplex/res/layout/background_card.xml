@@ -17,7 +17,7 @@
 	</item>
     -->
 
-    <item android:bottom="4dp">
+    <item android:bottom="0dp">
 
         <shape
             android:dither="true"

@@ -12,6 +12,7 @@
     <string name="logout">Logout</string>
     <string name="email">Email:</string>
     <string name="title">MyPlex</string>
+    <string name="required">required</string>
     <string name="password">Password:</string>
     <string name="facebook">Login with Facebook</string>
     <string name="google">Login with Google+</string>

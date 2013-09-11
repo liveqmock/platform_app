@@ -33,6 +33,7 @@ import android.support.v4.widget.SearchViewCompat;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -283,7 +284,8 @@ public class CardExplorer extends BaseActivity implements OnPlayListener{
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 //		getMenuInflater().inflate(R.menu.activity_main, menu);
-
+		MenuInflater inflater=getMenuInflater();
+		inflater.inflate(R.menu.optmenu, menu);
 		ActionBar actionBar = getActionBar();
 		mCardView.setActionBarHeight(actionBar.getHeight());
 		return true;
