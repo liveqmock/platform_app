@@ -46,6 +46,7 @@ import com.facebook.Settings;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableAuthException;
+import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.Scopes;
 
 
@@ -59,6 +60,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 	private RelativeLayout mSocialLogins;
 	private TextView mLetMeIn,mText;
 	private ImageView mLogo;
+	private String mToken;
 	private Session.StatusCallback statusCallback = new SessionStatusCallback();
 	//private LinearLayout mUserFields;
 	private static final String TAG = "BaseActivity";
@@ -282,23 +284,28 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		AsyncTask task = new AsyncTask() {
 			@Override
 			protected Object doInBackground(Object... params) {
-				String scope = "oauth2:" + Scopes.PLUS_LOGIN;
-				try {
+				///String scope = "oauth2:" + Scopes.PLUS_LOGIN ;
+				//String scope = "audience:server:client_id:305644042032-sog1j0k23j5e2b3qi2qg96q0kqf99f16.apps.googleusercontent.com:api_scope:https://www.googleapis.com/auth/plus.login";
+				/*Bundle appActivities = new Bundle();
+				appActivities.putString(GoogleAuthUtil.KEY_REQUEST_VISIBLE_ACTIVITIES,
+				          "http://schemas.google.com/AddActivity http://schemas.google.com/BuyActivity");
+				String scopes = "oauth2:server:client_id:305644042032-sog1j0k23j5e2b3qi2qg96q0kqf99f16.apps.googleusercontent.com:api_scope:https://www.googleapis.com/auth/plus.login";
+				String code = null;*/
+
+				/*try {
 					// We can retrieve the token to check via
 					// tokeninfo or to pass to a service-side
 					// application.
-					String token = GoogleAuthUtil.getToken(context,
-							mPlusClient.getAccountName(), scope);
-					Log.d(TAG, token);
-				} catch (UserRecoverableAuthException e) {
-					// This error is recoverable, so we could fix this
-					// by displaying the intent to the user.
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				} catch (GoogleAuthException e) {
-					e.printStackTrace();
-				}
+					
+					
+					code = GoogleAuthUtil.getToken(context,
+							mPlusClient.getAccountName(), scopes);
+					mToken=code;
+					//showToast(token);
+					Log.d(TAG, mToken);
+					Log.d(TAG, code);
+				}*/ 
+				
 				return null;
 			}
 			
@@ -309,13 +316,34 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 			}
 		};
 		task.execute((Void) null);
-        
+        showToast(mToken);
 		finish();
 		launchActivity(CardExplorer.class,this , null);
 
 	}
 
-
+	private void getGooglePlusToken()
+	{
+		String scope = "oauth2:server:client_id:305644042032-sog1j0k23j5e2b3qi2qg96q0kqf99f16.apps.googleusercontent.com:api_scope:" + Scopes.PLUS_LOGIN;
+		try {
+			// We can retrieve the token to check via
+			// tokeninfo or to pass to a service-side
+			// application.
+			String token = GoogleAuthUtil.getToken(LoginActivity.this,
+					mPlusClient.getAccountName(), scope);
+			mToken=token;
+			Log.d(TAG, token);
+		} 
+		catch (UserRecoverableAuthException e) {
+			// This error is recoverable, so we could fix this
+			// by displaying the intent to the user.
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (GoogleAuthException e) {
+			e.printStackTrace();
+		}
+	}
 	@Override
 	protected void onStart() {
 		super.onStart();
@@ -331,7 +359,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		if(Session.getActiveSession().isOpened() || mPlusClient.isConnected())
 		{
 			String token =Session.getActiveSession().getAccessToken();
-			showToast(token);
+			//showToast(token);
 			Log.d(TAG,token);
 			finish();
 			launchActivity(CardExplorer.class,LoginActivity.this , null);
@@ -364,7 +392,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		Session session = Session.getActiveSession();
 		if (session.isOpened() && !mPlusClient.isConnected()) {
 			String token =session.getAccessToken();
-			showToast(token);
+			//showToast(token);
 			finish();
 			launchActivity(CardExplorer.class,LoginActivity.this , null);
 		} else {
@@ -422,6 +450,15 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 			}
 		}
 		if (view.getId() == R.id.googlelogin && !mPlusClient.isConnected()) {
+			
+			/* final int errorCode = GooglePlayServicesUtil.checkGooglePlusApp(this);
+		      if (errorCode == GooglePlusUtil.SUCCESS) {
+		      }else {
+		          // Prompt the user to install the Google+ app.
+		          GooglePlusUtil.getErrorDialog(errorCode, this, 0).show();
+		      }*/
+
+			
 			if (mConnectionResult == null) {
 				mConnectionProgressDialog.show();
 			} else {

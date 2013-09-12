@@ -489,7 +489,7 @@ ConnectionCallbacks, OnConnectionFailedListener{
 			launchActivity(LoginActivity.class,this , null);
 		}
 	}
-	public void getGooglePlusToken()
+	/*public void getGooglePlusToken()
 	{
 		String accountName=mPlusClient.getAccountName();
 		Bundle bundle = new Bundle();
@@ -520,7 +520,7 @@ ConnectionCallbacks, OnConnectionFailedListener{
 
 		Log.d(TAG, accessToken);
 		Toast.makeText(this, accountName + " is connected. Token: "+accessToken, Toast.LENGTH_LONG).show();
-	}
+	}*/
 	@Override
 	public void onConnected(Bundle connectionHint) {
 
