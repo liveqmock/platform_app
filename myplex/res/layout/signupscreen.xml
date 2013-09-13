@@ -178,21 +178,30 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_above="@+id/toggleButton2"
-            android:paddingBottom="14dp"
+            android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="20dp"
-            android:text="@string/msgUpdate" />
+            android:paddingBottom="14dp"
+            android:paddingLeft="@dimen/margin"
+            android:paddingRight="@dimen/margin"
+            android:paddingTop="14dp"
+            android:textSize="14dp"
+            android:text="@string/msgUpdate"
+            android:thumb="@drawable/switch_thumb" />
 
         <Switch
             android:id="@+id/toggleButton2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingTop="14dp"
             android:layout_alignLeft="@+id/toggleButton1"
+            android:layout_alignParentRight="true"
+            android:paddingLeft="@dimen/margin"
+            android:paddingRight="@dimen/margin"
             android:layout_below="@+id/sep1"
-            android:text="@string/mailUpdate" />
-
-        
+            android:paddingBottom="14dp"
+            android:paddingTop="14dp"
+            android:textSize="14dp"
+            android:text="@string/mailUpdate"
+            android:thumb="@drawable/switch_thumb" />
 
     </RelativeLayout>
 

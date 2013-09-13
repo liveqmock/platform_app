@@ -18,8 +18,11 @@ import com.facebook.widget.WebDialog;
 import com.facebook.widget.WebDialog.OnCompleteListener;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.auth.GooglePlayServicesAvailabilityException;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
 import com.google.android.gms.plus.PlusClient;
@@ -31,18 +34,17 @@ import android.animation.ObjectAnimator;
 import android.animation.Animator.AnimatorListener;
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender.SendIntentException;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.AdapterView;
@@ -98,13 +100,13 @@ ConnectionCallbacks, OnConnectionFailedListener{
 				.findViewById(R.id.menu_fliter_right);
 		mDownFilterButton = (ImageView) getActionBar().getCustomView()
 				.findViewById(R.id.menu_fliter_down);
-		
+
 		ImageView searchButton = (ImageView)getActionBar().getCustomView().findViewById(R.id.menu_search);
 
 		mPlusClient = new PlusClient.Builder(this, this, this)
 		.setVisibleActivities("http://schemas.google.com/AddActivity", "http://schemas.google.com/BuyActivity")
 		.build();
-		
+
 
 		// Progress bar to be displayed if the connection failure is not resolved.
 		mConnectionProgressDialog = new ProgressDialog(this);
@@ -143,7 +145,7 @@ ConnectionCallbacks, OnConnectionFailedListener{
 				}
 			}
 		});
-//		prepareSlideMenu();
+		//		prepareSlideMenu();
 		prepareFilterMenu();
 		enableSideFilter();
 	}
@@ -158,34 +160,34 @@ ConnectionCallbacks, OnConnectionFailedListener{
 		mDownFilterButton.setVisibility(View.VISIBLE);
 		mFliterMenuLayout.setData(datalist);
 		mFliterMenuLayout
-				.setonMenuItemSelectedListener(new com.apalya.myplex.views.FliterMenu.onMenuItemSelected() {
+		.setonMenuItemSelectedListener(new com.apalya.myplex.views.FliterMenu.onMenuItemSelected() {
 
-					@Override
-					public void menuItemSelected(FilterMenudata data) {
-						onFilterMenuItemSelected(data);
-					}
-				});
+			@Override
+			public void menuItemSelected(FilterMenudata data) {
+				onFilterMenuItemSelected(data);
+			}
+		});
 
 		mFliterMenuLayout
-				.setonMenuOpened(new com.apalya.myplex.views.FliterMenu.onMenuOpened() {
+		.setonMenuOpened(new com.apalya.myplex.views.FliterMenu.onMenuOpened() {
 
-					@Override
-					public void menuOpened(boolean value) {
-						if (value) {
-							mRightFilterButton
-									.setImageResource(R.drawable.navigation_collapse);
-							mDownFilterButton
-									.setImageResource(R.drawable.navigation_collapse);
-							mFilterMenuToggle = true;
-						} else {
-							mRightFilterButton
-									.setImageResource(R.drawable.navigation_expand);
-							mDownFilterButton
-									.setImageResource(R.drawable.navigation_expand);
-							mFilterMenuToggle = false;
-						}
-					}
-				});
+			@Override
+			public void menuOpened(boolean value) {
+				if (value) {
+					mRightFilterButton
+					.setImageResource(R.drawable.navigation_collapse);
+					mDownFilterButton
+					.setImageResource(R.drawable.navigation_collapse);
+					mFilterMenuToggle = true;
+				} else {
+					mRightFilterButton
+					.setImageResource(R.drawable.navigation_expand);
+					mDownFilterButton
+					.setImageResource(R.drawable.navigation_expand);
+					mFilterMenuToggle = false;
+				}
+			}
+		});
 	}
 
 	public void onFilterMenuItemSelected(FilterMenudata data) {
@@ -208,15 +210,15 @@ ConnectionCallbacks, OnConnectionFailedListener{
 		public void onClick(View v) {
 			if (!mFilterMenuToggle) {
 				mRightFilterButton
-						.setImageResource(R.drawable.navigation_collapse);
+				.setImageResource(R.drawable.navigation_collapse);
 				mDownFilterButton
-						.setImageResource(R.drawable.navigation_collapse);
+				.setImageResource(R.drawable.navigation_collapse);
 				mFliterMenuLayout.show();
 			} else {
 				mRightFilterButton
-						.setImageResource(R.drawable.navigation_expand);
+				.setImageResource(R.drawable.navigation_expand);
 				mDownFilterButton
-						.setImageResource(R.drawable.navigation_expand);
+				.setImageResource(R.drawable.navigation_expand);
 				mFliterMenuLayout.hide();
 			}
 			mFilterMenuToggle = !mFilterMenuToggle;		
@@ -236,25 +238,25 @@ ConnectionCallbacks, OnConnectionFailedListener{
 	}
 
 	private void prepareSlideMenu() {
-//		mSlideInMenuWidth = (int) getResources().getDimension(
-//				R.dimen.slidemenugap);
-//		mSlideMenuLayout = (RelativeLayout) findViewById(R.id.slideinmenulayout);
-//		if (mSlideMenuLayout != null) {
-//			mSlideMenuList = (ListView) findViewById(R.id.slideinmenulistbox);
-//			mSlidemenuAdapter = new slidemenuadapter(this);
-//			mSlideMenuList.setAdapter(mSlidemenuAdapter);
-//			mSlideMenuList.setOnItemClickListener(new OnItemClickListener() {
-//
-//				@Override
-//				public void onItemClick(AdapterView<?> arg0, View arg1,
-//						int arg2, long arg3) {
-//					mSlideInMenuToggle = false;
-//					hideMenu();
-//				}
-//
-//			});
-//			mSlideMenuLayout.setX(-mSlideInMenuWidth);
-//		}
+		//		mSlideInMenuWidth = (int) getResources().getDimension(
+		//				R.dimen.slidemenugap);
+		//		mSlideMenuLayout = (RelativeLayout) findViewById(R.id.slideinmenulayout);
+		//		if (mSlideMenuLayout != null) {
+		//			mSlideMenuList = (ListView) findViewById(R.id.slideinmenulistbox);
+		//			mSlidemenuAdapter = new slidemenuadapter(this);
+		//			mSlideMenuList.setAdapter(mSlidemenuAdapter);
+		//			mSlideMenuList.setOnItemClickListener(new OnItemClickListener() {
+		//
+		//				@Override
+		//				public void onItemClick(AdapterView<?> arg0, View arg1,
+		//						int arg2, long arg3) {
+		//					mSlideInMenuToggle = false;
+		//					hideMenu();
+		//				}
+		//
+		//			});
+		//			mSlideMenuLayout.setX(-mSlideInMenuWidth);
+		//		}
 		// fillSlideMenuData();
 	}
 
@@ -389,18 +391,24 @@ ConnectionCallbacks, OnConnectionFailedListener{
 		switch(item.getItemId())
 		{
 		case R.id.invite:
+		{
+			//getAndUseAuthTokenInAsyncTask();
 			sendRequestDialog();
+
+
 			break;
+		}
 		case R.id.logout:
 
 			if(mPlusClient.isConnected() || Session.getActiveSession().isOpened())
 			{
 				if(mPlusClient.isConnected())
 				{
-					
+
 					//getGooglePlusToken();
-					
-					
+					//getTokenReq.execute((Void)null);
+
+
 					mPlusClient.clearDefaultAccount();
 					mPlusClient.revokeAccessAndDisconnect(new OnAccessRevokedListener() {
 						@Override
@@ -479,7 +487,7 @@ ConnectionCallbacks, OnConnectionFailedListener{
 		requestsDialog.show();
 	}
 
-	
+
 
 	private void onClickLogout() {
 		Session session = Session.getActiveSession();
@@ -489,67 +497,21 @@ ConnectionCallbacks, OnConnectionFailedListener{
 			launchActivity(LoginActivity.class,this , null);
 		}
 	}
-	/*public void getGooglePlusToken()
-	{
-		String accountName=mPlusClient.getAccountName();
-		Bundle bundle = new Bundle();
-	     bundle.putString(mPlusClient.KEY_REQUEST_VISIBLE_ACTIVITIES,
-	              "http://schemas.google.com/AddActivity http://schemas.google.com/BuyActivity");
-	     //Scopes SCOPES=Scopes.PLUS_PROFILE;
-	     
-	     String accessToken = null;
-	     try {
-	       accessToken = GoogleAuthUtil.getToken(this,
-	         mPlusClient.getAccountName(),"oauth2: https://www.googleapis.com/auth/plus.login https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/plus.me https://www.googleapis.com/auth/userinfo.email");
-	     } catch (IOException transientEx) {
-	       // network or server error, the call is expected to succeed if you try again later.
-	       // Don't attempt to call again immediately - the request is likely to
-	       // fail, you'll hit quotas or back-off.
-	       
-	       return;
-	     } catch (UserRecoverableAuthException e) {
-	            // Recover
-	            accessToken = null;
-	     } catch (GoogleAuthException authEx) {
-	       // Failure. The call is not expected to ever succeed so it should not be
-	       // retried.
-	       return;
-	     } catch (Exception e) {
-	       throw new RuntimeException(e);
-	     }
 
-		Log.d(TAG, accessToken);
-		Toast.makeText(this, accountName + " is connected. Token: "+accessToken, Toast.LENGTH_LONG).show();
-	}*/
 	@Override
 	public void onConnected(Bundle connectionHint) {
-
-
 	}
 
 	@Override
 	protected void onStart() {
 		super.onStart();
-		if(mPlusClient.isConnected() || mPlusClient.isConnecting())
-		{
-			//Nothing to implement
-		}
-		else
-		{
-			mPlusClient.connect();	
-		}
-
-
-
+		mPlusClient.connect();
 	}
-
-
 
 	@Override
 	protected void onStop() {
 		super.onStop();
-		if(mPlusClient.isConnected())
-			mPlusClient.disconnect();
+		mPlusClient.disconnect();
 
 	}
 
@@ -584,6 +546,8 @@ ConnectionCallbacks, OnConnectionFailedListener{
 			mConnectionResult = null;
 			if(!mPlusClient.isConnected())
 				mPlusClient.connect();
+
+
 		}else
 		{
 			Session.getActiveSession().onActivityResult(this, requestCode, responseCode, intent);
@@ -604,5 +568,60 @@ ConnectionCallbacks, OnConnectionFailedListener{
 		currentActivity.startActivity(launchIntent);
 	}
 
+	// Example of how to use the GoogleAuthUtil in a blocking, non-main thread context
+	void getAndUseAuthTokenBlocking() {
+		int MY_ACTIVITYS_AUTH_REQUEST_CODE=200;
+		try {
+			// Retrieve a token for the given account and scope. It will always return either
+			// a non-empty String or throw an exception.
+			//final String token = GoogleAuthUtil.getToken(this, mPlusClient.getAccountName(), "oauth2:server:client_id:305644042032-0ebc7fgt75vmaapp2pbqchfjlve6vf42.apps.googleusercontent.com:api_scope:" + Scopes.PLUS_LOGIN + " https://www.googleapis.com/auth/userinfo.email");
 
+			final String token = GoogleAuthUtil.getToken(this, mPlusClient.getAccountName(), "oauth2:" + Scopes.PLUS_LOGIN + " https://www.googleapis.com/auth/userinfo.email");
+			Log.d(TAG, "GOOGLE TOKEN<,,,,,,,,, "+token);
+			// Do work with token.
+			/* if (server indicates token is invalid) {
+	              // invalidate the token that we found is bad so that GoogleAuthUtil won't
+	              // return it next time (it may have cached it)
+	              GoogleAuthUtil.invalidateToken(Context, String)(context, token);
+	              // consider retrying getAndUseTokenBlocking() once more
+	              return;
+	          }*/
+			return;
+		} catch (GooglePlayServicesAvailabilityException playEx) {
+			Dialog alert = GooglePlayServicesUtil.getErrorDialog(
+					playEx.getConnectionStatusCode(),
+					this,
+					MY_ACTIVITYS_AUTH_REQUEST_CODE);
+
+		} catch (UserRecoverableAuthException userAuthEx) {
+			// Start the user recoverable action using the intent returned by
+			// getIntent()
+			startActivityForResult(
+					userAuthEx.getIntent(),
+					MY_ACTIVITYS_AUTH_REQUEST_CODE);
+			return;
+		} catch (IOException transientEx) {
+			// network or server error, the call is expected to succeed if you try again later.
+			// Don't attempt to call again immediately - the request is likely to
+			// fail, you'll hit quotas or back-off.
+			return;
+		} catch (GoogleAuthException authEx) {
+			// Failure. The call is not expected to ever succeed so it should not be
+			// retried.
+			return;
+		}
+	}
+
+	// Example of how to use AsyncTask to call blocking code on a background thread.
+	protected void getAndUseAuthTokenInAsyncTask() {
+		AsyncTask task = new AsyncTask() {
+			@Override
+			protected Object doInBackground(Object... params) {
+				// TODO Auto-generated method stub
+				getAndUseAuthTokenBlocking();
+				return null;
+			}
+		};
+		task.execute((Void)null);
+	}
 }

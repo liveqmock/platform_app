@@ -1,72 +1,45 @@
 package com.apalya.myplex;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-
-import android.animation.Animator;
-import android.animation.Animator.AnimatorListener;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
-import android.content.Intent;
 import android.content.IntentSender.SendIntentException;
-
 import android.graphics.Rect;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnFocusChangeListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.Window;
-import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
+import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.apalya.myplex.utils.FontUtil;
 import com.facebook.LoggingBehavior;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.Settings;
-import com.google.android.gms.auth.GoogleAuthException;
-import com.google.android.gms.auth.GoogleAuthUtil;
-import com.google.android.gms.auth.UserRecoverableAuthException;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.Scopes;
-
 
 
 public class LoginActivity extends BaseActivity implements OnClickListener {
 
-
-
 	private EditText mEmailField,mPwdField;
 	private Button mFacebookButton,mSignup,mLogin,mGoogleLogin;
-	private RelativeLayout mSocialLogins;
-	private TextView mLetMeIn,mText;
-	private ImageView mLogo;
-	private String mToken;
+	private TextView mLetMeIn,mText,mForgetMsg;
 	private Session.StatusCallback statusCallback = new SessionStatusCallback();
-	//private LinearLayout mUserFields;
-	private static final String TAG = "BaseActivity";
-	Animation mAnimationFadeIn;
-	Animation mAnimationFadeOut;
-	Animation mAnimationLinear;
+	private LinearLayout mUserFields,mOptionFields;
+	private ImageView mTitleIcon;
+	private static final String TAG = "LoginActivity";
+	private boolean mAnimateStatus=false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -75,9 +48,10 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		getActionBar().hide();
 		setContentView(R.layout.loginscreen);
 
+		mUserFields = (LinearLayout)findViewById(R.id.userfields);
+ 		mOptionFields = (LinearLayout) findViewById(R.id.linearLayout1);
+ 		mTitleIcon = (ImageView) findViewById(R.id.logo);
 		mEmailField = (EditText)findViewById(R.id.editEmail);
-		//mEmailField.setFocusable(false);
-
 		mGoogleLogin = (Button)findViewById(R.id.googlelogin);
 		mGoogleLogin.setOnClickListener(this);
 
@@ -87,64 +61,22 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		mSignup = (Button) findViewById(R.id.signup);
 
 		mText=(TextView)findViewById(R.id.Msg);
+		mForgetMsg = (TextView)findViewById(R.id.forgetPwdMsg);
 
 		mLetMeIn=(TextView)findViewById(R.id.letmeinMsg);
 		mLetMeIn.setTypeface(FontUtil.Roboto_Medium);
 
 		mPwdField =(EditText) findViewById(R.id.editPassword);
-
-
-
-
-
-		mLogo = (ImageView)findViewById(R.id.logo);
-		//mLogo.setAnimation(mAnimationLinear);
-
-
+		
 		mLetMeIn.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(mLetMeIn, "alpha", 0.5f, 1f);
 				fadeAnim2.setDuration(800);
 				fadeAnim2.start();
 				finish();
 				launchActivity(CardExplorer.class,LoginActivity.this , null);
 
-			}
-		});
-
-		/*mAnimationFadeIn = AnimationUtils.loadAnimation(this, R.anim.fadein);
-		mAnimationFadeOut = AnimationUtils.loadAnimation(this, R.anim.fadeout);
-		mAnimationLinear = AnimationUtils.loadAnimation(this, R.anim.linear);*/
-
-		//Check if Keyboard is visible or not
-		final View root= findViewById(R.id.rootlayout);  
-		root.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
-			@Override
-			public void onGlobalLayout() {
-				int heightDiff = root.getRootView().getHeight() - root.getHeight();
-
-				Rect rectgle= new Rect();
-				Window window= getWindow();
-				window.getDecorView().getWindowVisibleDisplayFrame(rectgle);
-				int contentViewTop= 
-						window.findViewById(Window.ID_ANDROID_CONTENT).getTop();
-
-				if(heightDiff <= contentViewTop){
-					//Soft KeyBoard Hidden
-					mFacebookButton.setVisibility(View.VISIBLE);
-					//mFacebookButton.setAnimation(mAnimationFadeIn);
-					mGoogleLogin.setVisibility(View.VISIBLE);
-					mText.setVisibility(View.VISIBLE);
-					mLetMeIn.setVisibility(View.VISIBLE);
-				}else{
-					//Soft KeyBoard Shown
-					mLetMeIn.setVisibility(View.GONE);
-					mText.setVisibility(View.GONE);
-					mFacebookButton.setVisibility(View.GONE);
-					mGoogleLogin.setVisibility(View.GONE);
-				}
 			}
 		});
 
@@ -161,7 +93,6 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 				fadeAnim2.start();
 				//mLogin.startAnimation(out);
 				//mLogin.startAnimation(in);
-				// TODO Auto-generated method stub
 				if( mEmailField.getText().toString().length() == 0 )
 					mEmailField.setError( "Username is required!" );
 				if( mPwdField.getText().toString().length() == 0 )
@@ -190,8 +121,6 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
-
 				ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(mSignup, "alpha", 0.5f, 1f);
 				fadeAnim2.setDuration(800);
 				fadeAnim2.start();
@@ -261,10 +190,71 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 
 		}
 
+		//Check if Keyboard is visible or not
+				final View root= findViewById(R.id.rootlayout);  
+				root.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+					@Override
+					public void onGlobalLayout() {
+						int heightDiff = root.getRootView().getHeight() - root.getHeight();
 
+						Rect rectgle= new Rect();
+						Window window= getWindow();
+						window.getDecorView().getWindowVisibleDisplayFrame(rectgle);
+						int contentViewTop= 
+								window.findViewById(Window.ID_ANDROID_CONTENT).getTop();
+
+						if(heightDiff <= contentViewTop ){
+							
+							if(mAnimateStatus)
+							{
+								
+								//Soft KeyBoard Hidden
+								RunSlideDownAnimation() ;
+								
+								 
+							    mFacebookButton.setVisibility(View.VISIBLE);
+								mGoogleLogin.setVisibility(View.VISIBLE);
+								mText.setVisibility(View.VISIBLE);
+								mLetMeIn.setVisibility(View.VISIBLE);
+								mTitleIcon.setVisibility(View.VISIBLE);
+								
+								ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(mFacebookButton, "alpha", 0.1f, 1f);
+								fadeAnim2.setDuration(2000);
+								fadeAnim2.start();
+								ValueAnimator fadeAnim3 = ObjectAnimator.ofFloat(mGoogleLogin, "alpha", 0.0f, 1f);
+								fadeAnim3.setDuration(2000);
+								fadeAnim3.start();
+								
+								ValueAnimator fadeAnim4 = ObjectAnimator.ofFloat(mText, "alpha", 0.0f, 1f);
+								fadeAnim4.setDuration(2000);
+								fadeAnim4.start();
+								
+								ValueAnimator fadeAnim5 = ObjectAnimator.ofFloat(mTitleIcon, "alpha", 0.0f, 1f);
+								fadeAnim5.setDuration(2000);
+								fadeAnim5.start();
+							}
+							else
+							{
+								//mAnimateStatus=true;
+							}
+						}else{
+							
+							mAnimateStatus=true;
+							//Soft KeyBoard Shown
+							mTitleIcon.setVisibility(View.GONE);
+							mLetMeIn.setVisibility(View.GONE);
+							mText.setVisibility(View.GONE);
+							mFacebookButton.setVisibility(View.GONE);
+							mGoogleLogin.setVisibility(View.GONE);
+							RunAnimation();
+						}
+					}
+				});
 
 	}
 
+	
+	
 	public void showSoftKeyboard(View view) {
 		if (view.requestFocus()) {
 			InputMethodManager imm = (InputMethodManager)
@@ -273,77 +263,76 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		}
 	}
 
+	public boolean isKeyboardVisible()
+	{
+		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+
+	    if (imm.isAcceptingText()) {
+	        return true;
+	    } else {
+	        return false;
+	    }
+	}
+	
+	
+	
+	/*private void hideKeypad() {
+	       InputMethodManager imm = (InputMethodManager) 
+	        getSystemService(Context.INPUT_METHOD_SERVICE);
+	    imm.hideSoftInputFromWindow(edittext1.getWindowToken(), 0);
+	}*/
 
 	@Override
 	public void onConnected(Bundle connectionHint) {
+
+		super.onConnected(connectionHint);
 		if (mConnectionProgressDialog.isShowing()) 
 			mConnectionProgressDialog.dismiss();
-		//String accountName = mPlusClient.getAccountName();
-		// Retrieve the oAuth 2.0 access token.
-		final Context context = this.getApplicationContext();
-		AsyncTask task = new AsyncTask() {
-			@Override
-			protected Object doInBackground(Object... params) {
-				///String scope = "oauth2:" + Scopes.PLUS_LOGIN ;
-				//String scope = "audience:server:client_id:305644042032-sog1j0k23j5e2b3qi2qg96q0kqf99f16.apps.googleusercontent.com:api_scope:https://www.googleapis.com/auth/plus.login";
-				/*Bundle appActivities = new Bundle();
-				appActivities.putString(GoogleAuthUtil.KEY_REQUEST_VISIBLE_ACTIVITIES,
-				          "http://schemas.google.com/AddActivity http://schemas.google.com/BuyActivity");
-				String scopes = "oauth2:server:client_id:305644042032-sog1j0k23j5e2b3qi2qg96q0kqf99f16.apps.googleusercontent.com:api_scope:https://www.googleapis.com/auth/plus.login";
-				String code = null;*/
+		/*String accountName = mPlusClient.getAccountName();
+		String pic = mPlusClient.getCurrentPerson().getImage().getUrl();
+		Log.d(LTAG, "IMAGE:::: ::: "+pic);
 
-				/*try {
-					// We can retrieve the token to check via
-					// tokeninfo or to pass to a service-side
-					// application.
-					
-					
-					code = GoogleAuthUtil.getToken(context,
-							mPlusClient.getAccountName(), scopes);
-					mToken=code;
-					//showToast(token);
-					Log.d(TAG, mToken);
-					Log.d(TAG, code);
-				}*/ 
-				
-				return null;
-			}
-			
-			@Override
-			protected void onPostExecute(Object result) {
-				// TODO Auto-generated method stub
-				super.onPostExecute(result);
-			}
-		};
-		task.execute((Void) null);
-        showToast(mToken);
+
+		if(pic.length()>0)
+		{
+		FadeInNetworkImageView Image = (FadeInNetworkImageView)findViewById(R.id.logo);
+		Image.setImageUrl(pic, MyVolley.getImageLoader());
+		}
+		else
+		{
+			showToast("No URL");
+
+		}*/
+		getAndUseAuthTokenInAsyncTask();
 		finish();
 		launchActivity(CardExplorer.class,this , null);
 
 	}
 
-	private void getGooglePlusToken()
+	private void RunSlideDownAnimation() 
 	{
-		String scope = "oauth2:server:client_id:305644042032-sog1j0k23j5e2b3qi2qg96q0kqf99f16.apps.googleusercontent.com:api_scope:" + Scopes.PLUS_LOGIN;
-		try {
-			// We can retrieve the token to check via
-			// tokeninfo or to pass to a service-side
-			// application.
-			String token = GoogleAuthUtil.getToken(LoginActivity.this,
-					mPlusClient.getAccountName(), scope);
-			mToken=token;
-			Log.d(TAG, token);
-		} 
-		catch (UserRecoverableAuthException e) {
-			// This error is recoverable, so we could fix this
-			// by displaying the intent to the user.
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (GoogleAuthException e) {
-			e.printStackTrace();
-		}
+		TranslateAnimation slide = new TranslateAnimation(0, 0, -500,0 );   
+	    slide.setDuration(1000);   
+	    slide.setFillAfter(true);   
+	    mUserFields.startAnimation(slide);
+	    mUserFields.startAnimation(slide);
+	    mForgetMsg.startAnimation(slide);
+	    mOptionFields.startAnimation(slide);
+	    //mText.startAnimation(slide);
+	    mLetMeIn.startAnimation(slide);
 	}
+	
+	private void RunAnimation() 
+	{
+		TranslateAnimation slide = new TranslateAnimation(0, 0, 500,0 );   
+	    slide.setDuration(1000);   
+	    slide.setFillAfter(true);   
+	    mUserFields.startAnimation(slide);
+	    mForgetMsg.startAnimation(slide);
+	    mOptionFields.startAnimation(slide);
+	    
+	}
+	
 	@Override
 	protected void onStart() {
 		super.onStart();
@@ -354,7 +343,6 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 
 	@Override
 	protected void onResume() {
-		// TODO Auto-generated method stub
 		super.onResume();
 		if(Session.getActiveSession().isOpened() || mPlusClient.isConnected())
 		{
@@ -391,8 +379,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 	private void updateView() {
 		Session session = Session.getActiveSession();
 		if (session.isOpened() && !mPlusClient.isConnected()) {
-			String token =session.getAccessToken();
-			//showToast(token);
+			//String token =session.getAccessToken();
 			finish();
 			launchActivity(CardExplorer.class,LoginActivity.this , null);
 		} else {
@@ -431,8 +418,6 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 
 	@Override
 	public void onClick(View view) {
-		// TODO Auto-generated method stub
-
 		ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(findViewById(view.getId()), "alpha", 0.5f, 1f);
 		fadeAnim2.setDuration(800);
 		fadeAnim2.start();
@@ -450,7 +435,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 			}
 		}
 		if (view.getId() == R.id.googlelogin && !mPlusClient.isConnected()) {
-			
+
 			/* final int errorCode = GooglePlayServicesUtil.checkGooglePlusApp(this);
 		      if (errorCode == GooglePlusUtil.SUCCESS) {
 		      }else {
@@ -458,7 +443,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		          GooglePlusUtil.getErrorDialog(errorCode, this, 0).show();
 		      }*/
 
-			
+
 			if (mConnectionResult == null) {
 				mConnectionProgressDialog.show();
 			} else {
@@ -468,7 +453,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 					// Try connecting again.
 					mConnectionResult = null;
 					mPlusClient.connect();
-					
+
 				}
 			}
 		}

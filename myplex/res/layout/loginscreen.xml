@@ -8,8 +8,7 @@
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:animateLayoutChanges="true" >
+        android:layout_gravity="center" >
 
         <ImageView
             android:id="@+id/logo"
@@ -182,9 +181,11 @@
             android:layout_below="@id/linearLayout1"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="@dimen/margin"
-            android:layout_marginTop="@dimen/bottomspacing"
+            android:layout_marginTop="@dimen/margin"
             android:paddingLeft="@dimen/margin"
             android:paddingRight="@dimen/margin"
+            android:paddingTop="@dimen/margin"
+            android:paddingBottom="@dimen/margin"
             android:text="@string/letme"
             android:textColor="@color/white" />
     </RelativeLayout>
