@@ -38,8 +38,9 @@ import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.myplexUtils;
 import com.apalya.myplex.menu.FilterMenuProvider;
 import com.apalya.myplex.utils.MyVolley;
+import com.apalya.myplex.utils.SharedPrefUtils;
 
-public class MainActivity extends Activity {
+public class MainActivity extends BaseActivity {
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
 	private ActionBarDrawerToggle mDrawerToggle;
@@ -247,6 +248,19 @@ public class MainActivity extends Activity {
 		pushFragment();
 	}
 
+	@Override
+	protected void onStart() {
+		// TODO Auto-generated method stub
+		super.onStart();
+		mPlusClient.connect();
+	}
+	@Override
+	protected void onStop() {
+		// TODO Auto-generated method stub
+		super.onStop();
+		mPlusClient.disconnect();
+	}
+	
 	private void selectItem(int position) {
 		switch (position) {
 		case 0:
@@ -274,8 +288,9 @@ public class MainActivity extends Activity {
 			mCurrentFragment = new CardExplorer();
 			break;
 		case 7:{
-			finish();
-			startActivity(new Intent(MainActivity.this,LoginActivity.class));
+			onClickLogout();
+			//finish();
+			//startActivity(new Intent(MainActivity.this,LoginActivity.class));
 			break;
 		}
 		default:

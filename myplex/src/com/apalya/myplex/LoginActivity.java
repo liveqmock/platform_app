@@ -65,6 +65,8 @@ import com.facebook.Settings;
 import com.facebook.model.GraphUser;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.plus.PlusClient.OnAccessRevokedListener;
 
 
 
@@ -277,6 +279,9 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		});
 
 
+		
+		
+		
 		Settings.addLoggingBehavior(LoggingBehavior.INCLUDE_ACCESS_TOKENS);
 
 
@@ -295,7 +300,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 				//session.openForRead(new Session.OpenRequest(this).setCallback(statusCallback));
 				if (!session.isOpened() && !session.isClosed()) {
 					session.openForRead(new Session.OpenRequest(this)
-					.setPermissions(Arrays.asList("basic_info","email","publish_stream","user_likes"))
+					.setPermissions(Arrays.asList("basic_info","email"))
 					.setCallback(statusCallback));
 				} else {
 					Session.openActiveSession(this, true, statusCallback);
@@ -372,6 +377,8 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 
 	}
 
+	
+	
 	private void prepareSlideNotifiation() {
 		mSlideNotificationLayout = (RelativeLayout)findViewById(R.id.slidenotificationlayout);
 		mSlideNotificationText = (TextView)findViewById(R.id.slidenotificationtextview);
@@ -513,10 +520,10 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 			
 		}
 		
-		mUserInfo.setLoginStatus(true);
+		/*mUserInfo.setLoginStatus(true);
 		mUserInfo.setName(mPlusClient.getCurrentPerson().getDisplayName());
 		mUserInfo.setProfilePic(mPlusClient.getCurrentPerson().getImage().getUrl());
-		
+*/		
 		AsyncTask<Object, Void, String> mAuthTask = new AsyncTask<Object, Void, String>() {
 			@Override
 			protected String doInBackground(Object... o) {
@@ -806,7 +813,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 	public static String authenticate(Context ctx, String account,String id, String expiry,String clientKey) {
         HttpURLConnection urlConnection = null;
         OutputStream outStream = null;
-        boolean response = false;
+        String response = null;
         int statusCode = 0;
 
         try {
@@ -836,7 +843,10 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
          // Write body
          OutputStream output = connection.getOutputStream(); 
          output.write(content.getBytes());
+         response=output.toString();
          output.close();
+         
+         return response;
          
          
         } catch (MalformedURLException e) {

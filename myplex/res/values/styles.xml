@@ -1,6 +1,19 @@
 <resources>
 
+ <!-- Application theme. -->
+    <style name="AppBaseTheme" parent="android:Theme.Holo.Light.DarkActionBar">
+        <!--
+            Theme customizations available in newer API levels can go in
+            res/values-vXX/styles.xml, while customizations related to
+            backward-compatibility can go here.
+        -->
+    </style>
 
+    <!-- Application theme. -->
+    <style name="AppTheme" parent="AppBaseTheme">
+        <item name="android:windowBackground">@layout/grey_bg</item>
+        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+    </style>
 	<color name="com_facebook_blue">#3B5998</color>
     
     <color name="com_facebook_usersettingsfragment_connected_text_color">#FFFFFF</color>

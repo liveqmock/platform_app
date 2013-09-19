@@ -1,6 +1,5 @@
 package com.apalya.myplex.data;
 
-
 import com.apalya.myplex.utils.MyVolley;
 
 import android.app.Application;
@@ -14,5 +13,6 @@ public class myplexapplication extends Application {
 	}
 	private void init() {
 		MyVolley.init(this);
+		
 	}
 }

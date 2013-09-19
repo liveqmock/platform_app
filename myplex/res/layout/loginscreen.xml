@@ -78,6 +78,8 @@
                     android:layout_width="fill_parent"
                     android:layout_height="@dimen/fieldheight"
                     android:orientation="horizontal"
+                    android:focusable="true"
+                    android:focusableInTouchMode="true"
                     android:paddingLeft="@dimen/margin"
                     android:paddingTop="@dimen/centerspacing" >
 

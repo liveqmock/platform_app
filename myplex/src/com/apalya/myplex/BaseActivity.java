@@ -285,46 +285,7 @@ ConnectionCallbacks, OnConnectionFailedListener{
 
 
 
-	public void onClickLogout() {
-		finish();
-		launchActivity(LoginActivity.class,this , null);
-
-//		if(mPlusClient.isConnected() || Session.getActiveSession().isOpened())
-//		{
-//			if(mPlusClient.isConnected())
-//			{
-//
-//				//getGooglePlusToken();
-//				//getTokenReq.execute((Void)null);
-//
-//
-//				mPlusClient.clearDefaultAccount();
-//				mPlusClient.revokeAccessAndDisconnect(new OnAccessRevokedListener() {
-//					@Override
-//					public void onAccessRevoked(ConnectionResult status) {
-//						// mPlusClient is now disconnected and access has been revoked.
-//						// Trigger app logic to comply with the developer policies
-//					}
-//				});
-//				mPlusClient.disconnect();
-//			}
-//			else if(Session.getActiveSession().isOpened())
-//			{
-//				Session session = Session.getActiveSession();
-//				if (!session.isClosed()) {
-//					session.closeAndClearTokenInformation();
-//					//finish();
-//					//launchActivity(LoginActivity.class,this , null);
-//				}
-//			}
-//
-//		}
-//		Map<String, String> params = new HashMap<String, String>();
-//		params.put("profile","work");
-//		params.put("clientKey",mDevInfo.getClientKey());
-//		signOutRequest(getString(R.string.signoutpath), params);
-
-	}
+	
 
 	@Override
 	public void onConnected(Bundle connectionHint) {
@@ -499,7 +460,45 @@ ConnectionCallbacks, OnConnectionFailedListener{
 		return true;
 	}
 
+	public void onClickLogout() {
+		//finish();
+		//launchActivity(LoginActivity.class,this , null);
 
+		if(mPlusClient.isConnected() || Session.getActiveSession().isOpened())
+		{
+			if(mPlusClient.isConnected())
+			{
+				//				//getGooglePlusToken();
+				//getTokenReq.execute((Void)null);
+
+
+				mPlusClient.clearDefaultAccount();
+				mPlusClient.revokeAccessAndDisconnect(new OnAccessRevokedListener() {
+					@Override
+					public void onAccessRevoked(ConnectionResult status) {
+						// mPlusClient is now disconnected and access has been revoked.
+						// Trigger app logic to comply with the developer policies
+					}
+				});
+				
+				mPlusClient.disconnect();
+			}
+			else if(Session.getActiveSession().isOpened())
+			{
+				Session session = Session.getActiveSession();
+				if (!session.isClosed()) {
+					session.closeAndClearTokenInformation();
+					//finish();
+					//launchActivity(LoginActivity.class,this , null);
+				}
+			}
+
+		}
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("profile","work");
+		params.put("clientKey",mDevInfo.getClientKey());
+		signOutRequest(getString(R.string.signoutpath), params);
+	}
 	protected ErrorListener signOutErrorListener() {
 		return new Response.ErrorListener() {
 			@Override
@@ -532,9 +531,9 @@ ConnectionCallbacks, OnConnectionFailedListener{
 								getString(R.string.devusername), "");
 						SharedPrefUtils.writeToSharedPref(BaseActivity.this,
 								getString(R.string.devpassword),"");
-
-						mUserInfo.setLoginStatus(false);
 						
+						mUserInfo.setLoginStatus(false);
+
 						finish();
 						launchActivity(LoginActivity.class,BaseActivity.this , null);
 					}
