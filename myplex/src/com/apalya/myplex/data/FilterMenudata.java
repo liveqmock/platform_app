@@ -1,7 +1,5 @@
 package com.apalya.myplex.data;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class FilterMenudata {
 	public static final int ITEM = 0;

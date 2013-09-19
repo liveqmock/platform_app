@@ -12,7 +12,6 @@ public class myplexapplication extends Application {
 		super.onCreate();
 		init();
 	}
-
 	private void init() {
 		MyVolley.init(this);
 	}

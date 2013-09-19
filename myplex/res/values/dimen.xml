@@ -21,7 +21,7 @@
 
 
       <!-- LOGIN SCREEN VALUES -->
-    
+    <dimen name="slidenotificationwithbutton">64dp</dimen>
     <dimen name="fieldwidth">280dp</dimen>
     
     <dimen name="editfieldheight">96dp</dimen>

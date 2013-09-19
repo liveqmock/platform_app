@@ -1,45 +1,95 @@
 package com.apalya.myplex;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
+import java.sql.Date;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.IntentSender.SendIntentException;
+import android.graphics.PorterDuff.Mode;
 import android.graphics.Rect;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.Window;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.Request.Method;
+import com.android.volley.Response.ErrorListener;
+import com.android.volley.Response.Listener;
+import com.android.volley.toolbox.StringRequest;
+import com.apalya.myplex.R.color;
 import com.apalya.myplex.utils.FontUtil;
+import com.apalya.myplex.utils.MyVolley;
+import com.apalya.myplex.utils.SharedPrefUtils;
 import com.facebook.LoggingBehavior;
+import com.facebook.Request;
+import com.facebook.Request.GraphUserCallback;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.Settings;
+import com.facebook.model.GraphUser;
+import com.google.android.gms.auth.GoogleAuthException;
+import com.google.android.gms.auth.GoogleAuthUtil;
+
+
+
 
 
 public class LoginActivity extends BaseActivity implements OnClickListener {
 
-	private EditText mEmailField,mPwdField;
+	static EditText mEmailField;
+	static EditText mPwdField;
+	
+	private static String googleToken = null;
 	private Button mFacebookButton,mSignup,mLogin,mGoogleLogin;
 	private TextView mLetMeIn,mText,mForgetMsg;
 	private Session.StatusCallback statusCallback = new SessionStatusCallback();
 	private LinearLayout mUserFields,mOptionFields;
 	private ImageView mTitleIcon;
 	private static final String TAG = "LoginActivity";
+	private RelativeLayout mSlideNotificationLayout;
+	private int mSlideNotifcationHeight;
+	private TextView mSlideNotificationText;
 	private boolean mAnimateStatus=false;
+	private View mRootLayout;
+	protected String fbUserId;
+	private ProgressBar loader;
+	private int mFacebookReqSent;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -47,6 +97,18 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 
 		getActionBar().hide();
 		setContentView(R.layout.loginscreen);
+		
+		prepareSlideNotifiation();
+		loader = (ProgressBar) findViewById(R.id.loading);
+		
+		findViewById(R.id.okalert).setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				hideNotification();
+			}
+		});
 
 		mUserFields = (LinearLayout)findViewById(R.id.userfields);
  		mOptionFields = (LinearLayout) findViewById(R.id.linearLayout1);
@@ -62,6 +124,45 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 
 		mText=(TextView)findViewById(R.id.Msg);
 		mForgetMsg = (TextView)findViewById(R.id.forgetPwdMsg);
+		mForgetMsg.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				
+				ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(mForgetMsg, "alpha", 0.5f, 1f);
+				fadeAnim2.setDuration(800);
+				fadeAnim2.start();
+				hideKeypad();
+				if( mEmailField.getText().toString().length() == 0 )
+					mEmailField.setError( "Username is required!" );
+				
+
+				if(mEmailField.getText().toString().length() > 0)
+				{
+					if(mEmailField.getText().toString().contains("@")&& mEmailField.getText().toString().contains("."))
+					{
+						/*Map<String, String> params = new HashMap<String, String>();
+						params.put("userid", mEmailField.getText().toString());
+						params.put("clientKey",mDevInfo.getClientKey());
+						mRequestType=2;
+						Log.d(TAG, "clientKey-----------: "+mDevInfo.getClientKey());
+						sendApiRequest(getString(R.string.signin), params);*/
+						//finish();
+						//launchActivity(CardExplorer.class,LoginActivity.this , null);
+					}
+					else
+					{
+						sendNotification("Hey, you might have missed to enter valid mail id!");
+						mEmailField.setError( "Enter Valid Email!" );
+						Animation shake = AnimationUtils.loadAnimation(LoginActivity.this, R.anim.shake);
+						mEmailField.startAnimation(shake);
+					}
+
+				}
+				
+				
+			}
+		});
 
 		mLetMeIn=(TextView)findViewById(R.id.letmeinMsg);
 		mLetMeIn.setTypeface(FontUtil.Roboto_Medium);
@@ -75,7 +176,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 				fadeAnim2.setDuration(800);
 				fadeAnim2.start();
 				finish();
-				launchActivity(CardExplorer.class,LoginActivity.this , null);
+				launchActivity(MainActivity.class,LoginActivity.this , null);
 
 			}
 		});
@@ -91,28 +192,43 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 				ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(mLogin, "alpha", 0.5f, 1f);
 				fadeAnim2.setDuration(800);
 				fadeAnim2.start();
-				//mLogin.startAnimation(out);
-				//mLogin.startAnimation(in);
-				if( mEmailField.getText().toString().length() == 0 )
-					mEmailField.setError( "Username is required!" );
-				if( mPwdField.getText().toString().length() == 0 )
-					mPwdField.setError( "Password is required!" );
+				hideKeypad();
+				
 
 				if(mEmailField.getText().toString().length() > 0 &&  mPwdField.getText().toString().length()>0)
 				{
 					if(mEmailField.getText().toString().contains("@")&& mEmailField.getText().toString().contains("."))
 					{
-						finish();
-						launchActivity(CardExplorer.class,LoginActivity.this , null);
+						Map<String, String> params = new HashMap<String, String>();
+						params.put("userid", mEmailField.getText().toString());
+						params.put("password", mPwdField.getText().toString());
+						params.put("profile", "work");
+						params.put("clientKey",mDevInfo.getClientKey());
+						Log.d(TAG, "clientKey-----------: "+mDevInfo.getClientKey());
+						loader.setVisibility(View.VISIBLE);
+						userLoginRequest(getString(R.string.signin), params);
+						//finish();
+						//launchActivity(CardExplorer.class,LoginActivity.this , null);
 					}
 					else
 					{
-						mPwdField.clearFocus();
-						mEmailField.requestFocus();
 						mEmailField.setError( "Enter Valid Email!" );
-						showToast("Enter Valid Email!");
+						sendNotification("Hey, you might have entered wrong mail id!");
+						
 					}
 
+				}
+				else
+				{
+					if( mEmailField.getText().toString().length() == 0 )
+					{
+						mEmailField.setError( "Username is required!" );
+					}
+					if( mPwdField.getText().toString().length() == 0 )
+					{
+						mPwdField.setError( "Password is required!" );
+					}
+					sendNotification("Hey, you might have missed some fields!");
 				}
 			}
 		});
@@ -125,7 +241,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 				fadeAnim2.setDuration(800);
 				fadeAnim2.start();
 
-				if(mEmailField.getText().toString().length() > 0 &&  mEmailField.getText().toString().length()>0)
+				if(mEmailField.getText().toString().length() > 0 &&  mPwdField.getText().toString().length()>0)
 				{
 					if(mEmailField.getText().toString().contains("@"))
 					{
@@ -133,8 +249,10 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 						Map<String, String> intentBundle = new HashMap<String, String>();
 						String intentParam1 = "username";
 						String intentParam2 = "userpwd";
+						
 						intentBundle.put(intentParam1,mEmailField.getText().toString() );
-						intentBundle.put(intentParam2,  mEmailField.getText().toString());
+						intentBundle.put(intentParam2,mPwdField.getText().toString());
+						
 						finish();
 						launchActivity(SignUpActivity.class,LoginActivity.this , intentBundle);
 
@@ -177,7 +295,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 				//session.openForRead(new Session.OpenRequest(this).setCallback(statusCallback));
 				if (!session.isOpened() && !session.isClosed()) {
 					session.openForRead(new Session.OpenRequest(this)
-					.setPermissions(Arrays.asList("basic_info","email"))
+					.setPermissions(Arrays.asList("basic_info","email","publish_stream","user_likes"))
 					.setCallback(statusCallback));
 				} else {
 					Session.openActiveSession(this, true, statusCallback);
@@ -191,11 +309,11 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		}
 
 		//Check if Keyboard is visible or not
-				final View root= findViewById(R.id.rootlayout);  
-				root.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+		mRootLayout = findViewById(R.id.rootlayout);  
+		mRootLayout.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
 					@Override
 					public void onGlobalLayout() {
-						int heightDiff = root.getRootView().getHeight() - root.getHeight();
+						int heightDiff = mRootLayout.getRootView().getHeight() - mRootLayout.getHeight();
 
 						Rect rectgle= new Rect();
 						Window window= getWindow();
@@ -207,12 +325,12 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 							
 							if(mAnimateStatus)
 							{
-								
+								//mTitleIcon.setVisibility(View.VISIBLE);
 								//Soft KeyBoard Hidden
-								RunSlideDownAnimation() ;
+								//RunSlideDownAnimation() ;
 								
 								 
-							    mFacebookButton.setVisibility(View.VISIBLE);
+							    /*mFacebookButton.setVisibility(View.VISIBLE);
 								mGoogleLogin.setVisibility(View.VISIBLE);
 								mText.setVisibility(View.VISIBLE);
 								mLetMeIn.setVisibility(View.VISIBLE);
@@ -231,7 +349,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 								
 								ValueAnimator fadeAnim5 = ObjectAnimator.ofFloat(mTitleIcon, "alpha", 0.0f, 1f);
 								fadeAnim5.setDuration(2000);
-								fadeAnim5.start();
+								fadeAnim5.start();*/
 							}
 							else
 							{
@@ -240,21 +358,104 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 						}else{
 							
 							mAnimateStatus=true;
+							//mTitleIcon.setVisibility(View.GONE);
 							//Soft KeyBoard Shown
-							mTitleIcon.setVisibility(View.GONE);
+							/*mTitleIcon.setVisibility(View.GONE);
 							mLetMeIn.setVisibility(View.GONE);
 							mText.setVisibility(View.GONE);
 							mFacebookButton.setVisibility(View.GONE);
-							mGoogleLogin.setVisibility(View.GONE);
-							RunAnimation();
+							mGoogleLogin.setVisibility(View.GONE);*/
+							//RunAnimation();
 						}
 					}
 				});
 
 	}
 
+	private void prepareSlideNotifiation() {
+		mSlideNotificationLayout = (RelativeLayout)findViewById(R.id.slidenotificationlayout);
+		mSlideNotificationText = (TextView)findViewById(R.id.slidenotificationtextview);
+		mSlideNotifcationHeight = (int) getResources().getDimension(R.dimen.slidenotificationwithbutton);
+		mSlideNotificationLayout.setY(-mSlideNotifcationHeight);
+		mSlideNotificationLayout.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				hideNotification();				
+			}
+		});
+	}
 	
-	
+	protected void userLoginRequest(String contextPath, final Map<String, String> bodyParams) {
+		// TODO Auto-generated method stub
+		RequestQueue queue = MyVolley.getRequestQueue();
+		 
+		String url=getString(R.string.url)+contextPath;
+		StringRequest myReq = new StringRequest(Method.POST,
+				url,
+				userLoginSuccessListener(),
+				userLoginErrorListener()) {
+
+			protected Map<String, String> getParams() throws com.android.volley.AuthFailureError {
+				Map<String, String> params = new HashMap<String, String>();
+				params=bodyParams;
+				return params;
+			};
+		};
+		Log.d(TAG,"Request sent ");
+		queue.add(myReq);
+	}
+	protected ErrorListener userLoginErrorListener() {
+		return new Response.ErrorListener() {
+			@Override
+			public void onErrorResponse(VolleyError error) {
+				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+				Log.d(TAG,"Error: "+error.toString());
+				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+			}
+		};
+	}
+
+	protected Listener<String> userLoginSuccessListener() {
+		return new Response.Listener<String>() {
+			@Override
+			public void onResponse(String response) {
+				Log.d(TAG,"Response: "+response);
+				try {	
+					Log.d(TAG, "########################################################");
+					JSONObject jsonResponse= new JSONObject(response);
+
+					if(jsonResponse.getString("status").equalsIgnoreCase("SUCCESS"))
+					{
+						Log.d(TAG, "status: "+jsonResponse.getString("status"));
+						Log.d(TAG, "code: "+jsonResponse.getString("code"));
+						Log.d(TAG, "message: "+jsonResponse.getString("message"));
+						Log.d(TAG, "########################################################");
+						Log.d(TAG, "---------------------------------------------------------");
+						
+						SharedPrefUtils.writeToSharedPref(LoginActivity.this,
+								getString(R.string.devusername), LoginActivity.mEmailField.getText().toString());
+						SharedPrefUtils.writeToSharedPref(LoginActivity.this,
+								getString(R.string.devpassword), LoginActivity.mPwdField.getText().toString());
+						
+						finish();
+						launchActivity(MainActivity.class,LoginActivity.this , null);
+					}
+					else
+					{
+						Log.d(TAG, "code: "+jsonResponse.getString("code"));
+						Log.d(TAG, "message: "+jsonResponse.getString("message"));
+						sendNotification("Err: "+jsonResponse.getString("code")+" "+jsonResponse.getString("message"));
+					}
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		};
+	}
+
+
 	public void showSoftKeyboard(View view) {
 		if (view.requestFocus()) {
 			InputMethodManager imm = (InputMethodManager)
@@ -274,21 +475,66 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 	    }
 	}
 	
+	private void showNotification(){
+		animate(-mSlideNotifcationHeight,0, mSlideNotificationLayout,false,2);
+		
+		
+	}
+	private void hideNotification(){
+		animate(0,-mSlideNotifcationHeight, mSlideNotificationLayout,false,2);
+		
+		/*finish();
+		launchActivity(CardExplorer.class, SplashActivity.this, null);*/
+	}
+	private void sendNotification(final String aMsg){
+		Handler h = new Handler(Looper.getMainLooper());
+		h.post(new Runnable() {
+			public void run() {
+				mSlideNotificationText.setText(aMsg);
+				showNotification();
+			}
+		});
+	}
 	
-	
-	/*private void hideKeypad() {
+		
+	private void hideKeypad() {
 	       InputMethodManager imm = (InputMethodManager) 
 	        getSystemService(Context.INPUT_METHOD_SERVICE);
-	    imm.hideSoftInputFromWindow(edittext1.getWindowToken(), 0);
-	}*/
+	    imm.hideSoftInputFromWindow(mRootLayout.getWindowToken(), 0);
+	}
 
 	@Override
 	public void onConnected(Bundle connectionHint) {
 
-		super.onConnected(connectionHint);
+		//super.onConnected(connectionHint);
 		if (mConnectionProgressDialog.isShowing()) 
+		{
 			mConnectionProgressDialog.dismiss();
-		/*String accountName = mPlusClient.getAccountName();
+			
+		}
+		
+		mUserInfo.setLoginStatus(true);
+		mUserInfo.setName(mPlusClient.getCurrentPerson().getDisplayName());
+		mUserInfo.setProfilePic(mPlusClient.getCurrentPerson().getImage().getUrl());
+		
+		AsyncTask<Object, Void, String> mAuthTask = new AsyncTask<Object, Void, String>() {
+			@Override
+			protected String doInBackground(Object... o) {
+				return authenticate(LoginActivity.this, mPlusClient.getAccountName(),mPlusClient.getCurrentPerson().getId(),mDevInfo.getClientKeyExp(),mDevInfo.getClientKey());
+			}
+
+			@Override
+			protected void onPostExecute(String result) {
+				
+			}
+		};
+
+		mAuthTask.execute();
+		
+		finish();
+		launchActivity(MainActivity.class,LoginActivity.this , null);
+		//getAndUseAuthTokenInAsyncTask();
+			/*String accountName = mPlusClient.getAccountName();
 		String pic = mPlusClient.getCurrentPerson().getImage().getUrl();
 		Log.d(LTAG, "IMAGE:::: ::: "+pic);
 
@@ -303,33 +549,35 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 			showToast("No URL");
 
 		}*/
-		getAndUseAuthTokenInAsyncTask();
-		finish();
-		launchActivity(CardExplorer.class,this , null);
+		
+		//finish();
+		//launchActivity(CardExplorer.class,this , null);
 
 	}
 
 	private void RunSlideDownAnimation() 
 	{
-		TranslateAnimation slide = new TranslateAnimation(0, 0, -500,0 );   
-	    slide.setDuration(1000);   
-	    slide.setFillAfter(true);   
-	    mUserFields.startAnimation(slide);
+		TranslateAnimation slide = new TranslateAnimation(0, 0, -100,0 );   
+	    slide.setDuration(300);   
+	    slide.setFillAfter(false);   
+	    mRootLayout.setAnimation(slide);
+	    /*mUserFields.startAnimation(slide);
 	    mUserFields.startAnimation(slide);
 	    mForgetMsg.startAnimation(slide);
 	    mOptionFields.startAnimation(slide);
 	    //mText.startAnimation(slide);
-	    mLetMeIn.startAnimation(slide);
+	    mLetMeIn.startAnimation(slide);*/
 	}
 	
 	private void RunAnimation() 
 	{
-		TranslateAnimation slide = new TranslateAnimation(0, 0, 500,0 );   
-	    slide.setDuration(1000);   
-	    slide.setFillAfter(true);   
-	    mUserFields.startAnimation(slide);
+		TranslateAnimation slide = new TranslateAnimation(0, 0, 100,0 );   
+	    slide.setDuration(300);   
+	    slide.setFillAfter(false);   
+	    mRootLayout.setAnimation(slide);
+	    /*mUserFields.startAnimation(slide);
 	    mForgetMsg.startAnimation(slide);
-	    mOptionFields.startAnimation(slide);
+	    mOptionFields.startAnimation(slide);*/
 	    
 	}
 	
@@ -346,11 +594,8 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		super.onResume();
 		if(Session.getActiveSession().isOpened() || mPlusClient.isConnected())
 		{
-			String token =Session.getActiveSession().getAccessToken();
-			//showToast(token);
-			Log.d(TAG,token);
 			finish();
-			launchActivity(CardExplorer.class,LoginActivity.this , null);
+			launchActivity(MainActivity.class,LoginActivity.this , null);
 		}
 
 	}
@@ -372,20 +617,125 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 	private class SessionStatusCallback implements Session.StatusCallback {
 		@Override
 		public void call(Session session, SessionState state, Exception exception) {
+			
 			updateView();
 		}
 	}
 
 	private void updateView() {
+		
 		Session session = Session.getActiveSession();
 		if (session.isOpened() && !mPlusClient.isConnected()) {
 			//String token =session.getAccessToken();
-			finish();
-			launchActivity(CardExplorer.class,LoginActivity.this , null);
+			final String token =Session.getActiveSession().getAccessToken();
+			final java.util.Date tokenExpiry=Session.getActiveSession().getExpirationDate();
+			
+			//Session.getActiveSession().g
+			//showToast(token);
+			Log.d(TAG,token);
+			Log.d(TAG,tokenExpiry.toGMTString());
+			
+			
+			Request request = Request.newMeRequest(Session.getActiveSession(), new GraphUserCallback() {
+
+			   	@Override
+				public void onCompleted(GraphUser user,
+						com.facebook.Response response) {
+					// TODO Auto-generated method stub
+			   		fbUserId=user.getId();
+			   		if(mFacebookReqSent==0)
+					{
+			   		
+			   			mUserInfo.setName(user.getName());
+			   			mUserInfo.setLoginStatus(true);
+			   			//mUserInfo.setProfilePic(user.)
+			   			
+					Log.d(TAG, "Facebook User Id:   "+fbUserId);
+					Map<String, String> params = new HashMap<String, String>();
+					params.put("facebook_id", fbUserId);
+					params.put("profile", "work");
+					params.put("auth_token", token);
+					params.put("token_expiry", tokenExpiry.toGMTString());
+					params.put("clientKey",mDevInfo.getClientKey());
+					facebookLoginRequest(getString(R.string.fbloginpath), params);
+					}
+					
+				}
+			});
+			request.executeAsync();
+			
+			
 		} else {
-			mFacebookButton.setText("LogIn with Facebook");
+			
 		}
 	}
+
+	protected void facebookLoginRequest(String contextPath,
+			final Map<String, String> bodyParams) {
+		RequestQueue queue = MyVolley.getRequestQueue();
+		 
+		mFacebookReqSent=1;
+		
+		String url=getString(R.string.url)+contextPath;
+		StringRequest myReq = new StringRequest(Method.POST,
+				url,
+				fbLoginSuccessListener(),
+				fbLoginErrorListener()) {
+
+			protected Map<String, String> getParams() throws com.android.volley.AuthFailureError {
+				Map<String, String> params = new HashMap<String, String>();
+				params=bodyParams;
+				return params;
+			};
+		};
+		Log.d(TAG,"Request sent ");
+		queue.add(myReq);
+		
+	}
+	protected ErrorListener fbLoginErrorListener() {
+		return new Response.ErrorListener() {
+			@Override
+			public void onErrorResponse(VolleyError error) {
+				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+				Log.d(TAG,"Error: "+error.toString());
+				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+			}
+		};
+	}
+
+	protected Listener<String> fbLoginSuccessListener() {
+		return new Response.Listener<String>() {
+			@Override
+			public void onResponse(String response) {
+				Log.d(TAG,"Response: "+response);
+				try {	
+					Log.d(TAG, "########################################################");
+					JSONObject jsonResponse= new JSONObject(response);
+
+					if(jsonResponse.getString("status").equalsIgnoreCase("SUCCESS"))
+					{
+						Log.d(TAG, "status: "+jsonResponse.getString("status"));
+						Log.d(TAG, "code: "+jsonResponse.getString("code"));
+						Log.d(TAG, "message: "+jsonResponse.getString("message"));
+						Log.d(TAG, "########################################################");
+						Log.d(TAG, "---------------------------------------------------------");
+						finish();
+						launchActivity(MainActivity.class,LoginActivity.this , null);
+					}
+					else
+					{
+						Log.d(TAG, "code: "+jsonResponse.getString("code"));
+						Log.d(TAG, "message: "+jsonResponse.getString("message"));
+						sendNotification("Err: "+jsonResponse.getString("code")+" "+jsonResponse.getString("message"));
+					}
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		};
+	}
+
 
 	private void onClickLogin() {
 		/*Session session = Session.getActiveSession();
@@ -434,15 +784,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 				onClickLogin();				
 			}
 		}
-		if (view.getId() == R.id.googlelogin && !mPlusClient.isConnected()) {
-
-			/* final int errorCode = GooglePlayServicesUtil.checkGooglePlusApp(this);
-		      if (errorCode == GooglePlusUtil.SUCCESS) {
-		      }else {
-		          // Prompt the user to install the Google+ app.
-		          GooglePlusUtil.getErrorDialog(errorCode, this, 0).show();
-		      }*/
-
+		else if (view.getId() == R.id.googlelogin && !mPlusClient.isConnected()) {
 
 			if (mConnectionResult == null) {
 				mConnectionProgressDialog.show();
@@ -458,4 +800,53 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 			}
 		}
 	}
+	
+	
+	
+	public static String authenticate(Context ctx, String account,String id, String expiry,String clientKey) {
+        HttpURLConnection urlConnection = null;
+        OutputStream outStream = null;
+        boolean response = false;
+        int statusCode = 0;
+
+        try {
+            URL url = new URL(ctx.getString(R.string.url) + ctx.getString(R.string.gplusloginpath));
+
+        	googleToken = GoogleAuthUtil.getToken(ctx, account, SCOPE_STRING);
+            
+            Log.v(TAG, "Authenticating at [" + url + "] with: " + googleToken);
+            
+            URLConnection connection =url.openConnection();
+         // Http Method becomes POST
+         connection.setDoOutput(true);
+
+         // Encode according to application/x-www-form-urlencoded specification
+         String content =
+             "clientKey=" + URLEncoder.encode (clientKey) +
+             "&google_id=" + URLEncoder.encode (id) +
+             "&auth_token=" + URLEncoder.encode (googleToken) +
+             "&token_expiry=" + URLEncoder.encode (expiry);
+         connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded"); 
+
+         // Try this should be the length of you content.
+         // it is not neccessary equal to 48. 
+         // content.getBytes().length is not neccessarily equal to content.length() if the String contains non ASCII characters.
+         //connection.setRequestProperty("Content-Length", content.getBytes().length); 
+
+         // Write body
+         OutputStream output = connection.getOutputStream(); 
+         output.write(content.getBytes());
+         output.close();
+         
+         
+        } catch (MalformedURLException e) {
+            Log.e(TAG, e.getMessage(), e);
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage(), e);
+        } catch (GoogleAuthException e) {
+            GoogleAuthUtil.invalidateToken(ctx, googleToken);
+        } 
+
+        return null;
+    }
 }

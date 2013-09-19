@@ -121,6 +121,7 @@ public class NetworkImageView extends ImageView {
                 mImageContainer = null;
             }
             setImageBitmap(null);
+            setImageResource(mDefaultImageId);
             return;
         }
 

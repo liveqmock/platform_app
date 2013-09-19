@@ -5,39 +5,23 @@
     android:layout_height="match_parent"
     android:background="#e6e6e6" >
 
-    <com.apalya.myplex.views.NewCardView
+    <com.apalya.myplex.views.CardView
         android:id="@+id/framelayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="12dp" >
-    </com.apalya.myplex.views.NewCardView>
+    </com.apalya.myplex.views.CardView>
 
-   
-
-    <RelativeLayout
-        android:id="@+id/slidenotificationlayout"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/slidenotification"
-        android:background="#FF8C00" >
-
-        <TextView
-            android:id="@+id/slidenotificationtextview"
-            android:layout_width="match_parent"
-            android:layout_height="@dimen/slidenotification"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:gravity="center"
-            android:singleLine="true"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp" />
-    </RelativeLayout>
-
-    <com.apalya.myplex.views.FliterMenu
-        android:id="@+id/fliterMenuLayout"
+    <ListView
+        android:id="@+id/cardlistview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" >
-    </com.apalya.myplex.views.FliterMenu>
+        android:layout_gravity="start"
+        android:layout_margin="12dp"
+        android:choiceMode="singleChoice"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="10dp"
+        android:scrollbars="none" >
+    </ListView>
 
 </RelativeLayout>

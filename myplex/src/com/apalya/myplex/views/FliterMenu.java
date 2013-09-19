@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.apalya.myplex.R;
 import com.apalya.myplex.data.FilterMenudata;
+import com.apalya.myplex.data.myplexUtils;
 import com.apalya.myplex.views.PinnedSectionListView.PinnedSectionListAdapter;
 
 import android.animation.AnimatorSet;
@@ -61,14 +62,10 @@ public class FliterMenu extends RelativeLayout {
 	public void init(Context cxt) {
 		mInflator = LayoutInflater.from(cxt);
 		mContext = cxt;
-		DisplayMetrics dm = new DisplayMetrics();
-		((Activity) mContext).getWindowManager().getDefaultDisplay()
-				.getMetrics(dm);
-		mScreenHeight = dm.heightPixels;
-		mScreenWidth = dm.widthPixels;
+		mScreenHeight = myplexUtils.mScreenHeight;
+		mScreenWidth = myplexUtils.mScreenWidth;
 		mHideposition = (mScreenHeight - ((int) mContext.getResources()
 				.getDimension(R.dimen.actionbarheight) + getStatusBarHeight() + 20));
-
 		RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(
 				LayoutParams.MATCH_PARENT, mHideposition);
 		layoutParams.addRule(RelativeLayout.ALIGN_PARENT_TOP);

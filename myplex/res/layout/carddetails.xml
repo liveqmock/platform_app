@@ -14,11 +14,11 @@
         android:layout_marginBottom="5dp"
         android:background="#000000" >
 
-        <ImageView
+        <com.android.volley.toolbox.NetworkImageView
+            android:id="@+id/carddetails_image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="centerInside"
-            android:src="@drawable/radiohead_in_rainbows" />
+            android:scaleType="centerCrop" />
 
         <VideoView
             android:layout_width="match_parent"

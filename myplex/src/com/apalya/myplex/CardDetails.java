@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.view.LayoutInflater;
@@ -12,13 +13,15 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.android.volley.toolbox.NetworkImageView;
+import com.apalya.myplex.adapters.CardDetailsAdapter;
+import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDetailCommentListData;
 import com.apalya.myplex.data.CardDetailDataHolder;
 import com.apalya.myplex.data.CardDetailDescriptionData;
 import com.apalya.myplex.data.CardDetailMediaData;
 import com.apalya.myplex.data.CardDetailMediaListData;
 import com.apalya.myplex.utils.MyVolley;
-import com.apalya.myplex.views.CardDetailsAdapter;
 import com.apalya.myplex.views.CustomDialog;
 import com.apalya.myplex.views.CustomFastScrollView;
 import com.apalya.myplex.views.FadeInNetworkImageView;
@@ -27,26 +30,45 @@ import com.apalya.myplex.views.JazzyViewPager;
 import com.apalya.myplex.views.JazzyViewPager.TransitionEffect;
 import com.apalya.myplex.views.OutlineContainer;
 
-public class CardDetails extends BaseActivity implements
+public class CardDetails extends BaseFragment implements
 		ItemExpandListenerCallBackListener {
 	private ListView listView;
 	private CustomFastScrollView fastScrollView;
 	private CardDetailsAdapter mAdapter;
 	private LayoutInflater mInflater;
+	private int mDetailType = Profile;
+	public static final int Profile = 0;
+	public static final int MovieDetail = 1;
+	public static final int TvShowsDetail = 2;
+	public static final int LiveTvDetail = 3;
+	public View rootView;	
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		setContentView(R.layout.carddetails);
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mInflater = LayoutInflater.from(this);
-		prepareContent();
 	}
 
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		
+		rootView = inflater.inflate(R.layout.carddetails, container,false);
+		listView = (ListView) rootView.findViewById(android.R.id.list);
+		fastScrollView = (CustomFastScrollView) rootView.findViewById(R.id.fast_scroll_view);
+		prepareContent();
+		return rootView;
+	}
+	private CardData mCardData;
 	private void prepareContent() {
-		listView = (ListView) findViewById(android.R.id.list);
-		fastScrollView = (CustomFastScrollView) findViewById(R.id.fast_scroll_view);
-		mAdapter = new CardDetailsAdapter(this);
+		mAdapter = new CardDetailsAdapter(getContext());
 		mAdapter.setItemExpandListener(this);
+		if(mDataObject instanceof CardData){
+			mCardData = (CardData)mDataObject;
+			mMainActivity.setTitle(mCardData.title);
+			NetworkImageView imageview = (NetworkImageView)rootView.findViewById(R.id.carddetails_image);
+			imageview.setImageUrl(mCardData.imageUrl, MyVolley.getImageLoader());
+		}
+		
 		dummyData();
 		fastScrollView.listItemsChanged();
 	}
@@ -60,7 +82,11 @@ public class CardDetails extends BaseActivity implements
 		subData.mContentFullDescription = "Left for dead on a sun-scorched planet, Riddick finds himself up against an alien race of predators. Activating an emergency beacon alerts two ships: one carrying a new breed of mercenary, the other captained by a man from Riddick&apos;s past.";
 		subData.mContentBriefDescription = "Left for dead on a sun-scorched planet, Riddick finds ....";
 		subData.mRating = (float) 3.5;
-		subData.mTitle = "Riddick";
+		if(mCardData != null){
+			subData.mTitle = mCardData.title;
+		}else{
+			subData.mTitle = "Title";
+		}
 		descriptionData.mData = subData;
 		return descriptionData;
 	}
@@ -159,7 +185,7 @@ public class CardDetails extends BaseActivity implements
 	}
 
 	private void showAlbumDialog() {
-		mAlbumDialog = new CustomDialog(this);
+		mAlbumDialog = new CustomDialog(getContext());
 		mAlbumDialog.setContentView(R.layout.albumview);
 		setupJazziness(TransitionEffect.Stack);
 		mAlbumDialog.setCancelable(true);

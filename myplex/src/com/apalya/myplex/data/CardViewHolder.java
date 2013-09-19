@@ -8,6 +8,8 @@ import android.widget.TextView;
 
 public class CardViewHolder {
 	public LinearLayout mFavourite;
+	public ImageView mFavourite_Image;
+	public LinearLayout mFavouriteProgress;
 	public LinearLayout mDelete;
 	public ImageView mRent;
 	public LinearLayout mInfo;

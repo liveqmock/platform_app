@@ -8,173 +8,200 @@ import java.util.TimerTask;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.ls.LSInput;
 
-import android.animation.Animator;
-import android.animation.Animator.AnimatorListener;
-import android.animation.Animator.AnimatorListener;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.AnimatorSet;
-import android.animation.ObjectAnimator;
-import android.app.ActionBar;
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ApplicationErrorReport.CrashInfo;
-import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.Point;
-import android.graphics.Rect;
-import android.graphics.drawable.ColorDrawable;
+import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v4.widget.SearchViewCompat;
-import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.view.animation.Animation;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.ScaleAnimation;
-import android.view.Window;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.AbsListView;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.RelativeLayout.LayoutParams;
 
 import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.apalya.myplex.adapters.CardActionListener;
+import com.apalya.myplex.adapters.CardGoogleLayoutAdapater;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.FilterMenudata;
-import com.apalya.myplex.data.slidemenudata;
-import com.apalya.myplex.utils.FontUtil;
+import com.apalya.myplex.listboxanimation.AlphaInAnimationAdapter;
+import com.apalya.myplex.listboxanimation.OnDismissCallback;
+import com.apalya.myplex.listboxanimation.ScaleInAnimationAdapter;
+import com.apalya.myplex.listboxanimation.SwingBottomInAnimationAdapter;
+import com.apalya.myplex.listboxanimation.SwingLeftInAnimationAdapter;
+import com.apalya.myplex.listboxanimation.SwingRightInAnimationAdapter;
+import com.apalya.myplex.listboxanimation.SwipeDismissAdapter;
 import com.apalya.myplex.utils.MyVolley;
-import com.apalya.myplex.views.FliterMenu;
-import com.apalya.myplex.views.NewCardView;
-import com.apalya.myplex.views.NewCardView.OnLoadMoreListener;
-import com.apalya.myplex.views.NewCardView.OnPlayListener;
-import com.apalya.myplex.views.slidemenuadapter;
+import com.apalya.myplex.views.CardView;
 
-public class CardExplorer extends BaseActivity implements OnPlayListener{
-	private NewCardView mCardView;
-	private RelativeLayout mSlideNotificationLayout;
-	private RelativeLayout mCardDetailsView;
+public class CardExplorer extends BaseFragment implements CardActionListener,
+		OnDismissCallback {
+	private CardView mCardView;
+	private ListView mGoogleCardListView;
+	private CardGoogleLayoutAdapater mGoogleCardListViewAdapter;
 	private static final int RESULTS_PAGE_SIZE = 20;
 	private boolean mHasData = false;
 	private boolean mInError = false;
 	private int mStartIndex = 0;
 	private ArrayList<CardData> mEntries = new ArrayList<CardData>();
+	private ArrayList<CardData> mMasterEntries = new ArrayList<CardData>();
+	private int displayMode = STACKVIEW;
+	static final int STACKVIEW = 1;
+	static final int GOOGLECARDVIEW = 2;
+	private ProgressDialog mProgressDialog = null;
+	
+	public void setDisplayMode(int mode) {
+		this.displayMode = mode;
+	}
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		setContentView(R.layout.cardbrowsing);
+	public void play(CardData object) {
+		CardDetails details = new CardDetails();
+		details.setDataObject(object);
+		mMainActivity.bringFragment(details);
+	}
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
-		
-		
-		prepareSlideNotifiation();
-//		prepareFilterMenu();
-		mCardView = (NewCardView) findViewById(R.id.framelayout);
-//		mCardDetailsView = (RelativeLayout)findViewById(R.id.carddetailsview);
-		// mCardView.setActionBarHeight(actionBar.getHeight());
-		mCardView.setContext(this);
-		mCardView.setOnPlayListener(this);
-		mCardView.setOnLoadMoreListener(new  OnLoadMoreListener() {
-			
-			@Override
-			public void loadmore(int value) {
-//				mStartIndex = value;
-//				loadPage();
-			}
-		});
-		// prepareData();
-		// this.setProgressBarIndeterminate(true);
-
-//		Timer t = new Timer();
-//		t.schedule(new TimerTask() {
-//
-//			@Override
-//			public void run() {
-//				prepareData(50);
-//
-//			}
-//		}, 1000);
-//		fillFilterMenuData();
-//		enableDownFilter();
-		// mCardView.show();
 	}
 
-	private void fillFilterMenuData(){
-		List<FilterMenudata> mMenuList = new ArrayList<FilterMenudata>();
-		for(int i = 0;i < 50;i++){
-			FilterMenudata data;
-			if(i % 8 == 0){
-				data = new FilterMenudata(FilterMenudata.SECTION, "Parent "+i, i);
-			}else{
-				data = new FilterMenudata(FilterMenudata.ITEM, "child", i);
-			}
-			mMenuList.add(data);
+	public void showProgressBar(){
+		if(mProgressDialog != null){
+			mProgressDialog.dismiss();
 		}
-		setFilterData(mMenuList);
+		mProgressDialog = ProgressDialog.show(getContext(),"", "Loading...", true,false);
+	}
+	public void dismissProgressBar(){
+		if(mProgressDialog != null){
+			mProgressDialog.dismiss();
+		}
+	}
+	public void updateText(String str){
+		if(mProgressDialog != null){
+			mProgressDialog.setTitle(str);
+		}
 	}
 	@Override
-	public void onFilterMenuItemSelected(FilterMenudata data) {
-		super.onFilterMenuItemSelected(data);
-	}
-	private int mSlideNotifcationHeight;
-	private TextView mSlideNotificationText;
-	private void prepareSlideNotifiation() {
-		mSlideNotificationLayout = (RelativeLayout)findViewById(R.id.slidenotificationlayout);
-		mSlideNotificationText = (TextView)findViewById(R.id.slidenotificationtextview);
-		mSlideNotifcationHeight = (int) getResources().getDimension(R.dimen.slidenotification);
-		mSlideNotificationLayout.setY(-mSlideNotifcationHeight);
-		mSlideNotificationLayout.setOnClickListener(new OnClickListener() {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		View rootView = inflater.inflate(R.layout.cardbrowsing, container,
+				false);
+		mCardView = (CardView) rootView.findViewById(R.id.framelayout);
+		mGoogleCardListView = (ListView) rootView
+				.findViewById(R.id.cardlistview);
+		mGoogleCardListViewAdapter = new CardGoogleLayoutAdapater(getContext());
+		// mGoogleCardListView.setAdapter(mGoogleCardListViewAdapter);
+		SwingBottomInAnimationAdapter swingBottomInAnimationAdapter = new SwingBottomInAnimationAdapter(
+				new SwipeDismissAdapter(mGoogleCardListViewAdapter, this));
+		swingBottomInAnimationAdapter.setAbsListView(mGoogleCardListView);
+
+		mGoogleCardListView.setAdapter(swingBottomInAnimationAdapter);
+
+		if (displayMode == STACKVIEW) {
+			mGoogleCardListView.setVisibility(View.GONE);
+			mCardView.setVisibility(View.VISIBLE);
+			mCardView.setVerticalScrollBarEnabled(false);
+			mCardView.setHorizontalScrollBarEnabled(false);
+			mCardView.setContext(getContext());
+			mCardView.setActionBarHeight(getActionBar().getHeight());
+			mCardView.setCardActionListener(this);
+		} else {
+			mGoogleCardListView.setVisibility(View.VISIBLE);
+			mCardView.setVisibility(View.GONE);
+			mGoogleCardListViewAdapter.setCardActionListener(this);
 			
-			@Override
-			public void onClick(View arg0) {
-				prepareData(debugTotal);
-				hideNotification();				
-			}
-		});
+		}
+		mMainActivity.setTitle("Home");
+		showProgressBar();
+		loadPage();
+		return rootView;
 	}
-	private void showNotification(){
-		animate(-mSlideNotifcationHeight,0, mSlideNotificationLayout,false,2);
+
+	public void setSelectedAnimation(int index){
+		switch (index) {
+		case 0:
+			SwingBottomInAnimationAdapter swingBottomInAnimationAdapter = new SwingBottomInAnimationAdapter(
+					new SwipeDismissAdapter(mGoogleCardListViewAdapter, this));
+			swingBottomInAnimationAdapter.setAbsListView(mGoogleCardListView);
+
+			mGoogleCardListView.setAdapter(swingBottomInAnimationAdapter);
+			break;
+		case 1:
+			SwingRightInAnimationAdapter swingRightinAnimationAdapter = new SwingRightInAnimationAdapter(
+					new SwipeDismissAdapter(mGoogleCardListViewAdapter, this));
+			swingRightinAnimationAdapter.setAbsListView(mGoogleCardListView);
+
+			mGoogleCardListView.setAdapter(swingRightinAnimationAdapter);
+			break;
+		case 2:
+			SwingLeftInAnimationAdapter swingLeftinAnimationAdapter = new SwingLeftInAnimationAdapter(
+					new SwipeDismissAdapter(mGoogleCardListViewAdapter, this));
+			swingLeftinAnimationAdapter.setAbsListView(mGoogleCardListView);
+
+			mGoogleCardListView.setAdapter(swingLeftinAnimationAdapter);
+			break;
+		case 3:
+			ScaleInAnimationAdapter scaleInAnimationAdapter = new ScaleInAnimationAdapter(
+					new SwipeDismissAdapter(mGoogleCardListViewAdapter, this));
+			scaleInAnimationAdapter.setAbsListView(mGoogleCardListView);
+
+			mGoogleCardListView.setAdapter(scaleInAnimationAdapter);
+			break;
+		case 4:
+			AlphaInAnimationAdapter alphaInAnimationAdapter = new AlphaInAnimationAdapter(
+					new SwipeDismissAdapter(mGoogleCardListViewAdapter, this));
+			alphaInAnimationAdapter.setAbsListView(mGoogleCardListView);
+
+			mGoogleCardListView.setAdapter(alphaInAnimationAdapter);
+			break;
+		}
 	}
-	private void hideNotification(){
-		animate(0,-mSlideNotifcationHeight, mSlideNotificationLayout,false,2);
+	@Override
+	public void setActionBarHeight(int height) {
+		super.setActionBarHeight(height);
+		mCardView.setActionBarHeight(height);
 	}
-	
 	
 	@Override
-	protected void onResume() {
+	public void onResume() {
 		super.onResume();
-		if (!mHasData && !mInError) {
-			 loadPage();
-		}
 	}
-/*https://picasaweb.google.com/data/feed/api/all?q=movie&max-results="
-+ RESULTS_PAGE_SIZE + "&thumbsize=160&alt=json"
-+ "&start-index="*/ 
-	private void loadPage() {
-		RequestQueue queue = MyVolley.getRequestQueue();
-		
-		JsonObjectRequest myReq = new JsonObjectRequest(Method.GET,
-				"http://106.186.115.151:8888/content/v2/search/?startIndex="+ mStartIndex, null,
-				createMyReqSuccessListener(), createMyReqErrorListener());
 
-		Log.d("pref","Request results for "+"http://106.186.115.151:8888/content/v2/search/?startIndex="+ mStartIndex);
+	@Override
+	public void loadmore(int value) {
+		mStartIndex = value;
+		loadPage();
+	}
+
+	/*
+	 * https://picasaweb.google.com/data/feed/api/all?q=movie&max-results=" +
+	 * RESULTS_PAGE_SIZE + "&thumbsize=160&alt=json" + "&start-index="
+	 */
+	private void loadPage() {
+		showActionBarProgress();
+		RequestQueue queue = MyVolley.getRequestQueue();
+
+		JsonObjectRequest myReq = new JsonObjectRequest(Method.GET,
+				"http://dev.myplex.in/content/v2/search/?startIndex="
+						+ mStartIndex, null, createMyReqSuccessListener(),
+				createMyReqErrorListener());
+
+		myReq.setShouldCache(true);
+		Log.d("pref", "Request results for "
+				+ "http://dev.myplex.in/content/v2/search/?startIndex="
+				+ mStartIndex);
 		queue.add(myReq);
 	}
 
@@ -186,37 +213,88 @@ public class CardExplorer extends BaseActivity implements OnPlayListener{
 					JSONObject feed = response.getJSONObject("results");
 					JSONArray entries = feed.getJSONArray("values");
 					JSONObject entry;
-					mEntries.clear();
+//					mEntries.clear();
+					mEntries = new ArrayList<CardData>();
 					for (int i = 0; i < entries.length(); i++) {
 						CardData data = new CardData("", "", 0);
-						
+
 						entry = entries.getJSONObject(i);
-						String url = null;
 						JSONObject content = entry.getJSONObject("content");
 						data.title = content.getString("title");
+						data.filterName = content.getString("language");		
 						JSONObject images = entry.getJSONObject("images");
-						JSONArray thumbnail  = images.getJSONArray("cover");
-						if(thumbnail.length()> 0){
-							data.imageUrl = thumbnail.getJSONObject(0).getString("link");	
+						JSONArray thumbnail = images.getJSONArray("cover");
+						if (thumbnail.length() > 0) {
+							data.imageUrl = thumbnail.getJSONObject(0)
+									.getString("link");
 						}
-						
 						mEntries.add(data);
+						mMasterEntries.add(data);
 					}
-					mCardView.addData(mEntries);
-					 mCardView.show();
-						Log.d("pref","Request found "+mEntries.size());
+					applyData();
+					Log.d("pref", "Request found " + mEntries.size());
 				} catch (JSONException e) {
 					e.printStackTrace();
-//					showErrorDialog();
+					// showErrorDialog();
 				}
 			}
 		};
 	}
+	private void prepareFilterData(){
+		List<FilterMenudata> filteroptions = new ArrayList<FilterMenudata>();
+		List<String> tempList = new ArrayList<String>();
+		filteroptions.add(new FilterMenudata(FilterMenudata.SECTION, "ALL", 1));
+		for(CardData data:mMasterEntries){
+			if(data.filterName != null && !tempList.contains(data.filterName)){
+				filteroptions.add(new FilterMenudata(FilterMenudata.SECTION, data.filterName, 1));
+				tempList.add(data.filterName);
+			}
+		}
+		mMainActivity.addFilterData(filteroptions,mFilterMenuClickListener);
+	}
+	private OnClickListener mFilterMenuClickListener = new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			if(v.getTag() instanceof FilterMenudata){
+				String label = ((FilterMenudata)v.getTag()).label;
+				if(label != null && label.equalsIgnoreCase("ALL")){
+					sort(mMasterEntries);
+					return;
+				}
+				ArrayList<CardData> localData = new ArrayList<CardData>();
+				for(CardData data:mEntries){
+					if(data.filterName != null && data.filterName.equalsIgnoreCase(label)){
+						localData.add(data);
+					}
+				}
+				sort(localData);
+			}
+		}
+	};
+	private void sort(ArrayList<CardData> localData){
+		if (displayMode == STACKVIEW) {
+			mCardView.forceUpdateData(localData);
+		} else {
+			mGoogleCardListViewAdapter.forceUpdateData(localData);
+		}
+	}
+	private void applyData() {
+		if (displayMode == STACKVIEW) {
+			mCardView.addData(mEntries);
+			mCardView.show();
+		} else {
+			mGoogleCardListViewAdapter.setData(mEntries);
+		}
+		prepareFilterData();
+		dismissProgressBar();
+		hideActionBarProgress();
+	}
 
 	private void showErrorDialog() {
 		mInError = true;
-		AlertDialog.Builder b = new AlertDialog.Builder(CardExplorer.this);
-		b.setMessage("Error occured");
+		AlertDialog.Builder b = new AlertDialog.Builder(getContext());
+		b.setMessage("No Response from server");
 		b.show();
 	}
 
@@ -224,187 +302,70 @@ public class CardExplorer extends BaseActivity implements OnPlayListener{
 		return new Response.ErrorListener() {
 			@Override
 			public void onErrorResponse(VolleyError error) {
-//				showErrorDialog();
+				 showErrorDialog();
+				hideActionBarProgress();
+				dismissProgressBar();
 			}
 		};
 	}
 	
-	
-	private void sendNotification(){
-		Handler h = new Handler(Looper.getMainLooper());
-		h.post(new Runnable() {
-			public void run() {
-				mSlideNotificationText.setText(debugTotal+" result available");
-				showNotification();
-			}
-		});
-	}
-	private void debugDelayResults(){
+	private CardData mCardData;
+
+	@Override
+	public void addFavourite(CardData data) {
+		mCardData = data;
 		Timer t = new Timer();
 		t.schedule(new TimerTask() {
-			
+
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
-				sendNotification();
+				mCardData.applyFavoriteInProgress = false;
+				mCardData.isFavorite = true;
+				Handler h = new Handler(Looper.getMainLooper());
+				h.post(new Runnable() {
+
+					@Override
+					public void run() {
+						mCardView.updateData(mCardData);
+					}
+				});
 			}
-		}, 2000);
+		}, 1000);
 	}
-	private int debugTotal;
-//	@Override
-//	public boolean onOptionsItemSelected(MenuItem item) {
-//		switch (item.getItemId()) {
-//		case R.id.slideinmenu:{
-//			showMenu();
-//			break;
-//		}
-//		case R.id.loadmore50: {
-//			debugTotal = 50;
-//			debugDelayResults();
-//			break;
-//		}
-//		case R.id.loadmore100: {
-//			debugTotal = 100;
-//			debugDelayResults();
-//			break;
-//		}
-//		case R.id.loadmore500: {
-//			debugTotal = 500;
-//			debugDelayResults();
-//			break;
-//		}
-//		default:
-//			break;
-//		}
-//		// TODO Auto-generated method stub
-//		return super.onOptionsItemSelected(item);
-//	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-//		getMenuInflater().inflate(R.menu.activity_main, menu);
-		MenuInflater inflater=getMenuInflater();
-		inflater.inflate(R.menu.optmenu, menu);
-		ActionBar actionBar = getActionBar();
-		mCardView.setActionBarHeight(actionBar.getHeight());
-		return true;
+	public void removeFavourite(CardData data) {
+		// TODO Auto-generated method stub
+
 	}
 
-	private int count = 0;
-	private Rect centerViewBounds = new Rect();
-	private Rect leftViewBounds = new Rect();
-	private Animator mCurrentAnimator;
-
-	
-	private void prepareData(final int total) {
-		Handler h = new Handler(Looper.getMainLooper());
-		h.post(new Runnable() {
-
-			@Override
-			public void run() {
-				for (int i = 0; i < total; i++) {
-					mCardView.addData(new com.apalya.myplex.data.CardData(
-							"Movie " + count++, null,
-							R.drawable.radiohead_in_rainbows));
-				}
-				mCardView.show();
-				// setProgressBarIndeterminate(false);
-			}
-		});
-	}
-	private RelativeLayout mCardDetailPreviewLayout;
-	private ImageView mCardDetailPreviewImage;
-	private RelativeLayout mCardDetailPreviewTitle;
-	private RelativeLayout mCardDetailPreviewBottom;
-	private TextView mCardDetailPreviewTitleText;
-	
-	public interface AnimationComplete{
-		public void OnAnimationComplete();
-	}
-	private void DelayedCallback(final AnimationComplete listener){
-		Handler h = new Handler(Looper.getMainLooper());
-		h.post(new Runnable() {
-			
-			@Override
-			public void run() {
-				if(listener != null){
-					listener.OnAnimationComplete();
-				}
-			}
-		});
-	}
 	@Override
-	public void play(CardData data) {
-		startActivity(new Intent(this,CardDetails.class));
-		
-//		mCardDetailPreviewLayout = (RelativeLayout)findViewById(R.id.dummy_card_preview);
-//		mCardDetailPreviewImage = (ImageView)findViewById(R.id.dummy_card_preview_image);
-//		mCardDetailPreviewTitle = (RelativeLayout)findViewById(R.id.dummy_card_title_layout);
-//		mCardDetailPreviewTitleText = (TextView)findViewById(R.id.dummy_card_title_name);
-//		mCardDetailPreviewBottom = (RelativeLayout)findViewById(R.id.dummy_card_preview_bottom_layout);
-//
-//		mCardDetailPreviewLayout.setVisibility(View.VISIBLE);
-//		mCardDetailPreviewTitle.setVisibility(View.VISIBLE);
-//		mCardDetailPreviewBottom.setVisibility(View.VISIBLE);
-//		
-//		mCardDetailPreviewImage.setImageResource(data.resId);
-//		mCardDetailPreviewTitleText.setText(data.title);
-//		
-//		mCardDetailsView.setVisibility(View.VISIBLE);
-//		fadeCardView(mCardView,new  AnimationComplete() {
-//			
-//			@Override
-//			public void OnAnimationComplete() {
-////				fadeCardView(mCardDetailPreviewTitle, null);
-////				fadeCardView(mCardDetailPreviewBottom, null);
-//			}
-//		});
-		
+	public void selectedCard(int index) {
+		// TODO Auto-generated method stub
+
 	}
-//	@Override
-//	public void onBackPressed() {
-//		if(mCardDetailsView.getVisibility() == View.VISIBLE){
-//			mCardDetailsView.setVisibility(View.GONE);
-//			mCardView.setVisibility(View.VISIBLE);
-//			AnimatorSet set = new AnimatorSet();
-//			set.play(ObjectAnimator.ofFloat(mCardView, View.ALPHA, 0, 1));
-//			set.setDuration(1000);
-//			set.setInterpolator(new DecelerateInterpolator());
-//			set.start();
-//		}else{
-//			super.onBackPressed();
-//		}
-//	}
-	private void fadeCardView(final View v,final AnimationComplete listener){
-		AnimatorSet set = new AnimatorSet();
-		set.play(ObjectAnimator.ofFloat(mCardView, View.ALPHA, 1, 0));
-		set.setDuration(1000);
-		set.setInterpolator(new DecelerateInterpolator());
-		set.addListener(new AnimatorListener() {
-			
-			@Override
-			public void onAnimationStart(Animator arg0) {
-				// TODO Auto-generated method stub
-			}
-			
-			@Override
-			public void onAnimationRepeat(Animator arg0) {
-				// TODO Auto-generated method stub
-			}
-			
-			@Override
-			public void onAnimationEnd(Animator arg0) {
-				// TODO Auto-generated method stub
-				v.setVisibility(View.GONE);
-				DelayedCallback(listener);
-			}
-			
-			@Override
-			public void onAnimationCancel(Animator arg0) {
-				// TODO Auto-generated method stub
-			}
-		});
-		set.start();
+
+	@Override
+	public void deletedCard(CardData data) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void moreInfo(int index) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void purchase(int index) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void onDismiss(AbsListView listView, int[] reverseSortedPositions) {
+		// TODO Auto-generated method stub
+
 	}
 }

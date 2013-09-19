@@ -4,8 +4,8 @@
     <string name="app_name">myplex</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
-    <string name="fbapp_id">582364305158936</string>
-    <!-- <string name="fbapp_id">276388885760599</string> -->
+   <!--  <string name="fbapp_id">582364305158936</string> -->
+    <string name="fbapp_id">276388885760599</string>
     <string name="send_request">Send Request</string>
     <string name="share">Share</string>
     <string name="logout">Logout</string>
@@ -13,19 +13,57 @@
     <string name="title">MyPlex</string>
     <string name="required">required</string>
     <string name="password">Password:</string>
-    <string name="facebook">Login with Facebook</string>
-    <string name="google">Login with Google+</string>
-    <string name="letme">"Let me in..."</string>
+    <string name="facebook">Sign In with Facebook</string>
+    <string name="google">Sign In with Google+</string>
+    <string name="letme">Let me in...</string>
+    <string name="progress_message">Loading...</string>
     <string name="or">or</string>
     <string name="phone">Phone:</string>
-    <string name="login">Log In</string>
-    <string name="signup">Sign Up</string>
+    <string name="login">Login</string>
+    <string name="signup">Register</string>
     <string name="fname">Full Name:</string>
     <string name="uName">Username:</string>
     <string name="msgUpdate">Receive SMS Updates</string>
     <string name="mailUpdate">Receive Mail Updates</string>
     <string name="submit">Continue to Myplex</string>
     <string name="forgetPwd">Forgot Password? Let\'s fix it here</string>
+    
+    
+    <string-array name="hometabletanim">
+        <item>Bottom-In</item>
+        <item>Right-In</item>
+        <item>Left-In</item>
+        <item>Scale</item>
+        <item>Alpha-In</item>
+    </string-array>
+    	<string name="searchhint">Search...</string>
+    <string name="tag1">1</string>
+	<string name="tag2">2</string>
+
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+     <string name="osname">Android</string>
+    <string name="interneterr">Hey, It seems your internet connection is not working, for full functionality of the app please activate it</string>
+    <string name="clientsecret">ApalyaAndroid</string>
+    <!-- URLS -->
+    <string name="url">http://dev.myplex.in/user/v2/</string>
+    <string name="devRegPath">registerDevice</string>
+    <string name="signin">signIn</string>
+    <string name="signuppath">signUp</string>
+    <string name="signoutpath">signOut</string>
+    <string name="fbloginpath">social/login/FB</string>
+    <string name="gplusloginpath">social/login/Google</string>
+    <!-- URLS -->
+    <!-- P.storage --> 
+    <string name="encryptkey">encrypt_random_key</string>
+    <string name="devclientkey">devClientKey</string>
+	<string name="devclientdevid">devClientDevId</string>
+	<string name="devclientkeyexp">devClientKeyExp</string>
+	<string name="devusername">username</string>
+	<string name="devpassword">password</string>
+	
+	<!-- P.storage -->
+    
 
     <string-array name="jazzy_effects">
         <item>Standard</item>

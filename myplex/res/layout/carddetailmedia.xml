@@ -4,24 +4,11 @@
     android:layout_height="wrap_content"
     android:background="@drawable/card_background" >
 
-    <TextView
-        android:id="@+id/carddetailmedia_textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="16dp"
-        android:layout_marginTop="5dp"
-        android:singleLine="true"
-        android:text="Large Text"
-        android:textColor="#6b6b6b"
-        android:textSize="15sp"
-        android:textStyle="bold" />
 
     <LinearLayout
         android:id="@+id/carddetailmedia_contentlayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/carddetailmedia_textView1"
         android:layout_marginTop="10dp"
         android:orientation="vertical" >
     </LinearLayout>

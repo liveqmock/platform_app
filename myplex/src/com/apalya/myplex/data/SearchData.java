@@ -1,11 +1,37 @@
 package com.apalya.myplex.data;
 
+import java.util.List;
+
+
 public class SearchData {
+	
+	public static class ButtonData{
+		public String getButtonName() {
+			return buttonName;
+		}
+
+		String buttonName;
+		boolean isCLicked = false;
+		public boolean isCLicked() {
+			return isCLicked;
+		}
+		public void setCLicked(boolean isCLicked) {
+			this.isCLicked = isCLicked;
+		}
+		public ButtonData(String name, boolean clickStatus) {
+			this.buttonName = name;
+			this.isCLicked = clickStatus;
+		}
+	}
+	
 	String categoryName;
-	boolean isVisible = false;
+//	boolean isVisible = false;
 	boolean isSection = false;
-	String[] names;
-    boolean isExpanded=false;
+//	String[] names;
+	List<ButtonData> searchTags;
+
+
+	boolean isExpanded=false;
     public static final int SECTION = 1;
 
 	public boolean isExpanded() {
@@ -24,13 +50,13 @@ public class SearchData {
 		this.isSection = isSection;
 	}
 
-	public boolean isVisible() {
+	/*public boolean isVisible() {
 		return isVisible;
 	}
 
 	public void setVisible(boolean isVisible) {
 		this.isVisible = isVisible;
-	}
+	}*/
 
 	public String getCategoryName() {
 		return categoryName;
@@ -40,12 +66,19 @@ public class SearchData {
 		this.categoryName = categoryName;
 	}
 
-	public String[] getNames() {
+	/*public String[] getNames() {
 		return names;
 	}
 
 	public void setNames(String[] names) {
 		this.names = names;
+	}*/
+    public List<ButtonData> getSearchTags() {
+		return searchTags;
+	}
+
+	public void setSearchTags(List<ButtonData> searchTags) {
+		this.searchTags = searchTags;
 	}
 
 }

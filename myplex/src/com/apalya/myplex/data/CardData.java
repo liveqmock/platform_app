@@ -7,6 +7,9 @@ import android.os.Parcelable;
 public class CardData implements Parcelable {
 	public String title;
 	public String imageUrl;
+	public boolean isFavorite = false;
+	public boolean applyFavoriteInProgress = false;
+	public String filterName;
 	public int resId;
 	public Rect ImageRect = new Rect();
 	public int ImageX;

@@ -21,9 +21,9 @@
             android:layout_marginLeft="5dp" >
 
             <ImageView
-               android:layout_gravity="center_vertical"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:layout_gravity="center_vertical"
                 android:src="@drawable/card_delete" />
         </LinearLayout>
 
@@ -36,9 +36,25 @@
             android:layout_marginRight="5dp" >
 
             <ImageView
+                android:id="@+id/card_title_fav_image"
                 android:layout_width="24dp"
-                android:layout_height="24dp"  android:layout_gravity="center_vertical"
-                android:src="@drawable/card_fav" />
+                android:layout_height="24dp"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/card_unfav" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/card_title_fav_progress"
+            android:layout_width="@dimen/cardtitleheight"
+            android:layout_height="@dimen/cardtitleheight"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="5dp" >
+
+            <ProgressBar
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center_vertical" />
         </LinearLayout>
 
         <TextView
@@ -65,9 +81,9 @@
 
         <com.android.volley.toolbox.NetworkImageView
             android:id="@+id/card_preview_image"
-            android:layout_width="fill_parent" 
+            android:layout_width="fill_parent"
             android:layout_height="@dimen/cardplayheight"
-            android:scaleType="fitCenter" />
+            android:scaleType="centerCrop" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -88,11 +104,11 @@
         <TextView
             android:id="@+id/card_status_comments_text"
             android:layout_width="wrap_content"
-            android:gravity="center_vertical"
             android:layout_height="@dimen/cardstatusheight"
             android:layout_alignBottom="@+id/card_status_comments"
             android:layout_marginLeft="7dp"
             android:layout_toRightOf="@+id/card_status_comments"
+            android:gravity="center_vertical"
             android:singleLine="true"
             android:text="5,514"
             android:textColor="#f57242"
@@ -110,11 +126,11 @@
         <TextView
             android:id="@+id/card_status_people_text"
             android:layout_width="wrap_content"
-            android:gravity="center_vertical"
             android:layout_height="@dimen/cardstatusheight"
             android:layout_alignBottom="@+id/card_status_people"
             android:layout_marginRight="7dp"
             android:layout_toLeftOf="@+id/card_status_people"
+            android:gravity="center_vertical"
             android:singleLine="true"
             android:text="13,514"
             android:textColor="#f57242"
@@ -125,7 +141,7 @@
         android:id="@+id/card_info_layout"
         android:layout_width="fill_parent"
         android:layout_height="@dimen/cardmoreinfoheight"
- 		android:layout_below="@+id/card_status_layout"
+        android:layout_below="@+id/card_status_layout"
         android:orientation="vertical" >
 
         <View
@@ -134,14 +150,16 @@
             android:background="#D8D8D8" />
 
         <LinearLayout
-            android:layout_width="fill_parent" android:layout_gravity="center" 
+            android:layout_width="fill_parent"
             android:layout_height="@dimen/cardmoreinfoheight"
+            android:layout_gravity="center"
             android:orientation="horizontal" >
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/cardmoreinfoheight"
-                android:layout_gravity="center" android:layout_marginLeft="5dp"
+                android:layout_gravity="center"
+                android:layout_marginLeft="5dp"
                 android:layout_weight="1" >
 
                 <ImageView
@@ -169,18 +187,17 @@
                 android:background="#D8D8D8" />
 
             <LinearLayout
-                 android:id="@+id/card_info_more"
+                android:id="@+id/card_info_more"
                 android:layout_width="wrap_content"
                 android:layout_height="@dimen/cardmoreinfoheight"
-                android:layout_gravity="center" android:layout_marginLeft="5dp"
-                android:layout_weight="1" > 
+                android:layout_gravity="center"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="1" >
 
                 <ImageView
-                   
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_gravity="center"
-                    
                     android:src="@drawable/card_info" />
 
                 <TextView
