@@ -4,8 +4,8 @@
     <string name="app_name">myplex</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
-   <!--  <string name="fbapp_id">582364305158936</string> -->
-    <string name="fbapp_id">276388885760599</string>
+    <string name="fbapp_id">582364305158936</string>
+    <!-- <string name="fbapp_id">276388885760599</string> -->
     <string name="send_request">Send Request</string>
     <string name="share">Share</string>
     <string name="logout">Logout</string>
