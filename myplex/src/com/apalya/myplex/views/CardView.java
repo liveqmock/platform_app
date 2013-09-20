@@ -9,10 +9,8 @@ import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.app.Activity;
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
@@ -199,6 +197,7 @@ public class CardView extends ScrollView {
 	}
 
 	public void addData(List<CardData> datalist) {
+		mDataList = new ArrayList<CardData>();
 		if (datalist != null) {
 			for (CardData data : datalist) {
 				this.mDataList.add(data);

@@ -1,6 +1,5 @@
 package com.apalya.myplex.views;
 
-import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;

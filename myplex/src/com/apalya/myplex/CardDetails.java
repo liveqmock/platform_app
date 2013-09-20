@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.view.LayoutInflater;
@@ -211,11 +210,11 @@ public class CardDetails extends BaseFragment implements
 
 			FadeInNetworkImageView imageView = (FadeInNetworkImageView) v
 					.findViewById(R.id.albumitem_imageView1);
-			Random rnd = new Random();
+//			Random rnd = new Random();
 			// int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(128),
 			// rnd.nextInt(64));
 			// imageView.setBackgroundColor(color);
-			TextView text = (TextView) v.findViewById(R.id.albumitem_textView1);
+//			TextView text = (TextView) v.findViewById(R.id.albumitem_textView1);
 //			text.setText("" + position);
 			imageView.setImageUrl(mMediaList.get(position).mThumbnailUrl,
 					MyVolley.getImageLoader());

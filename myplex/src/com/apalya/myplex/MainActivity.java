@@ -4,11 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-import android.R.color;
-import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -38,7 +35,6 @@ import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.myplexUtils;
 import com.apalya.myplex.menu.FilterMenuProvider;
 import com.apalya.myplex.utils.MyVolley;
-import com.apalya.myplex.utils.SharedPrefUtils;
 
 public class MainActivity extends BaseActivity {
 	private DrawerLayout mDrawerLayout;
@@ -48,6 +44,9 @@ public class MainActivity extends BaseActivity {
 	private CharSequence mTitle;
 	public LayoutInflater mInflater;
 	public BaseFragment mCurrentFragment;
+	public final static int CARDDETAILS = 0;
+	public final static int CARDEXPLORER = 1;
+	public final static int SEARCH = 2;
 	private Stack<BaseFragment> mFragmentStack = new Stack<BaseFragment>();
 	private List<NavigationOptionsMenu> mMenuItemList = new ArrayList<NavigationOptionsMenu>();
 
@@ -239,6 +238,36 @@ public class MainActivity extends BaseActivity {
 		super.onBackPressed();
 
 	}
+	public BaseFragment createFragment(int fragmentType){
+		BaseFragment fragment;
+		switch (fragmentType) {
+		case CARDDETAILS:
+			if(mCardDetails == null){
+				mCardDetails = new CardDetails();
+			}
+			fragment = mCardDetails;
+			break;
+		case CARDEXPLORER:
+			if(mCardExplorer == null){
+				mCardExplorer = new CardExplorer();
+			}
+			fragment = mCardExplorer;
+			break;
+		case SEARCH:
+			if(mSearchActivity == null){
+				mSearchActivity = new SearchActivity();
+			}
+			fragment = mSearchActivity;
+			break;
+		default:
+			if(mCardDetails == null){
+				mCardDetails = new CardDetails();
+			}
+			fragment = mCardDetails;
+			break;
+		}
+		return fragment;
+	}
 
 	public void bringFragment(BaseFragment fragment) {
 		if (fragment == null) {
@@ -260,32 +289,31 @@ public class MainActivity extends BaseActivity {
 		super.onStop();
 		mPlusClient.disconnect();
 	}
+	private CardExplorer mCardExplorer;
+	private CardDetails mCardDetails;
+	private SearchActivity mSearchActivity;
 	
 	private void selectItem(int position) {
 		switch (position) {
 		case 0:
-			mCurrentFragment = new CardDetails();
-			break;
-		case 1:{
-			CardExplorer fragment = new CardExplorer();
-			fragment.setDisplayMode(CardExplorer.STACKVIEW);
-			mCurrentFragment = fragment;
+		case 1:
+		case 4:
+		case 5:
+		default:{
+			mCardExplorer = (CardExplorer) createFragment(CARDEXPLORER);
+			mCardExplorer.setDisplayMode(CardExplorer.STACKVIEW);
+			mCurrentFragment = mCardExplorer;
 			}
 			break;
 		case 2:{
-			CardExplorer fragment = new CardExplorer();
-			fragment.setDisplayMode(CardExplorer.GOOGLECARDVIEW);
-			mCurrentFragment = fragment;
+			mCardExplorer = (CardExplorer) createFragment(CARDEXPLORER);
+			mCardExplorer.setDisplayMode(CardExplorer.GOOGLECARDVIEW);
+			mCurrentFragment = mCardExplorer;
 			}
 			break;
 		case 3:
+			mSearchActivity = (SearchActivity) createFragment(SEARCH);
 			mCurrentFragment = new SearchActivity();
-			break;
-		case 4:
-			mCurrentFragment = new CardExplorer();
-			break;
-		case 5:
-			mCurrentFragment = new CardExplorer();
 			break;
 		case 7:{
 			onClickLogout();
@@ -293,9 +321,9 @@ public class MainActivity extends BaseActivity {
 			//startActivity(new Intent(MainActivity.this,LoginActivity.class));
 			break;
 		}
-		default:
-			mCurrentFragment = new CardExplorer();
-			break;
+//		default:
+//			mCurrentFragment = new CardExplorer();
+//			break;
 		}
 		pushFragment();
 		mDrawerList.setItemChecked(position, true);
@@ -310,8 +338,9 @@ public class MainActivity extends BaseActivity {
 		mCurrentFragment.setMainActivity(this);
 		FragmentManager fragmentManager = getFragmentManager();
 		FragmentTransaction transaction = fragmentManager.beginTransaction();
-		transaction.setCustomAnimations(android.R.animator.fade_in,
-				android.R.animator.fade_out);
+//		transaction.setCustomAnimations(android.R.animator.fade_in,
+//				android.R.animator.fade_out);
+//		transaction.
 		transaction.replace(R.id.content_frame, mCurrentFragment);
 		transaction.addToBackStack(null);
 		transaction.commit();
@@ -374,7 +403,8 @@ public class MainActivity extends BaseActivity {
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		// If the nav drawer is open, hide action items related to the content
 		// view
-		boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerList);
+//		boolean drawerOpen = 
+				mDrawerLayout.isDrawerOpen(mDrawerList);
 		// menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
 		return super.onPrepareOptionsMenu(menu);
 	}
@@ -395,6 +425,10 @@ public class MainActivity extends BaseActivity {
 				SearchActivity fragment = new SearchActivity();
 				bringFragment(fragment);
 			}
+			break;
+		}
+		case R.id.menu_filter:{
+			Log.e("pref","onOptionsItemSelected");
 			break;
 		}
 		default:

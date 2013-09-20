@@ -1,51 +1,41 @@
 package com.apalya.myplex.views;
 
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
+
 import android.animation.Animator;
+import android.animation.Animator.AnimatorListener;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.animation.Animator.AnimatorListener;
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.Rect;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.FocusFinder;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
-import android.view.ViewGroup;
-import android.view.ViewParent;
-import android.view.View.OnClickListener;
-import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.OverScroller;
 import android.widget.RelativeLayout;
 import android.widget.Scroller;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.Stack;
-
+import com.android.volley.toolbox.NetworkImageView;
 import com.apalya.myplex.R;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardViewHolder;
 import com.apalya.myplex.data.CardViewMeta;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
-import com.android.volley.toolbox.NetworkImageView;
 public class NewCardView extends FrameLayout {
     static final int ANIMATED_SCROLL_GAP = 250;
 

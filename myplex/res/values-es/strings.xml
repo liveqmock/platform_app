@@ -16,6 +16,7 @@
 -->
 
 <resources>
+     <string name="app_name">myplex</string>
     <string name="com_facebook_dialogloginactivity_ok_button">Aceptar</string>
     <string name="com_facebook_loginview_log_out_button">Cerrar sesión</string>
     <string name="com_facebook_loginview_log_in_button">Iniciar sesión con Facebook</string>

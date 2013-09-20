@@ -141,9 +141,9 @@ public class CardDetailsAdapter extends BaseAdapter implements SectionIndexer {
 			CardDetailMediaListData localData = (CardDetailMediaListData) data.mData;
 			v = mInflater.inflate(R.layout.carddetailmedia, null);
 			v.setTag(data);
-			TextView text = (TextView) v
-					.findViewById(R.id.carddetailmedia_textView1);
-			text.setText(data.mLabel);
+//			TextView text = (TextView) v
+//					.findViewById(R.id.carddetailmedia_textView1);
+//			text.setText(data.mLabel);
 			LinearLayout contentLayout = (LinearLayout) v
 					.findViewById(R.id.carddetailmedia_contentlayout);
 			createMediaitem(contentLayout, localData);

@@ -422,7 +422,7 @@ ConnectionCallbacks, OnConnectionFailedListener{
 	}
 
 	private String getDateTime() { 
-		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+//		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 		Date date = new Date();
 		return date.toGMTString();
 		//return dateFormat.format(date.toGMTString());
@@ -463,7 +463,12 @@ ConnectionCallbacks, OnConnectionFailedListener{
 	public void onClickLogout() {
 		//finish();
 		//launchActivity(LoginActivity.class,this , null);
-
+//		Session localsession = Session.getActiveSession();
+//		if (localsession == null) {
+//			localsession = new Session(this);
+//			Session.setActiveSession(localsession);
+//		}
+		
 		if(mPlusClient.isConnected() || Session.getActiveSession().isOpened())
 		{
 			if(mPlusClient.isConnected())

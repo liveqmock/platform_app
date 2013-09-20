@@ -5,12 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -19,10 +16,8 @@ import android.view.animation.Animation;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
-import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 
-import com.android.volley.toolbox.NetworkImageView;
 import com.apalya.myplex.R;
 import com.apalya.myplex.data.CardDetailCast;
 import com.apalya.myplex.data.CardDetailCommentListData;
@@ -32,11 +27,10 @@ import com.apalya.myplex.data.CardDetailMediaListData;
 import com.apalya.myplex.data.myplexUtils;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
-import com.apalya.myplex.views.CustomFastScrollView;
+import com.apalya.myplex.views.CustomFastScrollView.SectionIndexer;
 import com.apalya.myplex.views.ExpandAnimation;
 import com.apalya.myplex.views.FadeInNetworkImageView;
 import com.apalya.myplex.views.ItemExpandListener;
-import com.apalya.myplex.views.CustomFastScrollView.SectionIndexer;
 import com.apalya.myplex.views.ItemExpandListener.ItemExpandListenerCallBackListener;
 
 public class CardDetailsAdapter extends BaseAdapter implements SectionIndexer {
@@ -46,7 +40,7 @@ public class CardDetailsAdapter extends BaseAdapter implements SectionIndexer {
 	private LayoutInflater mInflater;
 	public Context mContext;
 	private ItemExpandListenerCallBackListener mItemExpandListenerCallBackListener;
-	private int mScreenHeight;
+//	private int mScreenHeight;
 	private int mScreenWidth;
 	private int mImageGap;
 	private int mImageWidth;
@@ -59,7 +53,7 @@ public class CardDetailsAdapter extends BaseAdapter implements SectionIndexer {
 	public CardDetailsAdapter(Context cxt) {
 		this.mContext = cxt;
 		mInflater = LayoutInflater.from(cxt);
-		mScreenHeight = myplexUtils.mScreenHeight;
+//		mScreenHeight = myplexUtils.mScreenHeight;
 		mScreenWidth = myplexUtils.mScreenWidth;
 		mImageGap = (int) mContext.getResources().getDimension(
 				R.dimen.carddetailmultimediathumnnailmargin);
@@ -136,7 +130,7 @@ public class CardDetailsAdapter extends BaseAdapter implements SectionIndexer {
 		} else if (data.mData instanceof CardDetailCast) {
 
 		} else if (data.mData instanceof CardDetailCommentListData) {
-			CardDetailCommentListData localData = (CardDetailCommentListData) data.mData;
+//			CardDetailCommentListData localData = (CardDetailCommentListData) data.mData;
 			v = mInflater.inflate(R.layout.carddetailcomment, null);
 			
 		} else if (data.mData instanceof CardDetailMediaListData) {

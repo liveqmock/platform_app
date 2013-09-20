@@ -3,25 +3,17 @@ package com.apalya.myplex.views;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.apalya.myplex.R;
-import com.apalya.myplex.data.FilterMenudata;
-import com.apalya.myplex.data.myplexUtils;
-import com.apalya.myplex.views.PinnedSectionListView.PinnedSectionListAdapter;
-
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewPropertyAnimator;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.AbsListView;
@@ -31,8 +23,12 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
+
+import com.apalya.myplex.R;
+import com.apalya.myplex.data.FilterMenudata;
+import com.apalya.myplex.data.myplexUtils;
+import com.apalya.myplex.views.PinnedSectionListView.PinnedSectionListAdapter;
 
 public class FliterMenu extends RelativeLayout {
 	private boolean isOpened = false;

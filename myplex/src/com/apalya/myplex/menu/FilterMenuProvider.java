@@ -3,32 +3,26 @@ package com.apalya.myplex.menu;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.apalya.myplex.MainActivity;
-import com.apalya.myplex.R;
-import com.apalya.myplex.data.FilterMenudata;
-import com.apalya.myplex.views.FliterMenu;
-import com.apalya.myplex.views.PinnedSectionListView;
-import com.apalya.myplex.views.PinnedSectionListView.PinnedSectionListAdapter;
-
-import android.app.Activity;
-import android.app.Fragment;
 import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
-import android.util.Log;
 import android.view.ActionProvider;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.PopupWindow;
-import android.widget.TextView;
 import android.widget.PopupWindow.OnDismissListener;
 import android.widget.RelativeLayout.LayoutParams;
+import android.widget.TextView;
+
+import com.apalya.myplex.R;
+import com.apalya.myplex.data.FilterMenudata;
+import com.apalya.myplex.views.PinnedSectionListView;
+import com.apalya.myplex.views.PinnedSectionListView.PinnedSectionListAdapter;
 
 public class FilterMenuProvider extends ActionProvider {
 	protected final Context context;
@@ -83,6 +77,7 @@ public class FilterMenuProvider extends ActionProvider {
 		});
 		return mParent;
 	}
+	
 	private OnClickListener mDelegate;
 	public void addFilterData(List<FilterMenudata> datalist,
 			OnClickListener listener) {
@@ -153,7 +148,14 @@ public class FilterMenuProvider extends ActionProvider {
 
 	@Override
 	public View onCreateActionView() {
-		// TODO Auto-generated method stub
-		return null;
+		mParent = mInflater.inflate(R.layout.filteractionmenuitem, null);
+		mParent.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				showPopup();
+			}
+		});
+		return mParent;
 	}
 }

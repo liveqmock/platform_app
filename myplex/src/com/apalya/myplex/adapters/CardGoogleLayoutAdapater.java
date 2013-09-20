@@ -34,10 +34,10 @@ public class CardGoogleLayoutAdapater extends BaseAdapter{
 	}
 	public void setData(List<CardData> datalist){
 		if(datalist == null){return;}
+		mDataList = new ArrayList<CardData>();
 		for(CardData data: datalist){
 			this.mDataList.add(data);
 		}
-		mDataList = datalist;
 		mNumberofItems  = mDataList.size();
 		notifyDataSetChanged();
 	}

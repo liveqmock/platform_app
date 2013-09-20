@@ -2,25 +2,10 @@ package com.apalya.myplex;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import org.apache.http.util.LangUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.Request.Method;
-import com.android.volley.Response.ErrorListener;
-import com.android.volley.Response.Listener;
-import com.android.volley.toolbox.StringRequest;
-import com.apalya.myplex.utils.MyVolley;
-import com.apalya.myplex.utils.SharedPrefUtils;
-
-import android.app.AlertDialog;
-import android.app.LauncherActivity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -31,6 +16,16 @@ import android.view.View.OnClickListener;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+
+import com.android.volley.Request.Method;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.Response.ErrorListener;
+import com.android.volley.Response.Listener;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.apalya.myplex.utils.MyVolley;
+import com.apalya.myplex.utils.SharedPrefUtils;
 
 public class SplashActivity extends BaseActivity{
 

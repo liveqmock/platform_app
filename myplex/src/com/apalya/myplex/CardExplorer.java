@@ -58,6 +58,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,
 	private int displayMode = STACKVIEW;
 	static final int STACKVIEW = 1;
 	static final int GOOGLECARDVIEW = 2;
+	private View mRootView;
 	private ProgressDialog mProgressDialog = null;
 	
 	public void setDisplayMode(int mode) {
@@ -66,9 +67,9 @@ public class CardExplorer extends BaseFragment implements CardActionListener,
 
 	@Override
 	public void play(CardData object) {
-		CardDetails details = new CardDetails();
-		details.setDataObject(object);
-		mMainActivity.bringFragment(details);
+		BaseFragment fragment = mMainActivity.createFragment(MainActivity.CARDDETAILS);
+		fragment.setDataObject(object);
+		mMainActivity.bringFragment(fragment);
 	}
 
 	@Override
@@ -96,10 +97,13 @@ public class CardExplorer extends BaseFragment implements CardActionListener,
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View rootView = inflater.inflate(R.layout.cardbrowsing, container,
-				false);
-		mCardView = (CardView) rootView.findViewById(R.id.framelayout);
-		mGoogleCardListView = (ListView) rootView
+		if(mRootView != null){
+			show();
+			return mRootView;
+		}
+		mRootView = inflater.inflate(R.layout.cardbrowsing, container,false);
+		mCardView = (CardView) mRootView.findViewById(R.id.framelayout);
+		mGoogleCardListView = (ListView) mRootView
 				.findViewById(R.id.cardlistview);
 		mGoogleCardListViewAdapter = new CardGoogleLayoutAdapater(getContext());
 		// mGoogleCardListView.setAdapter(mGoogleCardListViewAdapter);
@@ -108,25 +112,18 @@ public class CardExplorer extends BaseFragment implements CardActionListener,
 		swingBottomInAnimationAdapter.setAbsListView(mGoogleCardListView);
 
 		mGoogleCardListView.setAdapter(swingBottomInAnimationAdapter);
-
-		if (displayMode == STACKVIEW) {
-			mGoogleCardListView.setVisibility(View.GONE);
-			mCardView.setVisibility(View.VISIBLE);
-			mCardView.setVerticalScrollBarEnabled(false);
-			mCardView.setHorizontalScrollBarEnabled(false);
-			mCardView.setContext(getContext());
-			mCardView.setActionBarHeight(getActionBar().getHeight());
-			mCardView.setCardActionListener(this);
-		} else {
-			mGoogleCardListView.setVisibility(View.VISIBLE);
-			mCardView.setVisibility(View.GONE);
-			mGoogleCardListViewAdapter.setCardActionListener(this);
-			
-		}
+		mCardView.setVisibility(View.VISIBLE);
+		mCardView.setVerticalScrollBarEnabled(false);
+		mCardView.setHorizontalScrollBarEnabled(false);
+		mCardView.setContext(getContext());
+		mCardView.setActionBarHeight(getActionBar().getHeight());
+		mCardView.setCardActionListener(this);
+		mGoogleCardListViewAdapter.setCardActionListener(this);
+		setDisplayMode(displayMode);
 		mMainActivity.setTitle("Home");
 		showProgressBar();
 		loadPage();
-		return rootView;
+		return mRootView;
 	}
 
 	public void setSelectedAnimation(int index){
@@ -173,10 +170,22 @@ public class CardExplorer extends BaseFragment implements CardActionListener,
 		super.setActionBarHeight(height);
 		mCardView.setActionBarHeight(height);
 	}
-	
+	private void show(){
+		if (displayMode == STACKVIEW) {
+			mGoogleCardListView.setVisibility(View.GONE);
+			mCardView.setVisibility(View.VISIBLE);
+			mMainActivity.setTitle("Home");
+		} else {
+			mGoogleCardListView.setVisibility(View.VISIBLE);
+			mCardView.setVisibility(View.GONE);
+			mMainActivity.setTitle("Home Tablet");
+		}
+		applyData();
+	}
 	@Override
 	public void onResume() {
 		super.onResume();
+		show();
 	}
 
 	@Override
@@ -281,10 +290,10 @@ public class CardExplorer extends BaseFragment implements CardActionListener,
 	}
 	private void applyData() {
 		if (displayMode == STACKVIEW) {
-			mCardView.addData(mEntries);
+			mCardView.addData(mMasterEntries);
 			mCardView.show();
 		} else {
-			mGoogleCardListViewAdapter.setData(mEntries);
+			mGoogleCardListViewAdapter.setData(mMasterEntries);
 		}
 		prepareFilterData();
 		dismissProgressBar();
