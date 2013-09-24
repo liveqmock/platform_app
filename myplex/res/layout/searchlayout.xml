@@ -15,29 +15,42 @@
 
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="50dp"
+            android:layout_height="40dp"
             android:orientation="horizontal"
             android:paddingBottom="5dp"
             android:paddingLeft="@dimen/layoutleftpadding"
             android:paddingTop="5dp" >
 
+             <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:src="@drawable/search16px"
+                    android:paddingRight="10dp" />
+                            
             <LinearLayout
                 android:id="@+id/spannable"
                 android:layout_width="wrap_content"
-                android:layout_height="35dp"
+                android:layout_height="fill_parent"
                 android:orientation="horizontal" >
             </LinearLayout>
 
             <EditText
                 android:id="@+id/inputSearch"
-                android:layout_width="fill_parent"
-                android:layout_height="35dp"
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
                 android:background="#FFFFFF"
-                android:drawableLeft="@drawable/search16px"
-                android:drawablePadding="10dp"
                 android:hint="@string/searchhint"
                 android:inputType="text"
     			android:imeOptions="actionDone" />
+            
+                <ImageView
+                    android:id="@+id/clearSearchresults"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:src="@drawable/card_delete"
+                    android:padding="4dp"
+                    android:visibility="gone" />
+                
         </LinearLayout>
     </HorizontalScrollView>
 

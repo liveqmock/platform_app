@@ -6,33 +6,54 @@ import java.util.List;
 public class SearchData {
 	
 	public static class ButtonData{
-		public String getButtonName() {
-			return buttonName;
-		}
 
-		String buttonName;
+		String mButtonId;
+		String mButtonName;
+		String mButtonQualifer;
+		String mButtonCategory;
 		boolean isCLicked = false;
+		
+		
+		public String getButtonName() {
+			return mButtonName;
+		}
+		
 		public boolean isCLicked() {
 			return isCLicked;
 		}
 		public void setCLicked(boolean isCLicked) {
 			this.isCLicked = isCLicked;
 		}
-		public ButtonData(String name, boolean clickStatus) {
-			this.buttonName = name;
+		
+		public String getTagCategory()
+		{
+			return this.mButtonCategory;
+		}
+		
+		public ButtonData(String id,String name,String category, String qualifier, boolean clickStatus) {
+			this.mButtonId = id;
+			this.mButtonName = name;
+			this.mButtonCategory = category;
+			this.mButtonQualifer = qualifier;
 			this.isCLicked = clickStatus;
 		}
 	}
 	
 	String categoryName;
-//	boolean isVisible = false;
 	boolean isSection = false;
-//	String[] names;
 	List<ButtonData> searchTags;
-
-
 	boolean isExpanded=false;
     public static final int SECTION = 1;
+    
+    public SearchData()
+    {
+    }
+    public SearchData(SearchData data)
+    {
+    	this.categoryName = data.categoryName;
+    	this.isSection = data.isSection;
+    	this.searchTags = data.searchTags;
+    }
 
 	public boolean isExpanded() {
 		return isExpanded;
@@ -50,35 +71,22 @@ public class SearchData {
 		this.isSection = isSection;
 	}
 
-	/*public boolean isVisible() {
-		return isVisible;
-	}
-
-	public void setVisible(boolean isVisible) {
-		this.isVisible = isVisible;
-	}*/
-
 	public String getCategoryName() {
 		return categoryName;
 	}
 
 	public void setCategoryName(String categoryName) {
 		this.categoryName = categoryName;
+		this.isSection = true;
 	}
 
-	/*public String[] getNames() {
-		return names;
-	}
-
-	public void setNames(String[] names) {
-		this.names = names;
-	}*/
     public List<ButtonData> getSearchTags() {
 		return searchTags;
 	}
 
 	public void setSearchTags(List<ButtonData> searchTags) {
 		this.searchTags = searchTags;
+		this.isSection = false;
 	}
 
 }

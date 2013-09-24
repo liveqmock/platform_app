@@ -31,12 +31,12 @@ public class SearchListAdapter extends BaseAdapter implements
 	private SectionIndexer sectionIndexer;
 	List<SearchData> mSearchDataList = new ArrayList<SearchData>();
 
-	public List<SearchData> getmSearchDataList() {
+	public List<SearchData> getSearchDataList() {
 		return mSearchDataList;
 	}
 
 
-	public void setmSearchDataList(List<SearchData> mSearchDataList) {
+	public void setSearchDataList(List<SearchData> mSearchDataList) {
 		this.mSearchDataList = mSearchDataList;
 	}
 
@@ -64,8 +64,7 @@ public class SearchListAdapter extends BaseAdapter implements
 	
 
 
-	public SearchListAdapter(Context context,
-			ArrayList<SearchData> mLocalSearchData) {
+	public SearchListAdapter(Context context, List<SearchData> mLocalSearchData) {
 		inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		mlocalContext = context;
 		mSearchDataList = mLocalSearchData;
@@ -98,7 +97,7 @@ public class SearchListAdapter extends BaseAdapter implements
 //				Button arrowButton = (Button) convertView.findViewById(R.id.Collapsiblebutton);
 				headerHolder.categoryText.setText(mLocalSearchData.getCategoryName());
 
-			} else if (!mLocalSearchData.isSection()) {
+			} else{
 				
 				TagsHolder tagsHolder = null;
 				if(convertView == null)
@@ -143,7 +142,7 @@ public class SearchListAdapter extends BaseAdapter implements
 		searchButton.setMinHeight(0);
 		searchButton.setBackgroundResource(R.drawable.roundedbutton_stroke);
 		searchButton.setTextColor(Color.parseColor("#F57242"));
-		searchButton.setTextSize(14.667f);
+		searchButton.setTextSize(14f);
 		searchButton.setTypeface(FontUtil.Roboto_Regular);
 		searchButton.setId(buttonid);
 		searchButton.setText(searchTag);
