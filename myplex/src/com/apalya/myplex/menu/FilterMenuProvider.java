@@ -65,18 +65,18 @@ public class FilterMenuProvider extends ActionProvider {
 
 	private PinnedSectionListView listView;
 
-	@Override
-	public View onCreateActionView(MenuItem forItem) {
-		mParent = mInflater.inflate(R.layout.filteractionmenuitem, null);
-		mParent.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View arg0) {
-				showPopup();
-			}
-		});
-		return mParent;
-	}
+//	@Override
+//	public View onCreateActionView(MenuItem forItem) {
+//		mParent = mInflater.inflate(R.layout.filteractionmenuitem, null);
+//		mParent.setOnClickListener(new OnClickListener() {
+//
+//			@Override
+//			public void onClick(View arg0) {
+//				showPopup();
+//			}
+//		});
+//		return mParent;
+//	}
 	
 	private OnClickListener mDelegate;
 	public void addFilterData(List<FilterMenudata> datalist,

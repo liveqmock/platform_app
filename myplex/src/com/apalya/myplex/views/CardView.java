@@ -10,6 +10,7 @@ import android.animation.Animator.AnimatorListener;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.os.CountDownTimer;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.SparseArray;
@@ -20,6 +21,7 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.OverScroller;
 import android.widget.ScrollView;
 import android.widget.Scroller;
 import android.widget.TextView;
@@ -32,6 +34,7 @@ import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardViewHolder;
 import com.apalya.myplex.data.CardViewMeta;
 import com.apalya.myplex.data.myplexUtils;
+import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
 
@@ -89,6 +92,7 @@ public class CardView extends ScrollView {
 
 	    mScroller = new Scroller(mContext);
 	    
+	    
         mMaxYOverscrollDistance = (int) (MAX_Y_OVERSCROLL_DISTANCE * mContext.getResources().getDisplayMetrics().density);
     }
     
@@ -119,7 +123,7 @@ public class CardView extends ScrollView {
     
 	public void setContext(Context cxt) {
 		mContext = cxt;
-		mInflater = LayoutInflater.from(mContext);
+		mInflater = LayoutInflater.from(myplexapplication.getContext());
 		init();
 	}
 
@@ -324,6 +328,8 @@ public class CardView extends ScrollView {
 					View view = mCardsLayout.findCardViewAtPoint((int)ev.getRawX(), (int)ev.getRawY());
 					if (view != null) {
 			        	int i = view.getId();
+			        	Log.e("pref","onInterceptTouchEvent actioup");
+//			        	customSmoothScroll(getScrollX(), i * mCardPositions[1]);
 			        	smoothScrollTo(getScrollX(), i * mCardPositions[1]);
 					}
 				}				
@@ -331,7 +337,45 @@ public class CardView extends ScrollView {
 		}
 		return eventStealed;
 	}
-	
+	private void customSmoothScroll(int dx,int dy){
+		smoothScrollTo(dx, dy);
+//		customSmoothScrollTo(dx,dy);
+	}
+	public void customSmoothScrollBy(int dx, int dy)
+	{
+	    if (mScroller == null)
+	    {
+	        smoothScrollBy(dx, dy);
+	        return;
+	    }
+
+	    if (getChildCount() == 0)
+	        return;
+
+
+	    final int width = getWidth() - getPaddingRight() - getPaddingLeft();
+	    final int right = getChildAt(0).getWidth();
+	    final int maxX = Math.max(0, right - width);
+	    final int scrollX = getScrollX();
+	    
+	    final int height = getHeight() - getPaddingTop() - getPaddingBottom();
+	    final int bottom = getChildAt(0).getBottom();
+	    final int maxY = Math.max(0, bottom - height);
+	    final int scrollY = getScrollY();
+	    dx = Math.max(0, Math.min(scrollX + dx, maxX)) - scrollX;
+	    dy = Math.max(0, Math.min(scrollY + dy, maxY)) - scrollY;
+ 
+	    Log.e("pref","customSmoothScrollBy mScroller "+mScroller.isFinished());
+	    mScroller.startScroll(scrollX, scrollY, dx, dy, 1500);
+
+//        mScroller.startScroll(getScrollX(), scrollY, 0, dy,500);
+	    invalidate();
+	}
+
+	public void customSmoothScrollTo(int x, int y)
+	{
+	    customSmoothScrollBy(x - getScrollX(), y - getScrollY());
+	}
 	@Override
 	public boolean onTouchEvent (MotionEvent ev) {
 		mMotionConsumedByClick = false;
@@ -341,8 +385,10 @@ public class CardView extends ScrollView {
 			if (ev.getAction() == MotionEvent.ACTION_MOVE) {
 				mMotionDetected = true;
 			} else if (ev.getAction() == MotionEvent.ACTION_UP) {
+				Log.e("pref","onTouchEvent actioup");
 //				if (mScroller.isFinished()) {
-					smoothScrollTo(getScrollX(), mCardsLayout.getSnapPosition(getScrollY()));
+					customSmoothScroll(getScrollX(), mCardsLayout.getSnapPosition(getScrollY()));
+//					smoothScrollTo(getScrollX(), mCardsLayout.getSnapPosition(getScrollY()));
 //				}
 			}
 		}
@@ -361,6 +407,7 @@ public class CardView extends ScrollView {
             scrollTo(x, y);
         }
     }
+    
     
     @Override
     protected boolean overScrollBy(int deltaX, int deltaY, int scrollX, int scrollY, int scrollRangeX, int scrollRangeY, int maxOverScrollX, int maxOverScrollY, boolean isTouchEvent) {

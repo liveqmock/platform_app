@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/carddetails_bg"
+    android:layout_marginBottom="@dimen/margin_gap_16"
+    android:layout_marginTop="@dimen/margin_gap_8" >
+
+    <RelativeLayout
+        android:id="@+id/carddetailfulldescription_expandlayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true" >
+
+        <ImageView
+            android:id="@+id/carddetailfulldescription_expand"
+            android:layout_width="@dimen/size_24"
+            android:layout_height="@dimen/size_24"
+            android:layout_marginRight="@dimen/margin_gap_8"
+            android:src="@drawable/dark_navigation_expand" />
+
+        <ProgressBar
+            android:id="@+id/carddetailfulldescription_expand_progress"
+            android:layout_marginRight="@dimen/margin_gap_8"
+            android:layout_width="@dimen/size_24"
+            android:layout_height="@dimen/size_24" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/carddetailfulldescriptiontitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="@dimen/margin_gap_8"
+        android:layout_toLeftOf="@+id/carddetailfulldescription_expandlayout"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/carddetaildesc_movename"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/margin_gap_8"
+            android:singleLine="true"
+            android:text="Riddick"
+            android:textColor="#4b4b4b"
+            android:textSize="@dimen/textsize_18" />
+
+        <RatingBar
+            android:id="@+id/carddetaildesc_setRating"
+            style="?android:attr/ratingBarStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/margin_gap_12" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/carddetailfulldescriptionsubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/carddetailfulldescriptiontitle"
+        android:layout_margin="@dimen/margin_gap_8"
+        android:layout_toLeftOf="@+id/carddetailfulldescription_expandlayout"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/carddetaildesc_parentalRating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="@dimen/margin_gap_4"
+            android:singleLine="true"
+            android:text="PG-13"
+            android:textColor="#4b4b4b"
+            android:textSize="@dimen/textsize_14" />
+
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="8dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="@dimen/margin_gap_2"
+            android:src="@drawable/length" />
+
+        <TextView
+            android:id="@+id/carddetaildesc_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="@dimen/margin_gap_4"
+            android:singleLine="true"
+            android:text=""
+            android:textColor="#4b4b4b"
+            android:textSize="@dimen/textsize_14" />
+
+        <TextView
+            android:id="@+id/carddetaildesc_releaseDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:singleLine="true"
+            android:text="July 29,2013"
+            android:textColor="#4b4b4b"
+            android:textSize="@dimen/textsize_14" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/carddetaildesc_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:lineSpacingExtra="1dp"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/carddetailfulldescriptionsubtitle"
+        android:layout_margin="@dimen/margin_gap_8"
+        android:layout_toLeftOf="@+id/carddetailfulldescription_expandlayout"
+        android:text="sadasdasadasdaasdadsadsdas"
+        android:textColor="#000000"
+        android:textSize="@dimen/textsize_12" />
+
+    <LinearLayout
+        android:id="@+id/carddetaildesc_contentlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/carddetaildesc_description"
+        android:layout_marginLeft="@dimen/margin_gap_8"
+        android:layout_marginRight="@dimen/margin_gap_8"
+        android:layout_toLeftOf="@+id/carddetailfulldescription_expandlayout"
+        android:orientation="vertical" >
+    </LinearLayout>
+
+</RelativeLayout>

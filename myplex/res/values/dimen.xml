@@ -1,60 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <dimen name="actionbarheight">48dp</dimen>
-    <dimen name="cardtitleheight">35dp</dimen>
-    <dimen name="cardstatusheight">30dp</dimen>
-    <dimen name="cardmoreinfoheight">36dp</dimen>
-    <dimen name="cardplayheight">152dp</dimen>
-    <dimen name="cardvideosize">200dp</dimen> <!-- total of cardtitleheight,cardstatusheight,cardmoreinfoheight,cardplayheight  -->
-    <dimen name="cardHeight">249dp</dimen> <!-- total of cardtitleheight,cardstatusheight,cardmoreinfoheight,cardplayheight  -->
-    <dimen name="cardmargin">12dp</dimen>
+    <dimen name="cardtitleheight">43dp</dimen>
+    <dimen name="cardstatusheight">34dp</dimen>
+    <dimen name="cardmoreinfoheight">43dp</dimen>
+    <dimen name="cardplayheight">181dp</dimen>
+    <dimen name="cardvideosize">301dp</dimen> <!-- total of cardtitleheight,cardstatusheight,cardmoreinfoheight,cardplayheight -->
+    <dimen name="cardHeight">301dp</dimen> <!-- total of cardtitleheight,cardstatusheight,cardmoreinfoheight,cardplayheight -->
+    <dimen name="cardmargin">9dp</dimen>
     <dimen name="cardpartialvisibleheight">50dp</dimen>
     <dimen name="slidemenugap">250dp</dimen>
     <dimen name="slidenotification">32dp</dimen>
-    
-    
-    
-<!-- dimenesion for search layout -->
-	<dimen name="layoutleftpadding">15dp</dimen>
+
+    <!-- margins -->
+    <dimen name="margin_gap_2">2dp</dimen>
+    <dimen name="margin_gap_4">4dp</dimen>
+    <dimen name="margin_gap_6">6dp</dimen>
+    <dimen name="margin_gap_8">8dp</dimen>
+    <dimen name="margin_gap_12">12dp</dimen>
+    <dimen name="margin_gap_14">14dp</dimen>
+    <dimen name="margin_gap_16">16dp</dimen>
+    <dimen name="margin_gap_24">24dp</dimen>
+    <dimen name="margin_gap_48">48dp</dimen>
+    <dimen name="margin_gap_54">54dp</dimen>
+
+    <!-- iconsize -->
+    <dimen name="size_16">16dp</dimen>
+    <dimen name="size_24">24dp</dimen>
+    <dimen name="size_32">32dp</dimen>
+    <dimen name="size_48">48dp</dimen>
+    <dimen name="size_52">52dp</dimen>
+    <dimen name="size_96">96dp</dimen>
+
+    <!-- textSize -->
+    <dimen name="textsize_8">8sp</dimen>
+    <dimen name="textsize_10">10sp</dimen>
+    <dimen name="textsize_12">12sp</dimen>
+    <dimen name="textsize_14">14sp</dimen>
+    <dimen name="textsize_16">16sp</dimen>
+    <dimen name="textsize_18">18sp</dimen>
+    <dimen name="textsize_20">20sp</dimen>
+    <dimen name="textsize_22">22sp</dimen>
+
+    <!-- dimenesion for search layout -->
+    <dimen name="layoutleftpadding">15dp</dimen>
     <dimen name="buttonpadding">30dp</dimen>
-<!-- dimenesion for search layout -->
+    <!-- dimenesion for search layout -->
 
 
-      <!-- LOGIN SCREEN VALUES -->
-    <dimen name="slidenotificationwithbutton">64dp</dimen>
-    <dimen name="fieldwidth">280dp</dimen>
-    
-    <dimen name="editfieldheight">96dp</dimen>
-    <dimen name="buttonwidth">112dp</dimen>
-    <dimen name="titlewidth">240dp</dimen>
-    <dimen name="titleheight">72dp</dimen>
-    
-    <!-- SPACING VALUES -->
-    
-     <dimen name="margin">16dp</dimen>
-    <dimen name="fieldheight">48dp</dimen>
-    <dimen name="fieldspacing">54dp</dimen>
-    <dimen name="bottomspacing">32dp</dimen>
-    <dimen name="centerspacing">14dp</dimen>
-    <dimen name="titlebottomspacing">54dp</dimen>
-    
-    <dimen name="height">72dp</dimen>
-    <dimen name="logobottommargin">96dp</dimen>
-    <dimen name="fieldmargin">2dp</dimen>
-    
-    <dimen name="buttonspacing">6dp</dimen>
-    
-    <dimen name="buttonmargin">14dp</dimen>
-    <dimen name="editmargin">12dp</dimen>
-    
-    <!-- TEXT SIZE VALUES -->
-    
-    <dimen name="titletextsize">20sp</dimen>
-    <dimen name="buttontextsize">14sp</dimen>
-    <dimen name="normaltextsize">13sp</dimen>
-    <dimen name="editfieldsize">14sp</dimen>
-    
-    
-    <!-- LOGIN SCREEN VALUES -->
-        <dimen name="rbm_item_padding_topbottom">16dp</dimen>    <dimen name="rbm_item_padding_leftright">8dp</dimen>        <dimen name="rbm_item_image_height">24dp</dimen>    <dimen name="rbm_item_image_width">24dp</dimen>        <dimen name="rbm_item_text_size">16sp</dimen>    <dimen name="rbm_item_text_padding_left">10dp</dimen>        <dimen name="fast_scroll_overllaywidth">290dp</dimen>    <dimen name="fast_scroll_overllayheight">90dp</dimen>        <dimen name="fast_scroll_overllaythumb">60dp</dimen>    <dimen name="fast_scroll_overllaytextsize">26dp</dimen>        <dimen name="carddetailmultimediathumnnailmargin">5dp</dimen>
+   <!-- LOGIN SCREEN VALUES -->
+    <dimen name="rbm_item_padding_topbottom">16dp</dimen>
+    <dimen name="rbm_item_padding_leftright">8dp</dimen>
+    <dimen name="rbm_item_image_height">24dp</dimen>
+    <dimen name="rbm_item_image_width">24dp</dimen>
+    <dimen name="rbm_item_text_size">16sp</dimen>
+    <dimen name="rbm_item_text_padding_left">10dp</dimen>
+    <dimen name="fast_scroll_overllaywidth">290dp</dimen>
+    <dimen name="fast_scroll_overllayheight">90dp</dimen>
+    <dimen name="fast_scroll_overllaythumb">60dp</dimen>
+    <dimen name="fast_scroll_overllaytextsize">26dp</dimen>
+    <dimen name="carddetailmultimediathumnnailmargin">5dp</dimen>
+
 </resources>

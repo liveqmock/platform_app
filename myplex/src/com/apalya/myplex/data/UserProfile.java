@@ -10,6 +10,7 @@ public class UserProfile {
 	private static String name;
 	private static boolean loggedInStatus;
 	
+	
 	public void setUserEmail(String aUserEmail)
 	{
 		useremail=aUserEmail;

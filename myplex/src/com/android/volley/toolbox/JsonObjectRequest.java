@@ -66,7 +66,7 @@ public class JsonObjectRequest extends JsonRequest<JSONObject> {
             String jsonString =
                 new String(response.data, HttpHeaderParser.parseCharset(response.headers));
             return Response.success(new JSONObject(jsonString),
-                    HttpHeaderParser.parseCacheHeaders(response));
+                    HttpHeaderParser.parseIgnoreCacheHeaders(response));
         } catch (UnsupportedEncodingException e) {
             return Response.error(new ParseError(e));
         } catch (JSONException je) {

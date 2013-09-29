@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.widget.AbsListView;
+import android.widget.GridView;
 import android.widget.ListView;
 
 import com.android.volley.Request.Method;
@@ -34,6 +35,7 @@ import com.apalya.myplex.adapters.CardActionListener;
 import com.apalya.myplex.adapters.CardGoogleLayoutAdapater;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.FilterMenudata;
+import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.listboxanimation.AlphaInAnimationAdapter;
 import com.apalya.myplex.listboxanimation.OnDismissCallback;
 import com.apalya.myplex.listboxanimation.ScaleInAnimationAdapter;
@@ -47,7 +49,7 @@ import com.apalya.myplex.views.CardView;
 public class CardExplorer extends BaseFragment implements CardActionListener,
 		OnDismissCallback {
 	private CardView mCardView;
-	private ListView mGoogleCardListView;
+	private GridView mGoogleCardListView;
 	private CardGoogleLayoutAdapater mGoogleCardListViewAdapter;
 	private static final int RESULTS_PAGE_SIZE = 20;
 	private boolean mHasData = false;
@@ -65,6 +67,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,
 		this.displayMode = mode;
 	}
 
+	
 	@Override
 	public void play(CardData object) {
 		BaseFragment fragment = mMainActivity.createFragment(MainActivity.CARDDETAILS);
@@ -76,6 +79,13 @@ public class CardExplorer extends BaseFragment implements CardActionListener,
 	public void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
+		
+		boolean tabletSize = getResources().getBoolean(R.bool.isTablet);
+		if (tabletSize) {
+			setDisplayMode(GOOGLECARDVIEW);
+		} else {
+			setDisplayMode(STACKVIEW);
+		}
 	}
 
 	public void showProgressBar(){
@@ -89,10 +99,18 @@ public class CardExplorer extends BaseFragment implements CardActionListener,
 			mProgressDialog.dismiss();
 		}
 	}
-	public void updateText(String str){
-		if(mProgressDialog != null){
-			mProgressDialog.setTitle(str);
-		}
+	public void updateText(final String str){
+		Handler h = new Handler(Looper.getMainLooper());
+		h.post(new Runnable() {
+			
+			@Override
+			public void run() {
+				if(mProgressDialog != null){
+					mProgressDialog.setTitle(str);
+				}
+			}
+		});
+		
 	}
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -103,68 +121,39 @@ public class CardExplorer extends BaseFragment implements CardActionListener,
 		}
 		mRootView = inflater.inflate(R.layout.cardbrowsing, container,false);
 		mCardView = (CardView) mRootView.findViewById(R.id.framelayout);
-		mGoogleCardListView = (ListView) mRootView
+		mGoogleCardListView = (GridView) mRootView
 				.findViewById(R.id.cardlistview);
-		mGoogleCardListViewAdapter = new CardGoogleLayoutAdapater(getContext());
-		// mGoogleCardListView.setAdapter(mGoogleCardListViewAdapter);
-		SwingBottomInAnimationAdapter swingBottomInAnimationAdapter = new SwingBottomInAnimationAdapter(
+		mGoogleCardListViewAdapter = new CardGoogleLayoutAdapater(myplexapplication.getContext());
+	    mGoogleCardListView.setAdapter(mGoogleCardListViewAdapter);
+		/*SwingBottomInAnimationAdapter swingBottomInAnimationAdapter = new SwingBottomInAnimationAdapter(
 				new SwipeDismissAdapter(mGoogleCardListViewAdapter, this));
 		swingBottomInAnimationAdapter.setAbsListView(mGoogleCardListView);
 
-		mGoogleCardListView.setAdapter(swingBottomInAnimationAdapter);
+		mGoogleCardListView.setAdapter(swingBottomInAnimationAdapter);*/
 		mCardView.setVisibility(View.VISIBLE);
 		mCardView.setVerticalScrollBarEnabled(false);
 		mCardView.setHorizontalScrollBarEnabled(false);
-		mCardView.setContext(getContext());
+		mCardView.setContext(myplexapplication.getContext());
 		mCardView.setActionBarHeight(getActionBar().getHeight());
 		mCardView.setCardActionListener(this);
 		mGoogleCardListViewAdapter.setCardActionListener(this);
 		setDisplayMode(displayMode);
 		mMainActivity.setTitle("Home");
-		showProgressBar();
-		loadPage();
+		delayedAction();
 		return mRootView;
 	}
-
-	public void setSelectedAnimation(int index){
-		switch (index) {
-		case 0:
-			SwingBottomInAnimationAdapter swingBottomInAnimationAdapter = new SwingBottomInAnimationAdapter(
-					new SwipeDismissAdapter(mGoogleCardListViewAdapter, this));
-			swingBottomInAnimationAdapter.setAbsListView(mGoogleCardListView);
-
-			mGoogleCardListView.setAdapter(swingBottomInAnimationAdapter);
-			break;
-		case 1:
-			SwingRightInAnimationAdapter swingRightinAnimationAdapter = new SwingRightInAnimationAdapter(
-					new SwipeDismissAdapter(mGoogleCardListViewAdapter, this));
-			swingRightinAnimationAdapter.setAbsListView(mGoogleCardListView);
-
-			mGoogleCardListView.setAdapter(swingRightinAnimationAdapter);
-			break;
-		case 2:
-			SwingLeftInAnimationAdapter swingLeftinAnimationAdapter = new SwingLeftInAnimationAdapter(
-					new SwipeDismissAdapter(mGoogleCardListViewAdapter, this));
-			swingLeftinAnimationAdapter.setAbsListView(mGoogleCardListView);
-
-			mGoogleCardListView.setAdapter(swingLeftinAnimationAdapter);
-			break;
-		case 3:
-			ScaleInAnimationAdapter scaleInAnimationAdapter = new ScaleInAnimationAdapter(
-					new SwipeDismissAdapter(mGoogleCardListViewAdapter, this));
-			scaleInAnimationAdapter.setAbsListView(mGoogleCardListView);
-
-			mGoogleCardListView.setAdapter(scaleInAnimationAdapter);
-			break;
-		case 4:
-			AlphaInAnimationAdapter alphaInAnimationAdapter = new AlphaInAnimationAdapter(
-					new SwipeDismissAdapter(mGoogleCardListViewAdapter, this));
-			alphaInAnimationAdapter.setAbsListView(mGoogleCardListView);
-
-			mGoogleCardListView.setAdapter(alphaInAnimationAdapter);
-			break;
-		}
+	public void delayedAction(){
+		Handler h = new Handler(Looper.getMainLooper());
+		h.post(new Runnable() {
+			
+			@Override
+			public void run() {
+				showProgressBar();
+				loadPage();				
+			}
+		});
 	}
+
 	@Override
 	public void setActionBarHeight(int height) {
 		super.setActionBarHeight(height);
@@ -199,17 +188,17 @@ public class CardExplorer extends BaseFragment implements CardActionListener,
 	 * RESULTS_PAGE_SIZE + "&thumbsize=160&alt=json" + "&start-index="
 	 */
 	private void loadPage() {
-		showActionBarProgress();
+		mMainActivity.showActionBarProgressBar();
 		RequestQueue queue = MyVolley.getRequestQueue();
 
 		JsonObjectRequest myReq = new JsonObjectRequest(Method.GET,
-				"http://dev.myplex.in/content/v2/search/?startIndex="
+				"http://dev.myplex.in/content/v2/recommendations/?startIndex="
 						+ mStartIndex, null, createMyReqSuccessListener(),
 				createMyReqErrorListener());
 
 		myReq.setShouldCache(true);
 		Log.d("pref", "Request results for "
-				+ "http://dev.myplex.in/content/v2/search/?startIndex="
+				+ "http://dev.myplex.in/content/v2/recommendations/?startIndex="
 				+ mStartIndex);
 		queue.add(myReq);
 	}
@@ -219,6 +208,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,
 			@Override
 			public void onResponse(JSONObject response) {
 				try {
+					updateText("parsing results");
 					JSONObject feed = response.getJSONObject("results");
 					JSONArray entries = feed.getJSONArray("values");
 					JSONObject entry;
@@ -232,7 +222,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,
 						data.title = content.getString("title");
 						data.filterName = content.getString("language");		
 						JSONObject images = entry.getJSONObject("images");
-						JSONArray thumbnail = images.getJSONArray("cover");
+						JSONArray thumbnail = images.getJSONArray("values");
 						if (thumbnail.length() > 0) {
 							data.imageUrl = thumbnail.getJSONObject(0)
 									.getString("link");
@@ -289,6 +279,11 @@ public class CardExplorer extends BaseFragment implements CardActionListener,
 		}
 	}
 	private void applyData() {
+		if(mMasterEntries.size() == 0){
+			showProgressBar();
+			loadPage();
+		}
+		updateText("preparing ui");
 		if (displayMode == STACKVIEW) {
 			mCardView.addData(mMasterEntries);
 			mCardView.show();
@@ -297,12 +292,12 @@ public class CardExplorer extends BaseFragment implements CardActionListener,
 		}
 		prepareFilterData();
 		dismissProgressBar();
-		hideActionBarProgress();
+		mMainActivity.hideActionBarProgressBar();
 	}
 
 	private void showErrorDialog() {
 		mInError = true;
-		AlertDialog.Builder b = new AlertDialog.Builder(getContext());
+		AlertDialog.Builder b = new AlertDialog.Builder(myplexapplication.getContext());
 		b.setMessage("No Response from server");
 		b.show();
 	}
@@ -312,7 +307,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,
 			@Override
 			public void onErrorResponse(VolleyError error) {
 				 showErrorDialog();
-				hideActionBarProgress();
+				 mMainActivity.hideActionBarProgressBar();
 				dismissProgressBar();
 			}
 		};

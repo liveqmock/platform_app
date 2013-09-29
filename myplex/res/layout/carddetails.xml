@@ -7,57 +7,29 @@
     android:background="#e6e6e6" >
 
     <RelativeLayout
-        android:id="@+id/relativeLayout1"
+        android:id="@+id/carddetail_videolayout"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/cardvideosize"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_marginBottom="5dp"
         android:background="#000000" >
-
-        <com.android.volley.toolbox.NetworkImageView
-            android:id="@+id/carddetails_image"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="centerCrop" />
-
-        <VideoView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone" />
-
-        <ImageView
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:src="@drawable/play" />
     </RelativeLayout>
 
-    <com.apalya.myplex.views.CustomFastScrollView
-        android:id="@+id/fast_scroll_view"
+    <ScrollView
+        android:id="@+id/carddetail_scroll_view"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/relativeLayout1"
-        android:background="#e6e6e6" >
+        android:layout_below="@+id/carddetail_videolayout"
+        android:background="#e6e6e6"
+        android:scrollbars="none" >
 
-        <ListView
-            android:id="@android:id/list"
-            android:layout_width="wrap_content"
-            android:layout_height="fill_parent"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:background="@android:color/transparent"
-            android:cacheColorHint="@android:color/transparent"
-            android:divider="@android:color/transparent"
-            android:dividerHeight="5dp"
-            android:focusable="true" />
-
-        <TextView
-            android:id="@android:id/empty"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/carddetail_detaillayout"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="" />
-    </com.apalya.myplex.views.CustomFastScrollView>
+            android:layout_margin="@dimen/margin_gap_8"
+            android:orientation="vertical" >
+        </LinearLayout>
+    </ScrollView>
 
     <RelativeLayout
         android:layout_width="match_parent"

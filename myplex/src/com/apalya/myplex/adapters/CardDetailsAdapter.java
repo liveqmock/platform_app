@@ -104,7 +104,7 @@ public class CardDetailsAdapter extends BaseAdapter implements SectionIndexer {
 		data.mViewPosition = position;
 		if (data.mData instanceof CardDetailDescriptionData) {
 			CardDetailDescriptionData localData = (CardDetailDescriptionData) data.mData;
-			v = mInflater.inflate(R.layout.carddetaildescription, null);
+//			v = mInflater.inflate(R.layout.carddetaildescription, null);
 			v.setTag(data);
 			TextView description = (TextView) v
 					.findViewById(R.id.carddetaildesc_description);
@@ -120,13 +120,13 @@ public class CardDetailsAdapter extends BaseAdapter implements SectionIndexer {
 					.findViewById(R.id.carddetaildesc_movename);
 			movename.setText(localData.mTitle);
 
-			LinearLayout loadmore = (LinearLayout) v
-					.findViewById(R.id.carddetaildesc_loadmoretext);
-			loadmore.setTag(v);
-			loadmore.setOnClickListener(mLoadMoreListener);
-			if (localData.mAlreadyExpanded) {
-				loadmore.setVisibility(View.INVISIBLE);
-			}
+//			LinearLayout loadmore = (LinearLayout) v
+//					.findViewById(R.id.carddetaildesc_loadmoretext);
+//			loadmore.setTag(v);
+//			loadmore.setOnClickListener(mLoadMoreListener);
+//			if (localData.mAlreadyExpanded) {
+//				loadmore.setVisibility(View.INVISIBLE);
+//			}
 		} else if (data.mData instanceof CardDetailCast) {
 
 		} else if (data.mData instanceof CardDetailCommentListData) {
@@ -143,19 +143,19 @@ public class CardDetailsAdapter extends BaseAdapter implements SectionIndexer {
 			LinearLayout contentLayout = (LinearLayout) v
 					.findViewById(R.id.carddetailmedia_contentlayout);
 			createMediaitem(contentLayout, localData);
-			LinearLayout loadmore = (LinearLayout) v
-					.findViewById(R.id.carddetailmedia_loadmoretext);
-			loadmore.setTag(v);
-			loadmore.setOnClickListener(mLoadMoreListener);
-			if (localData.mLastShownIndex >= localData.mList.size()) {
-				loadmore.setVisibility(View.INVISIBLE);
-			}
+//			LinearLayout loadmore = (LinearLayout) v
+//					.findViewById(R.id.carddetailmedia_loadmoretext);
+//			loadmore.setTag(v);
+//			loadmore.setOnClickListener(mLoadMoreListener);
+//			if (localData.mLastShownIndex >= localData.mList.size()) {
+//				loadmore.setVisibility(View.INVISIBLE);
+//			}
 		}
 		return v;
 	}
 
 	public void createMediaitem(LinearLayout mContentLayout,
-			CardDetailMediaListData localData) {
+			CardDetailMediaListData localData) {/*
 
 		int index = 0, j = 0;
 		for (int i = 0; i < localData.mNumberofBlockAdded; i++) {
@@ -175,8 +175,8 @@ public class CardDetailsAdapter extends BaseAdapter implements SectionIndexer {
 
 				Count++;
 				View v = mInflater.inflate(R.layout.cardmediasubitem, null);
-				FadeInNetworkImageView imageView = (FadeInNetworkImageView) v
-						.findViewById(R.id.cardmediasubitem_imageView1);
+//				FadeInNetworkImageView imageView = (FadeInNetworkImageView) v
+//						.findViewById(R.id.cardmediasubitem_imageView1);
 				LinearLayout.LayoutParams imageparams = new LinearLayout.LayoutParams(
 						mImageWidth, mImageWidth);
 				params.setMargins(mImageGap, mImageGap, mImageGap, mImageGap);
@@ -196,10 +196,10 @@ public class CardDetailsAdapter extends BaseAdapter implements SectionIndexer {
 			index = j;
 		}
 		localData.mLastShownIndex = j;
-	}
+	*/}
 
 	public void createMediaitem(LinearLayout mContentLayout,
-			CardDetailMediaListData localData, boolean value) {
+			CardDetailMediaListData localData, boolean value) {/*
 
 		int Count = 0;
 		LinearLayout sublayout = new LinearLayout(mContext);
@@ -243,7 +243,7 @@ public class CardDetailsAdapter extends BaseAdapter implements SectionIndexer {
 		anim.setDuration(500);
 		sublayout.startAnimation(anim);
 		localData.mNumberofBlockAdded++;
-	}
+	*/}
 
 	private OnClickListener mLoadMoreListener = new OnClickListener() {
 
@@ -263,9 +263,9 @@ public class CardDetailsAdapter extends BaseAdapter implements SectionIndexer {
 				description.setTypeface(FontUtil.Roboto_Medium);
 				description.setText(localData.mContentFullDescription);
 				localData.mAlreadyExpanded = true;
-				LinearLayout loadmore = (LinearLayout) v
-						.findViewById(R.id.carddetaildesc_loadmoretext);
-				loadmore.setVisibility(View.INVISIBLE);
+//				LinearLayout loadmore = (LinearLayout) v
+//						.findViewById(R.id.carddetaildesc_loadmoretext);
+//				loadmore.setVisibility(View.INVISIBLE);
 				Animation anim = new ExpandAnimation(description, ExpandAnimation.EXPAND,
 						mImageWidth);
 				anim.setDuration(500);
@@ -280,13 +280,13 @@ public class CardDetailsAdapter extends BaseAdapter implements SectionIndexer {
 				LinearLayout contentLayout = (LinearLayout) localv
 						.findViewById(R.id.carddetailmedia_contentlayout);
 				createMediaitem(contentLayout, localData, true);
-				LinearLayout loadmore = (LinearLayout) localv
-						.findViewById(R.id.carddetailmedia_loadmoretext);
-				loadmore.setTag(localv);
-				loadmore.setOnClickListener(mLoadMoreListener);
-				if (localData.mLastShownIndex >= localData.mList.size()) {
-					loadmore.setVisibility(View.INVISIBLE);
-				}
+//				LinearLayout loadmore = (LinearLayout) localv
+//						.findViewById(R.id.carddetailmedia_loadmoretext);
+//				loadmore.setTag(localv);
+//				loadmore.setOnClickListener(mLoadMoreListener);
+//				if (localData.mLastShownIndex >= localData.mList.size()) {
+//					loadmore.setVisibility(View.INVISIBLE);
+//				}
 
 			}
 			// localv.requestLayout();

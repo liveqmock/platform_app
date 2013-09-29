@@ -1,35 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="#424242" >
+    android:layout_height="match_parent" >
 
     <ImageView
-        android:id="@+id/menu_settings"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
+        android:id="@+id/customactionbar_drawer"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:layout_marginLeft="5dp"
+        android:layout_margin="5dp"
         android:src="@drawable/collections_sort_by_size" />
 
-    <ImageView
-        android:id="@+id/menu_search"
-        android:layout_width="35dp"
-        android:layout_height="35dp"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="5dp"
-        android:src="@drawable/abs__ic_search" />
-
     <RelativeLayout
-        android:id="@+id/title_withfilterright"
+        android:id="@+id/customactionbar_filter"
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/cardstatusheight"
+        android:layout_height="fill_parent"
         android:layout_centerInParent="true" >
 
         <TextView
-            android:id="@+id/applicationtitle_right"
+            android:id="@+id/customactionbar_filter_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -39,38 +29,30 @@
             android:textSize="22dp" />
 
         <ImageView
-            android:id="@+id/menu_fliter_right"
+            android:id="@+id/customactionbar_filter_button"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:layout_marginLeft="5dp"
             android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/applicationtitle_right"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@+id/customactionbar_filter_text"
             android:src="@drawable/navigation_expand" />
     </RelativeLayout>
 
-    <RelativeLayout
-        android:id="@+id/title_withfilterdown"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_centerInParent="true"
-        android:visibility="gone" >
+    <ImageView
+        android:id="@+id/customactionbar_search_button"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_margin="5dp"
+        android:src="@drawable/menu_search" />
 
-        <TextView
-            android:id="@+id/applicationtitle_down"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:text="Myplex"
-            android:textColor="#ffffff"
-            android:textSize="18dp" />
-
-        <ImageView
-            android:id="@+id/menu_fliter_down"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:src="@drawable/navigation_expand" />
-    </RelativeLayout>
+    <ProgressBar
+        android:id="@+id/customactionbar_progressBar"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_margin="5dp"
+        android:layout_centerVertical="true"
+        android:layout_toLeftOf="@+id/customactionbar_search_button" />
 
 </RelativeLayout>

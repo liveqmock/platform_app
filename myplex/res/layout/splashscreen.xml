@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:layout_marginBottom="@dimen/fieldheight"
+        android:layout_marginBottom="@dimen/size_48"
         android:contentDescription="@string/required"
         android:src="@drawable/logo" />
 
@@ -19,27 +19,7 @@
         style="@android:style/Widget.Holo.ProgressBar.Horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
         android:visibility="gone"
         android:indeterminateOnly="true" />
-    
-    <RelativeLayout
-        android:id="@+id/slidenotificationlayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#FF3239" >
-
-        <TextView
-            android:id="@+id/slidenotificationtextview"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:gravity="center"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp" />
- 
-        
-    </RelativeLayout>
-
 </RelativeLayout>

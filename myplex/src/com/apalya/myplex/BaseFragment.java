@@ -7,6 +7,7 @@ import com.apalya.myplex.data.FilterMenudata;
 import android.app.ActionBar;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -16,9 +17,9 @@ public class BaseFragment extends Fragment{
 	public Context mContext;
 	public ActionBar mActionBar;
 	public int mActionBarHeight;
-	public MenuItem mActionBarProgressItem;
 	public MainActivity mMainActivity;
 	public Object mDataObject;
+	public MenuItem mActionBarProgressItem;
 	public Context getContext() {
 		return mContext;
 	}
@@ -40,6 +41,13 @@ public class BaseFragment extends Fragment{
 	public void setDataObject(Object obj){
 		this.mDataObject = obj;
 	}
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		
+		super.onConfigurationChanged(newConfig);
+		// Pass any configuration change to the drawer toggls
+		//mDrawerToggle.onConfigurationChanged(newConfig);
+	}
 	public void showActionBarProgress(){
 		if(mActionBarProgressItem != null)
 		mActionBarProgressItem.setVisible(true);
@@ -48,9 +56,4 @@ public class BaseFragment extends Fragment{
 		if(mActionBarProgressItem != null)
 		mActionBarProgressItem.setVisible(false);
 	}
-//	@Override
-//	public boolean onOptionsItemSelected(MenuItem item) {
-//		// TODO Auto-generated method stub
-//		return super.onOptionsItemSelected(item);
-//	}
 }

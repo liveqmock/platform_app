@@ -3,6 +3,17 @@
     <color name="white">#ffffff</color>
     <color name="grey">#2e2e2e</color>
     <color name="rbm_menu_background">#303030</color>    <color name="rbm_item_text_color">#ffffff</color>    <color name="holo_blue">#FF33E5B5</color>
+    
+    <color name="common_signin_btn_dark_text_default">@android:color/white</color>
+    <color name="common_signin_btn_dark_text_pressed">@android:color/white</color>
+    <color name="common_signin_btn_dark_text_disabled">#FFAAAAAA</color>
+    <color name="common_signin_btn_dark_text_focused">@android:color/white</color>
+    <color name="common_signin_btn_light_text_default">#FF737373</color>
+    <color name="common_signin_btn_light_text_pressed">@android:color/white</color>
+    <color name="common_signin_btn_light_text_disabled">#FFAAAAAA</color>
+    <color name="common_signin_btn_light_text_focused">#FF737373</color>
+    <color name="common_signin_btn_default_background">#FFDD4B39</color>
+    <color name="common_action_bar_splitter">#d2d2d2</color>
 	
 	<dimen name="com_facebook_picker_place_image_size">64dp</dimen>
     <color name="com_facebook_picker_search_bar_background">#f5f5f7</color>

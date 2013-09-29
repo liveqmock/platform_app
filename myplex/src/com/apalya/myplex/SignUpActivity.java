@@ -4,10 +4,10 @@ package com.apalya.myplex;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -15,34 +15,48 @@ import com.android.volley.Request.Method;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.toolbox.StringRequest;
+import com.apalya.myplex.data.DeviceDetails;
+import com.apalya.myplex.data.myplexUtils;
+import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
 
+import android.animation.Animator;
+import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.animation.Animator.AnimatorListener;
+import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnFocusChangeListener;
+import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 
 
-public class SignUpActivity extends BaseActivity{
+public class SignUpActivity extends Activity{
 
 	private Button mSubmit;
 	private EditText mEmail,mPhone,mPassword;
+	private TextView mUserEmail,mUserPhone,mUserPwd,mUserName;
+	private Switch mSmsUpdates,mMailUpdates;
 	private static final String TAG = "SignUpActivity";
 	private RelativeLayout mSlideNotificationLayout;
 	private int mSlideNotifcationHeight;
 	private TextView mSlideNotificationText;
+	private Handler hidehandler=new Handler();
+	private ProgressDialog mProgressDialog = null;
+	private DeviceDetails mDevInfo;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -52,6 +66,8 @@ public class SignUpActivity extends BaseActivity{
 
 		setContentView(R.layout.signupscreen);
 
+		mDevInfo=myplexapplication.getDevDetailsInstance();
+		
 		prepareSlideNotifiation();
 
 		String username;
@@ -67,19 +83,25 @@ public class SignUpActivity extends BaseActivity{
 			username="";
 			userpwd="";
 		}
-
+		
+		mSmsUpdates=(Switch)findViewById(R.id.toggleButton1);
+		mSmsUpdates.setTypeface(FontUtil.Roboto_Regular);
+		
+		mMailUpdates=(Switch)findViewById(R.id.toggleButton2);
+		mMailUpdates.setTypeface(FontUtil.Roboto_Regular);
+		
+		mUserEmail=(TextView) findViewById(R.id.semailId);
+		mUserEmail.setTypeface(FontUtil.Roboto_Regular);
+		mUserPhone=(TextView) findViewById(R.id.sphone);
+		mUserPhone.setTypeface(FontUtil.Roboto_Regular);
+		mUserPwd=(TextView) findViewById(R.id.pwd);
+		mUserPwd.setTypeface(FontUtil.Roboto_Regular);
+		mUserName=(TextView) findViewById(R.id.fullname);
+		mUserName.setTypeface(FontUtil.Roboto_Regular);
 		mEmail = (EditText) findViewById(R.id.enterEmail);
 		mEmail.setText(username);
 		mEmail.setTypeface(FontUtil.Roboto_Regular);
 
-		findViewById(R.id.okalert).setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				hideNotification();
-			}
-		});
 
 
 		mPhone = (EditText) findViewById(R.id.enterPhone);
@@ -87,11 +109,12 @@ public class SignUpActivity extends BaseActivity{
 		mPassword = (EditText) findViewById(R.id.editsPassword);
 		mPassword.setText(userpwd);
 		mPassword.setTypeface(FontUtil.Roboto_Regular);
-		
+
 		EditText mFullName=(EditText)findViewById(R.id.editFullName);
 		mFullName.setTypeface(FontUtil.Roboto_Regular);
 
 		mSubmit = (Button) findViewById(R.id.submit);
+		mSubmit.setTypeface(FontUtil.Roboto_Regular);
 		mSubmit.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -116,6 +139,7 @@ public class SignUpActivity extends BaseActivity{
 						Log.d(TAG, "mobile-----------: "+mPhone.getText().toString());
 						Log.d(TAG, "password-----------: "+ mPassword.getText().toString());
 						Log.d(TAG, "clientKey-----------: "+mDevInfo.getClientKey());
+						showProgressBar();
 						RegisterUserReq(getString(R.string.signuppath), params);
 						//finish();
 						//launchActivity(CardExplorer.class,SignUpActivity.this, null);
@@ -134,7 +158,6 @@ public class SignUpActivity extends BaseActivity{
 					}
 				}
 				else{
-					// TODO Auto-generated method stub
 					if(mEmail.getText().toString().length()==0 )
 					{
 						mEmail.setError("Email/Phone No. is required!");
@@ -155,7 +178,7 @@ public class SignUpActivity extends BaseActivity{
 
 	}
 
-	
+
 
 	public void showSoftKeyboard(View view) {
 
@@ -167,10 +190,9 @@ public class SignUpActivity extends BaseActivity{
 
 	@Override
 	public void onBackPressed() {
-		// TODO Auto-generated method stub
 		super.onBackPressed();
 		finish();
-		launchActivity(LoginActivity.class,SignUpActivity.this, null);
+		myplexUtils.launchActivity(LoginActivity.class,SignUpActivity.this, null);
 	}
 
 	private boolean isPhoneNoValid(String aPhNo)
@@ -185,11 +207,21 @@ public class SignUpActivity extends BaseActivity{
 			return true;
 		}
 	}
+	public void showProgressBar(){
+		if(mProgressDialog != null){
+			mProgressDialog.dismiss();
+		}
+		mProgressDialog = ProgressDialog.show(this,"", "Loading...", true,false);
+	}
+	public void dismissProgressBar(){
+		if(mProgressDialog != null){
+			mProgressDialog.dismiss();
+		}
+	}
+	private void RegisterUserReq(String contextPath, final Map<String,String> bodyParams) {
 
-private void RegisterUserReq(String contextPath, final Map<String,String> bodyParams) {
-		
 		RequestQueue queue = MyVolley.getRequestQueue();
-		 
+
 		String url=getString(R.string.url)+contextPath;
 		StringRequest myReq = new StringRequest(Method.POST,
 				url,
@@ -205,11 +237,12 @@ private void RegisterUserReq(String contextPath, final Map<String,String> bodyPa
 		Log.d(TAG,"Request sent ");
 		queue.add(myReq);
 	}
-	
+
 	protected ErrorListener RegisterUserErrorListener() {
 		return new Response.ErrorListener() {
 			@Override
 			public void onErrorResponse(VolleyError error) {
+				dismissProgressBar();
 				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 				Log.d(TAG,"Error: "+error.toString());
 				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
@@ -221,6 +254,7 @@ private void RegisterUserReq(String contextPath, final Map<String,String> bodyPa
 		return new Response.Listener<String>() {
 			@Override
 			public void onResponse(String response) {
+				dismissProgressBar();
 				Log.d(TAG,"Response: "+response);
 				try {	
 					Log.d(TAG, "########################################################");
@@ -234,7 +268,7 @@ private void RegisterUserReq(String contextPath, final Map<String,String> bodyPa
 						Log.d(TAG, "########################################################");
 						Log.d(TAG, "---------------------------------------------------------");
 						finish();
-						launchActivity(MainActivity.class,SignUpActivity.this , null);
+						myplexUtils.launchActivity(MainActivity.class,SignUpActivity.this , null);
 					}
 					else
 					{
@@ -243,7 +277,6 @@ private void RegisterUserReq(String contextPath, final Map<String,String> bodyPa
 						sendNotification("Err: "+jsonResponse.getString("code")+" "+jsonResponse.getString("message"));
 					}
 				} catch (JSONException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -253,7 +286,7 @@ private void RegisterUserReq(String contextPath, final Map<String,String> bodyPa
 	private void prepareSlideNotifiation() {
 		mSlideNotificationLayout = (RelativeLayout)findViewById(R.id.slidenotificationlayout);
 		mSlideNotificationText = (TextView)findViewById(R.id.slidenotificationtextview);
-		mSlideNotifcationHeight = (int) getResources().getDimension(R.dimen.slidenotificationwithbutton);
+		mSlideNotifcationHeight = (int) getResources().getDimension(R.dimen.actionbarheight);
 		mSlideNotificationLayout.setY(-mSlideNotifcationHeight);
 		mSlideNotificationLayout.setOnClickListener(new OnClickListener() {
 
@@ -263,24 +296,23 @@ private void RegisterUserReq(String contextPath, final Map<String,String> bodyPa
 			}
 		});
 	}
+	private Runnable hideControllerThread = new Runnable() {
+
+		public void run() {
+			myplexUtils.animate(0,-mSlideNotifcationHeight, mSlideNotificationLayout,false,2);
+
+		}
+	};
 	private void showNotification(){
-		animate(-mSlideNotifcationHeight,0, mSlideNotificationLayout,false,2);
-
-
+		myplexUtils.animate(-mSlideNotifcationHeight,0, mSlideNotificationLayout,false,2);
+		hidehandler.removeCallbacks(hideControllerThread);
+		hideNotification();
 	}
 	private void hideNotification(){
-		animate(0,-mSlideNotifcationHeight, mSlideNotificationLayout,false,2);
-
-		/*finish();
-		launchActivity(CardExplorer.class, SplashActivity.this, null);*/
+		hidehandler.postDelayed(hideControllerThread, 3000);
 	}
 	private void sendNotification(final String aMsg){
-		Handler h = new Handler(Looper.getMainLooper());
-		h.post(new Runnable() {
-			public void run() {
-				mSlideNotificationText.setText(aMsg);
-				showNotification();
-			}
-		});
+		mSlideNotificationText.setText(aMsg);
+		showNotification();
 	}
 }

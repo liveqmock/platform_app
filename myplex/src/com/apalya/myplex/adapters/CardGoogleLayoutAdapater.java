@@ -2,8 +2,10 @@ package com.apalya.myplex.adapters;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -119,6 +121,10 @@ public class CardGoogleLayoutAdapater extends BaseAdapter{
 		}else{
 			tagData.mUiHolder.mFavourite_Image.setImageResource(R.drawable.card_unfav);
 		}
+		
+		/*Random rnd = new Random();
+        int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(128), rnd.nextInt(64)); 
+        tagData.mUiHolder.mPlay.setBackgroundColor(color);*/
 		
 		if (data.imageUrl == null || data.imageUrl.compareTo("Images/NoImage.jpg") == 0) {
 			tagData.mUiHolder.mPlay.setImageResource(data.resId);

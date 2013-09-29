@@ -1,5 +1,6 @@
 <resources>
 
+    
  <!-- Application theme. -->
     <style name="AppBaseTheme" parent="android:Theme.Holo.Light.DarkActionBar">
         <!--
@@ -14,6 +15,16 @@
         <item name="android:windowBackground">@layout/grey_bg</item>
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
+	
+     <style name="YaSeekBar">
+		<item name="android:indeterminateOnly">false</item>
+		<item name="android:minHeight">8dp</item>
+		<item name="android:maxHeight">8dp</item>
+		<item name="android:progressDrawable">@drawable/videoplayer_progressbar</item>
+        <item name="android:thumb">@drawable/seek_thumb</item>
+        <item name="android:thumbOffset">25dp</item>
+	</style>
+	
 	<color name="com_facebook_blue">#3B5998</color>
     
     <color name="com_facebook_usersettingsfragment_connected_text_color">#FFFFFF</color>

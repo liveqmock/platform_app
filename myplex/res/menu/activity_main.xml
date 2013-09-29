@@ -1,23 +1,4 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <item
-        android:id="@+id/menu_filter"
-        android:icon="@drawable/menu_home"
-        android:orderInCategory="10"
-        android:actionProviderClass="com.apalya.myplex.menu.FilterMenuProvider"
-        android:showAsAction="always">
-    </item>
-    <item
-        android:id="@+id/menu_progress"
-        android:icon="@drawable/menu_settings"
-        android:orderInCategory="10"
-        android:showAsAction="always">
-    </item>
-    <item
-        android:id="@+id/menu_search"
-        android:icon="@drawable/menu_search"
-        android:orderInCategory="10"
-        android:showAsAction="always">
-    </item>
 
 </menu>

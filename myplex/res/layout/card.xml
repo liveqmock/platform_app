@@ -14,46 +14,46 @@
 
         <LinearLayout
             android:id="@+id/card_title_delete"
-            android:layout_width="@dimen/cardtitleheight"
-            android:layout_height="@dimen/cardtitleheight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="5dp" >
+            android:layout_marginLeft="14dp" >
 
             <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="21dp"
+                android:layout_height="21dp"
                 android:layout_gravity="center_vertical"
                 android:src="@drawable/card_delete" />
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/card_title_fav"
-            android:layout_width="@dimen/cardtitleheight"
-            android:layout_height="@dimen/cardtitleheight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="5dp" >
+            android:layout_marginRight="14dp" >
 
             <ImageView
                 android:id="@+id/card_title_fav_image"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="21dp"
+                android:layout_height="21dp"
                 android:layout_gravity="center_vertical"
                 android:src="@drawable/card_unfav" />
         </LinearLayout>
 
         <LinearLayout
             android:id="@+id/card_title_fav_progress"
-            android:layout_width="@dimen/cardtitleheight"
-            android:layout_height="@dimen/cardtitleheight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="5dp" >
+            android:layout_marginRight="14dp" >
 
             <ProgressBar
-                android:layout_width="24dp"
-                android:layout_height="24dp"
+                android:layout_width="21dp"
+                android:layout_height="21dp"
                 android:layout_gravity="center_vertical" />
         </LinearLayout>
 
@@ -62,8 +62,6 @@
             android:layout_width="fill_parent"
             android:layout_height="@dimen/cardtitleheight"
             android:layout_centerInParent="true"
-            android:layout_marginLeft="32dp"
-            android:layout_marginRight="32dp"
             android:gravity="center"
             android:singleLine="true"
             android:text=""
@@ -75,6 +73,8 @@
     <RelativeLayout
         android:id="@+id/card_preview_layout"
         android:layout_width="fill_parent"
+        android:layout_marginRight="2dp"
+        android:layout_marginLeft="2dp"
         android:layout_height="@dimen/cardplayheight"
         android:layout_below="@+id/card_title_layout"
         android:background="#000000" >
@@ -83,7 +83,7 @@
             android:id="@+id/card_preview_image"
             android:layout_width="fill_parent"
             android:layout_height="@dimen/cardplayheight"
-            android:scaleType="centerCrop" />
+            android:scaleType="centerInside" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -94,11 +94,11 @@
 
         <ImageView
             android:id="@+id/card_status_comments"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="21dp"
+            android:layout_height="21dp"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="5dp"
+            android:layout_marginLeft="14dp"
             android:src="@drawable/card_comments" />
 
         <TextView
@@ -116,11 +116,11 @@
 
         <ImageView
             android:id="@+id/card_status_people"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="21dp"
+            android:layout_height="21dp"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
-            android:layout_marginRight="5dp"
+            android:layout_marginRight="14dp"
             android:src="@drawable/card_people" />
 
         <TextView
@@ -147,7 +147,7 @@
         <View
             android:layout_width="fill_parent"
             android:layout_height="1dp"
-            android:background="#D8D8D8" />
+            android:background="#D8D8D7" />
 
         <LinearLayout
             android:layout_width="fill_parent"
@@ -164,8 +164,8 @@
 
                 <ImageView
                     android:id="@+id/card_info_rent"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
                     android:layout_gravity="center"
                     android:src="@drawable/card_rent" />
 
@@ -184,7 +184,7 @@
             <View
                 android:layout_width="1dp"
                 android:layout_height="@dimen/cardmoreinfoheight"
-                android:background="#D8D8D8" />
+                android:background="#D8D8D7" />
 
             <LinearLayout
                 android:id="@+id/card_info_more"
@@ -195,8 +195,8 @@
                 android:layout_weight="1" >
 
                 <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="21dp"
+                    android:layout_height="21dp"
                     android:layout_gravity="center"
                     android:src="@drawable/card_info" />
 

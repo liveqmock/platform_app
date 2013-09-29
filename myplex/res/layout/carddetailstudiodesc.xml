@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/margin_gap_8" >
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/margin_gap_4"
+        android:layout_marginBottom="@dimen/margin_gap_2"
+        android:layout_marginTop="@dimen/margin_gap_2"
+        android:background="#efefef" >
+    </View>
+
+    <TextView
+        android:id="@+id/carddetaildesc_studiotitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_gap_8"
+        android:text="Myplex Description"
+        android:textColor="#4b4b4b"
+        android:textSize="@dimen/textsize_18" />
+
+    <TextView
+        android:id="@+id/carddetaildesc_studiodescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="sadasdasadasdaasdadsadsdas"
+        android:textColor="#4b4b4b"
+        android:textSize="@dimen/textsize_12" />
+
+</LinearLayout>

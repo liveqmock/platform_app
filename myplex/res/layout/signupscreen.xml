@@ -4,230 +4,243 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:layout_gravity="center"
-    android:background="@layout/grey_bg">
-<ScrollView 
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent" >
+    android:background="@layout/grey_bg" >
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent" >
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="@dimen/size_96"
+            android:layout_marginLeft="@dimen/margin_gap_16"
+            android:layout_marginRight="@dimen/margin_gap_16" >
+
+            <RelativeLayout
+                android:id="@+id/signuplayout"
+                android:layout_width="fill_parent"
+                android:layout_height="@dimen/size_96"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="@dimen/size_48"
+                android:background="@layout/background_card" >
+
+                <View
+                    android:id="@+id/sp"
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:layout_centerInParent="true"
+                    android:layout_centerVertical="true"
+                    android:background="@android:color/black" />
+
+                <TextView
+                    android:id="@+id/ortxt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerInParent="true"
+                    android:background="@drawable/rounded"
+                    android:paddingBottom="2dp"
+                    android:paddingLeft="3dp"
+                    android:paddingRight="3dp"
+                    android:text="@string/or"
+                    android:textSize="@dimen/textsize_14" />
+
+                <TextView
+                    android:id="@+id/sphone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/ortxt"
+                    android:paddingLeft="@dimen/margin_gap_16"
+                    android:paddingTop="6dp"
+                    android:text="@string/phone"
+                    android:textSize="@dimen/textsize_14" />
+
+                <EditText
+                    android:id="@+id/enterPhone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/size_48"
+                    android:layout_alignParentBottom="true"
+                    android:layout_below="@id/ortxt"
+                    android:layout_toRightOf="@id/sphone"
+                    android:background="@drawable/rounded"
+                    android:ems="10"
+                    android:hint="@string/hinttextphone"
+                    android:inputType="phone"
+                    android:paddingLeft="@dimen/margin_gap_8"
+                    android:paddingRight="@dimen/margin_gap_8"
+                    android:textSize="@dimen/textsize_14" />
+
+                <EditText
+                    android:id="@+id/enterEmail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="@dimen/size_48"
+                    android:layout_above="@+id/ortxt"
+                    android:layout_alignLeft="@+id/enterPhone"
+                    android:layout_alignParentRight="true"
+                    android:background="@drawable/rounded"
+                    android:ems="10"
+                    android:hint="@string/hinttextemail"
+                    android:inputType="textEmailAddress"
+                    android:paddingLeft="@dimen/margin_gap_8"
+                    android:paddingRight="@dimen/margin_gap_8"
+                    android:textSize="@dimen/textsize_14" >
+
+                    <requestFocus />
+                </EditText>
+
+                <TextView
+                    android:id="@+id/semailId"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@+id/enterEmail"
+                    android:layout_alignBottom="@+id/enterEmail"
+                    android:paddingLeft="@dimen/margin_gap_16"
+                    android:text="@string/email"
+                    android:textSize="@dimen/textsize_14" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/pwdlayout"
+                android:layout_width="fill_parent"
+                android:layout_height="@dimen/size_96"
+                android:layout_below="@id/signuplayout"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="@dimen/margin_gap_54"
+                android:background="@layout/background_card" >
+
+                <TextView
+                    android:id="@+id/pwd"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@+id/editsPassword"
+                    android:paddingLeft="@dimen/margin_gap_16"
+                    android:text="@string/password"
+                    android:textSize="@dimen/textsize_14" />
+
+                <View
+                    android:id="@+id/sep"
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:background="@android:color/black" />
+
+                <TextView
+                    android:id="@+id/fullname"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@+id/editFullName"
+                    android:paddingLeft="@dimen/margin_gap_16"
+                    android:text="@string/fname"
+                    android:textSize="@dimen/textsize_14" />
+
+                <EditText
+                    android:id="@+id/editFullName"
+                    android:layout_width="48dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/editsPassword"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@+id/sep"
+                    android:layout_centerVertical="true"
+                    android:background="@drawable/rounded"
+                    android:ems="10"
+                    android:hint="@string/hinttextname"
+                    android:inputType="textPersonName"
+                    android:paddingLeft="@dimen/margin_gap_8"
+                    android:paddingRight="@dimen/margin_gap_8"
+                    android:textSize="@dimen/textsize_14" />
+
+                <EditText
+                    android:id="@+id/editsPassword"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@+id/sep"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="14dp"
+                    android:layout_toRightOf="@+id/fullname"
+                    android:background="@drawable/rounded"
+                    android:ems="10"
+                    android:hint="@string/hinttextpwd"
+                    android:inputType="textPassword"
+                    android:paddingLeft="@dimen/margin_gap_8"
+                    android:paddingRight="@dimen/margin_gap_8"
+                    android:textSize="@dimen/textsize_14" >
+                </EditText>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/updates"
+                android:layout_width="fill_parent"
+                android:layout_height="@dimen/size_96"
+                android:layout_alignLeft="@+id/pwdlayout"
+                android:layout_alignRight="@+id/pwdlayout"
+                android:layout_below="@id/pwdlayout"
+                android:layout_marginTop="@dimen/margin_gap_54"
+                android:background="@layout/background_card"
+                android:orientation="vertical" >
+
+                <View
+                    android:id="@+id/sep1"
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:background="@android:color/black" />
+
+                <Switch
+                    android:id="@+id/toggleButton1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@+id/toggleButton2"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentRight="true"
+                    android:paddingBottom="14dp"
+                    android:paddingLeft="@dimen/margin_gap_16"
+                    android:paddingRight="@dimen/margin_gap_16"
+                    android:paddingTop="14dp"
+                    android:text="@string/msgUpdate"
+                    android:textSize="14dp"
+                    android:thumb="@drawable/switch_thumb" />
+
+                <Switch
+                    android:id="@+id/toggleButton2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/toggleButton1"
+                    android:layout_alignParentRight="true"
+                    android:layout_below="@+id/sep1"
+                    android:paddingBottom="14dp"
+                    android:paddingLeft="@dimen/margin_gap_16"
+                    android:paddingRight="@dimen/margin_gap_16"
+                    android:paddingTop="14dp"
+                    android:text="@string/mailUpdate"
+                    android:textSize="14dp"
+                    android:thumb="@drawable/switch_thumb" />
+            </RelativeLayout>
+
+            <Button
+                android:id="@+id/submit"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/updates"
+                android:layout_alignRight="@+id/updates"
+                android:layout_below="@id/updates"
+                android:layout_marginTop="@dimen/size_48"
+                android:background="@drawable/buttonimg"
+                android:text="@string/submit"
+                android:textColor="@color/white"
+                android:textSize="@dimen/textsize_14" />
+        </RelativeLayout>
+    </ScrollView>
 
     <RelativeLayout
-        android:layout_width="fill_parent"
-        android:layout_height="@dimen/editfieldheight"
-        android:layout_marginLeft="@dimen/margin"
-        android:layout_marginRight="@dimen/margin" >
-
-        <RelativeLayout
-            android:id="@+id/signuplayout"
-            android:layout_width="fill_parent"
-            android:layout_height="@dimen/editfieldheight"
-            android:layout_alignParentTop="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="@dimen/fieldheight"
-            android:background="@layout/background_card" >
-
-            <View
-                android:id="@+id/sp"
-                android:layout_width="fill_parent"
-                android:layout_height="1dp"
-                android:layout_centerInParent="true"
-                android:layout_centerVertical="true"
-                android:background="@android:color/black" />
-
-            <TextView
-                android:id="@+id/ortxt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:layout_centerInParent="true"
-                android:background="@drawable/rounded"
-                android:paddingBottom="2dp"
-                android:paddingLeft="3dp"
-                android:paddingRight="3dp"
-                android:text="@string/or"
-                android:textSize="@dimen/normaltextsize" />
-
-            <TextView
-                android:id="@+id/sphone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/ortxt"
-                android:paddingLeft="@dimen/margin"
-                android:paddingTop="6dp"
-                android:text="@string/phone"
-                android:textSize="@dimen/normaltextsize" />
-
-            <EditText
-                android:id="@+id/enterPhone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentBottom="true"
-                android:layout_below="@id/ortxt"
-                android:layout_toRightOf="@id/sphone"
-                android:background="@drawable/rounded"
-                android:ems="10"
-                android:inputType="phone"
-                android:paddingLeft="14dp" />
-
-            <EditText
-                android:id="@+id/enterEmail"
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/fieldheight"
-                android:layout_above="@+id/ortxt"
-                android:layout_alignLeft="@+id/enterPhone"
-                android:layout_alignParentRight="true"
-                android:background="@drawable/rounded"
-                android:ems="10"
-                android:inputType="textEmailAddress" >
-
-                <requestFocus />
-            </EditText>
-
-            <TextView
-                android:id="@+id/semailId"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBaseline="@+id/enterEmail"
-                android:layout_alignBottom="@+id/enterEmail"
-                android:paddingLeft="@dimen/margin"
-                android:text="@string/email"
-                android:textSize="@dimen/normaltextsize" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/pwdlayout"
-            android:layout_width="fill_parent"
-            android:layout_height="@dimen/editfieldheight"
-            android:layout_below="@id/signuplayout"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="@dimen/titlebottomspacing"
-            android:background="@layout/background_card" >
-
-            <TextView
-                android:id="@+id/pwd"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBaseline="@+id/editsPassword"
-                android:paddingLeft="@dimen/margin"
-                android:text="@string/password"
-                android:textSize="@dimen/normaltextsize" />
-
-            <View
-                android:id="@+id/sep"
-                android:layout_width="fill_parent"
-                android:layout_height="1dp"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:background="@android:color/black" />
-
-            <TextView
-                android:id="@+id/fullname"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignBaseline="@+id/editFullName"
-                android:paddingLeft="@dimen/margin"
-                android:text="@string/fname"
-                android:textSize="@dimen/normaltextsize" />
-
-            <EditText
-                android:id="@+id/editFullName"
-                android:layout_width="48dp"
-                android:layout_height="wrap_content"
-                android:layout_alignLeft="@+id/editsPassword"
-                android:layout_alignParentBottom="true"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/sep"
-                android:layout_centerVertical="true"
-                android:background="@drawable/rounded"
-                android:ems="10"
-                android:inputType="textPersonName"
-                android:textSize="@dimen/editfieldsize" />
-
-            <EditText
-                android:id="@+id/editsPassword"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_above="@+id/sep"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="14dp"
-                android:layout_toRightOf="@+id/fullname"
-                android:background="@drawable/rounded"
-                android:ems="10"
-                android:hint="@string/required"
-                android:inputType="textPassword"
-                android:textSize="@dimen/editfieldsize" >
-            </EditText>
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:id="@+id/updates"
-            android:layout_width="fill_parent"
-            android:layout_height="@dimen/editfieldheight"
-            android:layout_alignLeft="@+id/pwdlayout"
-            android:layout_alignRight="@+id/pwdlayout"
-            android:layout_below="@id/pwdlayout"
-            android:layout_marginTop="@dimen/fieldspacing"
-            android:background="@layout/background_card"
-            android:orientation="vertical" >
-
-            <View
-                android:id="@+id/sep1"
-                android:layout_width="fill_parent"
-                android:layout_height="1dp"
-                android:layout_alignParentRight="true"
-                android:layout_centerVertical="true"
-                android:background="@android:color/black" />
-
-            <Switch
-                android:id="@+id/toggleButton1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_above="@+id/toggleButton2"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentRight="true"
-                android:paddingBottom="14dp"
-                android:paddingLeft="@dimen/margin"
-                android:paddingRight="@dimen/margin"
-                android:paddingTop="14dp"
-                android:text="@string/msgUpdate"
-                android:textSize="14dp"
-                android:thumb="@drawable/switch_thumb" />
-
-            <Switch
-                android:id="@+id/toggleButton2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignLeft="@+id/toggleButton1"
-                android:layout_alignParentRight="true"
-                android:layout_below="@+id/sep1"
-                android:paddingBottom="14dp"
-                android:paddingLeft="@dimen/margin"
-                android:paddingRight="@dimen/margin"
-                android:paddingTop="14dp"
-                android:text="@string/mailUpdate"
-                android:textSize="14dp"
-                android:thumb="@drawable/switch_thumb" />
-        </RelativeLayout>
-
-        <Button
-            android:id="@+id/submit"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/updates"
-            android:layout_alignRight="@+id/updates"
-            android:layout_below="@id/updates"
-            android:layout_marginTop="@dimen/fieldheight"
-            android:background="@drawable/buttonimg"
-            android:text="@string/submit"
-            android:textColor="@color/white"
-            android:textSize="@dimen/buttontextsize" />
-    </RelativeLayout>
-
-</ScrollView>
-<RelativeLayout
         android:id="@+id/slidenotificationlayout"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/slidenotificationwithbutton"
+        android:layout_height="@dimen/actionbarheight"
         android:layout_alignParentTop="true"
         android:background="#FF3239" >
 
@@ -239,16 +252,9 @@
             android:layout_marginRight="10dp"
             android:gravity="center"
             android:textColor="#FFFFFF"
-            android:textSize="16sp" />
+            android:textSize="@dimen/textsize_14" />
 
-        <Button
-            android:id="@+id/okalert"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/slidenotificationtextview"
-            android:layout_centerHorizontal="true"
-            android:text="OK"
-            android:textColor="#FFFFFF"
-            android:textSize="12sp" />
+       
     </RelativeLayout>
+
 </RelativeLayout>

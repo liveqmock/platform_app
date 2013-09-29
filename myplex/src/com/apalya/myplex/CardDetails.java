@@ -1,46 +1,79 @@
 package com.apalya.myplex;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
+import android.app.AlertDialog;
+import android.drm.DrmErrorEvent;
+import android.drm.DrmEvent;
+import android.drm.DrmInfoEvent;
+import android.drm.DrmManagerClient;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.view.PagerAdapter;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.Space;
 
-import com.android.volley.toolbox.NetworkImageView;
-import com.apalya.myplex.adapters.CardDetailsAdapter;
 import com.apalya.myplex.data.CardData;
-import com.apalya.myplex.data.CardDetailCommentListData;
-import com.apalya.myplex.data.CardDetailDataHolder;
-import com.apalya.myplex.data.CardDetailDescriptionData;
+import com.apalya.myplex.data.CardDetailBaseData;
+import com.apalya.myplex.data.CardDetailCastCrew;
+import com.apalya.myplex.data.CardDetailCommentData;
 import com.apalya.myplex.data.CardDetailMediaData;
 import com.apalya.myplex.data.CardDetailMediaListData;
+import com.apalya.myplex.data.CardDetailMultiMediaGroup;
+import com.apalya.myplex.data.myplexUtils;
+import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.media.PlayerListener;
+import com.apalya.myplex.media.VideoView;
+import com.apalya.myplex.media.VideoViewPlayer;
+import com.apalya.myplex.media.VideoViewPlayer.StreamType;
 import com.apalya.myplex.utils.MyVolley;
+import com.apalya.myplex.views.CardDetailViewFactory;
+import com.apalya.myplex.views.CardDetailViewFactory.CardDetailViewFactoryListener;
 import com.apalya.myplex.views.CustomDialog;
-import com.apalya.myplex.views.CustomFastScrollView;
 import com.apalya.myplex.views.FadeInNetworkImageView;
 import com.apalya.myplex.views.ItemExpandListener.ItemExpandListenerCallBackListener;
 import com.apalya.myplex.views.JazzyViewPager;
 import com.apalya.myplex.views.JazzyViewPager.TransitionEffect;
 import com.apalya.myplex.views.OutlineContainer;
+import com.apalya.myplex.views.docketVideoWidget;
 
 public class CardDetails extends BaseFragment implements
-		ItemExpandListenerCallBackListener {
-	private ListView listView;
-	private CustomFastScrollView fastScrollView;
-	private CardDetailsAdapter mAdapter;
+		ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,PlayerListener {
 	private LayoutInflater mInflater;
+	private LinearLayout mParentContentLayout;
+	private CardDetailViewFactory mCardDetailViewFactory;
+	
+	private ImageView mDescriptionExpansion;
+	private ImageView mRelatedMediaExpansion;
+	private ImageView mCommentsExpansion;
+	
+	private LinearLayout mDescriptionContentLayout;
+	private LinearLayout mMediaContentLayout;
+	private LinearLayout mCommentsContentLayout;
+
+	private boolean mDescriptionExpansionToogle = false;
+	private boolean mRelatedExpansionToogle = false;
+	private boolean mCommentsExpansionToogle = false;
+	
+	
 	private int mDetailType = Profile;
 	public static final int Profile = 0;
 	public static final int MovieDetail = 1;
 	public static final int TvShowsDetail = 2;
 	public static final int LiveTvDetail = 3;
-	public View rootView;	
+	public View rootView;
+	
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -50,100 +83,315 @@ public class CardDetails extends BaseFragment implements
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		
-		rootView = inflater.inflate(R.layout.carddetails, container,false);
-		listView = (ListView) rootView.findViewById(android.R.id.list);
-		fastScrollView = (CustomFastScrollView) rootView.findViewById(R.id.fast_scroll_view);
+		mInflater = LayoutInflater.from(getContext());
+		rootView = inflater.inflate(R.layout.carddetails, container, false);
+		RelativeLayout videoLayout = (RelativeLayout)rootView.findViewById(R.id.carddetail_videolayout);
+		videoLayout.addView(createVideoPreview());
+		mParentContentLayout = (LinearLayout) rootView.findViewById(R.id.carddetail_detaillayout);
+		mCardDetailViewFactory = new CardDetailViewFactory(getContext());
+		mCardDetailViewFactory.setOnCardDetailExpandListener(this);
 		prepareContent();
 		return rootView;
 	}
+	
+	
 	private CardData mCardData;
-	private void prepareContent() {
-		mAdapter = new CardDetailsAdapter(getContext());
-		mAdapter.setItemExpandListener(this);
-		if(mDataObject instanceof CardData){
-			mCardData = (CardData)mDataObject;
-			mMainActivity.setTitle(mCardData.title);
-			NetworkImageView imageview = (NetworkImageView)rootView.findViewById(R.id.carddetails_image);
-			imageview.setImageUrl(mCardData.imageUrl, MyVolley.getImageLoader());
-		}
+	private FadeInNetworkImageView mPreviewImage;
+	private VideoView mVideoView;
+	private boolean mPlaying = false;
+	private ImageView mPlay;
+	private RelativeLayout mProgressBar;
+	VideoViewPlayer mVideoViewPlayer;
+	private int mPerBuffer = 0;
+	private View createVideoPreview(){
+		View v = mInflater.inflate(R.layout.cardmediasubitemvideo, null);
+		int width , height = 100;
 		
-		dummyData();
-		fastScrollView.listItemsChanged();
-	}
+		width = myplexUtils.mScreenWidth;
+		height = (width * 9)/16; 
+		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(width,height);
+		mPreviewImage = (FadeInNetworkImageView) v.findViewById(R.id.cardmediasubitemvideo_imagepreview);
+		mPreviewImage.setLayoutParams(params);
+		mVideoView = (VideoView)v.findViewById(R.id.cardmediasubitemvideo_videopreview);
+		mVideoView.setLayoutParams(params);
+		mPlay = (ImageView) v.findViewById(R.id.cardmediasubitemvideo_play);
+		mProgressBar = (RelativeLayout) v.findViewById(R.id.cardmediasubitemvideo_progressbarLayout);
+		
+		mPreviewImage.setImageUrl("https://lh5.googleusercontent.com/-d-qS8knzDP4/SePRfjfPYhI/AAAAAAAACVA/jxox5vRCphw/IMG_0084.jpg", MyVolley.getImageLoader());
+		myplexUtils.showFeedback(mPlay);
 
-	private CardDetailDataHolder createDescriptionData() {
-		CardDetailDataHolder descriptionData = new CardDetailDataHolder();
-		descriptionData.mFilterName = "Description";
-		descriptionData.mLabel = "Description";
-		descriptionData.mShowinQuickLaunch = true;
-		CardDetailDescriptionData subData = new CardDetailDescriptionData();
-		subData.mContentFullDescription = "Left for dead on a sun-scorched planet, Riddick finds himself up against an alien race of predators. Activating an emergency beacon alerts two ships: one carrying a new breed of mercenary, the other captained by a man from Riddick&apos;s past.";
-		subData.mContentBriefDescription = "Left for dead on a sun-scorched planet, Riddick finds ....";
-		subData.mRating = (float) 3.5;
-		if(mCardData != null){
-			subData.mTitle = mCardData.title;
-		}else{
-			subData.mTitle = "Title";
+		mPlay.setOnClickListener(mPlayListener);
+		return v;
+	}
+	private OnClickListener mPlayListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			if(mPlaying){
+				mVideoViewPlayer.closeSession();
+				mProgressBar.setVisibility(View.GONE);
+				showImagePreview();
+				mPlaying = false;
+				return;
+			}
+			mPlaying = true;
+			hideImagePreview();
+			mProgressBar.setVisibility(View.VISIBLE);
+			Uri uri = Uri.parse("rtsp://59.162.166.216:554/AAJTAK_QVGA.sdp");
+			uri = Uri.parse("rtsp://46.249.213.87:554/playlists/bollywood-action_qcif.hpl.3gp");
+			//uri = Uri.parse("widevine://pmweb.widevine.net/content/wvm/sintel_base_360p_3br_tp_short.wvm"); //DRM CONTENT
+			VideoViewPlayer.StreamType streamType = StreamType.VOD; 
+			if(mVideoViewPlayer == null){
+				mVideoViewPlayer = new VideoViewPlayer(mVideoView,mContext, uri, streamType);
+				if(uri.toString().contains(".wvm"))
+				{
+					//DRM CONTENT, GET THE RIGHTS
+					mVideoViewPlayer.acquireRights();
+				}
+				mVideoViewPlayer.openVideo();
+				
+			}else{
+				mVideoViewPlayer.setUri(uri, streamType);
+			}
+			mVideoViewPlayer.setPlayerListener(CardDetails.this);	
 		}
-		descriptionData.mData = subData;
-		return descriptionData;
+	};
+	@Override
+	public void onBufferingUpdate(MediaPlayer mp, int perBuffer) {
+		Log.e("player",perBuffer +" loading ");
+		if(this.mPerBuffer <= perBuffer){
+			this.mPerBuffer = perBuffer;
+		}
+		int currentseekposition = mVideoView.getCurrentPosition();
+		if(currentseekposition < 0){
+			currentseekposition = 510;
+		}
+		if(mVideoView.isPlaying() && currentseekposition > 500){
+			mProgressBar.setVisibility(View.GONE);
+			mVideoViewPlayer.deregisteronBufferingUpdate();
+		}
 	}
 
-	private CardDetailMediaData createMedia(String url) {
-		CardDetailMediaData mediaData = new CardDetailMediaData();
-		mediaData.mThumbnailDescription = "ThumbnailDescription";
-		mediaData.mThumbnailName = "ThumbnailName";
-		mediaData.mThumbnailUrl = url;
-		mediaData.mThumbnailMime = "ThumbnailDescription";
-		return mediaData;
+	@Override
+	public boolean onError(MediaPlayer mp, int arg1, int arg2) {
+		mProgressBar.setVisibility(View.GONE);
+		showImagePreview();
+		return false;
+	}
 
+	@Override
+	public void onCompletion(MediaPlayer mp) {
+		mProgressBar.setVisibility(View.GONE);
+		showImagePreview();
+	}
+
+	@Override
+	public void onPlayerQualityClick() {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void onSeekComplete(MediaPlayer mp) {
+		// TODO Auto-generated method stub
+		
+	}
+	private void showImagePreview(){
+		mPreviewImage.setVisibility(View.VISIBLE);
+		mVideoView.setVisibility(View.INVISIBLE);
+		mPlay.setImageResource(R.drawable.player_icon_play);
+		
+	}
+	private void hideImagePreview(){
+		mPreviewImage.setVisibility(View.INVISIBLE);
+		mVideoView.setVisibility(View.VISIBLE);
+		mPlay.setImageResource(R.drawable.player_icon_pause);
+	}
+	private void prepareContent() {
+		dummyData();
+		fillData();
+	}
+
+	private OnClickListener mDescriptionExpansionClickListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			if(mDescriptionContentLayout == null){return;}
+			if(mDescriptionExpansionToogle){
+				mDescriptionContentLayout.removeAllViews();
+			}else{
+				mDescriptionContentLayout.addView(mCardDetailViewFactory.CreateView(data,CardDetailViewFactory.CARDDETAIL_FULL_DESCRIPTION));
+				if(data.myplexDescription != null && data.myplexDescription.length() > 0){
+					mDescriptionContentLayout.addView(mCardDetailViewFactory.CreateView(data,CardDetailViewFactory.CARDDETAIL_MYPLEX_DESCRIPTION));
+				}
+				if(data.studioDescription != null && data.studioDescription.length() > 0){
+					mDescriptionContentLayout.addView(mCardDetailViewFactory.CreateView(data,CardDetailViewFactory.CARDDETAIL_STUDI0_DESCRIPTION));
+				}
+				if(data.mCastCrewList != null && data.mCastCrewList.size() > 0){
+					mDescriptionContentLayout.addView(mCardDetailViewFactory.CreateView(data,CardDetailViewFactory.CARDDETAIL_CASTANDCREW));
+				}
+				if(data.mPlayinPlaceList != null && data.mPlayinPlaceList.size() > 0){
+					mDescriptionContentLayout.addView(mCardDetailViewFactory.CreateView(data,CardDetailViewFactory.CARDDETAIL_PLAYINPLACE));
+				}
+			}
+			mDescriptionExpansionToogle = !mDescriptionExpansionToogle;
+		}
+	};
+	private OnClickListener mRelatedExpansionClickListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			if(mMediaContentLayout == null){return;}
+			if(mRelatedExpansionToogle){
+				mMediaContentLayout.removeAllViews();
+			}else{
+				mMediaContentLayout.addView(mCardDetailViewFactory.CreateView(data,CardDetailViewFactory.CARDDETAIL_EXTRA_RELATED_MULTIMEDIA ));
+			}
+			mRelatedExpansionToogle = !mRelatedExpansionToogle;
+		}
+	};
+	private OnClickListener mCommentsExpansionClickListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			if(mCommentsContentLayout == null){return;}
+			if(mCommentsExpansionToogle){
+				mCommentsContentLayout.removeAllViews();
+			}else{
+				mCommentsContentLayout.addView(mCardDetailViewFactory.CreateView(data,CardDetailViewFactory.CARDDETAIL_COMMENTS ));
+			}
+			mCommentsExpansionToogle = !mCommentsExpansionToogle;
+		}
+	};
+	private void addSpace(){
+		Space gap = new Space(getContext());
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,(int)getContext().getResources().getDimension(R.dimen.margin_gap_8));
+		gap.setLayoutParams(params);
+		mParentContentLayout.addView(gap);
+	}
+	private void fillData() {
+		mParentContentLayout.addView(mCardDetailViewFactory.CreateView(data,CardDetailViewFactory.CARDDETAIL_BRIEF_DESCRIPTION));
+		addSpace();
+		mParentContentLayout.addView(mCardDetailViewFactory.CreateView(data,CardDetailViewFactory.CARDDETAIL_BREIF_RELATED_MULTIMEDIA));
+		addSpace();
+		mParentContentLayout.addView(mCardDetailViewFactory.CreateView(data,CardDetailViewFactory.CARDDETAIL_BRIEF_COMMENTS));
+		
 	}
 
 	private int count = 0;
+	private CardDetailBaseData data;
 
-	private CardDetailDataHolder createImageData() {
-		CardDetailDataHolder descriptionData = new CardDetailDataHolder();
-		if(count == 0){
-			descriptionData.mFilterName = "Audio Release ";
-			descriptionData.mLabel = "Audio Release ";
-		}else if(count == 1){
-			descriptionData.mFilterName = "Muhurtham Photos";
-			descriptionData.mLabel = "Muhurtham Photos";
-		}else{
-			descriptionData.mFilterName = "Related Content";
-			descriptionData.mLabel = "Related Content";
-		}
-		count++;
-		descriptionData.mShowinQuickLaunch = true;
-		CardDetailMediaListData subData = new CardDetailMediaListData();
-		for (int i = 0; i < URLS.length; i++) {
-			subData.mList.add(createMedia(URLS[i]));
-		}
-		descriptionData.mData = subData;
-		return descriptionData;
-	}
-
-	private CardDetailDataHolder createCommentData(){
-		CardDetailDataHolder descriptionData = new CardDetailDataHolder();
-		descriptionData.mFilterName = "Commens and Review";
-		descriptionData.mLabel = "Commens and Review";
-		descriptionData.mShowinQuickLaunch = true;
-		CardDetailCommentListData subData = new CardDetailCommentListData();
-		descriptionData.mData = subData;
-		return descriptionData;
-		
-	}
 	private void dummyData() {
-		List<CardDetailDataHolder> datalist = new ArrayList<CardDetailDataHolder>();
-		datalist.add(createDescriptionData());
-		datalist.add(createImageData());
-//		datalist.add(createImageData());
-//		datalist.add(createImageData());
-		datalist.add(createCommentData());
+		data = new CardDetailBaseData();
+		data.contentID = "21321";
+		data.contentName = "The Godfather";
+		data.briefDescription = "The aging patriarch of an organized crime dynasty transfers control of his clandestine empire to his reluctant son. ";
+		data.fullDescription = "The story begins as Don Vito Corleone, the head of a New York Mafia , oversees his daughter's wedding with his wife Wendy. His beloved son Michael has just come home from the war, but does not intend to become part of his father's business. Through Michael's life the nature of the family business becomes clear. The business of the family is just like the head of the family, kind and benevolent to those who give respect, but given to ruthless violence whenever anything stands against the good of the family. Don Vito lives his life in the way of the old country, but times are changing and some don't want to follow the old ways and look out for community and .";// An up and coming rival of the Corleone family wants to start selling drugs in New York, and needs the Don's influence to further his plan. The clash of the Don's fading old world values and the new ways will demand a terrible price, especially from Michael, all for the sake of the family";
+		data.myplexDescription = "The story begins as Don Vito Corleone, the head of a New York Mafia , oversees his daughter's wedding with his wife Wendy. His beloved son Michael has just come home from the war, but does not intend to become part of his father's business. Through Michael's life the nature of the family business becomes clear. The business of the family is just like the head of the family, kind and benevolent to those who give respect, but given to ruthless violence whenever anything stands against the good of the family. Don Vito lives his life in the way of the old country, but times are changing and some don't want to follow the old ways and look out for community and";// . An up and coming rival of the Corleone family wants to start selling drugs in New York, and needs the Don's influence to further his plan. The clash of the Don's fading old world values and the new ways will demand a terrible price, especially from Michael, all for the sake of the family";
+		data.studioDescription = "The story begins as Don Vito Corleone, the head of a New York Mafia , oversees his daughter's wedding with his wife Wendy. His beloved son Michael has just come home from the war, but does not intend to become part of his father's business. Through Michael's life the nature of the family business becomes clear. The business of the family is just like the head of the family, kind and benevolent to those who give respect, but given to ruthless violence whenever anything stands against the good of the family. Don Vito lives his life in the way of the old country, but times are changing and some don't want to follow the old ways and look out for community and";// . An up and coming rival of the Corleone family wants to start selling drugs in New York, and needs the Don's influence to further his plan. The clash of the Don's fading old world values and the new ways will demand a terrible price, especially from Michael, all for the sake of the family";
+		data.parentalRating = "R";
+		data.rating = 4.6f;
+		data.releaseDate = " 24 March 1972";
+		fillMediaGroup(data.mMultiMediaGroup);
+		fillPlayinPlace(data.mPlayinPlaceList);
+		fillReviewsList(data.mReviewsList);
+		fillCommentsList(data.mCommentsList);
+		fillCastCrew(data.mCastCrewList);
+	}
 
-		mAdapter.setData(datalist);
-		listView.setAdapter(mAdapter);
+	private void fillMediaGroup(List<CardDetailMultiMediaGroup> list) {
+		{
+			CardDetailMultiMediaGroup group = new CardDetailMultiMediaGroup();
+			group.groupDescription = "some message";
+			group.groupName = "group name";
+			fillPlayinPlace(group.mList);
+			list.add(group);
+		}
+		{
+			CardDetailMultiMediaGroup group = new CardDetailMultiMediaGroup();
+			group.groupDescription = "some message1";
+			group.groupName = "group name1";
+			fillPlayinPlace(group.mList);
+			list.add(group);
+		}
+		{
+			CardDetailMultiMediaGroup group = new CardDetailMultiMediaGroup();
+			group.groupDescription = "some message2";
+			group.groupName = "group name2";
+			fillPlayinPlace(group.mList);
+			list.add(group);
+		}
+		{
+			CardDetailMultiMediaGroup group = new CardDetailMultiMediaGroup();
+			group.groupDescription = "some message3";
+			group.groupName = "group name3";
+			fillPlayinPlace(group.mList);
+			list.add(group);
+		}
+	}
+
+	private void fillPlayinPlace(List<CardDetailMediaData> list) {
+		{
+			CardDetailMediaData data = new CardDetailMediaData();
+			data.mThumbnailDescription = "Description ";
+			data.mThumbnailMime = "Image/JPEG";
+			data.mThumbnailUrl = "https://lh6.googleusercontent.com/-HEeoO3k3bPg/S0VKWAJUlbI/AAAAAAAAAik/k1x42L8UIvw/Movie-GhostRider-001.jpg";
+			list.add(data);
+		}
+		{
+			CardDetailMediaData data = new CardDetailMediaData();
+			data.mThumbnailDescription = "Description ";
+			data.mThumbnailMime = "Image/JPEG";
+			data.mThumbnailUrl = "https://lh4.googleusercontent.com/-16Op5dZqK4s/STQf00CgLaI/AAAAAAAAAS4/y94XF3tvI2o/Blog1000-Which-way-india-stn.jpg";
+			list.add(data);
+		}
+		{
+			CardDetailMediaData data = new CardDetailMediaData();
+			data.mThumbnailDescription = "Description ";
+			data.mThumbnailUrl = "https://lh3.googleusercontent.com/-yqLKT4RAfBM/S32v0NNVTbI/AAAAAAAAKyw/2ggyry4KiCE/Nature%252520Wallpapers%252520%25252880%252529.jpg";
+			list.add(data);
+		}
+		{
+			CardDetailMediaData data = new CardDetailMediaData();
+			data.mThumbnailDescription = "Description ";
+			data.mThumbnailMime = "Image/JPEG";
+			data.mThumbnailUrl = "https://lh5.googleusercontent.com/-d-qS8knzDP4/SePRfjfPYhI/AAAAAAAACVA/jxox5vRCphw/IMG_0084.jpg";
+			list.add(data);
+		}
+		{
+			CardDetailMediaData data = new CardDetailMediaData();
+			data.mThumbnailDescription = "Description ";
+			data.mThumbnailUrl = "https://lh5.googleusercontent.com/-eurfd_3DDJM/SYpR7j0o8CI/AAAAAAAAJ8k/XRRlN8bdQlA/DSCF3739r.jpg";
+			list.add(data);
+		}
+	}
+
+	private void fillReviewsList(List<CardDetailCommentData> list) {
+		for (int i = 0; i < 10; i++) {
+			CardDetailCommentData data = new CardDetailCommentData();
+			data.mMessage = "reviews here " + i;
+			data.mDate = "on " + i;
+			data.mName = "Person " + i;
+			list.add(data);
+		}
+	}
+
+	private void fillCommentsList(List<CardDetailCommentData> list) {
+		for (int i = 0; i < 10; i++) {
+			CardDetailCommentData data = new CardDetailCommentData();
+			data.mMessage = "I needed background with borders on the left, right, bottom and this worked for me, thanks! ";
+			data.mDate = "13 hours ago";
+			data.mName = "Nick " ;
+			list.add(data);
+		}
+	}
+
+	private void fillCastCrew(List<CardDetailCastCrew> list) {
+		for (int i = 0; i < 10; i++) {
+			CardDetailCastCrew data = new CardDetailCastCrew();
+			data.leftText = "character " + i;
+			data.rightText = "actual " + i;
+			list.add(data);
+		}
 	}
 
 	private static final String[] URLS = {
@@ -186,7 +434,7 @@ public class CardDetails extends BaseFragment implements
 	private void showAlbumDialog() {
 		mAlbumDialog = new CustomDialog(getContext());
 		mAlbumDialog.setContentView(R.layout.albumview);
-		setupJazziness(TransitionEffect.Stack);
+		setupJazziness(TransitionEffect.CubeOut);
 		mAlbumDialog.setCancelable(true);
 		mAlbumDialog.show();
 	}
@@ -197,6 +445,12 @@ public class CardDetails extends BaseFragment implements
 
 	private void setupJazziness(TransitionEffect effect) {
 		mJazzy = (JazzyViewPager) mAlbumDialog.findViewById(R.id.jazzy_pager);
+		int width , height = 100;
+		width = myplexUtils.mScreenWidth - 2*((int)mContext.getResources().getDimension(R.dimen.margin_gap_8));
+		height = (width * 9)/16; 
+		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(width,height);
+		mJazzy.setLayoutParams(params);
+		
 		mJazzy.setTransitionEffect(effect);
 		mJazzy.setAdapter(new MainAdapter());
 		// mJazzy.setPageMargin(30);
@@ -205,19 +459,15 @@ public class CardDetails extends BaseFragment implements
 	private class MainAdapter extends PagerAdapter {
 		@Override
 		public Object instantiateItem(ViewGroup container, final int position) {
-
-			View v = mInflater.inflate(R.layout.albumitem, null);
-
-			FadeInNetworkImageView imageView = (FadeInNetworkImageView) v
-					.findViewById(R.id.albumitem_imageView1);
-//			Random rnd = new Random();
-			// int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(128),
-			// rnd.nextInt(64));
-			// imageView.setBackgroundColor(color);
-//			TextView text = (TextView) v.findViewById(R.id.albumitem_textView1);
-//			text.setText("" + position);
-			imageView.setImageUrl(mMediaList.get(position).mThumbnailUrl,
-					MyVolley.getImageLoader());
+			CardDetailMediaData media =  mSelectedMediaGroup.mList.get(position);
+			View v = null;
+			if(media.mThumbnailMime != null && media.mThumbnailMime =="Image/JPEG"){
+				v = mInflater.inflate(R.layout.cardmediasubitemimage, null);
+				((FadeInNetworkImageView)v).setImageUrl(media.mThumbnailUrl, MyVolley.getImageLoader());
+			}else{
+				docketVideoWidget videoWidget = new docketVideoWidget(mContext);
+				v = videoWidget.CreateView(media);
+			}
 			container.addView(v);
 			mJazzy.setObjectForPosition(v, position);
 			return v;
@@ -230,7 +480,7 @@ public class CardDetails extends BaseFragment implements
 
 		@Override
 		public int getCount() {
-			return mMediaList.size();
+			return mSelectedMediaGroup.mList.size();
 		}
 
 		@Override
@@ -241,5 +491,23 @@ public class CardDetails extends BaseFragment implements
 				return view == obj;
 			}
 		}
+	}
+
+	@Override
+	public void onExpanded() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onTextSelected(String key) {
+		
+	}
+
+	private CardDetailMultiMediaGroup mSelectedMediaGroup;
+	@Override
+	public void onMediaGroupSelected(CardDetailMultiMediaGroup group) {
+		mSelectedMediaGroup = group;
+		showAlbumDialog();
 	}
 }

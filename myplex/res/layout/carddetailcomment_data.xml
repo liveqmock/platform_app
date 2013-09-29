@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.apalya.myplex.views.VerticalLineRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="30dp" >
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="@dimen/size_24"
+        android:layout_height="@dimen/size_24"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="@dimen/margin_gap_4"
+        android:src="@drawable/timelinecircle" />
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="@dimen/margin_gap_4"
+        android:layout_toRightOf="@+id/imageView1"
+        android:background="#efefef" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/carddetailcomment_personname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/margin_gap_4"
+                android:layout_marginRight="@dimen/margin_gap_4"
+                android:text="Name"
+                android:textSize="@dimen/textsize_12" />
+
+            <TextView
+                android:id="@+id/carddetailcomment_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/margin_gap_4"
+                android:layout_marginRight="@dimen/margin_gap_2"
+                android:text="time"
+                android:textColor="#808080"
+                android:textSize="@dimen/textsize_12"
+                android:textStyle="italic" />
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="@dimen/size_24"
+            android:layout_height="@dimen/size_24"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/card_info"
+            android:visibility="invisible" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/relativeLayout1"
+        android:layout_below="@+id/relativeLayout1" android:layout_marginRight="@dimen/margin_gap_4"
+        android:background="@drawable/commenttextbg" >
+
+        <TextView
+            android:id="@+id/carddetailcomment_comment"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin_gap_8"
+            android:text="one of the best movies this year"
+            android:textSize="@dimen/textsize_10" />
+    </LinearLayout>
+
+</com.apalya.myplex.views.VerticalLineRelativeLayout>
