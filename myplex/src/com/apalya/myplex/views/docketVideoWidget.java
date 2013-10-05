@@ -1,35 +1,31 @@
 package com.apalya.myplex.views;
 
-import com.apalya.myplex.R;
-import com.apalya.myplex.data.CardDetailMediaData;
-import com.apalya.myplex.data.myplexUtils;
-import com.apalya.myplex.media.PlayerListener;
-import com.apalya.myplex.media.VideoView;
-import com.apalya.myplex.media.VideoViewPlayer;
-import com.apalya.myplex.media.VideoViewPlayer.StreamType;
-import com.apalya.myplex.utils.MyVolley;
-
 import android.content.Context;
-import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.RelativeLayout.LayoutParams;
+
+import com.apalya.myplex.R;
+import com.apalya.myplex.data.CardDetailMediaData;
+import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.media.PlayerListener;
+import com.apalya.myplex.media.VideoViewExtn;
+import com.apalya.myplex.media.VideoViewPlayer;
+import com.apalya.myplex.media.VideoViewPlayer.StreamType;
+import com.apalya.myplex.utils.MyVolley;
+import com.apalya.myplex.utils.Util;
 
 public class docketVideoWidget implements PlayerListener{
 	private Context mContext;
 	private LayoutInflater mInflater;
 	private RelativeLayout mProgressBar;
 	private FadeInNetworkImageView mPreviewImage;
-	private VideoView mVideoView;
+	private VideoViewExtn mVideoView;
 	private ImageView mPlay;
 	private boolean mPlaying = false;
 	private CardDetailMediaData mMetaData;
@@ -46,18 +42,22 @@ public class docketVideoWidget implements PlayerListener{
 		View v = mInflater.inflate(R.layout.cardmediasubitemvideo, null);
 		int width , height = 100;
 		
-		width = myplexUtils.mScreenWidth - (int)(mContext.getResources().getDimension(R.dimen.margin_gap_8) +mContext.getResources().getDimension(R.dimen.margin_gap_24));
+		width = myplexapplication.getApplicationConfig().screenWidth - (3*(int)(mContext.getResources().getDimension(R.dimen.margin_gap_12)) );
 		height = (width * 9)/16; 
 		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(width,height);
+		params.leftMargin = (int)(mContext.getResources().getDimension(R.dimen.margin_gap_12));
+		params.topMargin = (int)(mContext.getResources().getDimension(R.dimen.margin_gap_4));
+		v.setLayoutParams(params);
 		mPreviewImage = (FadeInNetworkImageView) v.findViewById(R.id.cardmediasubitemvideo_imagepreview);
 		mPreviewImage.setLayoutParams(params);
-		mVideoView = (VideoView)v.findViewById(R.id.cardmediasubitemvideo_videopreview);
+		mVideoView = (VideoViewExtn)v.findViewById(R.id.cardmediasubitemvideo_videopreview);
 		mVideoView.setLayoutParams(params);
+		
 		mPlay = (ImageView) v.findViewById(R.id.cardmediasubitemvideo_play);
 		mProgressBar = (RelativeLayout) v.findViewById(R.id.cardmediasubitemvideo_progressbarLayout);
 		
 		mPreviewImage.setImageUrl(media.mThumbnailUrl, MyVolley.getImageLoader());
-		myplexUtils.showFeedback(mPlay);
+		Util.showFeedback(mPlay);
 
 		mPlay.setOnClickListener(mPlayListener);
 		

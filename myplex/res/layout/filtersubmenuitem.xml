@@ -2,42 +2,20 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="36dp"
-    android:orientation="vertical" >
+    android:layout_height="wrap_content"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    android:orientation="horizontal" >
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="#6b6b6b" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/filtersubmenutext"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingBottom="@dimen/rbm_item_padding_topbottom"
-        android:paddingLeft="@dimen/rbm_item_padding_leftright"
-        android:paddingRight="@dimen/rbm_item_padding_leftright"
-        android:paddingTop="@dimen/rbm_item_padding_topbottom"  >
-
-        <ImageView
-            android:id="@+id/filtersubmenuicon"
-            android:layout_width="@dimen/rbm_item_image_width"
-            android:layout_height="@dimen/rbm_item_image_height"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="50dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/social_send_now" />
-
-        <TextView
-            android:id="@+id/filtersubmenutext"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:ellipsize="end"
-            android:paddingLeft="@dimen/rbm_item_text_padding_left"
-            android:singleLine="true"
-            android:textColor="@color/rbm_item_text_color"
-            android:textSize="@dimen/rbm_item_text_size" />
-    </LinearLayout>
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="128dp"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:textColor="#ffffff"
+        android:textSize="20sp" />
 
 </LinearLayout>

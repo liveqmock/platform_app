@@ -3,10 +3,8 @@ package com.apalya.myplex.adapters;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,13 +22,10 @@ import com.apalya.myplex.data.CardDetailCommentListData;
 import com.apalya.myplex.data.CardDetailDataHolder;
 import com.apalya.myplex.data.CardDetailDescriptionData;
 import com.apalya.myplex.data.CardDetailMediaListData;
-import com.apalya.myplex.data.myplexUtils;
+import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.FontUtil;
-import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.views.CustomFastScrollView.SectionIndexer;
 import com.apalya.myplex.views.ExpandAnimation;
-import com.apalya.myplex.views.FadeInNetworkImageView;
-import com.apalya.myplex.views.ItemExpandListener;
 import com.apalya.myplex.views.ItemExpandListener.ItemExpandListenerCallBackListener;
 
 public class CardDetailsAdapter extends BaseAdapter implements SectionIndexer {
@@ -54,7 +49,7 @@ public class CardDetailsAdapter extends BaseAdapter implements SectionIndexer {
 		this.mContext = cxt;
 		mInflater = LayoutInflater.from(cxt);
 //		mScreenHeight = myplexUtils.mScreenHeight;
-		mScreenWidth = myplexUtils.mScreenWidth;
+		mScreenWidth = myplexapplication.getApplicationConfig().screenWidth;
 		mImageGap = (int) mContext.getResources().getDimension(
 				R.dimen.carddetailmultimediathumnnailmargin);
 		mImageWidth = (mScreenWidth - (6 * mImageGap)) / 3;

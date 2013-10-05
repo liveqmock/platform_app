@@ -14,7 +14,7 @@
         android:background="#000000" >
     </RelativeLayout>
 
-    <ScrollView
+    <com.apalya.myplex.views.CustomScrollView
         android:id="@+id/carddetail_scroll_view"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -26,16 +26,17 @@
             android:id="@+id/carddetail_detaillayout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/margin_gap_8"
+            android:layout_margin="@dimen/margin_gap_12"
             android:orientation="vertical" >
         </LinearLayout>
-    </ScrollView>
+    </com.apalya.myplex.views.CustomScrollView>
 
     <RelativeLayout
+         android:id="@+id/carddetail_bottomactionbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:background="#e6e6e6" >
+        android:background="#8Ce6e6e6" >
 
         <LinearLayout
             android:layout_width="fill_parent"
@@ -66,6 +67,7 @@
                     android:background="#D8D8D8" />
 
                 <ImageView
+                    android:id="@+id/carddetail_share"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_gravity="center_vertical"

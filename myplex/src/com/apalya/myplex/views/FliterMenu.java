@@ -27,7 +27,7 @@ import android.widget.TextView;
 
 import com.apalya.myplex.R;
 import com.apalya.myplex.data.FilterMenudata;
-import com.apalya.myplex.data.myplexUtils;
+import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.views.PinnedSectionListView.PinnedSectionListAdapter;
 
 public class FliterMenu extends RelativeLayout {
@@ -58,8 +58,8 @@ public class FliterMenu extends RelativeLayout {
 	public void init(Context cxt) {
 		mInflator = LayoutInflater.from(cxt);
 		mContext = cxt;
-		mScreenHeight = myplexUtils.mScreenHeight;
-		mScreenWidth = myplexUtils.mScreenWidth;
+		mScreenHeight = myplexapplication.getApplicationConfig().screenHeight;
+		mScreenWidth = myplexapplication.getApplicationConfig().screenWidth;
 		mHideposition = (mScreenHeight - ((int) mContext.getResources()
 				.getDimension(R.dimen.actionbarheight) + getStatusBarHeight() + 20));
 		RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(

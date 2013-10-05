@@ -21,9 +21,12 @@ import com.apalya.myplex.adapters.OpenListener.OpenCallBackListener;
 import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.SearchData;
 import com.apalya.myplex.data.SearchData.ButtonData;
+import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.views.PinnedSectionListView;
+import com.flurry.android.FlurryAgent;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
@@ -76,8 +79,8 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 			@Override
 			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
-
 					FillEditText(mSearchInput.getText().toString());
+					Analytics.trackEvent("TEXT-TYPED-"+mSearchInput.getText().toString());
 					mSearchInput.setText("");
 				}
 				return false;
@@ -90,6 +93,7 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 			
 			@Override
 			public void onClick(View v) {
+				Analytics.trackEvent("DELETE-ALL-SELECTED-SERCH-TAGS");
 				final LinearLayout spannablelayout = (LinearLayout) rootView.findViewById(R.id.spannable);
 				spannablelayout.removeAllViews();
 				ClearSearchTags();
@@ -137,9 +141,15 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 		if(mSearchbleTags == null)
 			return;
 		if(addorremove)
+		{
 			mSearchbleTags.add(tagData);
+			Analytics.endTimedEvent("SEARCH-TAG-ADDED-"+tagData.getButtonName());
+		}
 		else
+		{
 			mSearchbleTags.remove(tagData);
+			Analytics.endTimedEvent("SEARCH-TAG-REMOVED-"+tagData.getButtonName());
+		}
 	}
 	
 	private void ClearSearchTags()
@@ -155,7 +165,8 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 
 	private void loadSearchTags() {
 		mListData.clear();
-		showActionBarProgress();
+		Analytics.trackEvent("SEARCH-REQUEST",true);
+		mMainActivity.showActionBarProgressBar();
 		showProgressBar();
 		RequestQueue queue = MyVolley.getRequestQueue();
 		JsonObjectRequest myReq = new JsonObjectRequest(Method.GET, "http://dev.myplex.in/content/v2/tags/", null,
@@ -171,8 +182,10 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 			@Override
 			public void onResponse(JSONObject response) {
 				ParseJonsResponse(response);
-				hideActionBarProgress();
+				mMainActivity.hideActionBarProgressBar();
 				dismissProgressBar();
+				Analytics.endTimedEvent("SEARCH-REQUEST");
+				Analytics.trackEvent("SEARCH-REQUEST-SUCCESS");
 			}
 		};
 	}
@@ -235,7 +248,12 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 			Log.e("response Exception", e.getMessage());
 		}
 	}
-	
+	@Override
+	public void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		Analytics.trackEvent("SEARCH-SCREEN-VIEWED");
+	}
 	private void preapareFilterData()
 	{
 		if(mUniqueCategories !=null)
@@ -258,6 +276,7 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 			if (v.getTag() instanceof FilterMenudata) {
 				String label = ((FilterMenudata) v.getTag()).label;
 				sortTags(label);
+				Analytics.trackEvent("SEARCH-FILTER-TAG-SELECTED-"+label);
 			}
 		}
 	};
@@ -346,8 +365,10 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 		return new Response.ErrorListener() {
 			@Override
 			public void onErrorResponse(VolleyError error) {
-				hideActionBarProgress();
+				mMainActivity.hideActionBarProgressBar();
 				dismissProgressBar();
+				Analytics.endTimedEvent("SEARCH-REQUEST");
+				Analytics.trackEvent("SEARCH-REQUEST-ERROR");
 			}
 		};
 	}
@@ -526,7 +547,18 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 		});
 		return btn;
 	}
-	
+	@Override
+	public void onStart() {
+		// TODO Auto-generated method stub
+		super.onStart();
+		FlurryAgent.onStartSession(this.getActivity(), "X6WWX57TJQM54CVZRB3K");
+	}
+	@Override
+	public void onStop() {
+		// TODO Auto-generated method stub
+		super.onStop();
+		FlurryAgent.onEndSession(this.getActivity());
+	}
 	public void showProgressBar(){
 		if(mProgressDialog != null){
 			mProgressDialog.dismiss();

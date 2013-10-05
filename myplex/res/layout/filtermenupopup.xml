@@ -3,18 +3,26 @@
     android:id="@+id/fliterMenuLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_alignParentTop="true" android:background="#8C000000"
+    android:layout_alignParentTop="true"
     android:layout_centerHorizontal="true" >
+
+    <RelativeLayout
+        android:id="@+id/fliterMenuBlurredLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" >
+    </RelativeLayout>
 
     <com.apalya.myplex.views.PinnedSectionListView
         android:id="@+id/listView1"
         android:layout_width="match_parent"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginBottom="20dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" >
+        android:layout_centerHorizontal="true"
+        android:divider="@drawable/fliterpopuplist_bg"
+        android:background="@drawable/fliterpopuplist_bg"
+        android:dividerHeight="0dp" >
     </com.apalya.myplex.views.PinnedSectionListView>
 
 </RelativeLayout>

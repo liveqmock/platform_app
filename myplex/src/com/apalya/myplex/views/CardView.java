@@ -10,7 +10,6 @@ import android.animation.Animator.AnimatorListener;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
-import android.os.CountDownTimer;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.SparseArray;
@@ -21,7 +20,8 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.OverScroller;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Scroller;
 import android.widget.TextView;
@@ -31,9 +31,9 @@ import com.apalya.myplex.R;
 import com.apalya.myplex.adapters.CardActionListener;
 import com.apalya.myplex.adapters.CardItemClickListener;
 import com.apalya.myplex.data.CardData;
-import com.apalya.myplex.data.CardViewHolder;
+import com.apalya.myplex.data.CardDataHolder;
+import com.apalya.myplex.data.CardDataImagesItem;
 import com.apalya.myplex.data.CardViewMeta;
-import com.apalya.myplex.data.myplexUtils;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
@@ -109,7 +109,7 @@ public class CardView extends ScrollView {
 
 	private void init() {
 
-		mScreenHeight = myplexUtils.mScreenHeight;
+		mScreenHeight = myplexapplication.getApplicationConfig().screenHeight;
 		//mScreenWidth = dm.widthPixels;
 
 		int margin = (int) (2 * (getResources().getDimension(R.dimen.cardmargin)));
@@ -123,7 +123,7 @@ public class CardView extends ScrollView {
     
 	public void setContext(Context cxt) {
 		mContext = cxt;
-		mInflater = LayoutInflater.from(myplexapplication.getContext());
+		mInflater = LayoutInflater.from(mContext);
 		init();
 	}
 
@@ -226,56 +226,83 @@ public class CardView extends ScrollView {
 		if (v == null || !(position >= 0 && position < mNumberofItems)) {
 			return;
 		}
-
 		CardData data = mDataList.get(position);
 		v.setId(position);
-
-		CardViewMeta tagData = (CardViewMeta) v.getTag();
-		if (tagData == null) {
-			tagData = new CardViewMeta();
-			tagData.mUiHolder = new CardViewHolder();
-			tagData.mUiHolder.mDelete = (LinearLayout) v.findViewById(R.id.card_title_delete);
-			tagData.mUiHolder.mFavourite = (LinearLayout) v.findViewById(R.id.card_title_fav);
-			tagData.mUiHolder.mFavouriteProgress = (LinearLayout) v.findViewById(R.id.card_title_fav_progress);
-			tagData.mUiHolder.mFavourite_Image = (ImageView) v.findViewById(R.id.card_title_fav_image);
-			tagData.mUiHolder.mRent = (ImageView) v.findViewById(R.id.card_info_rent);
-			tagData.mUiHolder.mInfo = (LinearLayout) v.findViewById(R.id.card_info_more);
-			tagData.mUiHolder.mText = (TextView) v.findViewById(R.id.card_title_name);
-			tagData.mUiHolder.mText.setTypeface(FontUtil.Roboto_Medium);
-			tagData.mUiHolder.mPlay = (NetworkImageView) v.findViewById(R.id.card_preview_image);
-			v.setTag(tagData);
+		CardDataHolder dataHolder = (CardDataHolder)v.getTag();
+		if(dataHolder == null){
+			dataHolder = new CardDataHolder();
+			dataHolder.mTitleLayout = (RelativeLayout)v.findViewById(R.id.card_title_layout); 
+			dataHolder.mTitle = (TextView)v.findViewById(R.id.card_title_name);
+			dataHolder.mDelete = (ImageView)v.findViewById(R.id.card_title_delete);
+			dataHolder.mFavourite = (ImageView)v.findViewById(R.id.card_title_fav);
+			dataHolder.mPreview = (NetworkImageView)v.findViewById(R.id.card_preview_image);
+			dataHolder.mOverLayPlay = (ImageView)v.findViewById(R.id.card_play);
+			dataHolder.mComments = (ImageView)v.findViewById(R.id.card_title_delete);
+			dataHolder.mReviews = (ImageView)v.findViewById(R.id.card_title_delete);
+			dataHolder.mCommentsText = (TextView)v.findViewById(R.id.card_status_comments_text);
+			dataHolder.mReviewsText = (TextView)v.findViewById(R.id.card_status_people_text);
+			dataHolder.mRentLayout = (LinearLayout)v.findViewById(R.id.card_rent_layout);
+			dataHolder.mRentText = (TextView)v.findViewById(R.id.card_rent_text);
+			dataHolder.mProgressBar = (ProgressBar) v.findViewById(R.id.card_title_fav_progress);
+			
+			// fonts
+			
+			dataHolder.mTitle.setTypeface(FontUtil.Roboto_Medium);
+			dataHolder.mRentText.setTypeface(FontUtil.Roboto_Medium);
+			dataHolder.mCommentsText.setTypeface(FontUtil.Roboto_Medium);
+			dataHolder.mReviewsText.setTypeface(FontUtil.Roboto_Medium);
+			
+//			CardData dataHolder.mDataObject = (TextView)v.findViewById(id);
+			v.setTag(dataHolder);
 		}
-
-		tagData.mObj = data;
-		tagData.mUiHolder.mDelete.setOnClickListener(mDeleteListener);
-		tagData.mUiHolder.mDelete.setTag(data);
-		tagData.mUiHolder.mFavourite.setOnClickListener(mFavListener);
-		tagData.mUiHolder.mFavourite.setTag(data);
-		tagData.mUiHolder.mRent.setOnClickListener(mPurchaseListener);
-		tagData.mUiHolder.mRent.setTag(data);
-		tagData.mUiHolder.mInfo.setOnClickListener(mMoreInfoListener);
-		tagData.mUiHolder.mInfo.setTag(data);
-		tagData.mUiHolder.mText.setText(data.title);
-		tagData.mUiHolder.mPlay.setOnClickListener(mPlayListener);
-		tagData.mUiHolder.mPlay.setTag(data);
-		if(data.applyFavoriteInProgress){
-			tagData.mUiHolder.mFavourite.setVisibility(View.INVISIBLE);
-			tagData.mUiHolder.mFavouriteProgress.setVisibility(View.VISIBLE);
-		}else{
-			tagData.mUiHolder.mFavourite.setVisibility(View.VISIBLE);
-			tagData.mUiHolder.mFavouriteProgress.setVisibility(View.INVISIBLE);
+		dataHolder.mDataObject = data;
+		
+//		dataHolder.mTitleLayout.setBackgroundColor(color)
+		
+		if(data.generalInfo != null && data.generalInfo.title != null){
+			dataHolder.mTitle.setText(data.generalInfo.title);
 		}
-		if(data.isFavorite){
-			tagData.mUiHolder.mFavourite_Image.setImageResource(R.drawable.card_fav);
+		if(data.images != null){
+			for(CardDataImagesItem imageItem:data.images.values){
+				if(imageItem.profile != null && imageItem.profile.equalsIgnoreCase(myplexapplication.getApplicationConfig().type)){
+					if (imageItem.link == null || imageItem.link.compareTo("Images/NoImage.jpg") == 0) {
+						dataHolder.mPreview.setImageResource(0);
+					} else if (imageItem.link != null){
+						dataHolder.mPreview.setImageUrl(imageItem.link,MyVolley.getImageLoader());
+					}
+				}
+			}
+		}
+		if(data.currentUserData != null && data.currentUserData.favorite){
+			dataHolder.mFavourite.setImageResource(R.drawable.card_fav);
 		}else{
-			tagData.mUiHolder.mFavourite_Image.setImageResource(R.drawable.card_unfav);
+			dataHolder.mFavourite.setImageResource(R.drawable.card_unfav);
+		}
+		if(data.userReviews != null){
+			dataHolder.mReviewsText.setText(""+data.userReviews.values.size());	
+		}else{
+			dataHolder.mReviewsText.setText("0");
+		}
+		if(data.comments != null){
+			dataHolder.mCommentsText.setText(""+data.comments.values.size());	
+		}else{
+			dataHolder.mCommentsText.setText("0");
 		}
 		
-		if (data.imageUrl == null || data.imageUrl.compareTo("Images/NoImage.jpg") == 0) {
-			tagData.mUiHolder.mPlay.setImageResource(data.resId);
-		} else if (data.imageUrl != null){
-			tagData.mUiHolder.mPlay.setImageUrl(data.imageUrl,MyVolley.getImageLoader());
-		}
+//		dataHolder.mRentText.setText(data.price);
+		
+		
+		dataHolder.mDelete.setOnClickListener(mDeleteListener);
+		dataHolder.mDelete.setTag(dataHolder);
+		dataHolder.mOverLayPlay.setOnClickListener(mOpenCardListener);
+		dataHolder.mOverLayPlay.setTag(dataHolder);
+		dataHolder.mPreview.setOnClickListener(mOpenCardListener);
+		dataHolder.mPreview.setTag(dataHolder);
+		dataHolder.mRentLayout.setOnClickListener(mPurchaseListener);
+		dataHolder.mRentLayout.setTag(dataHolder);
+		dataHolder.mFavourite.setOnClickListener(mFavListener);
+		dataHolder.mFavourite.setTag(dataHolder);
+		
 	}
 	public void show() {
 		mCardsLayout.updateCardsPosition(getScrollY());
@@ -487,7 +514,7 @@ public class CardView extends ScrollView {
 			if(data == null ){
 				return;
 			}
-			data.applyFavoriteInProgress = true;
+//			data.applyFavoriteInProgress = true;
 			int index = mDataList.indexOf(data);
 			View localv = mCardsLayout.mCardViewReusePool.getView(index);
 			if(localv != null){
@@ -497,7 +524,7 @@ public class CardView extends ScrollView {
 					tagData.mUiHolder.mFavouriteProgress.setVisibility(View.VISIBLE);	
 				}
 			}
-			if(!data.isFavorite){
+			if(data.currentUserData != null && !data.currentUserData.favorite){
 				mCardActionListener.addFavourite(data);	
 			}else{
 				mCardActionListener.removeFavourite(data);
@@ -506,46 +533,32 @@ public class CardView extends ScrollView {
 			
 		}
 	};
-
-	private CardItemClickListener mPlayListener = new CardItemClickListener() {
-
-		@Override
-		public void onDelayedClick(View v) {
-			if (mCardActionListener != null){
-				CardData data = (CardData) v.getTag();
-				if(data == null ){
-					return;
-				}
-				if(mCurrentSelectedIndex != mDataList.indexOf(data)){
-					return;
-				}
-				mCardActionListener.play(data);
-			}
-		}
-	};
-
 	private CardItemClickListener mPurchaseListener = new CardItemClickListener() {
 
 		@Override
 		public void onDelayedClick(View v) {
-			if (mCardActionListener != null)
-				mCardActionListener.purchase(v.getId());
+			if(v.getTag() instanceof CardDataHolder){
+				CardDataHolder dataHolder = (CardDataHolder) v.getTag();
+				if(dataHolder == null){return;}
+				if(dataHolder.mDataObject == null){return;}
+				if(mCurrentSelectedIndex != mDataList.indexOf(dataHolder.mDataObject)){return;}
+				mCardActionListener.purchase(dataHolder.mDataObject);
+			}
 		}
 	};
 
-	private CardItemClickListener mMoreInfoListener = new CardItemClickListener() {
+	private CardItemClickListener mOpenCardListener = new CardItemClickListener() {
 
 		@Override
 		public void onDelayedClick(View v) {
 			if (mCardActionListener != null){
-				CardData data = (CardData) v.getTag();
-				if(data == null){
-					return;
+				if(v.getTag() instanceof CardDataHolder){
+					CardDataHolder dataHolder = (CardDataHolder) v.getTag();
+					if(dataHolder == null){return;}
+					if(dataHolder.mDataObject == null){return;}
+					if(mCurrentSelectedIndex != mDataList.indexOf(dataHolder.mDataObject)){return;}
+					mCardActionListener.open(dataHolder.mDataObject);
 				}
-				if(mCurrentSelectedIndex != mDataList.indexOf(data)){
-					return;
-				}
-				mCardActionListener.play(data);
 			}
 		}
 	};

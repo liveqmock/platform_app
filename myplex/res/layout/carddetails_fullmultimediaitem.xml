@@ -2,7 +2,7 @@
 <com.apalya.myplex.views.VerticalLineRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="30dp" >
+    android:paddingBottom="16dp" >
 
     <ImageView
         android:id="@+id/imageView1"
@@ -13,20 +13,47 @@
         android:layout_marginLeft="@dimen/margin_gap_4"
         android:src="@drawable/timelinecircle" />
 
-    <RelativeLayout
-        android:id="@+id/relativeLayout1"
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/relativeLayout1"
         android:layout_marginRight="@dimen/margin_gap_4"
         android:layout_toRightOf="@+id/imageView1"
-        android:background="#efefef" >
+        android:orientation="horizontal" >
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1" >
+
+            <com.apalya.myplex.views.FadeInNetworkImageView
+                android:id="@+id/carddetailmultimedia_stackview2"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="10dp"
+                android:rotation="350"
+                android:alpha="50"
+                android:scaleType="centerCrop"
+                android:src="@drawable/menu_profile" />
+
+            <com.apalya.myplex.views.FadeInNetworkImageView
+                android:id="@+id/carddetailmultimedia_stackview1"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_margin="10dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/menu_profile" />
+        </RelativeLayout>
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="132dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:orientation="horizontal" >
+            android:layout_gravity="center_vertical"
+            android:orientation="vertical" >
 
             <TextView
                 android:id="@+id/carddetailmultimedia_groupname"
@@ -34,8 +61,9 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/margin_gap_4"
                 android:layout_marginRight="@dimen/margin_gap_4"
+                android:gravity="center_vertical"
                 android:text="Name"
-                android:textColor="#4b4b4b"
+                android:textColor="#4b4b4c"
                 android:textSize="@dimen/textsize_16" />
 
             <TextView
@@ -43,56 +71,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/margin_gap_4"
+                android:layout_marginTop="@dimen/margin_gap_4"
                 android:layout_marginRight="@dimen/margin_gap_2"
                 android:text="time"
-                android:textColor="#4b4b4b"
+                android:textColor="#4b4b4c"
                 android:textSize="@dimen/textsize_12"
                 android:textStyle="italic" />
         </LinearLayout>
-
-        <ImageView
-            android:layout_width="@dimen/size_24"
-            android:layout_height="@dimen/size_24"
-            android:layout_alignParentRight="true"
-            android:src="@drawable/card_info"
-            android:visibility="invisible" />
-    </RelativeLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/relativeLayout1"
-        android:layout_below="@+id/relativeLayout1"
-        android:layout_marginRight="@dimen/margin_gap_4"
-        android:background="@drawable/commenttextbg"
-        android:orientation="horizontal" >
-
-        <RelativeLayout
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_gravity="center_vertical"
-            android:background="#ffffff" >
-
-            <com.apalya.myplex.views.FadeInNetworkImageView
-                android:id="@+id/carddetailmultimedia_stackview"
-                android:layout_width="150dp"
-                android:layout_height="150dp"
-                android:layout_margin="10dp"
-                android:background="#000000"
-                android:layout_gravity="center_vertical"
-                android:src="@drawable/menu_profile" />
-        </RelativeLayout>
-
-
-        <TextView
-            android:id="@+id/carddetailmultimedia_groupdescription"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="@dimen/margin_gap_4"
-            android:text="dadhsjkfhaskdh "
-            android:textColor="#4b4b4b"
-            android:textSize="@dimen/textsize_10" />
     </LinearLayout>
 
 </com.apalya.myplex.views.VerticalLineRelativeLayout>

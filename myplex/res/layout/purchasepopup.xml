@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#DC000000" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <TextView
+            android:id="@+id/purchasepopup_contentname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="45dp"
+            android:singleLine="true"
+            android:text="Riddick"
+            android:textColor="#ffffff"
+            android:textSize="@dimen/textsize_20" />
+
+        <RatingBar
+            android:id="@+id/purchasepopup_setRating"
+            style="?android:attr/ratingBarStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/purchasepopup_contentname"
+            android:layout_below="@+id/purchasepopup_contentname"
+            android:layout_marginTop="10dp" />
+
+        <LinearLayout
+            android:id="@+id/purchasepopup_subtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/purchasepopup_setRating"
+            android:layout_marginLeft="30dp"
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/purchasepopup_parentalRating"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="15dp"
+                android:singleLine="true"
+                android:text="PG-13"
+                android:textColor="#ffffff"
+                android:textSize="@dimen/textsize_12" />
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="12dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="@dimen/margin_gap_2"
+                android:src="@drawable/length" />
+
+            <TextView
+                android:id="@+id/purchasepopup_duration"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="15dp"
+                android:singleLine="true"
+                android:text="1:42:13"
+                android:textColor="#ffffff"
+                android:textSize="@dimen/textsize_12" />
+
+            <TextView
+                android:id="@+id/purchasepopup_releaseDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:singleLine="true"
+                android:text="July 29,2013"
+                android:textColor="#ffffff"
+                android:textSize="@dimen/textsize_12" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/purchasepopup_packslayout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/purchasepopup_subtitle"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginTop="20dp"
+            android:orientation="vertical" >
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/purchasepopup_packslayout"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginTop="40dp"
+            android:lineSpacingExtra="2dp"
+            android:text="When Keller Dover&apos;s daughter and her friend go missing, he takes matters into his own hands as the police pursue multiple leads and the pressure mounts. But just how far will this desperate father go to protect his family"
+            android:textColor="#ffffff"
+            android:textSize="@dimen/textsize_12" />
+    </RelativeLayout>
+
+</ScrollView>

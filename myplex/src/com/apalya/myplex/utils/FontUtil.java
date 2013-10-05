@@ -11,6 +11,7 @@ public class FontUtil {
 	public static Typeface Roboto_Thin;
 	public static Typeface RobotoCondensed_BoldItalic;
 	public static Typeface RobotoCondensed_Light;
+	public static Typeface Roboto_Light;
 	
 	public static boolean isFontsLoaded = false;
 	
@@ -22,6 +23,7 @@ public class FontUtil {
 		Roboto_Thin = Typeface.createFromAsset(mgr, "fonts/Roboto-Thin.ttf");
 		RobotoCondensed_BoldItalic = Typeface.createFromAsset(mgr, "fonts/RobotoCondensed-BoldItalic.ttf");
 		RobotoCondensed_Light = Typeface.createFromAsset(mgr, "fonts/RobotoCondensed-Light.ttf");
+		Roboto_Light = Typeface.createFromAsset(mgr, "fonts/Roboto-Light.ttf");
 		isFontsLoaded = true;
 	}
 

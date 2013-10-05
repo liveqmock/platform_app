@@ -8,7 +8,8 @@
 
     <ScrollView
         android:layout_width="480dp"
-        android:layout_height="match_parent" >
+        android:layout_height="match_parent" 
+        android:layout_centerHorizontal="true">
 
         <RelativeLayout
             android:layout_width="fill_parent"

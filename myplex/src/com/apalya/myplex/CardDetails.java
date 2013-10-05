@@ -1,29 +1,32 @@
 package com.apalya.myplex;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import android.app.AlertDialog;
-import android.drm.DrmErrorEvent;
-import android.drm.DrmEvent;
-import android.drm.DrmInfoEvent;
-import android.drm.DrmManagerClient;
+import android.animation.Animator;
+import android.animation.Animator.AnimatorListener;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.view.PagerAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.Space;
 
+import com.apalya.myplex.adapters.ScrollingDirection;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDetailBaseData;
 import com.apalya.myplex.data.CardDetailCastCrew;
@@ -31,25 +34,28 @@ import com.apalya.myplex.data.CardDetailCommentData;
 import com.apalya.myplex.data.CardDetailMediaData;
 import com.apalya.myplex.data.CardDetailMediaListData;
 import com.apalya.myplex.data.CardDetailMultiMediaGroup;
-import com.apalya.myplex.data.myplexUtils;
+import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.media.PlayerListener;
 import com.apalya.myplex.media.VideoView;
 import com.apalya.myplex.media.VideoViewPlayer;
 import com.apalya.myplex.media.VideoViewPlayer.StreamType;
 import com.apalya.myplex.utils.MyVolley;
+import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.views.CardDetailViewFactory;
 import com.apalya.myplex.views.CardDetailViewFactory.CardDetailViewFactoryListener;
 import com.apalya.myplex.views.CustomDialog;
+import com.apalya.myplex.views.CustomScrollView;
 import com.apalya.myplex.views.FadeInNetworkImageView;
 import com.apalya.myplex.views.ItemExpandListener.ItemExpandListenerCallBackListener;
 import com.apalya.myplex.views.JazzyViewPager;
 import com.apalya.myplex.views.JazzyViewPager.TransitionEffect;
 import com.apalya.myplex.views.OutlineContainer;
 import com.apalya.myplex.views.docketVideoWidget;
+import com.google.android.gms.internal.c;
 
 public class CardDetails extends BaseFragment implements
-		ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,PlayerListener {
+		ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,PlayerListener,ScrollingDirection {
 	private LayoutInflater mInflater;
 	private LinearLayout mParentContentLayout;
 	private CardDetailViewFactory mCardDetailViewFactory;
@@ -66,6 +72,8 @@ public class CardDetails extends BaseFragment implements
 	private boolean mRelatedExpansionToogle = false;
 	private boolean mCommentsExpansionToogle = false;
 	
+	private CustomScrollView mScrollView;
+	private RelativeLayout mBottomActionBar;
 	
 	private int mDetailType = Profile;
 	public static final int Profile = 0;
@@ -73,18 +81,20 @@ public class CardDetails extends BaseFragment implements
 	public static final int TvShowsDetail = 2;
 	public static final int LiveTvDetail = 3;
 	public View rootView;
-	
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	}
-
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		mMainActivity.setPotrait();
 		mInflater = LayoutInflater.from(getContext());
 		rootView = inflater.inflate(R.layout.carddetails, container, false);
+		mScrollView = (CustomScrollView)rootView.findViewById(R.id.carddetail_scroll_view);
+		mBottomActionBar = (RelativeLayout)rootView.findViewById(R.id.carddetail_bottomactionbar);
+		mScrollView.setDirectionListener(this);
 		RelativeLayout videoLayout = (RelativeLayout)rootView.findViewById(R.id.carddetail_videolayout);
 		videoLayout.addView(createVideoPreview());
 		mParentContentLayout = (LinearLayout) rootView.findViewById(R.id.carddetail_detaillayout);
@@ -93,8 +103,7 @@ public class CardDetails extends BaseFragment implements
 		prepareContent();
 		return rootView;
 	}
-	
-	
+
 	private CardData mCardData;
 	private FadeInNetworkImageView mPreviewImage;
 	private VideoView mVideoView;
@@ -107,7 +116,7 @@ public class CardDetails extends BaseFragment implements
 		View v = mInflater.inflate(R.layout.cardmediasubitemvideo, null);
 		int width , height = 100;
 		
-		width = myplexUtils.mScreenWidth;
+		width = myplexapplication.getApplicationConfig().screenWidth;
 		height = (width * 9)/16; 
 		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(width,height);
 		mPreviewImage = (FadeInNetworkImageView) v.findViewById(R.id.cardmediasubitemvideo_imagepreview);
@@ -118,7 +127,7 @@ public class CardDetails extends BaseFragment implements
 		mProgressBar = (RelativeLayout) v.findViewById(R.id.cardmediasubitemvideo_progressbarLayout);
 		
 		mPreviewImage.setImageUrl("https://lh5.googleusercontent.com/-d-qS8knzDP4/SePRfjfPYhI/AAAAAAAACVA/jxox5vRCphw/IMG_0084.jpg", MyVolley.getImageLoader());
-		myplexUtils.showFeedback(mPlay);
+		Util.showFeedback(mPlay);
 
 		mPlay.setOnClickListener(mPlayListener);
 		return v;
@@ -139,17 +148,10 @@ public class CardDetails extends BaseFragment implements
 			mProgressBar.setVisibility(View.VISIBLE);
 			Uri uri = Uri.parse("rtsp://59.162.166.216:554/AAJTAK_QVGA.sdp");
 			uri = Uri.parse("rtsp://46.249.213.87:554/playlists/bollywood-action_qcif.hpl.3gp");
-			//uri = Uri.parse("widevine://pmweb.widevine.net/content/wvm/sintel_base_360p_3br_tp_short.wvm"); //DRM CONTENT
-			VideoViewPlayer.StreamType streamType = StreamType.VOD; 
+			VideoViewPlayer.StreamType streamType = StreamType.VOD;
 			if(mVideoViewPlayer == null){
 				mVideoViewPlayer = new VideoViewPlayer(mVideoView,mContext, uri, streamType);
-				if(uri.toString().contains(".wvm"))
-				{
-					//DRM CONTENT, GET THE RIGHTS
-					mVideoViewPlayer.acquireRights();
-				}
 				mVideoViewPlayer.openVideo();
-				
 			}else{
 				mVideoViewPlayer.setUri(uri, streamType);
 			}
@@ -209,8 +211,39 @@ public class CardDetails extends BaseFragment implements
 	private void prepareContent() {
 		dummyData();
 		fillData();
+		prepareFilterData();
 	}
 
+	private void prepareFilterData() {
+		List<FilterMenudata> filteroptions = new ArrayList<FilterMenudata>();
+		filteroptions.add(new FilterMenudata(FilterMenudata.SECTION,"Details", 1));
+		filteroptions.add(new FilterMenudata(FilterMenudata.ITEM,"Description", 2));
+		filteroptions.add(new FilterMenudata(FilterMenudata.ITEM,"Credits", 3));
+		filteroptions.add(new FilterMenudata(FilterMenudata.ITEM,"Extra", 4));
+		filteroptions.add(new FilterMenudata(FilterMenudata.SECTION,"Related Multimedia", 5));
+		filteroptions.add(new FilterMenudata(FilterMenudata.SECTION,"Comments", 6));
+		mMainActivity.addFilterData(filteroptions, mFilterMenuClickListener);
+	}
+	private OnClickListener mFilterMenuClickListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			if (v.getTag() instanceof FilterMenudata) {
+				FilterMenudata menuData = (FilterMenudata)v.getTag();
+				int moveTo = mCardDetailViewFactory.getYPosition(menuData.label);
+				int currentY = mScrollView.getScrollY();
+				int moveTo1 = -currentY + moveTo;
+//				int diff = Math.abs(moveTo - currentY);
+//				if(currentY < moveTo){
+//					moveTo = currentY + diff;
+//				}else{
+//					moveTo = currentY - diff;
+//				}
+				Log.d("CardDetail"," value for "+menuData.label+" = "+mCardDetailViewFactory.getYPosition(menuData.label)+" scrollY = "+mScrollView.getScrollY());
+				mScrollView.smoothScrollBy(0, moveTo1);
+			}
+		}
+	};
 	private OnClickListener mDescriptionExpansionClickListener = new OnClickListener() {
 
 		@Override
@@ -386,12 +419,73 @@ public class CardDetails extends BaseFragment implements
 	}
 
 	private void fillCastCrew(List<CardDetailCastCrew> list) {
-		for (int i = 0; i < 10; i++) {
+		{
 			CardDetailCastCrew data = new CardDetailCastCrew();
-			data.leftText = "character " + i;
-			data.rightText = "actual " + i;
+			data.leftText = "Director";
+			data.rightText = "Hannibal Chau";
 			list.add(data);
 		}
+		{
+			CardDetailCastCrew data = new CardDetailCastCrew();
+			data.leftText = "Charlie Hunnam";
+			data.rightText = "Raleigh Becket";
+			list.add(data);
+		}
+		{
+			CardDetailCastCrew data = new CardDetailCastCrew();
+			data.leftText = "Diego Klattenhoff";
+			data.rightText = "Yancy Becket";
+			list.add(data);
+		}
+		{
+			CardDetailCastCrew data = new CardDetailCastCrew();
+			data.leftText = "Idris Elba";
+			data.rightText = "Stacker Pentecost";
+			list.add(data);
+		}
+		{
+			CardDetailCastCrew data = new CardDetailCastCrew();
+			data.leftText = "Rinko Kikuchi";
+			data.rightText = "Mako Mori";
+			list.add(data);
+		}
+		{
+			CardDetailCastCrew data = new CardDetailCastCrew();
+			data.leftText = "Charlie Day";
+			data.rightText = "Dr. Newton Geiszler";
+			list.add(data);
+		}
+		{
+			CardDetailCastCrew data = new CardDetailCastCrew();
+			data.leftText = "Burn Gorman";
+			data.rightText = "Gottlieb";
+			list.add(data);
+		}
+		{
+			CardDetailCastCrew data = new CardDetailCastCrew();
+			data.leftText = "Max Martini";
+			data.rightText = "Herc Hansen";
+			list.add(data);
+		}
+		{
+			CardDetailCastCrew data = new CardDetailCastCrew();
+			data.leftText = "Robert Kazinsky";
+			data.rightText = "Chuck Hansen";
+			list.add(data);
+		}
+		{
+			CardDetailCastCrew data = new CardDetailCastCrew();
+			data.leftText = "Clifton Collins Jr.";
+			data.rightText = "Ops Tendo Choi";
+			list.add(data);
+		}
+		{
+			CardDetailCastCrew data = new CardDetailCastCrew();
+			data.leftText = "Ron Perlman";
+			data.rightText = "Hannibal Chau";
+			list.add(data);
+		}
+		
 	}
 
 	private static final String[] URLS = {
@@ -446,7 +540,7 @@ public class CardDetails extends BaseFragment implements
 	private void setupJazziness(TransitionEffect effect) {
 		mJazzy = (JazzyViewPager) mAlbumDialog.findViewById(R.id.jazzy_pager);
 		int width , height = 100;
-		width = myplexUtils.mScreenWidth - 2*((int)mContext.getResources().getDimension(R.dimen.margin_gap_8));
+		width = myplexapplication.getApplicationConfig().screenWidth - 2*((int)mContext.getResources().getDimension(R.dimen.margin_gap_8));
 		height = (width * 9)/16; 
 		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(width,height);
 		mJazzy.setLayoutParams(params);
@@ -509,5 +603,80 @@ public class CardDetails extends BaseFragment implements
 	public void onMediaGroupSelected(CardDetailMultiMediaGroup group) {
 		mSelectedMediaGroup = group;
 		showAlbumDialog();
+	}
+
+	private static final int STATE_ONSCREEN = 0;
+	private static final int STATE_OFFSCREEN = 1;
+	private static final int STATE_RETURNING = 2;
+	private int mState = STATE_ONSCREEN;
+	private int mMinRawY = 0;
+	private int mQuickReturnHeight;
+	private TranslateAnimation anim;
+	@Override
+	public void scrollDirection(boolean value) {
+		mQuickReturnHeight  = mBottomActionBar.getHeight();
+		int translationY = 0;
+
+		int mScrollY = mScrollView.getScrollY();
+		int rawY = mScrollY;
+
+
+		switch (mState) {
+		case STATE_OFFSCREEN:
+			if (rawY >= mMinRawY) {
+				mMinRawY = rawY;
+			} else {
+				mState = STATE_RETURNING;
+			}
+			translationY = rawY;
+			break;
+
+
+		case STATE_ONSCREEN:
+			if (rawY > mQuickReturnHeight) {
+				mState = STATE_OFFSCREEN;
+				mMinRawY = rawY;
+			}
+			translationY = rawY;
+			break;
+
+
+		case STATE_RETURNING:
+
+
+			translationY = (rawY - mMinRawY) + mQuickReturnHeight;
+
+
+			System.out.println(translationY);
+			if (translationY < 0) {
+				translationY = 0;
+				mMinRawY = rawY + mQuickReturnHeight;
+			}
+
+
+			if (rawY == 0) {
+				mState = STATE_ONSCREEN;
+				translationY = 0;
+			}
+
+
+			if (translationY > mQuickReturnHeight) {
+				mState = STATE_OFFSCREEN;
+				mMinRawY = rawY;
+			}
+			break;
+		}
+
+
+		/** this can be used if the build is below honeycomb **/
+		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.HONEYCOMB) {
+			anim = new TranslateAnimation(0, 0, translationY,
+					translationY);
+			anim.setFillAfter(true);
+			anim.setDuration(0);
+			 mBottomActionBar.startAnimation(anim);
+		} else {
+			 mBottomActionBar.setTranslationY(translationY);
+		}
 	}
 }

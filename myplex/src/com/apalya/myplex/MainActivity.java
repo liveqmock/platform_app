@@ -1,78 +1,63 @@
 package com.apalya.myplex;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.text.format.Time;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.Request.Method;
-import com.android.volley.Response.ErrorListener;
-import com.android.volley.Response.Listener;
 import com.android.volley.toolbox.NetworkImageView;
-import com.android.volley.toolbox.StringRequest;
-import com.apalya.myplex.data.DeviceDetails;
 import com.apalya.myplex.data.FilterMenudata;
-import com.apalya.myplex.data.UserProfile;
-import com.apalya.myplex.data.myplexUtils;
-import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.menu.FilterMenuProvider;
-import com.apalya.myplex.utils.AccountUtils;
+import com.apalya.myplex.utils.Blur;
+import com.apalya.myplex.utils.Blur.BlurResponse;
 import com.apalya.myplex.utils.MyVolley;
-import com.apalya.myplex.utils.SharedPrefUtils;
+import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.views.PinnedSectionListView;
 import com.apalya.myplex.views.PinnedSectionListView.PinnedSectionListAdapter;
-import com.facebook.Session;
-import com.flurry.android.FlurryAgent;
 
 public class MainActivity extends Activity {
 	private DrawerLayout mDrawerLayout;
@@ -83,14 +68,13 @@ public class MainActivity extends Activity {
 	public LayoutInflater mInflater;
 	public BaseFragment mCurrentFragment;
 	public final static int CARDDETAILS = 0;
+	public final static int CARDDETAILSTABLET = 3;
 	public final static int CARDEXPLORER = 1;
 	public final static int SEARCH = 2;
-	private ProgressDialog mProgressDialog = null;
-	private String TAG="MAINACTIVITY";
+	public FrameLayout mContentLayout;
+	public Context mContext;
 	private Stack<BaseFragment> mFragmentStack = new Stack<BaseFragment>();
 	private List<NavigationOptionsMenu> mMenuItemList = new ArrayList<NavigationOptionsMenu>();
-	private DeviceDetails mDevInfo;
-	private UserProfile mUserInfo;
 
 	public class NavigationOptionsMenu {
 		public String label = new String();
@@ -107,10 +91,15 @@ public class MainActivity extends Activity {
 		}
 	}
 
+	public void setLandscape(){
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+	}
+	public void setPotrait(){
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+	}
 	private void fillMenuItem() {
-		
-		mMenuItemList.add(new NavigationOptionsMenu(myplexapplication.getUserProfileInstance().getName(),
-				R.drawable.menu_profile, myplexapplication.getUserProfileInstance().getProfilePic(), 0));
+		mMenuItemList.add(new NavigationOptionsMenu("Profile",
+				R.drawable.menu_profile, null, 0));
 		mMenuItemList.add(new NavigationOptionsMenu("Home",
 				R.drawable.menu_home, null, 1));
 		mMenuItemList.add(new NavigationOptionsMenu("Home Tablet",
@@ -169,14 +158,24 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.mainview);
-		DisplayMetrics dm = new DisplayMetrics();
-		getWindowManager().getDefaultDisplay().getMetrics(dm);
-		myplexUtils.mScreenHeight = dm.heightPixels;
-		myplexUtils.mScreenWidth = dm.widthPixels;
 
-		mDevInfo=myplexapplication.getDevDetailsInstance();
-		mUserInfo=myplexapplication.getUserProfileInstance();
+		mContext = this;
+		Util.prepareDisplayinfo(this);
+		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+				.detectDiskReads().detectDiskWrites().detectNetwork() // or
+																		// .detectAll()
+																		// for
+																		// all
+																		// detectable
+																		// problems
+				.penaltyLog().build());
+		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+				.detectLeakedSqlLiteObjects().detectLeakedClosableObjects()
+				.penaltyLog().penaltyDeath().build());
+
+		setContentView(R.layout.mainview);
+		
+		mContentLayout = (FrameLayout)findViewById(R.id.content_frame);
 		
 		mInflater = LayoutInflater.from(this);
 		fillMenuItem();
@@ -229,6 +228,20 @@ public class MainActivity extends Activity {
 		}
 	}
 
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		Log.e("pref","onSaveInstanceState");
+		// TODO Auto-generated method stub
+		super.onSaveInstanceState(outState);
+	}
+
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		Log.e("pref","onRestoreInstanceState");
+		// TODO Auto-generated method stub
+		super.onRestoreInstanceState(savedInstanceState);
+	}
+
 	public void updateActionBarTitle() {
 		if (mTitleTextView != null) {
 			mTitleTextView.setText(mTitle);
@@ -265,7 +278,8 @@ public class MainActivity extends Activity {
 		if (v == null) {
 			return;
 		}
-		ImageView navigationDrawer = (ImageView) v.findViewById(R.id.customactionbar_drawer);
+		ImageView navigationDrawer = (ImageView) v
+				.findViewById(R.id.customactionbar_drawer);
 		navigationDrawer.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -279,15 +293,19 @@ public class MainActivity extends Activity {
 				}
 			}
 		});
-		myplexUtils.showFeedback(navigationDrawer);
-		mCustomActionBarTitleLayout = (RelativeLayout) v.findViewById(R.id.customactionbar_filter);
+		Util.showFeedback(navigationDrawer);
+		mCustomActionBarTitleLayout = (RelativeLayout) v
+				.findViewById(R.id.customactionbar_filter);
 		mCustomActionBarTitleLayout.setOnClickListener(mOnFilterClickListener);
-		myplexUtils.showFeedback(mCustomActionBarTitleLayout);
-		mCustomActionBarFilterImage = (ImageView) v.findViewById(R.id.customactionbar_filter_button);
-		mTitleTextView = (TextView) v.findViewById(R.id.customactionbar_filter_text);
-		mCustomActionBarSearch  = (ImageView) v.findViewById(R.id.customactionbar_search_button);
+		Util.showFeedback(mCustomActionBarTitleLayout);
+		mCustomActionBarFilterImage = (ImageView) v
+				.findViewById(R.id.customactionbar_filter_button);
+		mTitleTextView = (TextView) v
+				.findViewById(R.id.customactionbar_filter_text);
+		mCustomActionBarSearch = (ImageView) v
+				.findViewById(R.id.customactionbar_search_button);
 		mCustomActionBarSearch.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View arg0) {
 				if ((mCurrentFragment instanceof SearchActivity)) {
@@ -296,23 +314,26 @@ public class MainActivity extends Activity {
 				} else {
 					SearchActivity fragment = new SearchActivity();
 					bringFragment(fragment);
-				}	
+				}
 			}
 		});
-		myplexUtils.showFeedback(mCustomActionBarSearch);
-		mCustomActionBarProgressBar = (ProgressBar) v.findViewById(R.id.customactionbar_progressBar);
+		Util.showFeedback(mCustomActionBarSearch);
+		mCustomActionBarProgressBar = (ProgressBar) v
+				.findViewById(R.id.customactionbar_progressBar);
 	}
 
-	public void showActionBarProgressBar(){
-		if(mCustomActionBarProgressBar != null){
+	public void showActionBarProgressBar() {
+		if (mCustomActionBarProgressBar != null) {
 			mCustomActionBarProgressBar.setVisibility(View.VISIBLE);
 		}
 	}
-	public void hideActionBarProgressBar(){
-		if(mCustomActionBarProgressBar != null){
+
+	public void hideActionBarProgressBar() {
+		if (mCustomActionBarProgressBar != null) {
 			mCustomActionBarProgressBar.setVisibility(View.GONE);
 		}
 	}
+
 	private class DrawerItemClickListener implements
 			ListView.OnItemClickListener {
 		@Override
@@ -323,38 +344,41 @@ public class MainActivity extends Activity {
 	}
 
 	private boolean mShowExitToast = true;
-	private boolean closeApplication(){
-		if(mShowExitToast){
-			Toast.makeText(this, "Press back again to close the application.", Toast.LENGTH_LONG).show();
+
+	private boolean closeApplication() {
+		if (mShowExitToast) {
+			Toast.makeText(this, "Press back again to close the application.",
+					Toast.LENGTH_LONG).show();
 			mShowExitToast = false;
 			Timer timer = new Timer();
 			timer.schedule(new TimerTask() {
-				
+
 				@Override
 				public void run() {
 					mShowExitToast = true;
 				}
 			}, 3000);
 			return false;
-		}else{
-			FlurryAgent.onEndSession(this);
+		} else {
 			exitApp();
 			return true;
 		}
-		
+
 	}
-	private void exitApp(){
+
+	private void exitApp() {
 		android.os.Process.killProcess(android.os.Process.myPid());
 		System.runFinalizersOnExit(true);
 		System.exit(0);
 		finish();
 	}
+
 	@Override
 	public void onBackPressed() {
 		try {
 			BaseFragment fragment = mFragmentStack.peek();
 			if (fragment instanceof CardExplorer) {
-				if(closeApplication()){
+				if (closeApplication()) {
 					mFragmentStack.pop();
 				}
 				return;
@@ -393,6 +417,12 @@ public class MainActivity extends Activity {
 			}
 			fragment = mSearchActivity;
 			break;
+		case CARDDETAILSTABLET:
+			if (mCardDetailsTablet == null) {
+				mCardDetailsTablet = new CardDetailsTablet();
+			}
+			fragment = mCardDetailsTablet;
+			break;
 		default:
 			if (mCardDetails == null) {
 				mCardDetails = new CardDetails();
@@ -411,12 +441,15 @@ public class MainActivity extends Activity {
 		pushFragment();
 	}
 
+
 	private CardExplorer mCardExplorer;
 	private CardDetails mCardDetails;
+	private CardDetailsTablet mCardDetailsTablet;
 	private SearchActivity mSearchActivity;
 
 	private void selectItem(int position) {
 		switch (position) {
+		case 0:
 		case 1:
 		case 4:
 		case 5:
@@ -425,10 +458,6 @@ public class MainActivity extends Activity {
 			mCardExplorer.setDisplayMode(CardExplorer.STACKVIEW);
 			mCurrentFragment = mCardExplorer;
 		}
-			break;
-		case 0: 
-			mCardDetails = (CardDetails) createFragment(CARDDETAILS);
-			mCurrentFragment = mCardDetails;
 			break;
 		case 2: {
 			mCardExplorer = (CardExplorer) createFragment(CARDEXPLORER);
@@ -440,27 +469,22 @@ public class MainActivity extends Activity {
 			mSearchActivity = (SearchActivity) createFragment(SEARCH);
 			mCurrentFragment = new SearchActivity();
 			break;
-		case 6:
-			mCurrentFragment=null;
+		case 7: {
+//			onClickLogout();
+			// finish();
+			// startActivity(new Intent(MainActivity.this,LoginActivity.class));
 			break;
-		
+		}
 		// default:
 		// mCurrentFragment = new CardExplorer();
 		// break;
 		}
-		if(mCurrentFragment!=null)
-		{
-			pushFragment();
-			mDrawerList.setItemChecked(position, true);
-			setTitle(mMenuItemList.get(position).label);
-			mDrawerLayout.closeDrawer(mDrawerList);
-		}
-		else
-		{
-			onClickLogout();
-		}
-		
+		pushFragment();
+		mDrawerList.setItemChecked(position, true);
+		setTitle(mMenuItemList.get(position).label);
+		mDrawerLayout.closeDrawer(mDrawerList);
 	}
+
 	private void pushFragment() {
 		mFragmentStack.push(mCurrentFragment);
 		mCurrentFragment.setContext(this);
@@ -485,10 +509,9 @@ public class MainActivity extends Activity {
 
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
-		
 		super.onConfigurationChanged(newConfig);
 		// Pass any configuration change to the drawer toggls
-		//mDrawerToggle.onConfigurationChanged(newConfig);
+		mDrawerToggle.onConfigurationChanged(newConfig);
 	}
 
 	private FilterMenuProvider mFilterMenuProvider;
@@ -524,23 +547,23 @@ public class MainActivity extends Activity {
 		if (mDrawerToggle.onOptionsItemSelected(item)) {
 			return true;
 		}
-//		switch (item.getItemId()) {
-//		case R.id.menu_search: {
-//			if ((mCurrentFragment instanceof SearchActivity)) {
-//				CardExplorer fragment = new CardExplorer();
-//				bringFragment(fragment);
-//			} else {
-//				SearchActivity fragment = new SearchActivity();
-//				bringFragment(fragment);
-//			}
-//			break;
-//		}
-//		default:
-//			if (mCurrentFragment != null) {
-//				return mCurrentFragment.onOptionsItemSelected(item);
-//			}
-//			return super.onOptionsItemSelected(item);
-//		}
+		// switch (item.getItemId()) {
+		// case R.id.menu_search: {
+		// if ((mCurrentFragment instanceof SearchActivity)) {
+		// CardExplorer fragment = new CardExplorer();
+		// bringFragment(fragment);
+		// } else {
+		// SearchActivity fragment = new SearchActivity();
+		// bringFragment(fragment);
+		// }
+		// break;
+		// }
+		// default:
+		// if (mCurrentFragment != null) {
+		// return mCurrentFragment.onOptionsItemSelected(item);
+		// }
+		// return super.onOptionsItemSelected(item);
+		// }
 		return super.onOptionsItemSelected(item);
 	}
 
@@ -550,17 +573,19 @@ public class MainActivity extends Activity {
 	private OnClickListener mFilterDelegate;
 	private PopupWindow mFilterMenuPopupWindow = null;
 	private List<PopupWindow> mFilterMenuPopupWindowList = new ArrayList<PopupWindow>();
-	
+
 	private OnItemClickListener mFilterItemClicked = new OnItemClickListener() {
 
 		@Override
-		public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-			if(mFilterDelegate != null){
+		public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+				long arg3) {
+			if (mFilterDelegate != null) {
 				mFilterDelegate.onClick(arg1);
 			}
 			dismissFilterMenuPopupWindow();
 		}
 	};
+
 	private void dismissFilterMenuPopupWindow() {
 		if (mFilterMenuPopupWindow != null) {
 			mFilterMenuPopupWindowList.remove(mFilterMenuPopupWindow);
@@ -569,27 +594,72 @@ public class MainActivity extends Activity {
 		}
 	}
 
+	private void addBlur(){
+		if(mCurrentFragment == null){return;}
+		if(mCurrentFragment.getView() == null){return;}
+		if(mFilterMenuPopup == null){return;}
+		try {
+//			mFilterListView.setVisibility(View.INVISIBLE);
+			ValueAnimator fadeAnim = ObjectAnimator.ofFloat(mFilterListView, "alpha", 0f,1f);
+			fadeAnim.setDuration(1200);
+			fadeAnim.addListener(new AnimatorListenerAdapter() {
+				public void onAnimationEnd(Animator animation) {
+//					mFilterListView.setVisibility(View.VISIBLE);
+				}
+			});
+			fadeAnim.start();
+			mCurrentFragment.getView().setDrawingCacheEnabled(true);
+			Bitmap orginalBitmap = mCurrentFragment.getView().getDrawingCache();
+			Blur blur = new Blur();
+			Drawable bg = new ColorDrawable(Color.parseColor("#00000000"));
+			mPopBlurredLayout.setBackgroundDrawable(bg);
+			blur.fastblur(mContext, orginalBitmap, 12, new BlurResponse() {
+				
+				@Override
+				public void BlurredBitmap(Bitmap b) {
+					if( b == null || mFilterMenuPopup == null){return;}
+					Drawable d = new BitmapDrawable(b); 
+					mPopBlurredLayout.setBackgroundDrawable(d);
+					ValueAnimator fadeAnim = ObjectAnimator.ofFloat(mPopBlurredLayout, "alpha", 0f,1f);
+					fadeAnim.setDuration(500);
+					fadeAnim.addListener(new AnimatorListenerAdapter() {
+						public void onAnimationEnd(Animator animation) {
+//							mFilterListView.setVisibility(View.VISIBLE);
+						}
+					});
+					fadeAnim.start();
+					mCurrentFragment.getView().setDrawingCacheEnabled(false);
+				}
+			});
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	private void showFilterMenuPopup() {
 		dismissFilterMenuPopupWindow();
-		mFilterMenuPopupWindow = new PopupWindow(mFilterMenuPopup, LayoutParams.MATCH_PARENT,
-				LayoutParams.MATCH_PARENT, true);
+		addBlur();
+		mFilterMenuPopupWindow = new PopupWindow(mFilterMenuPopup,
+				LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, true);
 		mFilterMenuPopupWindowList.add(mFilterMenuPopupWindow);
 		mFilterMenuPopupWindow.setOutsideTouchable(true);
 		mFilterMenuPopupWindow.setBackgroundDrawable(new BitmapDrawable());
 		mFilterMenuPopupWindow.showAsDropDown(mCustomActionBarTitleLayout);
 	}
+	private RelativeLayout mPopBlurredLayout;
 	public void addFilterData(List<FilterMenudata> datalist,
 			OnClickListener listener) {
 		mFilterDelegate = listener;
 		mFilterMenuPopup = mInflater.inflate(R.layout.filtermenupopup, null);
-		mFilterListView = (PinnedSectionListView)mFilterMenuPopup.findViewById(R.id.listView1);
-		mMenuDataList = datalist;		
+		mPopBlurredLayout  = (RelativeLayout)mFilterMenuPopup.findViewById(R.id.fliterMenuBlurredLayout);
+		mFilterListView = (PinnedSectionListView) mFilterMenuPopup
+				.findViewById(R.id.listView1);
+		mMenuDataList = datalist;
 		MyPinnedSectionListAdapter adapter = new MyPinnedSectionListAdapter(
-				this, android.R.layout.simple_list_item_1,
-				android.R.id.text1, mMenuDataList);
+				this, android.R.layout.simple_list_item_1, android.R.id.text1,
+				mMenuDataList);
 		mFilterListView.setAdapter(adapter);
 		mFilterListView.setOnItemClickListener(mFilterItemClicked);
-		
+
 		if (mFilterMenuProvider != null) {
 			mFilterMenuProvider.addFilterData(datalist, listener);
 		}
@@ -616,8 +686,7 @@ public class MainActivity extends Activity {
 				v.setTag(mMenuDataList.get(position));
 			} else if (getItem(position).type == FilterMenudata.ITEM) {
 				v = mInflater.inflate(R.layout.filtersubmenuitem, null);
-				TextView txt = (TextView) v
-						.findViewById(R.id.filtersubmenutext);
+				TextView txt = (TextView) v.findViewById(R.id.filtersubmenutext);
 				txt.setText(mMenuDataList.get(position).label);
 				v.setTag(mMenuDataList.get(position));
 			}
@@ -639,121 +708,4 @@ public class MainActivity extends Activity {
 			return viewType == FilterMenudata.SECTION;
 		}
 	}
-	
-	public void shareData(){
-		Intent sendIntent = new Intent();
-		sendIntent.setAction(Intent.ACTION_SEND);
-		sendIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
-		sendIntent.setType("text/plain");
-		startActivity(Intent.createChooser(sendIntent,  myplexapplication.getContext().getResources().getText(R.string.send_to)));
-	}
-	protected boolean signOutRequest(String aUrlPath,final Map<String, String> bodyParams) {
-		showProgressBar();
-		RequestQueue queue = MyVolley.getRequestQueue();
-		String url=getString(R.string.url)+aUrlPath;
-		StringRequest myReq = new StringRequest(Method.POST,
-				url,
-				signOutSuccessListener(),
-				signOutErrorListener()) {
-
-			protected Map<String, String> getParams() throws com.android.volley.AuthFailureError {
-				Map<String, String> params = new HashMap<String, String>();
-				params=bodyParams;
-				return params;
-			};
-		};
-		Log.d(TAG,"Request sent ");
-		queue.add(myReq);
-		return true;
-	}
-	public void showProgressBar(){
-		if(mProgressDialog != null){
-			mProgressDialog.dismiss();
-		}
-		mProgressDialog = ProgressDialog.show(this,"", "Loading...", true,false);
-	}
-	public void dismissProgressBar(){
-		if(mProgressDialog != null){
-			mProgressDialog.dismiss();
-		}
-	}
-	public void onClickLogout() {
-		
-		Log.d("BASE ACTIVITY", "@@@@@@@@@@@@@@ LOGOUT ACTIVITY @@@@@@@@@@@@@@@@@@@@@");
-		
-		Session session = Session.getActiveSession();
-		
-		if(AccountUtils.isAuthenticated(MainActivity.this) || session!=null)
-		{
-			if(session.isOpened())
-			{
-				session.closeAndClearTokenInformation();
-			}
-			else
-			{
-				AccountUtils.signOut(MainActivity.this);
-			}
-
-		}
-		Log.d("Main ACTIVITY", "@@@@@@@@@@@@@@ LOGOUT ACTIVITY 3@@@@@@@@@@@@@@@@@@@@@");
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("profile","work");
-		params.put("clientKey",mDevInfo.getClientKey());
-		signOutRequest(getString(R.string.signoutpath), params);
-	}
-	protected ErrorListener signOutErrorListener() {
-		return new Response.ErrorListener() {
-			@Override
-			public void onErrorResponse(VolleyError error) {
-				dismissProgressBar();
-				Log.d(TAG, "@@@@@@@@@@@@@@ BASE ACTIVITY @@@@@@@@@@@@@@@@@@@@@");
-				Log.d(TAG,"Error: "+error.toString());
-				Log.d(TAG, "@@@@@@@@@@@@@@@ BASE ACTIVITY @@@@@@@@@@@@@@@@@@@@");
-			}
-		};
-	}
-	protected Listener<String> signOutSuccessListener() {
-		return new Response.Listener<String>() {
-			@Override
-			public void onResponse(String response) {
-				Log.d(TAG,"Response: "+response);
-				Log.d(TAG, "*****************BASE ACTIVITY************************");
-				dismissProgressBar();
-				JSONObject jsonResponse;
-				try {
-					jsonResponse = new JSONObject(response);
-					if(jsonResponse.getString("status").equalsIgnoreCase("SUCCESS"))
-					{
-						Log.d(TAG, "status: "+jsonResponse.getString("status"));
-						Log.d(TAG, "code: "+jsonResponse.getString("code"));
-						Log.d(TAG, "message: "+jsonResponse.getString("message"));
-						Log.d(TAG, "########################################################");
-						Log.d(TAG, "---------------------------------------------------------");
-
-						SharedPrefUtils.writeToSharedPref(MainActivity.this,
-								getString(R.string.devusername), "");
-						SharedPrefUtils.writeToSharedPref(MainActivity.this,
-								getString(R.string.devpassword),"");
-						
-						mUserInfo.setLoginStatus(false);
-						mUserInfo.setName("");
-						mUserInfo.setProfilePic("");
-
-						finish();
-						myplexUtils.launchActivity(LoginActivity.class,MainActivity.this , null);
-					}
-					else
-					{
-						Log.d(TAG, "code: "+jsonResponse.getString("code"));
-						Log.d(TAG, "message: "+jsonResponse.getString("message"));
-						myplexUtils.showToast("Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"));
-					}
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		};
-	}
-	
 }

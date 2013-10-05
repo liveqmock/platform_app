@@ -13,26 +13,32 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 public class VerticalLineRelativeLayout extends RelativeLayout {
+	private Paint paint = new Paint();
 	public VerticalLineRelativeLayout(Context context, AttributeSet attrs,
 			int defStyle) {
 		super(context, attrs, defStyle);
 		setWillNotDraw(false);
-
+		createPaint();
 		// TODO Auto-generated constructor stub
 	}
 
 	public VerticalLineRelativeLayout(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		setWillNotDraw(false);
-
+		createPaint();
 		// TODO Auto-generated constructor stub
 	}
 
 	public VerticalLineRelativeLayout(Context context) {
 		super(context);
 		setWillNotDraw(false);
-
+		createPaint();
 		// TODO Auto-generated constructor stub
+	}
+	private void createPaint(){
+		paint.setColor(Color.parseColor("#efefef"));
+		paint.setStrokeWidth(6f);
+		paint.setStyle(Paint.Style.FILL);
 	}
 	@Override
 	protected void onDraw(Canvas canvas) {
@@ -40,12 +46,7 @@ public class VerticalLineRelativeLayout extends RelativeLayout {
 		View child = getChildAt(0);
 		Rect rect = new Rect();
 		child.getGlobalVisibleRect(rect);
-		rect.width();
-		rect.height();
-		Paint paint = new Paint();
-		paint.setColor(Color.parseColor("#efefef"));
-		paint.setStrokeWidth(6f);
-		paint.setStyle(Paint.Style.FILL);
+		
 		canvas.drawLine((startX+(rect.width()/2)), rect.height(), (startX+(rect.width()/2)), getHeight(), paint);
 		super.onDraw(canvas);
 	}

@@ -2,10 +2,8 @@ package com.apalya.myplex.adapters;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -89,9 +87,9 @@ public class CardGoogleLayoutAdapater extends BaseAdapter{
 			tagData.mUiHolder.mDelete = (LinearLayout) v.findViewById(R.id.card_title_delete);
 			tagData.mUiHolder.mFavourite = (LinearLayout) v.findViewById(R.id.card_title_fav);
 			tagData.mUiHolder.mFavouriteProgress = (LinearLayout) v.findViewById(R.id.card_title_fav_progress);
-			tagData.mUiHolder.mFavourite_Image = (ImageView) v.findViewById(R.id.card_title_fav_image);
+//			tagData.mUiHolder.mFavourite_Image = (ImageView) v.findViewById(R.id.card_title_fav_image);
 			tagData.mUiHolder.mRent = (ImageView) v.findViewById(R.id.card_info_rent);
-			tagData.mUiHolder.mInfo = (LinearLayout) v.findViewById(R.id.card_info_more);
+//			tagData.mUiHolder.mInfo = (LinearLayout) v.findViewById(R.id.card_info_more);
 			tagData.mUiHolder.mText = (TextView) v.findViewById(R.id.card_title_name);
 			tagData.mUiHolder.mText.setTypeface(FontUtil.Roboto_Medium);
 			tagData.mUiHolder.mPlay = (NetworkImageView) v.findViewById(R.id.card_preview_image);
@@ -106,31 +104,26 @@ public class CardGoogleLayoutAdapater extends BaseAdapter{
 		tagData.mUiHolder.mRent.setTag(v);
 		tagData.mUiHolder.mInfo.setOnClickListener(mMoreInfoListener);
 		tagData.mUiHolder.mInfo.setTag(v);
-		tagData.mUiHolder.mText.setText(data.title);
+//		tagData.mUiHolder.mText.setText(data.title);
 		tagData.mUiHolder.mPlay.setOnClickListener(mPlayListener);
 		tagData.mUiHolder.mPlay.setTag(v);
-		if(data.applyFavoriteInProgress){
-			tagData.mUiHolder.mFavourite.setVisibility(View.INVISIBLE);
-			tagData.mUiHolder.mFavouriteProgress.setVisibility(View.VISIBLE);
-		}else{
-			tagData.mUiHolder.mFavourite.setVisibility(View.VISIBLE);
-			tagData.mUiHolder.mFavouriteProgress.setVisibility(View.INVISIBLE);
-		}
-		if(data.isFavorite){
-			tagData.mUiHolder.mFavourite_Image.setImageResource(R.drawable.card_fav);
-		}else{
-			tagData.mUiHolder.mFavourite_Image.setImageResource(R.drawable.card_unfav);
-		}
-		
-		/*Random rnd = new Random();
-        int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(128), rnd.nextInt(64)); 
-        tagData.mUiHolder.mPlay.setBackgroundColor(color);*/
-		
-		if (data.imageUrl == null || data.imageUrl.compareTo("Images/NoImage.jpg") == 0) {
-			tagData.mUiHolder.mPlay.setImageResource(data.resId);
-		} else if (data.imageUrl != null){
-			tagData.mUiHolder.mPlay.setImageUrl(data.imageUrl,MyVolley.getImageLoader());
-		}
+//		if(data.applyFavoriteInProgress){
+//			tagData.mUiHolder.mFavourite.setVisibility(View.INVISIBLE);
+//			tagData.mUiHolder.mFavouriteProgress.setVisibility(View.VISIBLE);
+//		}else{
+//			tagData.mUiHolder.mFavourite.setVisibility(View.VISIBLE);
+//			tagData.mUiHolder.mFavouriteProgress.setVisibility(View.INVISIBLE);
+//		}
+//		if(data.isFavorite){
+//			tagData.mUiHolder.mFavourite_Image.setImageResource(R.drawable.card_fav);
+//		}else{
+//			tagData.mUiHolder.mFavourite_Image.setImageResource(R.drawable.card_unfav);
+//		}
+//		if (data.imageUrl == null || data.imageUrl.compareTo("Images/NoImage.jpg") == 0) {
+//			tagData.mUiHolder.mPlay.setImageResource(data.resId);
+//		} else if (data.imageUrl != null){
+//			tagData.mUiHolder.mPlay.setImageUrl(data.imageUrl,MyVolley.getImageLoader());
+//		}
 		if (position == mDataList.size() - 1) {
 			if (mCardActionListener != null) {
 				mCardActionListener.loadmore(mDataList.size());
@@ -212,17 +205,17 @@ public class CardGoogleLayoutAdapater extends BaseAdapter{
 			if(data == null ){
 				return;
 			}
-			data.applyFavoriteInProgress = true;
+//			data.applyFavoriteInProgress = true;
 			int index = mDataList.indexOf(data);
 			if(metadata.mUiHolder != null){
 				metadata.mUiHolder.mFavourite.setVisibility(View.INVISIBLE);
 				metadata.mUiHolder.mFavouriteProgress.setVisibility(View.VISIBLE);	
 			}
-			if(!data.isFavorite){
-				mCardActionListener.addFavourite(data);	
-			}else{
-				mCardActionListener.removeFavourite(data);
-			}
+//			if(!data.isFavorite){
+//				mCardActionListener.addFavourite(data);	
+//			}else{
+//				mCardActionListener.removeFavourite(data);
+//			}
 			parentView.requestLayout();
 			
 		}
@@ -245,7 +238,7 @@ public class CardGoogleLayoutAdapater extends BaseAdapter{
 				if(data == null ){
 					return;
 				}
-				mCardActionListener.play(data);
+//				mCardActionListener.play(data);
 			}
 		}
 	};
@@ -254,8 +247,8 @@ public class CardGoogleLayoutAdapater extends BaseAdapter{
 
 		@Override
 		public void onDelayedClick(View v) {
-			if (mCardActionListener != null)
-				mCardActionListener.purchase(v.getId());
+//			if (mCardActionListener != null)
+//				mCardActionListener.purchase(v.getId());
 		}
 	};
 
@@ -276,7 +269,7 @@ public class CardGoogleLayoutAdapater extends BaseAdapter{
 				if(data == null){
 					return;
 				}
-				mCardActionListener.play(data);
+//				mCardActionListener.play(data);
 			}
 		}
 	};

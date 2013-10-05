@@ -4,7 +4,7 @@ import com.apalya.myplex.data.CardData;
 
 public interface CardActionListener {
 	public void loadmore(int value);
-
+	
 	public void selectedCard(int index);
 
 	public void addFavourite(CardData data);
@@ -13,9 +13,7 @@ public interface CardActionListener {
 
 	public void deletedCard(CardData data);
 
-	public void moreInfo(int index);
+	public void purchase(CardData object);
 
-	public void purchase(int index);
-
-	public void play(CardData object);
+	public void open(CardData object);
 }

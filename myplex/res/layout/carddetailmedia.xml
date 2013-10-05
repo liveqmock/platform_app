@@ -2,39 +2,48 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/carddetails_bg"
-    android:paddingBottom="@dimen/margin_gap_8"
-    android:paddingTop="@dimen/margin_gap_8" >
+    android:background="@drawable/carddetails_bg" >
 
-   <RelativeLayout
+    <RelativeLayout
         android:id="@+id/carddetailmedia_expandlayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true" >
+        android:layout_alignParentTop="true"
+        android:layout_margin="@dimen/margin_gap_12" >
 
         <ImageView
             android:id="@+id/carddetailmedia_expand"
             android:layout_width="@dimen/size_24"
             android:layout_height="@dimen/size_24"
-            android:layout_marginRight="@dimen/margin_gap_8"
             android:src="@drawable/dark_navigation_expand" />
 
         <ProgressBar
             android:id="@+id/carddetailmedia_expand_progress"
-            android:layout_marginRight="@dimen/margin_gap_8"
             android:layout_width="@dimen/size_24"
             android:layout_height="@dimen/size_24" />
     </RelativeLayout>
+
+    <TextView
+        android:id="@+id/carddetailmedia_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/margin_gap_12"
+        android:layout_marginTop="@dimen/margin_gap_12"
+        android:singleLine="true"
+        android:text="Related Multimedia"
+        android:textColor="#4b4b4b"
+        android:textSize="@dimen/textsize_16" />
 
     <LinearLayout
         android:id="@+id/carddetailmedia_contentlayout"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/margin_gap_8"
+        android:layout_below="@+id/carddetailmedia_title"
+        android:layout_marginLeft="@dimen/margin_gap_12"
+        android:layout_marginTop="@dimen/margin_gap_12"
         android:layout_toLeftOf="@+id/carddetailmedia_expandlayout"
         android:orientation="vertical" >
-        
     </LinearLayout>
 
 </RelativeLayout>

@@ -4,44 +4,41 @@ package com.apalya.myplex;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.Request.Method;
-import com.android.volley.Response.ErrorListener;
-import com.android.volley.Response.Listener;
-import com.android.volley.toolbox.StringRequest;
-import com.apalya.myplex.data.DeviceDetails;
-import com.apalya.myplex.data.myplexUtils;
-import com.apalya.myplex.data.myplexapplication;
-import com.apalya.myplex.utils.FontUtil;
-import com.apalya.myplex.utils.MyVolley;
 
-import android.animation.Animator;
-import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
-import android.animation.Animator.AnimatorListener;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.animation.DecelerateInterpolator;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
+
+import com.android.volley.Request.Method;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.Response.ErrorListener;
+import com.android.volley.Response.Listener;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.apalya.myplex.data.DeviceDetails;
+import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.utils.Analytics;
+import com.apalya.myplex.utils.FontUtil;
+import com.apalya.myplex.utils.MyVolley;
+import com.apalya.myplex.utils.Util;
+import com.flurry.android.FlurryAgent;
 
 
 public class SignUpActivity extends Activity{
@@ -67,7 +64,7 @@ public class SignUpActivity extends Activity{
 		setContentView(R.layout.signupscreen);
 
 		mDevInfo=myplexapplication.getDevDetailsInstance();
-		
+
 		prepareSlideNotifiation();
 
 		String username;
@@ -83,13 +80,13 @@ public class SignUpActivity extends Activity{
 			username="";
 			userpwd="";
 		}
-		
+
 		mSmsUpdates=(Switch)findViewById(R.id.toggleButton1);
 		mSmsUpdates.setTypeface(FontUtil.Roboto_Regular);
-		
+
 		mMailUpdates=(Switch)findViewById(R.id.toggleButton2);
 		mMailUpdates.setTypeface(FontUtil.Roboto_Regular);
-		
+
 		mUserEmail=(TextView) findViewById(R.id.semailId);
 		mUserEmail.setTypeface(FontUtil.Roboto_Regular);
 		mUserPhone=(TextView) findViewById(R.id.sphone);
@@ -192,7 +189,7 @@ public class SignUpActivity extends Activity{
 	public void onBackPressed() {
 		super.onBackPressed();
 		finish();
-		myplexUtils.launchActivity(LoginActivity.class,SignUpActivity.this, null);
+		Util.launchActivity(LoginActivity.class,SignUpActivity.this, null);
 	}
 
 	private boolean isPhoneNoValid(String aPhNo)
@@ -220,6 +217,7 @@ public class SignUpActivity extends Activity{
 	}
 	private void RegisterUserReq(String contextPath, final Map<String,String> bodyParams) {
 
+		Analytics.trackEvent("REGISTRATION-REQUEST",true);
 		RequestQueue queue = MyVolley.getRequestQueue();
 
 		String url=getString(R.string.url)+contextPath;
@@ -243,18 +241,39 @@ public class SignUpActivity extends Activity{
 			@Override
 			public void onErrorResponse(VolleyError error) {
 				dismissProgressBar();
+				Analytics.endTimedEvent("REGISTRATION-REQUEST");
+				Analytics.trackEvent("REGISTRATION-REQUEST-ERROR");
 				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 				Log.d(TAG,"Error: "+error.toString());
 				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 			}
 		};
 	}
-
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		Analytics.trackEvent("REGISTER-SCREEN-VIEWED");
+	}
+	@Override
+	protected void onStart() {
+		// TODO Auto-generated method stub
+		super.onStart();
+		FlurryAgent.onStartSession(this, "X6WWX57TJQM54CVZRB3K");
+	}
+	@Override
+	protected void onStop() {
+		// TODO Auto-generated method stub
+		super.onStop();
+		FlurryAgent.onEndSession(this);
+	}
 	protected Listener<String> RegisterUserSuccessListener() {
 		return new Response.Listener<String>() {
 			@Override
 			public void onResponse(String response) {
 				dismissProgressBar();
+				Analytics.endTimedEvent("REGISTRATION-REQUEST");
+				
 				Log.d(TAG,"Response: "+response);
 				try {	
 					Log.d(TAG, "########################################################");
@@ -262,16 +281,18 @@ public class SignUpActivity extends Activity{
 
 					if(jsonResponse.getString("status").equalsIgnoreCase("SUCCESS"))
 					{
+						Analytics.trackEvent("REGISTRATION-REQUEST-SUCCESS");
 						Log.d(TAG, "status: "+jsonResponse.getString("status"));
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
 						Log.d(TAG, "########################################################");
 						Log.d(TAG, "---------------------------------------------------------");
 						finish();
-						myplexUtils.launchActivity(MainActivity.class,SignUpActivity.this , null);
+						Util.launchActivity(MainActivity.class,SignUpActivity.this , null);
 					}
 					else
 					{
+						Analytics.trackEvent("REGISTRATION-REQUEST-SERVER-ERROR");
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
 						sendNotification("Err: "+jsonResponse.getString("code")+" "+jsonResponse.getString("message"));
@@ -299,12 +320,12 @@ public class SignUpActivity extends Activity{
 	private Runnable hideControllerThread = new Runnable() {
 
 		public void run() {
-			myplexUtils.animate(0,-mSlideNotifcationHeight, mSlideNotificationLayout,false,2);
+			Util.animate(0,-mSlideNotifcationHeight, mSlideNotificationLayout,false,2,SignUpActivity.this);
 
 		}
 	};
 	private void showNotification(){
-		myplexUtils.animate(-mSlideNotifcationHeight,0, mSlideNotificationLayout,false,2);
+		Util.animate(-mSlideNotifcationHeight,0, mSlideNotificationLayout,false,2,SignUpActivity.this);
 		hidehandler.removeCallbacks(hideControllerThread);
 		hideNotification();
 	}

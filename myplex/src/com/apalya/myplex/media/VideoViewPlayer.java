@@ -243,7 +243,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 	private void prepareDrmManager(){
 		
 		// Setup the DRM Client
-		drmManager = new DrmManagerClient(myplexapplication.getContext()); 
+		drmManager = new DrmManagerClient(mContext); 
 		
 		drmManager.setOnEventListener( new DrmManagerClient.OnEventListener() {
 			public void onEvent( DrmManagerClient client, DrmEvent event){
