@@ -4,6 +4,7 @@ public class ConsumerApi {
 	public static String DOMAIN = "alpha.myplex.in:8866";
 	public static final String SEARCH_ACTION = "search";
 	public static final String TAG_ACTION = "tags";
+	public static final String SIGN_OUT_ACTION = "signOut";
 	public static final String CONTENTDETAILS_ACTION = "contentDetail";
 	public static final String CONTENT_CONTEXT = "content/v2";
 	public static final String USER_CONTEXT = "user/v2";
@@ -14,6 +15,8 @@ public class ConsumerApi {
 	public static final String QUERY = "query=";
 	public static final String CLIENTKEY = "clientKey=";
 	public static final String LEVEL = "level=";
+	public static final String FIELDS = "fields=";
+	public static final String VIDEOS = "videos";
 	public static final String STARTLETTER = "startLetter=";
 	public static final String STARTINDEX = "startIndex=";
 	
@@ -50,5 +53,10 @@ public class ConsumerApi {
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH + CONTENTDETAILS_ACTION
 				+ SLASH + contentID + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY  + AMPERSAND
 		        + LEVEL + level;
+	}
+	public static String getVideosDetail(String contentID){
+		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH + CONTENTDETAILS_ACTION
+				+ SLASH + contentID + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY  + AMPERSAND
+		        + FIELDS + VIDEOS;
 	}
 }

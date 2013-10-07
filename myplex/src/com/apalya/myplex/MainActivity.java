@@ -51,13 +51,16 @@ import android.widget.Toast;
 
 import com.android.volley.toolbox.NetworkImageView;
 import com.apalya.myplex.data.FilterMenudata;
+import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.menu.FilterMenuProvider;
 import com.apalya.myplex.utils.Blur;
 import com.apalya.myplex.utils.Blur.BlurResponse;
+import com.apalya.myplex.utils.LogOutUtil;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.views.PinnedSectionListView;
 import com.apalya.myplex.views.PinnedSectionListView.PinnedSectionListAdapter;
+import com.facebook.Session;
 
 public class MainActivity extends Activity {
 	private DrawerLayout mDrawerLayout;
@@ -98,8 +101,8 @@ public class MainActivity extends Activity {
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 	}
 	private void fillMenuItem() {
-		mMenuItemList.add(new NavigationOptionsMenu("Profile",
-				R.drawable.menu_profile, null, 0));
+		mMenuItemList.add(new NavigationOptionsMenu(myplexapplication.getUserProfileInstance().getName(),
+				R.drawable.menu_profile, myplexapplication.getUserProfileInstance().getProfilePic(), 0));
 		mMenuItemList.add(new NavigationOptionsMenu("Home",
 				R.drawable.menu_home, null, 1));
 		mMenuItemList.add(new NavigationOptionsMenu("Home Tablet",
@@ -156,22 +159,33 @@ public class MainActivity extends Activity {
 	};
 
 	@Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // To preserve battery life, the Mixpanel library will store
+        // events rather than send them immediately. This means it
+        // is important to call flush() to send any unsent events
+        // before your application is taken out of memory.
+        myplexapplication.getMixPanel().flush();
+    }
+	
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		mContext = this;
 		Util.prepareDisplayinfo(this);
-		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+		/*StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
 				.detectDiskReads().detectDiskWrites().detectNetwork() // or
 																		// .detectAll()
 																		// for
 																		// all
 																		// detectable
 																		// problems
-				.penaltyLog().build());
+				.penaltyDialog().build());
 		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
 				.detectLeakedSqlLiteObjects().detectLeakedClosableObjects()
-				.penaltyLog().penaltyDeath().build());
+				.penaltyLog().penaltyDeath().build());*/
 
 		setContentView(R.layout.mainview);
 		
@@ -469,20 +483,22 @@ public class MainActivity extends Activity {
 			mSearchActivity = (SearchActivity) createFragment(SEARCH);
 			mCurrentFragment = new SearchActivity();
 			break;
-		case 7: {
-//			onClickLogout();
-			// finish();
-			// startActivity(new Intent(MainActivity.this,LoginActivity.class));
+		case 6: {
+			mCurrentFragment=null;
+			LogOutUtil.onClickLogout(this);
 			break;
 		}
 		// default:
 		// mCurrentFragment = new CardExplorer();
 		// break;
 		}
+		if(mCurrentFragment!=null)
+		{
 		pushFragment();
 		mDrawerList.setItemChecked(position, true);
 		setTitle(mMenuItemList.get(position).label);
 		mDrawerLayout.closeDrawer(mDrawerList);
+		}
 	}
 
 	private void pushFragment() {

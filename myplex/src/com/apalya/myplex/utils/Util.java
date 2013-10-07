@@ -199,6 +199,7 @@ public class Util {
 				aMsg, 
 				Toast.LENGTH_LONG).show();
 	}
+	
 	public void startDownload(String aUrl,String aMovieName,Context mContext)
 	{
 		if(isDownloadManagerAvailable(mContext))
@@ -233,13 +234,13 @@ public class Util {
 			//Download Manager is not available
 		}
 	}
-	public void sendRequestDialog(final Context mContext) {
+	public static void inviteFriends(final Context mContext) {
 		Bundle params = new Bundle();
 
-		params.putString("message", "Learn how to make your Android apps social");
-		params.putString("data",
+		params.putString("message", "Hi, I am using this cool myplex app, just try it out...");
+		/*params.putString("data",
 				"{\"badge_of_awesomeness\":\"1\"," +
-				"\"social_karma\":\"5\"}");
+				"\"social_karma\":\"5\"}");*/
 		WebDialog requestsDialog = (
 				new WebDialog.RequestsDialogBuilder(mContext,
 						Session.getActiveSession(),

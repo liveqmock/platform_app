@@ -40,6 +40,8 @@ import com.apalya.myplex.media.PlayerListener;
 import com.apalya.myplex.media.VideoView;
 import com.apalya.myplex.media.VideoViewPlayer;
 import com.apalya.myplex.media.VideoViewPlayer.StreamType;
+import com.apalya.myplex.utils.MediaUtil;
+import com.apalya.myplex.utils.MediaUtil.MediaUtilEventListener;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.views.CardDetailViewFactory;
@@ -55,7 +57,7 @@ import com.apalya.myplex.views.docketVideoWidget;
 import com.google.android.gms.internal.c;
 
 public class CardDetails extends BaseFragment implements
-		ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,PlayerListener,ScrollingDirection {
+		ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,PlayerListener,ScrollingDirection,MediaUtilEventListener {
 	private LayoutInflater mInflater;
 	private LinearLayout mParentContentLayout;
 	private CardDetailViewFactory mCardDetailViewFactory;
@@ -146,16 +148,16 @@ public class CardDetails extends BaseFragment implements
 			mPlaying = true;
 			hideImagePreview();
 			mProgressBar.setVisibility(View.VISIBLE);
-			Uri uri = Uri.parse("rtsp://59.162.166.216:554/AAJTAK_QVGA.sdp");
-			uri = Uri.parse("rtsp://46.249.213.87:554/playlists/bollywood-action_qcif.hpl.3gp");
-			VideoViewPlayer.StreamType streamType = StreamType.VOD;
+			MediaUtil.setUrlEventListener(CardDetails.this);
+			MediaUtil.getVideoUrl("151","Low");
+			/*VideoViewPlayer.StreamType streamType = StreamType.VOD;
 			if(mVideoViewPlayer == null){
 				mVideoViewPlayer = new VideoViewPlayer(mVideoView,mContext, uri, streamType);
 				mVideoViewPlayer.openVideo();
 			}else{
 				mVideoViewPlayer.setUri(uri, streamType);
 			}
-			mVideoViewPlayer.setPlayerListener(CardDetails.this);	
+			mVideoViewPlayer.setPlayerListener(CardDetails.this);	*/
 		}
 	};
 	@Override
@@ -678,5 +680,29 @@ public class CardDetails extends BaseFragment implements
 		} else {
 			 mBottomActionBar.setTranslationY(translationY);
 		}
+	}
+	@Override
+	public void urlReceived(boolean aStatus,String url) {
+		// TODO Auto-generated method stub
+		if(aStatus)
+		{
+			Util.showToast(url,mContext);
+			//Uri uri = Uri.parse("rtsp://59.162.166.216:554/AAJTAK_QVGA.sdp");
+			//uri = Uri.parse("rtsp://46.249.213.87:554/playlists/bollywood-action_qcif.hpl.3gp");
+			Uri uri= Uri.parse(url);
+			VideoViewPlayer.StreamType streamType = StreamType.VOD;
+			if(mVideoViewPlayer == null){
+				mVideoViewPlayer = new VideoViewPlayer(mVideoView,mContext, uri, streamType);
+				mVideoViewPlayer.openVideo();
+			}else{
+				mVideoViewPlayer.setUri(uri, streamType);
+			}
+			mVideoViewPlayer.setPlayerListener(CardDetails.this);	
+		}
+		else
+		{
+			Util.showToast("FAILED",mContext);	
+		}
+		
 	}
 }

@@ -411,6 +411,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
         // is important to call flush() to send any unsent events
         // before your application is taken out of memory.
         mMixpanel.flush();
+        
     }
 	private void prepareSlideNotifiation() {
 		mSlideNotificationLayout = (RelativeLayout)findViewById(R.id.slidenotificationlayout);
@@ -917,7 +918,19 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 						Analytics.trackEvent("FACEBOOK-LOGIN-AUTH-REQUEST-SERVER-ERROR");
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
-						sendNotification("Err: "+jsonResponse.getString("code")+" \nErr Msg: "+jsonResponse.getString("message"));
+						if(jsonResponse.getString("code").equalsIgnoreCase("401")){
+							String devId=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
+									getString(R.string.devclientdevid));
+
+							Map<String, String> params = new HashMap<String, String>();
+							params.put("deviceId", devId);
+
+							genKeyRequest(getString(R.string.genKeyReqPath),params);
+							
+						}
+						else{
+							sendNotification("Err: "+jsonResponse.getString("code")+" \nErr Msg: "+jsonResponse.getString("message"));
+						}
 					}
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -1232,6 +1245,9 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			// Se the profile id
 			if (person != null) {
 				AccountUtils.setPlusProfileId(this, person.getId());
+				mUserInfo.setGoogleId(person.getId());
+				mUserInfo.setUserEmail(mPlusClient.getAccountName());
+				mUserInfo.setProfilePic("https://plus.google.com/s2/photos/profile/"+person.getId()+"?sz=300");
 			}
 		} else {
 			Log.e(TAG, "Got " + connectionResult.getErrorCode() + ". Could not load plus profile.");
@@ -1325,7 +1341,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
     }
 private boolean isTokenValid(String clientKeyExp) {
 		
-		//Util.showToast(clientKeyExp);
+		//Util.showToast(clientKeyExp,this);
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 		Date convertedDate = new Date();
@@ -1337,12 +1353,12 @@ private boolean isTokenValid(String clientKeyExp) {
 		Date currentDate = new Date();
 		if(convertedDate.compareTo(currentDate)>0)
 		{
-			//Util.showToast("Valid");
+			//Util.showToast("Valid",this);
 			return true;
 		}
 		else
 		{
-			//Util.showToast("Invalid");
+			//Util.showToast("Invalid",this);
 			return false;
 		}
 
@@ -1599,7 +1615,7 @@ private boolean isTokenValid(String clientKeyExp) {
 							finish();
 							Util.launchActivity(MainActivity.class,LoginActivity.this , null);
 						}
-						
+						Util.showToast("Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),LoginActivity.this);
 					}
 					else
 					{
