@@ -21,6 +21,6 @@ public class CardDataHolder {
 	public TextView mReviewsText;
 	public TextView mRentText;
 	public LinearLayout mRentLayout;
-	public ProgressBar mProgressBar;
+	public ProgressBar mFavProgressBar;
 	public CardData mDataObject;
 }

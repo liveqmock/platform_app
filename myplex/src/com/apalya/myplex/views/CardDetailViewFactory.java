@@ -1,84 +1,78 @@
 package com.apalya.myplex.views;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.inputmethod.EditorInfo;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
 import android.widget.Space;
 import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 
 import com.apalya.myplex.R;
+import com.apalya.myplex.data.CardData;
+import com.apalya.myplex.data.CardDataCertifiedRatingsItem;
+import com.apalya.myplex.data.CardDataCommentsItem;
+import com.apalya.myplex.data.CardDataRelatedCastItem;
+import com.apalya.myplex.data.CardDataUserReviewsItem;
 import com.apalya.myplex.data.CardDetailBaseData;
 import com.apalya.myplex.data.CardDetailMultiMediaGroup;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.FontUtil;
+import com.apalya.myplex.utils.MessagePost;
+import com.apalya.myplex.utils.MessagePost.MessagePostCallback;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
 
 public class CardDetailViewFactory {
 	
 	public interface CardDetailViewFactoryListener{
-		public void onExpanded();
+		public void onDescriptionExpanded();
+		public void onCommentsExpanded();
+		public void onCommentsCollapsed();
+		public void onDescriptionCollapsed();
 		public void onTextSelected(String key);
 		public void onMediaGroupSelected(CardDetailMultiMediaGroup group);
 	}
 	public void setOnCardDetailExpandListener(CardDetailViewFactoryListener listener){
 		this.mCardExpandListener = listener;
 	}
-	private OnClickListener mOnDescriptionExpand = new OnClickListener() {
-		
-		@Override
-		public void onClick(View v) {
-			if(mData == null){return;}
-			if(!mData.isExpanded){
-				if(mCardExpandListener != null){
-					mCardExpandListener.onExpanded();
-				}
-			}
-		}
-	}; 
-	private OnClickListener mOnMultiMediaExpand = new OnClickListener() {
-		
-		@Override
-		public void onClick(View v) {
-			if(mData == null){return;}
-			if(!mData.isExpanded){
-				if(mCardExpandListener != null){
-					mCardExpandListener.onExpanded();
-				}
-			}
-		}
-	}; 
-	private OnClickListener mOnCommentsExpand = new OnClickListener() {
-		
-		@Override
-		public void onClick(View v) {
-			if(mData == null){return;}
-			if(!mData.isExpanded){
-				if(mCardExpandListener != null){
-					mCardExpandListener.onExpanded();
-				}
-			}
-		}
-	}; 
+//	private OnClickListener mOnMultiMediaExpand = new OnClickListener() {
+//		
+//		@Override
+//		public void onClick(View v) {
+//			if(mData == null){return;}
+//			if(!mData.isExpanded){
+//				if(mCardExpandListener != null){
+//					mCardExpandListener.onExpanded();
+//				}
+//			}
+//		}
+//	}; 
 	private CardDetailViewFactoryListener mCardExpandListener;
 	private Context mContext;
 	private LayoutInflater mInflator;
-	private CardDetailBaseData mData;
+	private CardData mData;
 	private View mDetails;
 	private View mDescription;
+	private View mMyPlexDescription;
+	private View mStudioDescription;
 	private View mCredits;
 	private View mExtras;
 	private View mMultimedia;
 	private View mComments;
 
-	public void SetData(CardDetailBaseData data){
+	public void SetData(CardData data){
 		this.mData = data;
 	}
 	public CardDetailViewFactory(Context cxt) {
@@ -100,7 +94,7 @@ public class CardDetailViewFactory {
 	public static final int CARDDETAIL_COMMENTS = 11;
 	public static final int CARDDETAIL_BRIEF_COMMENTS = 12;
 
-	public View CreateView(CardDetailBaseData data, int type) {
+	public View CreateView(CardData data, int type) {
 		mData = data;
 		switch (type) {
 		case CARDDETAIL_BRIEF_DESCRIPTION:
@@ -126,42 +120,185 @@ public class CardDetailViewFactory {
 		case CARDDETAIL_EXTRA_RELATED_MULTIMEDIA:
 			return createExtraMultiMediaView();
 		case CARDDETAIL_COMMENTS:
-			return createCommentsView();
+			return createCommentsView(CARDDETAIL_COMMENTS);
 		case CARDDETAIL_BRIEF_COMMENTS:
-			return createBriefCommentsView();
+			return createCommentsView(CARDDETAIL_BRIEF_COMMENTS);
 		default:
 			break;
 		}
 		return null;
 	}
 
-	private View createBriefCommentsView() {
-		View v = mInflator.inflate(R.layout.carddetailcomment, null);
-		mComments = v;
-		LinearLayout layout = (LinearLayout)v.findViewById(R.id.carddetailcomment_contentlayout);
-		addSpace(layout, (int)mContext.getResources().getDimension(R.dimen.margin_gap_16));
-		for(int i = 0; i <mData.mCommentsList.size();i++ ){
-			View child = mInflator.inflate(R.layout.carddetailcomment_data, null);
-//			VerticalLineRelativeLayout timelinelayout = (VerticalLineRelativeLayout)child.findViewById(R.id.timeLineLayout);
-//			timelinelayout.setWillNotDrawEnabled(false);
-			TextView personName = (TextView)child.findViewById(R.id.carddetailcomment_personname);
-			personName.setText(mData.mCommentsList.get(i).mName);
-			personName.setTypeface(FontUtil.Roboto_Regular);
-			TextView commentTime = (TextView)child.findViewById(R.id.carddetailcomment_time);
-			commentTime.setText(mData.mCommentsList.get(i).mDate);
-			commentTime.setTypeface(FontUtil.Roboto_Regular);
-			TextView commentMessage  = (TextView)child.findViewById(R.id.carddetailcomment_comment);
-			commentMessage.setText(mData.mCommentsList.get(i).mMessage);
-			commentMessage.setTypeface(FontUtil.Roboto_Regular);
-//			addSpace(layout, 16);
-			layout.addView(child);
+	public static final int  COMMENTSECTION_COMMENTS = 101;
+	public static final int COMMENTSECTION_REVIEW = 102;
+	private void fillCommentSectionData(int type,int numberofItems,LinearLayout layout){
+		layout.removeAllViews();
+		int count = 0;
+		if(type == COMMENTSECTION_COMMENTS){
+			for(CardDataCommentsItem commentsItem:mData.comments.values){
+				count++;
+				if(count > numberofItems && numberofItems != -1){
+					break;
+				}
+				View child = mInflator.inflate(R.layout.carddetailcomment_data, null);
+	//			VerticalLineRelativeLayout timelinelayout = (VerticalLineRelativeLayout)child.findViewById(R.id.timeLineLayout);
+	//			timelinelayout.setWillNotDrawEnabled(false);
+				TextView personName = (TextView)child.findViewById(R.id.carddetailcomment_personname);
+				personName.setText(commentsItem.name);
+				personName.setTypeface(FontUtil.Roboto_Regular);
+				TextView commentTime = (TextView)child.findViewById(R.id.carddetailcomment_time);
+				commentTime.setText(commentsItem.timestamp);
+				commentTime.setTypeface(FontUtil.Roboto_Regular);
+				TextView commentMessage  = (TextView)child.findViewById(R.id.carddetailcomment_comment);
+				commentMessage.setText(commentsItem.comment);
+				commentMessage.setTypeface(FontUtil.Roboto_Regular);
+	//			addSpace(layout, 16);
+				layout.addView(child);
+			}
+		}else if(type == COMMENTSECTION_REVIEW){
+			for(CardDataUserReviewsItem reviewItem:mData.userReviews.values){
+				count++;
+				if(count > numberofItems && numberofItems != -1){
+					break;
+				}
+				View child = mInflator.inflate(R.layout.carddetailcomment_data, null);
+	//			VerticalLineRelativeLayout timelinelayout = (VerticalLineRelativeLayout)child.findViewById(R.id.timeLineLayout);
+	//			timelinelayout.setWillNotDrawEnabled(false);
+				TextView personName = (TextView)child.findViewById(R.id.carddetailcomment_personname);
+				personName.setText(reviewItem.username);
+				personName.setTypeface(FontUtil.Roboto_Regular);
+				TextView commentTime = (TextView)child.findViewById(R.id.carddetailcomment_time);
+				commentTime.setText(reviewItem.timestamp);
+				commentTime.setTypeface(FontUtil.Roboto_Regular);
+				TextView commentMessage  = (TextView)child.findViewById(R.id.carddetailcomment_comment);
+				commentMessage.setText(reviewItem.review);
+				commentMessage.setTypeface(FontUtil.Roboto_Regular);
+	//			addSpace(layout, 16);
+				layout.addView(child);
+			}
 		}
+	}
+	private View createCommentsView(final int type) {
+		if(mData.comments == null){return null;}
+		if(mData.comments.values == null ){return null;}
+		if(mData.comments.values.size() == 0){return null;}
+		View v = mInflator.inflate(R.layout.carddetailbriefcomment, null);
+		mComments = v;
+		final LinearLayout layout = (LinearLayout)v.findViewById(R.id.carddetailcomment_contentlayout);
+		addSpace(layout, (int)mContext.getResources().getDimension(R.dimen.margin_gap_16));
+		if(type == CARDDETAIL_COMMENTS){
+			fillCommentSectionData(COMMENTSECTION_COMMENTS,-1,layout);
+		}else{
+			fillCommentSectionData(COMMENTSECTION_COMMENTS,10,layout);
+		}
+	
+		LinearLayout commentLayout = (LinearLayout)v.findViewById(R.id.carddetailcomment_commentlayout);
+		LinearLayout reviewLayout = (LinearLayout)v.findViewById(R.id.carddetailcomment_reviewlayout);
+		final ImageView commentImage = (ImageView)v.findViewById(R.id.carddetailcomment_commentimage);
+		final TextView commentHeading = (TextView)v.findViewById(R.id.carddetailcomment_commentheading);
+		final ImageView reviewImage = (ImageView)v.findViewById(R.id.carddetailcomment_reviewimage);
+		final TextView reviewHeading = (TextView)v.findViewById(R.id.carddetailcomment_reviewheading);
+		final EditText editBox = (EditText)v.findViewById(R.id.carddetailcomment_edittext);
+		editBox.setTypeface(FontUtil.Roboto_Medium);
+		
+		editBox.setOnEditorActionListener(new OnEditorActionListener() {
+
+			@Override
+			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+				if(actionId == EditorInfo.IME_ACTION_SEND)
+				{
+					String userSearchText = editBox.getText().toString();
+					if(userSearchText.length() <=0)
+						return true;
+					String searchText = editBox.getText().toString();
+					String hintText = (String) editBox.getHint();
+					if(hintText.equalsIgnoreCase(mContext.getResources().getString(R.string.carddetailcommentsection_editcomment))){
+						sendMessage(searchText,COMMENTSECTION_COMMENTS);
+					}else{
+						sendMessage(searchText,COMMENTSECTION_REVIEW);
+					}
+					return true;
+				}
+				return false;
+			}
+			
+		});
+		
+		commentImage.setImageResource(R.drawable.card_iconcommentblue);
+		commentHeading.setTextColor(Color.parseColor("#6CBEE9"));
+		commentLayout.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				commentImage.setImageResource(R.drawable.card_iconcommentblue);
+				commentHeading.setTextColor(Color.parseColor("#6CBEE9"));
+				reviewImage.setImageResource(R.drawable.card_iconuser);
+				reviewHeading.setTextColor(Color.parseColor("#000000"));
+				editBox.setHint(R.string.carddetailcommentsection_editcomment);
+				
+				if(type == CARDDETAIL_COMMENTS){
+					fillCommentSectionData(COMMENTSECTION_COMMENTS,-1,layout);
+				}else{
+					fillCommentSectionData(COMMENTSECTION_COMMENTS,10,layout);
+				}
+			}
+		});
+		
+		
+
+		reviewLayout.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				commentImage.setImageResource(R.drawable.card_iconcomment);
+				commentHeading.setTextColor(Color.parseColor("#000000"));
+				reviewImage.setImageResource(R.drawable.card_iconuserblue);
+				reviewHeading.setTextColor(Color.parseColor("#6CBEE9"));
+				editBox.setHint(R.string.carddetailcommentsection_editreview);
+				if(type == CARDDETAIL_COMMENTS){
+					fillCommentSectionData(COMMENTSECTION_REVIEW,-1,layout);
+				}else{
+					fillCommentSectionData(COMMENTSECTION_REVIEW,10,layout);
+				}
+			}
+		});
+		
+		
+		ImageView image = (ImageView)v.findViewById(R.id.carddetailcomment_expand);
+		
+		if(type == CARDDETAIL_COMMENTS){
+			image.setImageResource(R.drawable.dark_navigation_collapse);
+		}else{
+			image.setImageResource(R.drawable.dark_navigation_expand);
+		}
+		image.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				if(mCardExpandListener != null){
+					if(type == CARDDETAIL_COMMENTS){
+						mCardExpandListener.onCommentsCollapsed();
+					}else{
+						mCardExpandListener.onCommentsExpanded();
+					}
+				}				
+			}
+		});
 		return v;
 	}
-
-	private View createCommentsView() {
-		return createBriefCommentsView();
+	private void sendMessage(String searchText,
+			int commentsectionComments) {
+		MessagePost post = new MessagePost();
+		post.sendComment(searchText, mData, new MessagePostCallback() {
+			
+			@Override
+			public void sendMessage(boolean status) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 	}
+
 
 	private View createExtraMultiMediaView() {
 		// TODO Auto-generated method stub
@@ -174,31 +311,32 @@ public class CardDetailViewFactory {
 	}
 
 	private View createBriefRelatedView() {
+		if(true){return null;}
 		View v = mInflator.inflate(R.layout.carddetailmedia, null);
 		TextView text = (TextView)v.findViewById(R.id.carddetailmedia_title);
 		text.setTypeface(FontUtil.Roboto_Light);
 		mMultimedia = text;		
 		ImageView expand = (ImageView)v.findViewById(R.id.carddetailmedia_expand);
-		expand.setOnClickListener(mOnMultiMediaExpand);
+//		expand.setOnClickListener(mOnMultiMediaExpand);
 		Util.showFeedback(expand);
 		LinearLayout contentLayout = (LinearLayout)v.findViewById(R.id.carddetailmedia_contentlayout);
-		for(CardDetailMultiMediaGroup group:mData.mMultiMediaGroup){
-			View child = mInflator.inflate(R.layout.carddetails_fullmultimediaitem, null);
-			TextView groupname = (TextView)child.findViewById(R.id.carddetailmultimedia_groupname);
-			groupname.setText(group.groupName);
-			groupname.setTypeface(FontUtil.Roboto_Regular);
-			TextView secondaryname = (TextView)child.findViewById(R.id.carddetailmultimedia_secondaryname);
-			
-			FadeInNetworkImageView imageView1 = (FadeInNetworkImageView)child.findViewById(R.id.carddetailmultimedia_stackview1);
-			imageView1.setImageUrl(group.mList.get(0).mThumbnailUrl, MyVolley.getImageLoader());
-			
-			FadeInNetworkImageView imageView2 = (FadeInNetworkImageView)child.findViewById(R.id.carddetailmultimedia_stackview2);
-			imageView2.setImageUrl(group.mList.get(1).mThumbnailUrl, MyVolley.getImageLoader());
-			
-			imageView1.setTag(group);
-			imageView1.setOnClickListener(mMediaGroupClickListener);
-			contentLayout.addView(child);
-		}
+//		for(CardDetailMultiMediaGroup group:mData.mMultiMediaGroup){
+//			View child = mInflator.inflate(R.layout.carddetails_fullmultimediaitem, null);
+//			TextView groupname = (TextView)child.findViewById(R.id.carddetailmultimedia_groupname);
+//			groupname.setText(group.groupName);
+//			groupname.setTypeface(FontUtil.Roboto_Regular);
+//			TextView secondaryname = (TextView)child.findViewById(R.id.carddetailmultimedia_secondaryname);
+//			
+//			FadeInNetworkImageView imageView1 = (FadeInNetworkImageView)child.findViewById(R.id.carddetailmultimedia_stackview1);
+//			imageView1.setImageUrl(group.mList.get(0).mThumbnailUrl, MyVolley.getImageLoader());
+//			
+//			FadeInNetworkImageView imageView2 = (FadeInNetworkImageView)child.findViewById(R.id.carddetailmultimedia_stackview2);
+//			imageView2.setImageUrl(group.mList.get(1).mThumbnailUrl, MyVolley.getImageLoader());
+//			
+//			imageView1.setTag(group);
+//			imageView1.setOnClickListener(mMediaGroupClickListener);
+//			contentLayout.addView(child);
+//		}
 		return v;
 	}
 	private void addSpace(ViewGroup v,int space){
@@ -250,7 +388,7 @@ public class CardDetailViewFactory {
 		
 		layout.addView(imagelayout);
 		docketVideoWidget videoWidget = new docketVideoWidget(mContext);
-		layout.addView(videoWidget.CreateView(mData.mPlayinPlaceList.get(0)));
+//		layout.addView(videoWidget.CreateView(mData.mPlayinPlaceList.get(0)));
 		
 		{
 			LinearLayout imagelayout1 = new LinearLayout(mContext);
@@ -307,13 +445,21 @@ public class CardDetailViewFactory {
 
 	private View createCastCrewView() {
 		View v = (LinearLayout)mInflator.inflate(R.layout.carddetailcastcrew, null);
+		mCredits = v;
 		TextView title = (TextView)v.findViewById(R.id.carddetailcastandcrew_credits);
 		title.setTypeface(FontUtil.Roboto_Light);
-		mCredits = title;
+		
 		LinearLayout leftLayout = (LinearLayout)v.findViewById(R.id.carddetailcastcrew_leftlayout);
 		LinearLayout rightLayout = (LinearLayout)v.findViewById(R.id.carddetailcastcrew_rightlayout);
-		for(int i = 0; i < mData.mCastCrewList.size();i++){
+		for(CardDataRelatedCastItem relatedCastItem: mData.relatedCast){
 			
+			String LeftString = new String();
+			for(String role:relatedCastItem.types){
+				if(LeftString.length() > 0){
+					LeftString = ",";
+				}
+				LeftString += role;
+			}
 			TextView leftText = new TextView(mContext);
 			LinearLayout.LayoutParams leftparams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT);
 			leftparams.gravity = Gravity.RIGHT;
@@ -327,16 +473,13 @@ public class CardDetailViewFactory {
 			rightText.setTextSize(12);
 			rightText.setTextColor(Color.parseColor("#4b4b4c"));
 			
-			leftText.setText(mData.mCastCrewList.get(i).leftText);
+			leftText.setText(relatedCastItem.name);
 			leftText.setTypeface(FontUtil.Roboto_Regular);
 			Util.showFeedback(leftText);
-			leftText.setTag( mData.mCastCrewList.get(i).leftText);
+			leftText.setTag( relatedCastItem.name);
 			leftText.setOnClickListener(mCastandCrewClickListener);
 //			leftText.setPaintFlags(leftText.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
-			rightText.setText(mData.mCastCrewList.get(i).rightText);
-			Util.showFeedback(rightText);
-			rightText.setTag(mData.mCastCrewList.get(i).rightText);
-			rightText.setOnClickListener(mCastandCrewClickListener);
+			rightText.setText(LeftString);
 			rightText.setTypeface(FontUtil.Roboto_Regular);
 //			rightText.setPaintFlags(rightText.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 			leftLayout.addView(leftText);
@@ -366,10 +509,12 @@ public class CardDetailViewFactory {
 		View v = mInflator.inflate(R.layout.carddetailstudiodesc, null);
 		TextView title = (TextView)v.findViewById(R.id.carddetaildesc_studiotitle);
 		title.setText("Studio Description");
+		title.setTypeface(FontUtil.Roboto_Light);
+		mStudioDescription = v;
 		title.setTypeface(FontUtil.Roboto_Medium);
 		TextView text = (TextView)v.findViewById(R.id.carddetaildesc_studiodescription);
-		text.setTypeface(FontUtil.Roboto_Medium);
-		text.setText(mData.myplexDescription);
+		text.setTypeface(FontUtil.RobotoCondensed_Light);
+		text.setText(mData.generalInfo.studioDescription);
 		return v;
 	}
 
@@ -377,90 +522,153 @@ public class CardDetailViewFactory {
 		View v = mInflator.inflate(R.layout.carddetailstudiodesc, null);
 		TextView title = (TextView)v.findViewById(R.id.carddetaildesc_studiotitle);
 		title.setText("Myplex Description");
-		title.setTypeface(FontUtil.Roboto_Medium);
+		title.setTypeface(FontUtil.Roboto_Light);
+		mMyPlexDescription = v;
 		TextView text = (TextView)v.findViewById(R.id.carddetaildesc_studiodescription);
-		text.setText(mData.myplexDescription);
-		text.setTypeface(FontUtil.Roboto_Medium);
+		text.setText(mData.generalInfo.myplexDescription);
+		text.setTypeface(FontUtil.RobotoCondensed_Light);
 		return v;
 	}
 
 	private View createFullDescriptionView() {
-		
+		if(mData.generalInfo == null){return null;}
 		View v = mInflator.inflate(R.layout.carddetailfulldescription, null);
+		mDetails  = v;
 		TextView movieName = (TextView)v.findViewById(R.id.carddetaildesc_movename);
-		movieName.setText(mData.contentName);
+		if(mData.generalInfo.title != null){
+			movieName.setText(mData.generalInfo.title);	
+		}
 		movieName.setTypeface(FontUtil.Roboto_Regular);
 		TextView parentalRating = (TextView)v.findViewById(R.id.carddetaildesc_parentalRating);
-		parentalRating.setText(mData.parentalRating);
+		if(mData.content != null && mData.content.certifiedRatings != null && mData.content.certifiedRatings.values != null){
+			for(CardDataCertifiedRatingsItem ratingItem:mData.content.certifiedRatings.values){
+				parentalRating.setText(ratingItem.rating);
+				break;
+			}
+		}
 		parentalRating.setTypeface(FontUtil.Roboto_Regular);
 		RatingBar ratingBar = (RatingBar)v.findViewById(R.id.carddetaildesc_setRating);
-		ratingBar.setRating(mData.rating);
+		if(mData.userReviews != null){
+			ratingBar.setRating(mData.userReviews.averageRating);	
+		}
 		TextView relaseDate = (TextView)v.findViewById(R.id.carddetaildesc_releaseDate);
-		relaseDate.setText(mData.releaseDate);
+		if(mData.content != null && mData.content.releaseDate != null){
+			relaseDate.setText(mData.content.releaseDate);
+		}
 		relaseDate.setTypeface(FontUtil.Roboto_Regular);
-		TextView moviedescription = (TextView)v.findViewById(R.id.carddetaildesc_description);
-		moviedescription.setText(mData.fullDescription);
-		moviedescription.setTypeface(FontUtil.RobotoCondensed_Light);
 		
-		ImageView expand = (ImageView)v.findViewById(R.id.carddetailfulldescription_expand);
-		expand.setOnClickListener(mOnDescriptionExpand);
-		Util.showFeedback(expand);
-		
-		LinearLayout layout = (LinearLayout)v.findViewById(R.id.carddetaildesc_contentlayout);
-		layout.addView(createMyplexDescriptionView());
-		layout.addView(createStudioDescriptionView());
-		layout.addView(createCastCrewView());
-		createPlayInPlaceView(layout);
-		addSpace(layout,(int)mContext.getResources().getDimension(R.dimen.margin_gap_8));
-		return v;
-	}
-	private View createBriefDescriptionView() {
-		
-		View v = mInflator.inflate(R.layout.carddetailfulldescription, null);
-		mDetails = v;
-		TextView movieName = (TextView)v.findViewById(R.id.carddetaildesc_movename);
-		movieName.setText(mData.contentName);
-		movieName.setTypeface(FontUtil.Roboto_Light);
-		TextView parentalRating = (TextView)v.findViewById(R.id.carddetaildesc_parentalRating);
-		parentalRating.setText(mData.parentalRating);
-		parentalRating.setTypeface(FontUtil.Roboto_Medium);
-		RatingBar ratingBar = (RatingBar)v.findViewById(R.id.carddetaildesc_setRating);
-		ratingBar.setRating(mData.rating);
-		TextView relaseDate = (TextView)v.findViewById(R.id.carddetaildesc_releaseDate);
-		relaseDate.setText(mData.releaseDate);
-		relaseDate.setTypeface(FontUtil.Roboto_Medium);
-		
+		TextView contentDuration = (TextView)v.findViewById(R.id.carddetaildesc_duration);
+		if(mData.content != null ){
+			contentDuration.setText(""+mData.content.duration);
+		}
+		contentDuration.setTypeface(FontUtil.Roboto_Medium);
 		
 		TextView moviedescriptionTitle = (TextView)v.findViewById(R.id.carddetaildesc_descriptionTitle);
 		moviedescriptionTitle.setTypeface(FontUtil.Roboto_Light);
 		mDescription = moviedescriptionTitle;
 		
-		
 		TextView moviedescription = (TextView)v.findViewById(R.id.carddetaildesc_description);
-		moviedescription.setText(mData.fullDescription);
-		moviedescription.setTypeface(FontUtil.Roboto_Regular);
-		
+		if(mData.generalInfo.briefDescription != null){
+			moviedescription.setText(mData.generalInfo.description);
+		}
+		moviedescription.setTypeface(FontUtil.RobotoCondensed_Light);
 		
 		ImageView expand = (ImageView)v.findViewById(R.id.carddetailfulldescription_expand);
-		expand.setOnClickListener(mOnDescriptionExpand);
+		expand.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				if(mCardExpandListener != null){
+					mCardExpandListener.onDescriptionCollapsed();
+				}
+			}
+		});
 		Util.showFeedback(expand);
-		
-		
-		
-		
 		LinearLayout layout = (LinearLayout)v.findViewById(R.id.carddetaildesc_contentlayout);
-//		layout.addView(createMyplexDescriptionView());
-//		layout.addView(createStudioDescriptionView());
-		layout.addView(createCastCrewView());
-		createPlayInPlaceView(layout);
+		if(mData.generalInfo != null && mData.generalInfo.myplexDescription != null){
+			layout.addView(createMyplexDescriptionView());
+		}
+		if(mData.generalInfo != null && mData.generalInfo.studioDescription != null){
+			layout.addView(createStudioDescriptionView());
+		}
+		if(mData.relatedCast != null && mData.relatedCast.size() > 0){
+			layout.addView(createCastCrewView());
+		}
+		Button packageButton = (Button)v.findViewById(R.id.carddetaildesc_purchasebutton);
+		packageButton.setOnClickListener(packageButtonListener);
+//		createPlayInPlaceView(layout);
 		addSpace(layout,(int)mContext.getResources().getDimension(R.dimen.margin_gap_8));
 		return v;
 	}
+	private View createBriefDescriptionView() {
+		if(mData.generalInfo == null){return null;}
+		View v = mInflator.inflate(R.layout.carddetailbreifdescription, null);
+		mDetails = v;
+		TextView movieName = (TextView)v.findViewById(R.id.carddetailbreifdescription_movename);
+		if(mData.generalInfo.title != null){
+			movieName.setText(mData.generalInfo.title);	
+		}
+		movieName.setTypeface(FontUtil.Roboto_Light);
+		TextView parentalRating = (TextView)v.findViewById(R.id.carddetailbriefdescription_parentalRating);
+		if(mData.content != null && mData.content.certifiedRatings != null && mData.content.certifiedRatings.values != null){
+			for(CardDataCertifiedRatingsItem ratingItem:mData.content.certifiedRatings.values){
+				parentalRating.setText(ratingItem.rating);
+				break;
+			}
+		}
+		parentalRating.setTypeface(FontUtil.Roboto_Medium);
+		RatingBar ratingBar = (RatingBar)v.findViewById(R.id.carddetailbriefdescription_setRating);
+		if(mData.userReviews != null){
+			ratingBar.setRating(mData.userReviews.averageRating);	
+		}
+		
+		TextView relaseDate = (TextView)v.findViewById(R.id.carddetailbriefdescription_releaseDate);
+		if(mData.content != null && mData.content.releaseDate != null){
+			relaseDate.setText(mData.content.releaseDate);
+		}
+		relaseDate.setTypeface(FontUtil.Roboto_Medium);
+		
+		TextView contentDuration = (TextView)v.findViewById(R.id.carddetailbriefdescription_duration);
+		if(mData.content != null ){
+			contentDuration.setText(""+mData.content.duration);
+		}
+		contentDuration.setTypeface(FontUtil.Roboto_Medium);
+		
+		TextView moviedescription = (TextView)v.findViewById(R.id.carddetailbriefdescription_description);
+		if(mData.generalInfo.briefDescription != null){
+			moviedescription.setText(mData.generalInfo.briefDescription);
+		}
+		moviedescription.setTypeface(FontUtil.Roboto_Regular);
+		
+		Button packageButton = (Button)v.findViewById(R.id.carddetailbriefdescription_purchasebutton);
+		packageButton.setOnClickListener(packageButtonListener);
+		
+		
+		ImageView expand = (ImageView)v.findViewById(R.id.carddetailbriefdescription_expand);
+		expand.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				if(mCardExpandListener != null){
+					mCardExpandListener.onDescriptionExpanded();
+				}				
+			}
+		});
+		Util.showFeedback(expand);
+		return v;
+	}
+	private OnClickListener packageButtonListener = new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			PackagePopUp popup = new PackagePopUp(mContext);
+			popup.showPackDialog(mData, ((Activity)mContext).getActionBar().getCustomView());			
+		}
+	};
 	public int getYPosition(String label) {
 		if(label.equalsIgnoreCase("Details")){
 			return (int)mDetails.getY();
-		}
-		else if(label.equalsIgnoreCase("Description")){
+		}else if(label.equalsIgnoreCase("Description")){
 			return (int)mDescription.getY();
 		}else if(label.equalsIgnoreCase("Credits")){
 			return (int)mCredits.getY();
@@ -470,7 +678,11 @@ public class CardDetailViewFactory {
 			return (int)mMultimedia.getY();
 		}else if(label.equalsIgnoreCase("Comments")){
 			return (int)mComments.getY();
-		}
+		}else if(label.equalsIgnoreCase("Myplex Descrition")){
+			return (int)mMyPlexDescription.getY();
+		}else if(label.equalsIgnoreCase("Studio Descrition")){
+			return (int)mStudioDescription.getY();
+		}		
 		return 0;
 	}
 }

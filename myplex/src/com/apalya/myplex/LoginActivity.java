@@ -53,8 +53,10 @@ import com.apalya.myplex.data.UserProfile;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.AccountUtils;
 import com.apalya.myplex.utils.Analytics;
+import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
+import com.apalya.myplex.utils.PlayServicesUtils;
 import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.utils.Util;
 import com.facebook.FacebookAuthorizationException;
@@ -411,7 +413,6 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
         // is important to call flush() to send any unsent events
         // before your application is taken out of memory.
         mMixpanel.flush();
-        
     }
 	private void prepareSlideNotifiation() {
 		mSlideNotificationLayout = (RelativeLayout)findViewById(R.id.slidenotificationlayout);
@@ -918,19 +919,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 						Analytics.trackEvent("FACEBOOK-LOGIN-AUTH-REQUEST-SERVER-ERROR");
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
-						if(jsonResponse.getString("code").equalsIgnoreCase("401")){
-							String devId=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
-									getString(R.string.devclientdevid));
-
-							Map<String, String> params = new HashMap<String, String>();
-							params.put("deviceId", devId);
-
-							genKeyRequest(getString(R.string.genKeyReqPath),params);
-							
-						}
-						else{
-							sendNotification("Err: "+jsonResponse.getString("code")+" \nErr Msg: "+jsonResponse.getString("message"));
-						}
+						sendNotification("Err: "+jsonResponse.getString("code")+" \nErr Msg: "+jsonResponse.getString("message"));
 					}
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -977,7 +966,13 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			if(!AccountUtils.isAuthenticated(LoginActivity.this))
 			{
 				Analytics.trackEvent("GOOGLE-LOGIN-SELECTED");
-				mPlusClient.connect();
+				
+				// Verifies the proper version of Google Play Services exists on the device.
+		        if(PlayServicesUtils.checkGooglePlaySevices(this))
+		        {
+				if(mPlusClient!=null)
+					mPlusClient.connect();
+		        }
 			}
 			else
 			{
@@ -1046,8 +1041,10 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				}
 				else
 				{
-					Log.d(TAG, error.toString());	
+					Log.d(TAG, error.toString());
+					
 				}
+				sendNotification(error.toString());
 				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 			}
 		};
@@ -1091,14 +1088,14 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 							AccountUtils.refreshAuthToken(LoginActivity.this);
 							//tryAuthenticate();
 							//							GoogleAuthUtil.invalidateToken(LoginActivity.this,AccountUtils.getAuthToken(LoginActivity.this));
-							//sendNotification(jsonResponse.getString("message"));
+							sendNotification(jsonResponse.getString("message"));
 							//mPlusClient.disconnect();
 							//mPlusClient.connect();
 							//getAndUseAuthTokenInAsyncTask();
 						}
 						else
 						{
-							//sendNotification(jsonResponse.getString("message"));
+							sendNotification(jsonResponse.getString("message"));
 						}
 						//(jsonResponse.getString("message"));
 						//showToast("Err: "+jsonResponse.getString("code")+" \nErr Msg: "+jsonResponse.getString("message"));
@@ -1115,9 +1112,9 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 	public void onConnected(Bundle connectionHint) {
 		// It is possible that the authenticated account doesn't have a profile.
 		Analytics.trackEvent("GOOGLE-LOGIN-CONNECTED");
-		mPlusClient.loadPerson(this, "me");
 		showProgressBar();
-		tryAuthenticate();
+		mPlusClient.loadPerson(this, "me");
+		
 	}
 
 	@Override
@@ -1154,25 +1151,12 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				getString(R.string.devclientkeyexp));    	
 
 		Map<String, String> gparams = new HashMap<String, String>();
-		gparams.put("google_id", mPlusClient.getCurrentPerson().getId());
+		gparams.put("google_id", mUserInfo.getGoogleId());
 		gparams.put("authToken", AccountUtils.getAuthToken(this));
 		gparams.put("tokenExpiry", clientKeyExp);
 		gparams.put("clientKey",clientKey);
-		googleLoginRequest(getString(R.string.gplusloginpath), gparams);
-
-		/*
-        // Cancel progress fragment.
-        // Create set up fragment.
-        mAuthInProgress = false;
-        if (mAuthProgressFragmentResumed) {
-            getSupportFragmentManager().popBackStack();
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.root_container,
-                            SignInSetupFragment.makeFragment(SETUP_ATTENDEE), "setup_attendee")
-                    .addToBackStack("signin_main")
-                    .commit();
-        }
-		 */}
+		googleLoginRequest(getString(R.string.gplusloginpath), gparams);	
+	}
 
 	@Override
 	public void onRecoverableException(final int code) {
@@ -1246,8 +1230,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			if (person != null) {
 				AccountUtils.setPlusProfileId(this, person.getId());
 				mUserInfo.setGoogleId(person.getId());
-				mUserInfo.setUserEmail(mPlusClient.getAccountName());
-				mUserInfo.setProfilePic("https://plus.google.com/s2/photos/profile/"+person.getId()+"?sz=300");
+				tryAuthenticate();
+				
 			}
 		} else {
 			Log.e(TAG, "Got " + connectionResult.getErrorCode() + ". Could not load plus profile.");
@@ -1341,7 +1325,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
     }
 private boolean isTokenValid(String clientKeyExp) {
 		
-		//Util.showToast(clientKeyExp,this);
+		//Util.showToast(clientKeyExp);
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 		Date convertedDate = new Date();
@@ -1353,12 +1337,12 @@ private boolean isTokenValid(String clientKeyExp) {
 		Date currentDate = new Date();
 		if(convertedDate.compareTo(currentDate)>0)
 		{
-			//Util.showToast("Valid",this);
+			//Util.showToast("Valid");
 			return true;
 		}
 		else
 		{
-			//Util.showToast("Invalid",this);
+			//Util.showToast("Invalid");
 			return false;
 		}
 
@@ -1469,6 +1453,9 @@ private boolean isTokenValid(String clientKeyExp) {
 		
 		String clientKey=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
 				getString(R.string.devclientkey));
+		if(clientKey != null && clientKey.length() >10){
+			ConsumerApi.DEBUGCLIENTKEY = clientKey;
+		}
 		String clientKeyExp=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
 				getString(R.string.devclientkeyexp));
 
@@ -1615,7 +1602,7 @@ private boolean isTokenValid(String clientKeyExp) {
 							finish();
 							Util.launchActivity(MainActivity.class,LoginActivity.this , null);
 						}
-						Util.showToast("Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),LoginActivity.this);
+						
 					}
 					else
 					{

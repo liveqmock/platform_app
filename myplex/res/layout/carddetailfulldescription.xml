@@ -16,7 +16,7 @@
             android:id="@+id/carddetailfulldescription_expand"
             android:layout_width="@dimen/size_24"
             android:layout_height="@dimen/size_24"
-            android:src="@drawable/dark_navigation_expand" />
+            android:src="@drawable/dark_navigation_collapse" />
 
         <ProgressBar
             android:id="@+id/carddetailfulldescription_expand_progress"
@@ -41,7 +41,7 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="@dimen/margin_gap_8"
             android:singleLine="true"
-            android:text="Riddick"
+            android:text=""
             android:textColor="#4b4b4c"
             android:textSize="@dimen/textsize_16" />
 
@@ -71,7 +71,7 @@
             android:layout_gravity="center_vertical"
             android:layout_marginRight="@dimen/margin_gap_8"
             android:singleLine="true"
-            android:text="PG-13"
+            android:text=""
             android:textColor="#4b4b4c"
             android:textSize="@dimen/textsize_12" />
 
@@ -80,7 +80,7 @@
             android:layout_height="8dp"
             android:layout_gravity="center_vertical"
             android:layout_marginRight="@dimen/margin_gap_2"
-            android:src="@drawable/length" />
+            android:src="@drawable/card_iconplaytime" />
 
         <TextView
             android:id="@+id/carddetaildesc_duration"
@@ -89,7 +89,7 @@
             android:layout_gravity="center_vertical"
             android:layout_marginRight="@dimen/margin_gap_8"
             android:singleLine="true"
-            android:text="1:21:23"
+            android:text=""
             android:textColor="#4b4b4c"
             android:textSize="@dimen/textsize_12" />
 
@@ -99,7 +99,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:singleLine="true"
-            android:text="July 29,2013"
+            android:text=""
             android:textColor="#4b4b4c"
             android:textSize="@dimen/textsize_12" />
     </LinearLayout>
@@ -115,7 +115,7 @@
         android:paddingLeft="4dp"
         android:paddingRight="4dp"
         android:text="Starts from 199 onwards"
-        android:textColor="#ffffff"
+        android:textColor="#54b5e9"
         android:textSize="@dimen/textsize_12" />
 
     <View
@@ -150,7 +150,7 @@
         android:layout_marginTop="12dp"
         android:layout_marginRight="36dp"
         android:lineSpacingExtra="3dp"
-        android:text="asdfdsa fdsfdasfdfds fafadsdfsfads fsaddgagds"
+        android:text=""
         android:textColor="#4b4b4c"
         android:textSize="14sp" />
 

@@ -8,20 +8,7 @@
     <com.apalya.myplex.views.CardView
         android:id="@+id/framelayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" 
-        android:layout_margin="@dimen/cardmargin" >
+        android:layout_height="match_parent"        android:layout_margin="@dimen/cardmargin" >
     </com.apalya.myplex.views.CardView>
-
-    <ListView
-        android:id="@+id/cardlistview"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:layout_margin="@dimen/cardmargin"
-        android:choiceMode="singleChoice"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="10dp"
-        android:scrollbars="none" >
-    </ListView>
 
 </RelativeLayout>

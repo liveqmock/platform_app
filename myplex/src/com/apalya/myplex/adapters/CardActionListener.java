@@ -5,11 +5,11 @@ import com.apalya.myplex.data.CardData;
 public interface CardActionListener {
 	public void loadmore(int value);
 	
+	public void viewReady();
+
 	public void selectedCard(int index);
-
-	public void addFavourite(CardData data);
-
-	public void removeFavourite(CardData data);
+	
+	public void favouriteAction(CardData data,int type);
 
 	public void deletedCard(CardData data);
 

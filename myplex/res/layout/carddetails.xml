@@ -59,7 +59,7 @@
                     android:layout_height="24dp"
                     android:layout_gravity="center_vertical"
                     android:layout_weight="1"
-                    android:src="@drawable/card_rent" />
+                    android:src="@drawable/card_iconheartblue" />
 
                 <View
                     android:layout_width="1dp"

@@ -52,7 +52,18 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Util {
-
+	public static int getStatusBarHeight(Context context) {
+		if(context == null){return 48;}
+		int result = 0;
+		int resourceId = context.getResources().getIdentifier("status_bar_height", "dimen", "android");
+		if (resourceId > 0) {
+			result = context.getResources().getDimensionPixelSize(resourceId);
+		}
+		if (result > 100) {
+			result = 48;
+		}
+		return result;
+	}
 	public static int dpToPx(Resources res, int dp) {
 		return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp,
 				res.getDisplayMetrics());
@@ -199,7 +210,6 @@ public class Util {
 				aMsg, 
 				Toast.LENGTH_LONG).show();
 	}
-	
 	public void startDownload(String aUrl,String aMovieName,Context mContext)
 	{
 		if(isDownloadManagerAvailable(mContext))
@@ -234,13 +244,13 @@ public class Util {
 			//Download Manager is not available
 		}
 	}
-	public static void inviteFriends(final Context mContext) {
+	public void sendRequestDialog(final Context mContext) {
 		Bundle params = new Bundle();
 
-		params.putString("message", "Hi, I am using this cool myplex app, just try it out...");
-		/*params.putString("data",
+		params.putString("message", "Learn how to make your Android apps social");
+		params.putString("data",
 				"{\"badge_of_awesomeness\":\"1\"," +
-				"\"social_karma\":\"5\"}");*/
+				"\"social_karma\":\"5\"}");
 		WebDialog requestsDialog = (
 				new WebDialog.RequestsDialogBuilder(mContext,
 						Session.getActiveSession(),

@@ -60,6 +60,11 @@ public class MediaUtil {
 					for(int i=0; i<minResultSet.results.size();i++)
 					{
 						int urlCount=minResultSet.results.get(i).videos.values.size();
+						if(urlCount==1){
+							url=minResultSet.results.get(0).videos.values.get(0).link;
+						}
+						else
+						{
 						for(int j=0;j<urlCount;j++)
 						{
 							String urlType=minResultSet.results.get(i).videos.values.get(j).type;
@@ -67,6 +72,7 @@ public class MediaUtil {
 							{
 								url=minResultSet.results.get(i).videos.values.get(j).link;
 							}
+						}
 						}
 					}
 					if (urlEventListener != null) {

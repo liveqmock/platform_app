@@ -10,7 +10,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_marginLeft="@dimen/margin_gap_4"
-        android:src="@drawable/timelinecircle" />
+        android:src="@drawable/card_icontimeline" />
 
     <RelativeLayout
         android:id="@+id/relativeLayout1"

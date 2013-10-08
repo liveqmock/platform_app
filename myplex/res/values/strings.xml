@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="domain_name">alpha.myplex.in:8866</string>
+	<string name="domain_name">api.beta.myplex.in</string>
     <string name="app_name">myplex</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
@@ -32,7 +32,8 @@
     <string name="forgetPwd">Forgot Password? Let\'s fix it here</string>
     <string name="userCancelled">User has cancelled the request</string>
     <string name="send_to">Share Via</string>
-    
+    <string name="carddetailcommentsection_editcomment">Add a comment</string>
+    <string name="carddetailcommentsection_editreview">Add a review</string>
     <string-array name="hometabletanim">
         <item>Bottom-In</item>
         <item>Right-In</item>

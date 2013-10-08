@@ -40,12 +40,25 @@ public class CacheHolder {
 //	}
 //
 	/** returns JSON Objects for given cardIds */
-	public HashMap<String, Object> GetData(List<CardData> cardIds, SearchResult callBack) {
-		if(callBack == null){
-			HashMap<String, Object> resultSet = mIndexHandler.searchInIndex(cardIds,OperationType.IDSEARCH);
-			return resultSet;
+	public HashMap<String, Object> GetData(List<CardData> cardIds,OperationType type, SearchResult callBack) {
+		switch (type) {
+		case IDSEARCH:
+			if(callBack == null){
+				HashMap<String, Object> resultSet = mIndexHandler.searchInIndex(cardIds,OperationType.IDSEARCH);
+				return resultSet;
+			}
+			mIndexHandler.searchInIndex(cardIds,OperationType.IDSEARCH,callBack);
+			break;
+		case FTSEARCH:
+		default:
+			if(callBack ==null)
+			{
+				HashMap<String, Object> resultSet = mIndexHandler.searchInIndex(cardIds,OperationType.FTSEARCH);
+				return resultSet;
+			}
+			mIndexHandler.searchInIndex(cardIds,OperationType.FTSEARCH,callBack);
+			break;
 		}
-		mIndexHandler.searchInIndex(cardIds,OperationType.IDSEARCH,callBack);
 		return null;
 	}
 //
@@ -62,15 +75,15 @@ public class CacheHolder {
 //		return null;
 //	}
 //
-//	public HashMap<String, Object> search(List<String> multiTextSearch, SearchResult callBack) {
-//		if(callBack ==null)
-//		{
-//			HashMap<String, Object> resultSet = mIndexHandler.searchInIndex(multiTextSearch,OperationType.FTSEARCH);
-//			return resultSet;
-//		}
-//		mIndexHandler.searchInIndex(multiTextSearch,OperationType.FTSEARCH,callBack);
-//		return null;
-//	}
+	public HashMap<String, Object> search(List<CardData> multiTextSearch, SearchResult callBack) {
+		if(callBack ==null)
+		{
+			HashMap<String, Object> resultSet = mIndexHandler.searchInIndex(multiTextSearch,OperationType.FTSEARCH);
+			return resultSet;
+		}
+		mIndexHandler.searchInIndex(multiTextSearch,OperationType.FTSEARCH,callBack);
+		return null;
+	}
 //
 //	public void CloseCache() {
 //		try {

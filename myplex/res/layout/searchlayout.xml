@@ -7,11 +7,14 @@
     android:orientation="vertical" >
 
     <!-- Editext for Search -->
-
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="40dp">
     <HorizontalScrollView
         android:id="@+id/selectionscroll"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:layout_weight="2">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -26,7 +29,7 @@
                     android:layout_height="fill_parent"
                     android:src="@drawable/search16px"
                     android:paddingRight="10dp" />
-                            
+
             <LinearLayout
                 android:id="@+id/spannable"
                 android:layout_width="wrap_content"
@@ -42,17 +45,22 @@
                 android:hint="@string/searchhint"
                 android:inputType="text"
     			android:imeOptions="actionDone" />
-            
-                <ImageView
-                    android:id="@+id/clearSearchresults"
-                    android:layout_width="wrap_content"
-                    android:layout_height="fill_parent"
-                    android:src="@drawable/card_delete"
-                    android:padding="4dp"
-                    android:visibility="gone" />
-                
+
         </LinearLayout>
     </HorizontalScrollView>
+
+        <ImageView
+            android:id="@+id/clearSearchresults"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:src="@drawable/card_iconclose"
+            android:padding="4dp"
+            android:visibility="gone"
+            android:layout_gravity="right"
+            android:layout_weight="0.2"
+            android:background="#00000000"/>
+
+    </LinearLayout>
 
     <com.apalya.myplex.views.CustomFastScrollView
         android:id="@+id/fast_scroll_view"

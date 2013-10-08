@@ -2,7 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#DC000000" >
+    android:background="#CC000000" >
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -56,7 +56,7 @@
                 android:layout_height="12dp"
                 android:layout_gravity="center_vertical"
                 android:layout_marginRight="@dimen/margin_gap_2"
-                android:src="@drawable/length" />
+                android:src="@drawable/card_iconplaytime" />
 
             <TextView
                 android:id="@+id/purchasepopup_duration"
@@ -93,6 +93,7 @@
         </LinearLayout>
 
         <TextView
+            android:id="@+id/purchasepopup_packsDescription"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/purchasepopup_packslayout"

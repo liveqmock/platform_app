@@ -33,10 +33,14 @@ import com.apalya.myplex.adapters.CardItemClickListener;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDataHolder;
 import com.apalya.myplex.data.CardDataImagesItem;
+import com.apalya.myplex.data.CardDataPackagePriceDetailsItem;
+import com.apalya.myplex.data.CardDataPackages;
 import com.apalya.myplex.data.CardViewMeta;
 import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.utils.FavouriteUtil;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
+import com.apalya.myplex.utils.Util;
 
 public class CardView extends ScrollView {
     private static final String TAG = "CardView";
@@ -88,6 +92,7 @@ public class CardView extends ScrollView {
 	    setSmoothScrollingEnabled(true); 
 
 		mCardsLayout = new CardsLayout(mContext, this);
+		
 	    addView(mCardsLayout);
 
 	    mScroller = new Scroller(mContext);
@@ -151,20 +156,8 @@ public class CardView extends ScrollView {
 	public void setActionBarHeight(int actionBarHeight) {
 		mActionBarHeight = actionBarHeight;
 		int margin = (int) (2 * getResources().getDimension(R.dimen.cardmargin));
-		mAvailableScreenSize = (int) (mScreenHeight - (getStatusBarHeight() + mActionBarHeight + margin));
+		mAvailableScreenSize = (int) (mScreenHeight - (Util.getStatusBarHeight(mContext) + mActionBarHeight + margin));
 		prepareViewPositions();
-	}
-
-	public int getStatusBarHeight() {
-		int result = 0;
-		int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
-		if (resourceId > 0) {
-			result = getResources().getDimensionPixelSize(resourceId);
-		}
-		if (result > 100) {
-			result = 48;
-		}
-		return result;
 	}
 
 	public void setData(List<CardData> dataList) {
@@ -214,7 +207,7 @@ public class CardView extends ScrollView {
 		index = mDataList.indexOf(data);
 		Log.e(TAG, "updateData " +index);
 		if(index == -1){return;}
-		View localv = mCardsLayout.mCardViewReusePool.findView(index);
+		View localv = mCardsLayout.mCardViewReusePool.getView(index);
 		applyData(localv, index);
 	}
 
@@ -229,7 +222,7 @@ public class CardView extends ScrollView {
 		CardData data = mDataList.get(position);
 		v.setId(position);
 		CardDataHolder dataHolder = (CardDataHolder)v.getTag();
-		if(dataHolder == null){
+//		if(dataHolder == null){
 			dataHolder = new CardDataHolder();
 			dataHolder.mTitleLayout = (RelativeLayout)v.findViewById(R.id.card_title_layout); 
 			dataHolder.mTitle = (TextView)v.findViewById(R.id.card_title_name);
@@ -243,7 +236,7 @@ public class CardView extends ScrollView {
 			dataHolder.mReviewsText = (TextView)v.findViewById(R.id.card_status_people_text);
 			dataHolder.mRentLayout = (LinearLayout)v.findViewById(R.id.card_rent_layout);
 			dataHolder.mRentText = (TextView)v.findViewById(R.id.card_rent_text);
-			dataHolder.mProgressBar = (ProgressBar) v.findViewById(R.id.card_title_fav_progress);
+			dataHolder.mFavProgressBar = (ProgressBar) v.findViewById(R.id.card_title_fav_progress);
 			
 			// fonts
 			
@@ -254,7 +247,7 @@ public class CardView extends ScrollView {
 			
 //			CardData dataHolder.mDataObject = (TextView)v.findViewById(id);
 			v.setTag(dataHolder);
-		}
+//		}
 		dataHolder.mDataObject = data;
 		
 //		dataHolder.mTitleLayout.setBackgroundColor(color)
@@ -268,15 +261,19 @@ public class CardView extends ScrollView {
 					if (imageItem.link == null || imageItem.link.compareTo("Images/NoImage.jpg") == 0) {
 						dataHolder.mPreview.setImageResource(0);
 					} else if (imageItem.link != null){
+						Log.d("CardExplorer","imageItem.link ="+imageItem.link+" profile = "+imageItem.profile);
 						dataHolder.mPreview.setImageUrl(imageItem.link,MyVolley.getImageLoader());
 					}
+					break;
 				}
 			}
 		}
+		dataHolder.mFavProgressBar.setVisibility(View.INVISIBLE);
+		dataHolder.mFavourite.setVisibility(View.VISIBLE);
 		if(data.currentUserData != null && data.currentUserData.favorite){
-			dataHolder.mFavourite.setImageResource(R.drawable.card_fav);
+			dataHolder.mFavourite.setImageResource(R.drawable.card_iconheartblue);
 		}else{
-			dataHolder.mFavourite.setImageResource(R.drawable.card_unfav);
+			dataHolder.mFavourite.setImageResource(R.drawable.card_iconheart);
 		}
 		if(data.userReviews != null){
 			dataHolder.mReviewsText.setText(""+data.userReviews.values.size());	
@@ -288,8 +285,25 @@ public class CardView extends ScrollView {
 		}else{
 			dataHolder.mCommentsText.setText("0");
 		}
+		float price = 10000f;
+		if(data.packages == null){
+			dataHolder.mRentText.setText("free");
+		}else{
+			for(CardDataPackages packageitem:data.packages){
+				if(packageitem.priceDetails != null){
+					for(CardDataPackagePriceDetailsItem priceDetailItem:packageitem.priceDetails){
+						if(priceDetailItem.price < price){
+							price = priceDetailItem.price;
+						}
+					}
+					dataHolder.mRentText.setText("Start from Rs "+price);
+				}else{
+					dataHolder.mRentText.setText("free");
+				}
+			}	
+		}
 		
-//		dataHolder.mRentText.setText(data.price);
+		
 		
 		
 		dataHolder.mDelete.setOnClickListener(mDeleteListener);
@@ -317,6 +331,7 @@ public class CardView extends ScrollView {
 					mCardActionListener.loadmore(mNumberofItems);
 					mLoadMoreLastCalledNumberofItems = mNumberofItems;
 				}
+				mCardActionListener.selectedCard(currentSelectedIndex);
 			}
 		}
 	}
@@ -363,6 +378,17 @@ public class CardView extends ScrollView {
 			}
 		}
 		return eventStealed;
+	}
+	public void sendViewReadyMsg(boolean value){
+		mCardsLayout.sendViewReadyMsg(value);
+	}
+	public void viewReady(){
+		if(mCardActionListener!= null){
+			mCardActionListener.viewReady();
+		}
+	}
+	public void moveTo(int position){
+		smoothScrollTo(getScrollX(), position * mCardPositions[1]);
 	}
 	private void customSmoothScroll(int dx,int dy){
 		smoothScrollTo(dx, dy);
@@ -414,8 +440,8 @@ public class CardView extends ScrollView {
 			} else if (ev.getAction() == MotionEvent.ACTION_UP) {
 				Log.e("pref","onTouchEvent actioup");
 //				if (mScroller.isFinished()) {
-					customSmoothScroll(getScrollX(), mCardsLayout.getSnapPosition(getScrollY()));
-//					smoothScrollTo(getScrollX(), mCardsLayout.getSnapPosition(getScrollY()));
+//					customSmoothScroll(getScrollX(), mCardsLayout.getSnapPosition(getScrollY()));
+					smoothScrollTo(getScrollX(), mCardsLayout.getSnapPosition(getScrollY()));
 //				}
 			}
 		}
@@ -510,27 +536,18 @@ public class CardView extends ScrollView {
 				return;
 			}
 			Log.e(TAG, "mFavListener onClick");
-			CardData data = (CardData) v.getTag();
-			if(data == null ){
-				return;
-			}
-//			data.applyFavoriteInProgress = true;
-			int index = mDataList.indexOf(data);
-			View localv = mCardsLayout.mCardViewReusePool.getView(index);
-			if(localv != null){
-				CardViewMeta tagData = (CardViewMeta)localv.getTag();
-				if(tagData != null){
-					tagData.mUiHolder.mFavourite.setVisibility(View.INVISIBLE);
-					tagData.mUiHolder.mFavouriteProgress.setVisibility(View.VISIBLE);	
+			if(v.getTag() instanceof CardDataHolder){
+				CardDataHolder dataHolder = (CardDataHolder) v.getTag();
+				if(dataHolder == null){return;}
+				if(dataHolder.mDataObject == null){return;}
+				int type = FavouriteUtil.FAVOURITEUTIL_ADD;
+				if(dataHolder.mDataObject.currentUserData != null && dataHolder.mDataObject.currentUserData.favorite){
+					type = FavouriteUtil.FAVOURITEUTIL_REMOVE;
 				}
+				dataHolder.mFavProgressBar.setVisibility(View.VISIBLE);
+				dataHolder.mFavourite.setVisibility(View.INVISIBLE);
+				mCardActionListener.favouriteAction(dataHolder.mDataObject,type);
 			}
-			if(data.currentUserData != null && !data.currentUserData.favorite){
-				mCardActionListener.addFavourite(data);	
-			}else{
-				mCardActionListener.removeFavourite(data);
-			}
-			localv.requestLayout();
-			
 		}
 	};
 	private CardItemClickListener mPurchaseListener = new CardItemClickListener() {
@@ -639,7 +656,10 @@ class CardsLayout extends FrameLayout {
 
 	int mTopCardVisiblePx;
 	int mTopMargin;
-	
+	boolean sendViewReady = false;
+	public void sendViewReadyMsg(boolean value){
+		sendViewReady = value;
+	}
 	public CardsLayout(Context context, CardView alterCardView) {
 		super(context);
 		
@@ -747,6 +767,10 @@ class CardsLayout extends FrameLayout {
 	@Override
 	protected void onLayout(boolean changed, int l, int t, int r, int b) {
 		updateCardsPosition(mAlterCardView.getScrollY());
+		if(sendViewReady){
+			mAlterCardView.viewReady();
+			sendViewReady = false;
+		}
 	}
 
 	@Override

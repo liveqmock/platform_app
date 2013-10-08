@@ -35,7 +35,7 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="5dp"
             android:layout_toRightOf="@+id/customactionbar_filter_text"
-            android:src="@drawable/navigation_expand" />
+            android:src="@drawable/actionbar_filter_down" />
     </RelativeLayout>
 
     <ImageView

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -16,23 +17,30 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.Request.Method;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.apalya.myplex.adapters.CacheManagerCallback;
 import com.apalya.myplex.adapters.SearchListAdapter;
 import com.apalya.myplex.adapters.OpenListener.OpenCallBackListener;
+import com.apalya.myplex.cache.CacheHolder;
+import com.apalya.myplex.cache.CacheManager;
+import com.apalya.myplex.cache.IndexHandler;
+import com.apalya.myplex.cache.SearchResult;
+import com.apalya.myplex.data.CardData;
+import com.apalya.myplex.data.CardExplorerData;
 import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.SearchData;
 import com.apalya.myplex.data.SearchData.ButtonData;
-import com.apalya.myplex.utils.Analytics;
+import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.views.PinnedSectionListView;
-import com.flurry.android.FlurryAgent;
-
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.ProgressDialog;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -51,7 +59,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
-public class SearchActivity extends BaseFragment implements OpenCallBackListener {
+public class SearchActivity extends BaseFragment implements OpenCallBackListener,CacheManagerCallback {
 
 	EditText mSearchInput;
 	private PinnedSectionListView mPinnedListView;
@@ -64,7 +72,9 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 	HashMap<String, Integer> mUniqueCategories = new HashMap<String, Integer>();
 	private String allCategories = "ALL";
 	private ProgressDialog mProgressDialog = null;
-
+	private CacheManager mCacheManager = new CacheManager();
+	public static final String TAG = "SearchActivity";
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -74,14 +84,22 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		rootView = inflater.inflate(R.layout.searchlayout, container, false);
 		mSearchInput = (EditText) rootView.findViewById(R.id.inputSearch);
+		mSearchInput.setTypeface(FontUtil.Roboto_Regular);
 		mSearchInput.setOnEditorActionListener(new OnEditorActionListener() {
 
 			@Override
 			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					FillEditText(mSearchInput.getText().toString());
-					Analytics.trackEvent("TEXT-TYPED-"+mSearchInput.getText().toString());
+				if(actionId == EditorInfo.IME_ACTION_DONE)
+				{
+					String userSearchText = mSearchInput.getText().toString();
+					if(userSearchText.length() <=0)
+						return true;
+					
+					
+					String searchText = mSearchInput.getText().toString();
+					FillEditText(searchText);
 					mSearchInput.setText("");
+					searchText ="";
 				}
 				return false;
 			}
@@ -93,7 +111,6 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 			
 			@Override
 			public void onClick(View v) {
-				Analytics.trackEvent("DELETE-ALL-SELECTED-SERCH-TAGS");
 				final LinearLayout spannablelayout = (LinearLayout) rootView.findViewById(R.id.spannable);
 				spannablelayout.removeAllViews();
 				ClearSearchTags();
@@ -131,25 +148,42 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 		mMainActivity.setTitle("Search");
 
 		loadSearchTags();
-
+		
 		return rootView;
 	}
-	
+	private String mSearchQuery = new String();
+	@Override
+	public void searchButtonClicked() {
+		
+		if(mSearchbleTags ==null || mSearchbleTags.size() <=0)
+			return;
+		mMainActivity.showActionBarProgressBar();
+		
+		String searchQuery = new String();
+		final List<CardData> searchString = new ArrayList<CardData>();
+		for (ButtonData data : mSearchbleTags) {
+			CardData temp = new CardData();
+//			temp._id = data.getButtonId() != null ? data.getButtonId() : data.getButtonName();
+			temp._id = data.getButtonName();
+			if(searchQuery.length() > 0){
+				searchQuery = ",";
+			}
+			searchQuery = data.getButtonName();
+			searchString.add(temp);
+		}
+		mSearchQuery = searchQuery;
+		mCacheManager.getCardDetails(searchString, IndexHandler.OperationType.FTSEARCH, SearchActivity.this);
+
+	}
 	//Boolean true to add, false to remove
 	private void UpdateSearchTags(ButtonData tagData, Boolean addorremove)
 	{
 		if(mSearchbleTags == null)
 			return;
 		if(addorremove)
-		{
 			mSearchbleTags.add(tagData);
-			Analytics.endTimedEvent("SEARCH-TAG-ADDED-"+tagData.getButtonName());
-		}
 		else
-		{
 			mSearchbleTags.remove(tagData);
-			Analytics.endTimedEvent("SEARCH-TAG-REMOVED-"+tagData.getButtonName());
-		}
 	}
 	
 	private void ClearSearchTags()
@@ -165,11 +199,10 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 
 	private void loadSearchTags() {
 		mListData.clear();
-		Analytics.trackEvent("SEARCH-REQUEST",true);
 		mMainActivity.showActionBarProgressBar();
 		showProgressBar();
 		RequestQueue queue = MyVolley.getRequestQueue();
-		JsonObjectRequest myReq = new JsonObjectRequest(Method.GET, "http://dev.myplex.in/content/v2/tags/", null,
+		JsonObjectRequest myReq = new JsonObjectRequest(Method.GET, ConsumerApi.getSearchTags("",ConsumerApi.LEVELDEVICEMAX), null,
 				createMyReqSuccessListener(), createMyReqErrorListener());
 		myReq.setShouldCache(true);
 
@@ -184,8 +217,6 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 				ParseJonsResponse(response);
 				mMainActivity.hideActionBarProgressBar();
 				dismissProgressBar();
-				Analytics.endTimedEvent("SEARCH-REQUEST");
-				Analytics.trackEvent("SEARCH-REQUEST-SUCCESS");
 			}
 		};
 	}
@@ -223,18 +254,21 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 				case 1:
 					innerObj = startletters;
 					
-					//Sorting Json response start
-					SortedMap<String, Object> sortedObj = new TreeMap<String, Object>();
-					Iterator<?> sortingIterator = innerObj.keys();
-					while (sortingIterator.hasNext()) {
-						String key = (String) sortingIterator.next();
-						sortedObj.put(key, innerObj.getJSONObject(key));
-					}
-					//Sorting Json response end
-					Iterator<String> sortedIterator = sortedObj.keySet().iterator();
-					while (sortedIterator.hasNext()) {
-						String key = (String) sortedIterator.next();
-						FillListData(key,innerObj);
+					if(innerObj !=null)
+					{
+						//Sorting Json response start
+						SortedMap<String, Object> sortedObj = new TreeMap<String, Object>();
+						Iterator<?> sortingIterator = innerObj.keys();
+						while (sortingIterator.hasNext()) {
+							String key = (String) sortingIterator.next();
+							sortedObj.put(key, innerObj.getJSONObject(key));
+						}
+						//Sorting Json response end
+						Iterator<String> sortedIterator = sortedObj.keySet().iterator();
+						while (sortedIterator.hasNext()) {
+							String key = (String) sortedIterator.next();
+							FillListData(key,innerObj);
+						}
 					}
 					break;
 				default:
@@ -248,12 +282,7 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 			Log.e("response Exception", e.getMessage());
 		}
 	}
-	@Override
-	public void onResume() {
-		// TODO Auto-generated method stub
-		super.onResume();
-		Analytics.trackEvent("SEARCH-SCREEN-VIEWED");
-	}
+	
 	private void preapareFilterData()
 	{
 		if(mUniqueCategories !=null)
@@ -265,7 +294,9 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 				String categoryName = (String) mapIterator.next();
 				searchFilter.add(new FilterMenudata(FilterMenudata.ITEM, categoryName, 0));
 			}
-			mMainActivity.addFilterData(searchFilter,mFilterMenuClickListener);
+			if(isVisible()){
+				mMainActivity.addFilterData(searchFilter,mFilterMenuClickListener);
+			}
 		}
 	}
 	
@@ -276,7 +307,6 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 			if (v.getTag() instanceof FilterMenudata) {
 				String label = ((FilterMenudata) v.getTag()).label;
 				sortTags(label);
-				Analytics.trackEvent("SEARCH-FILTER-TAG-SELECTED-"+label);
 			}
 		}
 	};
@@ -348,7 +378,12 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 			String qualifier = tag.getString("qualifier");
 			String category = tag.getString("category");
 			if(category!=null && category.length() >0)
-				mUniqueCategories.put(category, (mUniqueCategories.size()+1));// Filling Unique Categories
+			{
+				int count =0;
+				if(mUniqueCategories.containsKey(category))
+					count = mUniqueCategories.get(category);
+				mUniqueCategories.put(category, (count+1));// Filling Unique Categories
+			}
 			tagsInfo.add(new ButtonData(id, name, category, qualifier, false));
 		}
 		tagsObj.setSearchTags(tagsInfo);
@@ -367,8 +402,6 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 			public void onErrorResponse(VolleyError error) {
 				mMainActivity.hideActionBarProgressBar();
 				dismissProgressBar();
-				Analytics.endTimedEvent("SEARCH-REQUEST");
-				Analytics.trackEvent("SEARCH-REQUEST-ERROR");
 			}
 		};
 	}
@@ -380,8 +413,9 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 		ImageView clearButton = (ImageView)rootView.findViewById(R.id.clearSearchresults);
 		clearButton.setVisibility(View.VISIBLE);
 		
-		final ButtonData userButton = new ButtonData(null, buttonName, "", "", false);
+		ButtonData userButton = new ButtonData(null, buttonName, "", "", false);
 		Button button = CreateButton(userButton);
+		button.setTag(userButton);
 		MarginLayoutParams marginParams = new MarginLayoutParams(spannablelayout.getLayoutParams());
 		marginParams.setMargins(0, 0, 10, 0);
 		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(marginParams);
@@ -396,7 +430,8 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 				fadeAnim.addListener(new AnimatorListenerAdapter() {
 					public void onAnimationEnd(Animator animation) {
 						spannablelayout.removeView(v);
-						UpdateSearchTags(userButton, false);
+						Button btn = (Button)v;
+						UpdateSearchTags((ButtonData)btn.getTag(), false);
 					}
 				});
 				fadeAnim.start();
@@ -411,7 +446,7 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 		});
 		fadeinAnimation.start();
 		spannablelayout.addView(button, layoutParams);
-		UpdateSearchTags(new ButtonData(null, button.getText().toString(), null, null, false), true);
+		UpdateSearchTags(userButton, true);
 		UpdateRecentList(button.getText().toString());
 	}
 
@@ -513,52 +548,25 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 	}
 
 	private Button CreateButton(final ButtonData tagData) {
-		Button btn = new Button(getContext());
+		final Button btn = new Button(getContext());
 		btn.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-		btn.setBackgroundResource(R.drawable.roundedbutton);
+		
 		btn.setTextColor(Color.parseColor("#FFFFFF"));
 		btn.setText(tagData.getButtonName());
 		btn.setTextSize(14f);
 		btn.setTypeface(FontUtil.Roboto_Regular);
-		btn.setOnClickListener(new OnClickListener() {
+		btn.setBackgroundResource(R.drawable.roundedbutton);
+					Drawable drawableRight = getResources().getDrawable(R.drawable.buttonclose);
+					drawableRight.setBounds(0, 0, (int)(drawableRight.getIntrinsicWidth()*0.35), 
+			                (int)(drawableRight.getIntrinsicHeight()*0.35));
+					btn.setCompoundDrawables(null, null, drawableRight, null); 
+					btn.setCompoundDrawablePadding(8);
+					btn.setBackgroundResource(R.drawable.roundedbuttonwithclose);
 
-			@Override
-			public void onClick(final View v) {
-				v.setAlpha(1.0f);
-				Button btn1 = (Button) v;
-				Button OwnerButton = (Button) btn1.getTag();
-				ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(OwnerButton, "alpha", 0.5f, 1f);
-				fadeAnim2.setDuration(800);
-				fadeAnim2.start();
-				
-				ValueAnimator fadeAnim = ObjectAnimator.ofFloat(v, "alpha", 1f, 0f);
-				fadeAnim.setDuration(800);
 
-				fadeAnim.addListener(new AnimatorListenerAdapter() {
-					public void onAnimationEnd(Animator animation) {
-						LinearLayout spannablelayout = (LinearLayout) rootView.findViewById(R.id.spannable);
-						spannablelayout.removeView(v);
-						UpdateSearchTags(tagData, false);
-					}
-				});
-				fadeAnim.start();
-
-			}
-		});
 		return btn;
 	}
-	@Override
-	public void onStart() {
-		// TODO Auto-generated method stub
-		super.onStart();
-		FlurryAgent.onStartSession(this.getActivity(), "X6WWX57TJQM54CVZRB3K");
-	}
-	@Override
-	public void onStop() {
-		// TODO Auto-generated method stub
-		super.onStop();
-		FlurryAgent.onEndSession(this.getActivity());
-	}
+	
 	public void showProgressBar(){
 		if(mProgressDialog != null){
 			mProgressDialog.dismiss();
@@ -574,6 +582,46 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 		if(mProgressDialog != null){
 			mProgressDialog.setTitle(str);
 		}
+	}
+
+	@Override
+	public void OnCacheResults(HashMap<String, CardData> obj) {
+		if(obj == null){return;}
+		
+		CardExplorerData dataBundle = myplexapplication.getCardExplorerData();
+		
+		dataBundle.reset();
+		dataBundle.searchQuery = mSearchQuery;
+		dataBundle.requestType = CardExplorerData.REQUEST_SEARCH;
+		
+		mMainActivity.addFilterData(new ArrayList<FilterMenudata>(), null);
+		
+		Set<String> keySet = obj.keySet(); 
+		for(String key: keySet){
+			CardData data =  obj.get(key);
+//			dataBundle.mEntries.add(data);
+			if(dataBundle.mEntries.get(key) == null){
+				dataBundle.mEntries.put(key,data);
+				dataBundle.mMasterEntries.add(data);
+			}
+			if(data.generalInfo !=null)
+				Log.i(TAG,"adding "+data._id+":"+data.generalInfo.title+" from Cache");
+		}
+		mCacheManager.unRegisterCallback();
+		mMainActivity.hideActionBarProgressBar();
+		BaseFragment fragment = mMainActivity.createFragment(MainActivity.CARDEXPLORER);
+		mMainActivity.bringFragment(fragment);
+	}
+
+	@Override
+	public void OnOnlineResults(List<CardData> dataList) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void OnOnlineError(VolleyError error) {
+		mMainActivity.hideActionBarProgressBar();		
 	}
 
 }

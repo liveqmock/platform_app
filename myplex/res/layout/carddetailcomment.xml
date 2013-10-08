@@ -17,7 +17,7 @@
             android:id="@+id/carddetailcomment_expand"
             android:layout_width="@dimen/size_24"
             android:layout_height="@dimen/size_24"
-            android:src="@drawable/dark_navigation_expand" />
+            android:src="@drawable/dark_navigation_collapse" />
 
         <ProgressBar
             android:id="@+id/carddetailcomment_expand_progress"
@@ -42,7 +42,7 @@
             <ImageView
                 android:layout_width="@dimen/size_24"
                 android:layout_height="@dimen/size_24" android:layout_marginRight="@dimen/margin_gap_6"
-                android:src="@drawable/card_comments" />
+                android:src="@drawable/card_iconcomment" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -62,7 +62,7 @@
             <ImageView
                 android:layout_width="@dimen/size_24"
                 android:layout_height="@dimen/size_24" android:layout_marginRight="@dimen/margin_gap_6"
-                android:src="@drawable/card_people" />
+                android:src="@drawable/card_iconuser" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -82,7 +82,7 @@
             <ImageView
                 android:layout_width="@dimen/size_24"
                 android:layout_height="@dimen/size_24" android:layout_marginRight="@dimen/margin_gap_6"
-                android:src="@drawable/card_fav" />
+                android:src="@drawable/card_iconheart" />
 
             <TextView
                 android:layout_width="wrap_content"

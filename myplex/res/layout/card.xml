@@ -19,7 +19,7 @@
             android:layout_centerVertical="true"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="14dp"
-            android:src="@drawable/card_delete" />
+            android:src="@drawable/card_iconclose" />
 
         <ImageView
             android:id="@+id/card_title_fav"
@@ -29,12 +29,13 @@
             android:layout_centerVertical="true"
             android:layout_gravity="center_vertical"
             android:layout_marginRight="14dp"
-            android:src="@drawable/card_unfav" />
+            android:src="@drawable/card_iconheart" />
 
         <ProgressBar
             android:id="@+id/card_title_fav_progress"
             android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_height="24dp" 
+            android:visibility="invisible"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_gravity="center_vertical"
@@ -65,7 +66,7 @@
             android:id="@+id/card_preview_image"
             android:layout_width="fill_parent"
             android:layout_height="@dimen/cardplayheight"
-            android:scaleType="centerCrop" />
+            android:scaleType="centerInside" />
 
         <ImageView
             android:id="@+id/card_play"
@@ -92,7 +93,7 @@
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:layout_marginLeft="14dp"
-            android:src="@drawable/card_comments" />
+            android:src="@drawable/card_iconcomment" />
 
         <ImageView
             android:id="@+id/card_status_people"
@@ -101,7 +102,7 @@
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
             android:layout_marginRight="14dp"
-            android:src="@drawable/card_people" />
+            android:src="@drawable/card_iconuser" />
 
         <TextView
             android:id="@+id/card_status_people_text"
@@ -149,7 +150,7 @@
             android:layout_gravity="center"
             android:layout_marginLeft="7dp"
             android:singleLine="true"
-            android:text="Starts from 199"
+            android:text="Starts with Rs 199"
             android:textColor="#6b6b6b"
             android:textSize="14sp" />
     </LinearLayout>

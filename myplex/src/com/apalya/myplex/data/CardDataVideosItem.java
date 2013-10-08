@@ -8,7 +8,6 @@ public class CardDataVideosItem {
 	public String type; 
 	public String bitrate;
 	public String link;
-	public String commercialModel;
 	public String resolution; 
 	public CardDataVideosItem(){
 		

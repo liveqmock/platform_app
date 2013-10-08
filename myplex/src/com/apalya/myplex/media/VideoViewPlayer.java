@@ -733,6 +733,11 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 			mMediaPlayerController.hide();
 		}
 	}
+	public void showMediaController(){
+		if(mMediaPlayerController != null){
+			mMediaPlayerController.show();
+		}
+	}
 	public void setSplashScreenDismissed(boolean value){
 		mSplashScreenDismissed = value;
 	}

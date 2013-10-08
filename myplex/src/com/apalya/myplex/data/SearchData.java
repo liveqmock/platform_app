@@ -14,6 +14,11 @@ public class SearchData {
 		boolean isCLicked = false;
 		
 		
+		public String getButtonId()
+		{
+			return this.mButtonId;
+		}
+		
 		public String getButtonName() {
 			return mButtonName;
 		}

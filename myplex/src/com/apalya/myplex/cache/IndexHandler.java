@@ -50,7 +50,7 @@ public class IndexHandler {
 	public static final String LUCENE_CONTENT_EXPIRY = "expiresAt";
 	public static final String LUCENE_CONTENT_INFO = "cardInfo";
 	
-	protected enum OperationType{IDSEARCH,FTSEARCH,UPDATEDB,SEARCHDB}
+	public enum OperationType{IDSEARCH,FTSEARCH,UPDATEDB,SEARCHDB}
 
 
 	File mIndexDir = null;
@@ -78,6 +78,8 @@ public class IndexHandler {
 	}
 
 	private void initIndexWriter() {
+		if(mIndexWriter != null)
+			return;
 		try {
 			Analyzer analyzer = new StandardAnalyzer(LuceneVersion);
 			IndexWriterConfig config = new IndexWriterConfig(LuceneVersion, analyzer);
@@ -124,8 +126,7 @@ public class IndexHandler {
 	{
 		try {
 			Set<String> words = new HashSet(Arrays.asList(StandardAnalyzer.STOP_WORDS_SET));
-			if (mIndexWriter == null)
-				initIndexWriter();
+			initIndexWriter();
 			long startTime = System.currentTimeMillis();
             List<String> stopWrods = new ArrayList<String>();
 			Log.i(TAG, "Indexing " +indexableObj.size() +"documents " +"Start");
@@ -184,6 +185,7 @@ public class IndexHandler {
 	}
 
 	private void initIndexReader() throws CorruptIndexException, IOException {
+		if(mIndexReader == null)
 			mIndexReader = IndexReader.open(mDirectory);
 	}
 
@@ -260,8 +262,7 @@ public class IndexHandler {
 	}
 	public void deleteDocuments() throws CorruptIndexException, IOException
 	{
-		if(mIndexWriter ==null)
-			initIndexWriter();
+		initIndexWriter();
 		mIndexWriter.deleteDocuments(new Term(""));
 		mIndexWriter.commit();
 	}
@@ -295,7 +296,7 @@ public class IndexHandler {
 		private List<CardData> mCardIds = null;
 		private OperationType mSearchType;
 		private SearchResult mCallback = null;
-		private HashMap<String, Object> mSearchResult = new HashMap<String, Object>();
+		private HashMap<String, CardData> mSearchResult = new HashMap<String, CardData>();
 		
 		public BgSearchAsyncTask(List<CardData> cardIds, OperationType searchType, SearchResult callBack) {
 			this.mCardIds = cardIds;

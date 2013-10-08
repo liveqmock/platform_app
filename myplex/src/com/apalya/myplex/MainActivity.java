@@ -50,6 +50,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.toolbox.NetworkImageView;
+import com.apalya.myplex.data.CardExplorerData;
 import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.menu.FilterMenuProvider;
@@ -60,7 +61,6 @@ import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.views.PinnedSectionListView;
 import com.apalya.myplex.views.PinnedSectionListView.PinnedSectionListAdapter;
-import com.facebook.Session;
 
 public class MainActivity extends Activity {
 	private DrawerLayout mDrawerLayout;
@@ -71,7 +71,6 @@ public class MainActivity extends Activity {
 	public LayoutInflater mInflater;
 	public BaseFragment mCurrentFragment;
 	public final static int CARDDETAILS = 0;
-	public final static int CARDDETAILSTABLET = 3;
 	public final static int CARDEXPLORER = 1;
 	public final static int SEARCH = 2;
 	public FrameLayout mContentLayout;
@@ -100,12 +99,27 @@ public class MainActivity extends Activity {
 	public void setPotrait(){
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 	}
+	public void setSensor(){
+		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+	}
+	public void hideActionBar(){
+		ActionBar actionBar = getActionBar();
+		if(actionBar != null){
+			actionBar.hide();
+		}
+	}
+	public void showActionBar(){
+		ActionBar actionBar = getActionBar();
+		if(actionBar != null){
+			actionBar.show();
+		}
+	}
 	private void fillMenuItem() {
 		mMenuItemList.add(new NavigationOptionsMenu(myplexapplication.getUserProfileInstance().getName(),
 				R.drawable.menu_profile, myplexapplication.getUserProfileInstance().getProfilePic(), 0));
 		mMenuItemList.add(new NavigationOptionsMenu("Home",
 				R.drawable.menu_home, null, 1));
-		mMenuItemList.add(new NavigationOptionsMenu("Home Tablet",
+		mMenuItemList.add(new NavigationOptionsMenu("My Favourite",
 				R.drawable.menu_home, null, 1));
 		mMenuItemList.add(new NavigationOptionsMenu("Search",
 				R.drawable.menu_search, null, 1));
@@ -159,33 +173,22 @@ public class MainActivity extends Activity {
 	};
 
 	@Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        // To preserve battery life, the Mixpanel library will store
-        // events rather than send them immediately. This means it
-        // is important to call flush() to send any unsent events
-        // before your application is taken out of memory.
-        myplexapplication.getMixPanel().flush();
-    }
-	
-	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		mContext = this;
 		Util.prepareDisplayinfo(this);
-		/*StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-				.detectDiskReads().detectDiskWrites().detectNetwork() // or
-																		// .detectAll()
-																		// for
-																		// all
-																		// detectable
-																		// problems
-				.penaltyDialog().build());
-		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-				.detectLeakedSqlLiteObjects().detectLeakedClosableObjects()
-				.penaltyLog().penaltyDeath().build());*/
+//		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+//				.detectDiskReads().detectDiskWrites().detectNetwork() // or
+//																		// .detectAll()
+//																		// for
+//																		// all
+//																		// detectable
+//																		// problems
+//				.penaltyDialog().build());
+//		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+//				.detectLeakedSqlLiteObjects().detectLeakedClosableObjects()
+//				.penaltyLog().penaltyDeath().build());
 
 		setContentView(R.layout.mainview);
 		
@@ -323,8 +326,7 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View arg0) {
 				if ((mCurrentFragment instanceof SearchActivity)) {
-					CardExplorer fragment = new CardExplorer();
-					bringFragment(fragment);
+						mCurrentFragment.searchButtonClicked();
 				} else {
 					SearchActivity fragment = new SearchActivity();
 					bringFragment(fragment);
@@ -397,6 +399,7 @@ public class MainActivity extends Activity {
 				}
 				return;
 			}
+			myplexapplication.getCardExplorerData().continueWithExisting = true;
 			mFragmentStack.pop();
 			fragment = mFragmentStack.peek();
 			if (fragment != null) {
@@ -414,33 +417,19 @@ public class MainActivity extends Activity {
 		BaseFragment fragment;
 		switch (fragmentType) {
 		case CARDDETAILS:
-			if (mCardDetails == null) {
-				mCardDetails = new CardDetails();
-			}
+			mCardDetails = new CardDetails();
 			fragment = mCardDetails;
 			break;
 		case CARDEXPLORER:
-			if (mCardExplorer == null) {
 				mCardExplorer = new CardExplorer();
-			}
 			fragment = mCardExplorer;
 			break;
 		case SEARCH:
-			if (mSearchActivity == null) {
-				mSearchActivity = new SearchActivity();
-			}
+			mSearchActivity = new SearchActivity();
 			fragment = mSearchActivity;
 			break;
-		case CARDDETAILSTABLET:
-			if (mCardDetailsTablet == null) {
-				mCardDetailsTablet = new CardDetailsTablet();
-			}
-			fragment = mCardDetailsTablet;
-			break;
 		default:
-			if (mCardDetails == null) {
-				mCardDetails = new CardDetails();
-			}
+			mCardDetails = new CardDetails();
 			fragment = mCardDetails;
 			break;
 		}
@@ -458,47 +447,49 @@ public class MainActivity extends Activity {
 
 	private CardExplorer mCardExplorer;
 	private CardDetails mCardDetails;
-	private CardDetailsTablet mCardDetailsTablet;
 	private SearchActivity mSearchActivity;
 
 	private void selectItem(int position) {
 		switch (position) {
 		case 0:
 		case 1:
-		case 4:
 		case 5:
 		default: {
 			mCardExplorer = (CardExplorer) createFragment(CARDEXPLORER);
-			mCardExplorer.setDisplayMode(CardExplorer.STACKVIEW);
 			mCurrentFragment = mCardExplorer;
 		}
 			break;
 		case 2: {
 			mCardExplorer = (CardExplorer) createFragment(CARDEXPLORER);
-			mCardExplorer.setDisplayMode(CardExplorer.GOOGLECARDVIEW);
+			mCurrentFragment = mCardExplorer;
+		}
+		case 3:{
+			mCardExplorer = (CardExplorer) createFragment(CARDEXPLORER);
+			CardExplorerData mData = myplexapplication.getCardExplorerData();
+			mData.reset();
+			mData.requestType = CardExplorerData.REQUEST_FAVOURITE;
 			mCurrentFragment = mCardExplorer;
 		}
 			break;
-		case 3:
+		case 4:
 			mSearchActivity = (SearchActivity) createFragment(SEARCH);
 			mCurrentFragment = new SearchActivity();
 			break;
 		case 6: {
-			mCurrentFragment=null;
-			LogOutUtil.onClickLogout(this);
-			break;
+			LogOutUtil.onClickLogout(MainActivity.this);
+			return;
+//			onClickLogout();
+			// finish();
+			// startActivity(new Intent(MainActivity.this,LoginActivity.class));
 		}
 		// default:
 		// mCurrentFragment = new CardExplorer();
 		// break;
 		}
-		if(mCurrentFragment!=null)
-		{
 		pushFragment();
 		mDrawerList.setItemChecked(position, true);
 		setTitle(mMenuItemList.get(position).label);
 		mDrawerLayout.closeDrawer(mDrawerList);
-		}
 	}
 
 	private void pushFragment() {
@@ -511,6 +502,8 @@ public class MainActivity extends Activity {
 		// transaction.setCustomAnimations(android.R.animator.fade_in,
 		// android.R.animator.fade_out);
 		// transaction.
+		setActionBarTitle("Myplex");
+		updateActionBarTitle();
 		transaction.replace(R.id.content_frame, mCurrentFragment);
 		transaction.addToBackStack(null);
 		transaction.commit();

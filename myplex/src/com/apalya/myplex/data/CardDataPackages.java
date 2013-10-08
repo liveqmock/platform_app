@@ -5,7 +5,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CardDataPackages {
-	public List<CardDataPackagePriceDetails> priceDetails;
+	public List<CardDataPackagePriceDetailsItem> priceDetails;
 	public String contentType;
 	public boolean couponFlag;
 	public String contentId;

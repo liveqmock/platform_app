@@ -4,6 +4,10 @@ public class ConsumerApi {
 	public static String DOMAIN = "alpha.myplex.in:8866";
 	public static final String SEARCH_ACTION = "search";
 	public static final String TAG_ACTION = "tags";
+	public static final String CONTENT_TAG = "content";
+	public static final String FAVORITELIST_ACTION = "contentList/favorites";
+	public static final String FAVORITE_ACTION  = "favorite";
+	public static final String RECOMMENDATIONS_ACTION = "recommendations";
 	public static final String SIGN_OUT_ACTION = "signOut";
 	public static final String CONTENTDETAILS_ACTION = "contentDetail";
 	public static final String CONTENT_CONTEXT = "content/v2";
@@ -33,14 +37,41 @@ public class ConsumerApi {
 	public static final String LEVELDEVICEMIN = "devicemin";
 	public static final String LEVELDEVICEMAX = "devicemax";
 	
-	public static final String DEBUGCLIENTKEY = "c86f79514ec7976bd20de36f1c6f15900d8e09f699818024283bad1bf0609650";
+	public static String DEBUGCLIENTKEY = "c86f79514ec7976bd20de36f1c6f15900d8e09f699818024283bad1bf0609650";
 
 	public static String getSearch(String queryStr, String level,int startIndex) {
+		if(queryStr == null||(queryStr != null && queryStr.length() ==0)){
+			queryStr = "*";
+		}
+		queryStr.replace(" ", "%20");
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH
 				+ SEARCH_ACTION + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY
 				+  AMPERSAND + QUERY + queryStr + AMPERSAND + STARTINDEX
 				+ startIndex + AMPERSAND + LEVEL
 				+ level;
+	}
+	public static String getRecommendation(String level,int startIndex) {
+		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH
+				+ RECOMMENDATIONS_ACTION + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY
+				+  AMPERSAND + STARTINDEX
+				+ startIndex + AMPERSAND + LEVEL
+				+ level;
+	}
+
+	public static String getCommentPostUrl(String contentID) {
+		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + CONTENT_TAG + SLASH + contentID +SLASH
+				+ QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY;
+	}
+	public static String getFavourites(String level,int startIndex) {
+		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + CONTENT_TAG + SLASH
+				+ FAVORITELIST_ACTION + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY
+				+  AMPERSAND + STARTINDEX
+				+ startIndex + AMPERSAND + LEVEL
+				+ level;
+	}
+	public static String getFavourite(String contentId) {
+		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + CONTENT_TAG +SLASH + contentId +SLASH
+				+ FAVORITE_ACTION + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY;
 	}
 
 	public static String getSearchTags(String startLetterstr,

@@ -2,13 +2,16 @@ package com.apalya.myplex.data;
 
 import android.app.Application;
 
+import com.apalya.myplex.cache.CacheHolder;
 import com.apalya.myplex.utils.MyVolley;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 
 public class myplexapplication extends Application {
 	public static ApplicationConfig mDisplayInfo; 
+	public static CardExplorerData mCardExplorerData;
 	private static UserProfile mUserProfile;
 	private static DeviceDetails mDeviceDetails;
+	private static CacheHolder mCache ;
 	private static MixpanelAPI mixPanel;
 	private static final String MIXPANEL_DISTINCT_ID_NAME = "Mixpanel Example $distinctid";
 	/*
@@ -64,5 +67,16 @@ public class myplexapplication extends Application {
 		}
 		return mDisplayInfo;
 	}
-	public static MixpanelAPI getMixPanel(){		return mixPanel;	}	/*public static Context getContext(){		return mContext;	}*/	public static UserProfile getUserProfileInstance(){		if(mUserProfile==null)			mUserProfile=new UserProfile();		return mUserProfile;	}	public static DeviceDetails getDevDetailsInstance(){		if(mDeviceDetails==null)			mDeviceDetails=new DeviceDetails();		return mDeviceDetails;	}
+	public static MixpanelAPI getMixPanel(){		return mixPanel;	}	/*public static Context getContext(){		return mContext;	}*/	public static UserProfile getUserProfileInstance(){		if(mUserProfile==null)			mUserProfile=new UserProfile();		return mUserProfile;	}	public static DeviceDetails getDevDetailsInstance(){		if(mDeviceDetails==null)			mDeviceDetails=new DeviceDetails();		return mDeviceDetails;	}
+	public static CardExplorerData getCardExplorerData(){
+		if(mCardExplorerData==null)
+			mCardExplorerData=new CardExplorerData();
+		return mCardExplorerData;
+	}
+	public static CacheHolder getCacheHolder(){
+		if(mCache == null){
+			mCache = new CacheHolder();
+		}
+		return mCache;
+	}
 }

@@ -9,6 +9,7 @@ public class CardDataGenralInfo {
     public String category;
     public boolean isSellable;
     public String description;
+    public String briefDescription;
     public String myplexDescription;
     public String studioDescription;
     public CardDataGenralInfo(){}

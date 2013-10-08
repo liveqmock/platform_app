@@ -89,6 +89,7 @@ public class SearchListAdapter extends BaseAdapter implements
 					headerHolder = new HeaderHolder();
 					convertView = inflater.inflate(R.layout.list, null);
 					headerHolder.categoryText = (TextView) convertView.findViewById(R.id.searchgroup);
+					headerHolder.categoryText.setTypeface(FontUtil.Roboto_Regular);
 					convertView.setTag(headerHolder);
 				}
 				else

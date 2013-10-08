@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/carddetails_bg" >
+
+    <RelativeLayout
+        android:id="@+id/carddetailbriefdescription_expandlayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="@dimen/margin_gap_12" >
+
+        <ImageView
+            android:id="@+id/carddetailbriefdescription_expand"
+            android:layout_width="@dimen/size_24"
+            android:layout_height="@dimen/size_24"
+            android:src="@drawable/dark_navigation_expand" />
+
+        <ProgressBar
+            android:id="@+id/carddetailbriefdescription_expand_progress"
+            android:layout_width="@dimen/size_24"
+            android:layout_height="@dimen/size_24"
+            android:visibility="invisible" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/carddetailbriefdescriptiontitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="@dimen/margin_gap_12"
+        android:layout_marginTop="@dimen/margin_gap_12"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/carddetailbreifdescription_movename"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/margin_gap_8"
+            android:singleLine="true"
+            android:text=""
+            android:textColor="#4b4b4c"
+            android:textSize="@dimen/textsize_16" />
+
+        <RatingBar
+            android:id="@+id/carddetailbriefdescription_setRating"
+            style="?android:attr/ratingBarStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/margin_gap_12" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/carddetailbriefdescriptionsubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/carddetailbriefdescriptiontitle"
+        android:layout_marginLeft="@dimen/margin_gap_12"
+        android:layout_marginTop="@dimen/margin_gap_12"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/carddetailbriefdescription_parentalRating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="@dimen/margin_gap_8"
+            android:singleLine="true"
+            android:text=""
+            android:textColor="#4b4b4c"
+            android:textSize="@dimen/textsize_12" />
+
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="8dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="@dimen/margin_gap_2"
+            android:src="@drawable/card_iconplaytime" />
+
+        <TextView
+            android:id="@+id/carddetailbriefdescription_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginRight="@dimen/margin_gap_8"
+            android:singleLine="true"
+            android:text=""
+            android:textColor="#4b4b4c"
+            android:textSize="@dimen/textsize_12" />
+
+        <TextView
+            android:id="@+id/carddetailbriefdescription_releaseDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:singleLine="true"
+            android:text=""
+            android:textColor="#4b4b4c"
+            android:textSize="@dimen/textsize_12" />
+    </LinearLayout>
+
+     <Button
+        android:id="@+id/carddetailbriefdescription_purchasebutton"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:layout_below="@+id/carddetailbriefdescriptionsubtitle"
+        android:layout_marginLeft="@dimen/margin_gap_12"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/carddetailbutton_bg"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:text="Starts from 199 onwards"
+        android:textColor="#54b5e9"
+        android:textSize="@dimen/textsize_12" />
+    
+
+    <TextView
+        android:id="@+id/carddetailbriefdescription_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/carddetailbriefdescription_purchasebutton"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginRight="36dp"
+        android:lineSpacingExtra="3dp"
+        android:text=""
+        android:textColor="#4b4b4c"
+        android:textSize="14sp" />
+
+</RelativeLayout>
