@@ -12,28 +12,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.Request.Method;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.apalya.myplex.adapters.CacheManagerCallback;
-import com.apalya.myplex.adapters.SearchListAdapter;
-import com.apalya.myplex.adapters.OpenListener.OpenCallBackListener;
-import com.apalya.myplex.cache.CacheHolder;
-import com.apalya.myplex.cache.CacheManager;
-import com.apalya.myplex.cache.IndexHandler;
-import com.apalya.myplex.cache.SearchResult;
-import com.apalya.myplex.data.CardData;
-import com.apalya.myplex.data.CardExplorerData;
-import com.apalya.myplex.data.FilterMenudata;
-import com.apalya.myplex.data.SearchData;
-import com.apalya.myplex.data.SearchData.ButtonData;
-import com.apalya.myplex.data.myplexapplication;
-import com.apalya.myplex.utils.ConsumerApi;
-import com.apalya.myplex.utils.FontUtil;
-import com.apalya.myplex.utils.MyVolley;
-import com.apalya.myplex.views.PinnedSectionListView;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
@@ -46,8 +24,8 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.ViewGroup.MarginLayoutParams;
 import android.view.inputmethod.EditorInfo;
@@ -59,7 +37,29 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 
-public class SearchActivity extends BaseFragment implements OpenCallBackListener,CacheManagerCallback {
+import com.android.volley.Request.Method;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.apalya.myplex.adapters.CacheManagerCallback;
+import com.apalya.myplex.adapters.OpenListener.OpenCallBackListener;
+import com.apalya.myplex.adapters.SearchListAdapter;
+import com.apalya.myplex.cache.CacheManager;
+import com.apalya.myplex.cache.IndexHandler;
+import com.apalya.myplex.data.CardData;
+import com.apalya.myplex.data.CardExplorerData;
+import com.apalya.myplex.data.FilterMenudata;
+import com.apalya.myplex.data.SearchData;
+import com.apalya.myplex.data.SearchData.ButtonData;
+import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.utils.ConsumerApi;
+import com.apalya.myplex.utils.FontUtil;
+import com.apalya.myplex.utils.MyVolley;
+import com.apalya.myplex.views.PinnedSectionListView;
+
+public class SearchActivity extends BaseFragment implements
+		OpenCallBackListener, CacheManagerCallback {
 
 	EditText mSearchInput;
 	private PinnedSectionListView mPinnedListView;
@@ -74,68 +74,71 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 	private ProgressDialog mProgressDialog = null;
 	private CacheManager mCacheManager = new CacheManager();
 	public static final String TAG = "SearchActivity";
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
 		rootView = inflater.inflate(R.layout.searchlayout, container, false);
 		mSearchInput = (EditText) rootView.findViewById(R.id.inputSearch);
 		mSearchInput.setTypeface(FontUtil.Roboto_Regular);
 		mSearchInput.setOnEditorActionListener(new OnEditorActionListener() {
 
 			@Override
-			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-				if(actionId == EditorInfo.IME_ACTION_DONE)
-				{
+			public boolean onEditorAction(TextView v, int actionId,
+					KeyEvent event) {
+				if (actionId == EditorInfo.IME_ACTION_DONE) {
 					String userSearchText = mSearchInput.getText().toString();
-					if(userSearchText.length() <=0)
+					if (userSearchText.length() <= 0)
 						return true;
-					
-					
+
 					String searchText = mSearchInput.getText().toString();
 					FillEditText(searchText);
 					mSearchInput.setText("");
-					searchText ="";
+					searchText = "";
 				}
 				return false;
 			}
 
 		});
 
-		final ImageView clearButton = (ImageView)rootView.findViewById(R.id.clearSearchresults);
+		final ImageView clearButton = (ImageView) rootView
+				.findViewById(R.id.clearSearchresults);
 		clearButton.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
-				final LinearLayout spannablelayout = (LinearLayout) rootView.findViewById(R.id.spannable);
+				final LinearLayout spannablelayout = (LinearLayout) rootView
+						.findViewById(R.id.spannable);
 				spannablelayout.removeAllViews();
 				ClearSearchTags();
 				clearButton.setVisibility(View.GONE);
-				if(mListData !=null)
-				{
-					for(int count =0; count < mListData.size(); count++)
-					{
-						if(mListData.get(count) ==null || mListData.get(count).getSearchTags() ==null)
+				if (mListData != null) {
+					for (int count = 0; count < mListData.size(); count++) {
+						if (mListData.get(count) == null
+								|| mListData.get(count).getSearchTags() == null)
 							continue;
-						int tagcount = mListData.get(count).getSearchTags().size();
-						for(int tags=0; tags < tagcount; tags++)
-						{
-							if(mListData.get(count).getSearchTags().get(tags) !=null)
-								mListData.get(count).getSearchTags().get(tags).setCLicked(false);
+						int tagcount = mListData.get(count).getSearchTags()
+								.size();
+						for (int tags = 0; tags < tagcount; tags++) {
+							if (mListData.get(count).getSearchTags().get(tags) != null)
+								mListData.get(count).getSearchTags().get(tags)
+										.setCLicked(false);
 						}
 					}
-					
+
 					mAdapter.notifyDataSetChanged();
 				}
 			}
 		});
 		// ArrayList<SearchData> mSearchData = fillSearchData();
 		try {
-			mPinnedListView = (PinnedSectionListView) rootView.findViewById(R.id.list_view);
+			mPinnedListView = (PinnedSectionListView) rootView
+					.findViewById(R.id.list_view);
 			mListData = new ArrayList<SearchData>();
 			mSearchbleTags = new ArrayList<SearchData.ButtonData>();
 			mAdapter = new SearchListAdapter(getContext(), mListData);
@@ -148,52 +151,54 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 		mMainActivity.setTitle("Search");
 
 		loadSearchTags();
-		
+
 		return rootView;
 	}
+
 	private String mSearchQuery = new String();
+
 	@Override
 	public void searchButtonClicked() {
-		
-		if(mSearchbleTags ==null || mSearchbleTags.size() <=0)
+
+		if (mSearchbleTags == null || mSearchbleTags.size() <= 0)
 			return;
 		mMainActivity.showActionBarProgressBar();
-		
+
 		String searchQuery = new String();
 		final List<CardData> searchString = new ArrayList<CardData>();
 		for (ButtonData data : mSearchbleTags) {
 			CardData temp = new CardData();
-//			temp._id = data.getButtonId() != null ? data.getButtonId() : data.getButtonName();
+			// temp._id = data.getButtonId() != null ? data.getButtonId() :
+			// data.getButtonName();
 			temp._id = data.getButtonName();
-			if(searchQuery.length() > 0){
+			if (searchQuery.length() > 0) {
 				searchQuery = ",";
 			}
 			searchQuery = data.getButtonName();
 			searchString.add(temp);
 		}
 		mSearchQuery = searchQuery;
-		mCacheManager.getCardDetails(searchString, IndexHandler.OperationType.FTSEARCH, SearchActivity.this);
+		mCacheManager.getCardDetails(searchString,
+				IndexHandler.OperationType.FTSEARCH, SearchActivity.this);
 
 	}
-	//Boolean true to add, false to remove
-	private void UpdateSearchTags(ButtonData tagData, Boolean addorremove)
-	{
-		if(mSearchbleTags == null)
+
+	// Boolean true to add, false to remove
+	private void UpdateSearchTags(ButtonData tagData, Boolean addorremove) {
+		if (mSearchbleTags == null)
 			return;
-		if(addorremove)
+		if (addorremove)
 			mSearchbleTags.add(tagData);
 		else
 			mSearchbleTags.remove(tagData);
 	}
-	
-	private void ClearSearchTags()
-	{
-		if(mSearchbleTags !=null)
+
+	private void ClearSearchTags() {
+		if (mSearchbleTags != null)
 			mSearchbleTags.clear();
 	}
-	
-	public List<ButtonData> GetSearchTags()
-	{
+
+	public List<ButtonData> GetSearchTags() {
 		return mSearchbleTags;
 	}
 
@@ -202,8 +207,9 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 		mMainActivity.showActionBarProgressBar();
 		showProgressBar();
 		RequestQueue queue = MyVolley.getRequestQueue();
-		JsonObjectRequest myReq = new JsonObjectRequest(Method.GET, ConsumerApi.getSearchTags("",ConsumerApi.LEVELDEVICEMAX), null,
-				createMyReqSuccessListener(), createMyReqErrorListener());
+		JsonObjectRequest myReq = new JsonObjectRequest(Method.GET,
+				ConsumerApi.getSearchTags("", ConsumerApi.LEVELDEVICEMAX),
+				null, createMyReqSuccessListener(), createMyReqErrorListener());
 		myReq.setShouldCache(true);
 
 		Log.d("tagresponse", myReq.getUrl());
@@ -221,8 +227,7 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 		};
 	}
 
-	private void ParseJonsResponse(JSONObject response)
-	{
+	private void ParseJonsResponse(JSONObject response) {
 		try {
 			JSONObject tags = response.getJSONObject("tags");
 			JSONObject qualifiers = null;
@@ -248,26 +253,26 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 					Iterator<?> it = innerObj.keys();
 					while (it.hasNext()) {
 						String key = (String) it.next();
-						FillListData(key,innerObj);
+						FillListData(key, innerObj);
 					}
 					break;
 				case 1:
 					innerObj = startletters;
-					
-					if(innerObj !=null)
-					{
-						//Sorting Json response start
+
+					if (innerObj != null) {
+						// Sorting Json response start
 						SortedMap<String, Object> sortedObj = new TreeMap<String, Object>();
 						Iterator<?> sortingIterator = innerObj.keys();
 						while (sortingIterator.hasNext()) {
 							String key = (String) sortingIterator.next();
 							sortedObj.put(key, innerObj.getJSONObject(key));
 						}
-						//Sorting Json response end
-						Iterator<String> sortedIterator = sortedObj.keySet().iterator();
+						// Sorting Json response end
+						Iterator<String> sortedIterator = sortedObj.keySet()
+								.iterator();
 						while (sortedIterator.hasNext()) {
 							String key = (String) sortedIterator.next();
-							FillListData(key,innerObj);
+							FillListData(key, innerObj);
 						}
 					}
 					break;
@@ -282,24 +287,26 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 			Log.e("response Exception", e.getMessage());
 		}
 	}
-	
-	private void preapareFilterData()
-	{
-		if(mUniqueCategories !=null)
-		{
+
+	private void preapareFilterData() {
+		if (mUniqueCategories != null) {
 			List<FilterMenudata> searchFilter = new ArrayList<FilterMenudata>();
-			searchFilter.add(new FilterMenudata(FilterMenudata.ITEM, allCategories, 0));
-			Iterator<String> mapIterator = mUniqueCategories.keySet().iterator();
+			searchFilter.add(new FilterMenudata(FilterMenudata.ITEM,
+					allCategories, 0));
+			Iterator<String> mapIterator = mUniqueCategories.keySet()
+					.iterator();
 			while (mapIterator.hasNext()) {
 				String categoryName = (String) mapIterator.next();
-				searchFilter.add(new FilterMenudata(FilterMenudata.ITEM, categoryName, 0));
+				searchFilter.add(new FilterMenudata(FilterMenudata.ITEM,
+						categoryName, 0));
 			}
-			if(isVisible()){
-				mMainActivity.addFilterData(searchFilter,mFilterMenuClickListener);
+			if (isVisible()) {
+				mMainActivity.addFilterData(searchFilter,
+						mFilterMenuClickListener);
 			}
 		}
 	}
-	
+
 	private OnClickListener mFilterMenuClickListener = new OnClickListener() {
 
 		@Override
@@ -310,92 +317,95 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 			}
 		}
 	};
-	
-	private void sortTags(String sortCategory)
-	{
-		Log.d("searchSort", "based on:"+sortCategory);
-		
-		if(sortCategory.equalsIgnoreCase(allCategories))
-		{
+
+	private void sortTags(String sortCategory) {
+		Log.d("searchSort", "based on:" + sortCategory);
+
+		if (sortCategory.equalsIgnoreCase(allCategories)) {
 			mAdapter.setSearchDataList(mMasterListData);
-		}
-		else
-		{
-			//Creating a local copy from masterList for sorting
+		} else {
+			// Creating a local copy from masterList for sorting
 			List<SearchData> sortListdata = new ArrayList<SearchData>();
 			for (SearchData searchData : mMasterListData) {
 				sortListdata.add(new SearchData(searchData));
-			} 
-			
-			//holds data to be removed from list whose Data is not matching the category
+			}
+
+			// holds data to be removed from list whose Data is not matching the
+			// category
 			List<SearchData> itemsToRemove = new ArrayList<SearchData>();
-			for(int sortcount =0; sortcount< sortListdata.size(); sortcount++)
-			{
+			for (int sortcount = 0; sortcount < sortListdata.size(); sortcount++) {
 				SearchData tempSearchData = sortListdata.get(sortcount);
-				if(tempSearchData ==null || tempSearchData.getSearchTags() ==null)
-				{
+				if (tempSearchData == null
+						|| tempSearchData.getSearchTags() == null) {
 					continue;
 				}
 				List<ButtonData> matchingButtonData = new ArrayList<SearchData.ButtonData>();
-				for(int tagscount =0; tagscount< tempSearchData.getSearchTags().size(); tagscount++)
-				{
-					if(tempSearchData.getSearchTags().get(tagscount).getTagCategory() !=null && tempSearchData.getSearchTags().get(tagscount).getTagCategory().equalsIgnoreCase(sortCategory))
-						matchingButtonData.add(tempSearchData.getSearchTags().get(tagscount));
+				for (int tagscount = 0; tagscount < tempSearchData
+						.getSearchTags().size(); tagscount++) {
+					if (tempSearchData.getSearchTags().get(tagscount)
+							.getTagCategory() != null
+							&& tempSearchData.getSearchTags().get(tagscount)
+									.getTagCategory()
+									.equalsIgnoreCase(sortCategory))
+						matchingButtonData.add(tempSearchData.getSearchTags()
+								.get(tagscount));
 				}
 				tempSearchData.setSearchTags(matchingButtonData);
-				
-				if(matchingButtonData.size() <= 0)
-				{
-					//Remove Header and items from list which doesn't have matching data
-					itemsToRemove.add(sortListdata.get(sortListdata.indexOf(tempSearchData)-1));
+
+				if (matchingButtonData.size() <= 0) {
+					// Remove Header and items from list which doesn't have
+					// matching data
+					itemsToRemove.add(sortListdata.get(sortListdata
+							.indexOf(tempSearchData) - 1));
 					itemsToRemove.add(tempSearchData);
 				}
 			}
 			sortListdata.removeAll(itemsToRemove);
-			
+
 			mAdapter.setSearchDataList(sortListdata);
 		}
 		mAdapter.notifyDataSetChanged();
 	}
-	
-	private void FillListData(String key, JSONObject object)
-	{
-		try{
-			
-		SearchData searchableObj = new SearchData();
-		searchableObj.setCategoryName(key);
 
-		SearchData tagsObj = new SearchData();
-		List<ButtonData> tagsInfo = new ArrayList<SearchData.ButtonData>();
+	private void FillListData(String key, JSONObject object) {
+		try {
 
-		JSONObject letters = object.getJSONObject(key);
-		JSONArray tagArray = letters.getJSONArray("values");
+			SearchData searchableObj = new SearchData();
+			searchableObj.setCategoryName(key);
 
-		for (int tagcount = 0; tagcount < tagArray.length(); tagcount++) {
-			JSONObject tag = tagArray.getJSONObject(tagcount);
-			String id = tag.getString("_id");
-			String name = tag.getString("name");
-			String qualifier = tag.getString("qualifier");
-			String category = tag.getString("category");
-			if(category!=null && category.length() >0)
-			{
-				int count =0;
-				if(mUniqueCategories.containsKey(category))
-					count = mUniqueCategories.get(category);
-				mUniqueCategories.put(category, (count+1));// Filling Unique Categories
+			SearchData tagsObj = new SearchData();
+			List<ButtonData> tagsInfo = new ArrayList<SearchData.ButtonData>();
+
+			JSONObject letters = object.getJSONObject(key);
+			JSONArray tagArray = letters.getJSONArray("values");
+
+			for (int tagcount = 0; tagcount < tagArray.length(); tagcount++) {
+				JSONObject tag = tagArray.getJSONObject(tagcount);
+				String id = tag.getString("_id");
+				String name = tag.getString("name");
+				String qualifier = tag.getString("qualifier");
+				String category = tag.getString("category");
+				if (category != null && category.length() > 0) {
+					int count = 0;
+					if (mUniqueCategories.containsKey(category))
+						count = mUniqueCategories.get(category);
+					mUniqueCategories.put(category, (count + 1));// Filling
+																	// Unique
+																	// Categories
+				}
+				tagsInfo.add(new ButtonData(id, name, category, qualifier,
+						false));
 			}
-			tagsInfo.add(new ButtonData(id, name, category, qualifier, false));
-		}
-		tagsObj.setSearchTags(tagsInfo);
+			tagsObj.setSearchTags(tagsInfo);
 
-		mListData.add(searchableObj);
-		mListData.add(tagsObj);
-		}catch(Exception e)
-		{
+			mListData.add(searchableObj);
+			mListData.add(tagsObj);
+		} catch (Exception e) {
 			e.printStackTrace();
 			Log.e("FillListData Exception", e.getMessage());
 		}
 	}
+
 	private Response.ErrorListener createMyReqErrorListener() {
 		return new Response.ErrorListener() {
 			@Override
@@ -407,37 +417,44 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 	}
 
 	private void FillEditText(String buttonName) {
-		final LinearLayout spannablelayout = (LinearLayout) rootView.findViewById(R.id.spannable);
-		final HorizontalScrollView scroll = (HorizontalScrollView) rootView.findViewById(R.id.selectionscroll);
+		final LinearLayout spannablelayout = (LinearLayout) rootView
+				.findViewById(R.id.spannable);
+		final HorizontalScrollView scroll = (HorizontalScrollView) rootView
+				.findViewById(R.id.selectionscroll);
 
-		ImageView clearButton = (ImageView)rootView.findViewById(R.id.clearSearchresults);
+		ImageView clearButton = (ImageView) rootView
+				.findViewById(R.id.clearSearchresults);
 		clearButton.setVisibility(View.VISIBLE);
-		
+
 		ButtonData userButton = new ButtonData(null, buttonName, "", "", false);
 		Button button = CreateButton(userButton);
 		button.setTag(userButton);
-		MarginLayoutParams marginParams = new MarginLayoutParams(spannablelayout.getLayoutParams());
+		MarginLayoutParams marginParams = new MarginLayoutParams(
+				spannablelayout.getLayoutParams());
 		marginParams.setMargins(0, 0, 10, 0);
-		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(marginParams);
+		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+				marginParams);
 
 		button.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(final View v) {
-				ValueAnimator fadeAnim = ObjectAnimator.ofFloat(v, "alpha", 1f, 0f);
+				ValueAnimator fadeAnim = ObjectAnimator.ofFloat(v, "alpha", 1f,
+						0f);
 				fadeAnim.setDuration(800);
 
 				fadeAnim.addListener(new AnimatorListenerAdapter() {
 					public void onAnimationEnd(Animator animation) {
 						spannablelayout.removeView(v);
-						Button btn = (Button)v;
-						UpdateSearchTags((ButtonData)btn.getTag(), false);
+						Button btn = (Button) v;
+						UpdateSearchTags((ButtonData) btn.getTag(), false);
 					}
 				});
 				fadeAnim.start();
 			}
 		});
-		ValueAnimator fadeinAnimation = ObjectAnimator.ofFloat(button, "alpha", 0f, 1f);
+		ValueAnimator fadeinAnimation = ObjectAnimator.ofFloat(button, "alpha",
+				0f, 1f);
 		fadeinAnimation.setDuration(800);
 		fadeinAnimation.addListener(new AnimatorListenerAdapter() {
 			public void onAnimationEnd(Animator animation) {
@@ -452,68 +469,82 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 
 	private void FillEditText(View v) {
 
-		ImageView clearButton = (ImageView)rootView.findViewById(R.id.clearSearchresults);
+		ImageView clearButton = (ImageView) rootView
+				.findViewById(R.id.clearSearchresults);
 		clearButton.setVisibility(View.VISIBLE);
-		
+
 		final Button btn = (Button) v;
 		final SearchData mSearchData = (SearchData) v.getTag();
-		
-		if(mSearchData.getSearchTags().get(btn.getId()).isCLicked() == true)
+
+		if (mSearchData.getSearchTags().get(btn.getId()).isCLicked() == true)
 			return; // return if button is already clicked
 		mSearchData.getSearchTags().get(btn.getId()).setCLicked(true);
 		mAdapter.notifyDataSetChanged();
-		
-		LinearLayout spannablelayout = (LinearLayout) rootView.findViewById(R.id.spannable);
-		final HorizontalScrollView scroll = (HorizontalScrollView) rootView.findViewById(R.id.selectionscroll);
 
-		Button button = CreateButton(mSearchData.getSearchTags().get(btn.getId()));
+		LinearLayout spannablelayout = (LinearLayout) rootView
+				.findViewById(R.id.spannable);
+		final HorizontalScrollView scroll = (HorizontalScrollView) rootView
+				.findViewById(R.id.selectionscroll);
+
+		Button button = CreateButton(mSearchData.getSearchTags().get(
+				btn.getId()));
 		btn.setAlpha(mButtonApha);
 		button.setId(btn.getId());
 		button.setTag(R.string.tag1, mSearchData);
-		button.setTag(R.string.tag2,(Button)v);
+		button.setTag(R.string.tag2, (Button) v);
 
 		button.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(final View v) {
-				
+
 				// FadeOut Animation of Clicked button Start
-				ValueAnimator fadeAnim = ObjectAnimator.ofFloat(v, "alpha", 1f, 0f);
+				ValueAnimator fadeAnim = ObjectAnimator.ofFloat(v, "alpha", 1f,
+						0f);
 				fadeAnim.setDuration(800);
 				fadeAnim.addListener(new AnimatorListenerAdapter() {
 					public void onAnimationEnd(Animator animation) {
-						LinearLayout spannablelayout = (LinearLayout) rootView.findViewById(R.id.spannable);
+						LinearLayout spannablelayout = (LinearLayout) rootView
+								.findViewById(R.id.spannable);
 						spannablelayout.removeView(v);
-						UpdateSearchTags(mSearchData.getSearchTags().get(btn.getId()),false);
+						UpdateSearchTags(
+								mSearchData.getSearchTags().get(btn.getId()),
+								false);
 					}
 				});
 				fadeAnim.start();
 
 				// FadeOut Animation of Clicked button End
-				
-				//TODO:: fadein Animation not working. need to fix this
-				//FadeIn Animation in list
-				final Button ownerButton =(Button)v.getTag(R.string.tag2);
+
+				// TODO:: fadein Animation not working. need to fix this 
+				// FadeIn Animation in list
+				final Button ownerButton = (Button) v.getTag(R.string.tag2);
 				ownerButton.setAlpha(1f);
-				ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(ownerButton, "alpha", mButtonApha, 1f);
+				ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(ownerButton,
+						"alpha", mButtonApha, 1f);
 				fadeAnim2.setDuration(800);
 				fadeAnim2.addListener(new AnimatorListenerAdapter() {
 					public void onAnimationEnd(Animator animation) {
-						SearchData mSearchData = (SearchData) v.getTag(R.string.tag1);
-						mSearchData.getSearchTags().get(ownerButton.getId()).setCLicked(false);
+						SearchData mSearchData = (SearchData) v
+								.getTag(R.string.tag1);
+						mSearchData.getSearchTags().get(ownerButton.getId())
+								.setCLicked(false);
 						mAdapter.notifyDataSetChanged();
 					}
 				});
 				fadeAnim2.start();
-				//FadeIn Animation in list
+				// FadeIn Animation in list
 			}
 		});
 
-		MarginLayoutParams marginParams = new MarginLayoutParams(spannablelayout.getLayoutParams());
+		MarginLayoutParams marginParams = new MarginLayoutParams(
+				spannablelayout.getLayoutParams());
 		marginParams.setMargins(0, 0, 10, 0);
-		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(marginParams);
+		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+				marginParams);
 
-		ValueAnimator fadeinAnimation = ObjectAnimator.ofFloat(button, "alpha", 0f, 1f);
+		ValueAnimator fadeinAnimation = ObjectAnimator.ofFloat(button, "alpha",
+				0f, 1f);
 		fadeinAnimation.setDuration(800);
 		fadeinAnimation.addListener(new AnimatorListenerAdapter() {
 			public void onAnimationEnd(Animator animation) {
@@ -522,7 +553,7 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 		});
 		fadeinAnimation.start();
 		spannablelayout.addView(button, layoutParams);
-		UpdateSearchTags(mSearchData.getSearchTags().get(btn.getId()),true);
+		UpdateSearchTags(mSearchData.getSearchTags().get(btn.getId()), true);
 		UpdateRecentList(button.getText().toString());
 
 	}
@@ -549,79 +580,84 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 
 	private Button CreateButton(final ButtonData tagData) {
 		final Button btn = new Button(getContext());
-		btn.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-		
+		btn.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT,
+				LayoutParams.WRAP_CONTENT));
+
 		btn.setTextColor(Color.parseColor("#FFFFFF"));
 		btn.setText(tagData.getButtonName());
 		btn.setTextSize(14f);
-		btn.setTypeface(FontUtil.Roboto_Regular);
+		btn.setTypeface(FontUtil.Roboto_Light);
 		btn.setBackgroundResource(R.drawable.roundedbutton);
-					Drawable drawableRight = getResources().getDrawable(R.drawable.buttonclose);
-					drawableRight.setBounds(0, 0, (int)(drawableRight.getIntrinsicWidth()*0.35), 
-			                (int)(drawableRight.getIntrinsicHeight()*0.35));
-					btn.setCompoundDrawables(null, null, drawableRight, null); 
-					btn.setCompoundDrawablePadding(8);
-					btn.setBackgroundResource(R.drawable.roundedbuttonwithclose);
-
+		Drawable drawableRight = getResources().getDrawable(R.drawable.tagclose);
+		drawableRight.setBounds(0, 0, (int) (drawableRight.getIntrinsicWidth()), (int) (drawableRight.getIntrinsicHeight()));
+		btn.setCompoundDrawables(null, null, drawableRight, null);
+		btn.setCompoundDrawablePadding(8);
+		btn.setBackgroundResource(R.drawable.roundedbuttonwithclose);
 
 		return btn;
 	}
-	
-	public void showProgressBar(){
-		if(mProgressDialog != null){
+
+	public void showProgressBar() {
+		if (mProgressDialog != null) {
 			mProgressDialog.dismiss();
 		}
-		mProgressDialog = ProgressDialog.show(getContext(),"", "Fetching Data...", true,false);
+		mProgressDialog = ProgressDialog.show(getContext(), "",
+				"Fetching Data...", true, false);
 	}
-	public void dismissProgressBar(){
-		if(mProgressDialog != null){
+
+	public void dismissProgressBar() {
+		if (mProgressDialog != null) {
 			mProgressDialog.dismiss();
 		}
 	}
-	public void updateText(String str){
-		if(mProgressDialog != null){
+
+	public void updateText(String str) {
+		if (mProgressDialog != null) {
 			mProgressDialog.setTitle(str);
 		}
 	}
 
 	@Override
 	public void OnCacheResults(HashMap<String, CardData> obj) {
-		if(obj == null){return;}
-		
+		if (obj == null) {
+			return;
+		}
+
 		CardExplorerData dataBundle = myplexapplication.getCardExplorerData();
-		
+
 		dataBundle.reset();
 		dataBundle.searchQuery = mSearchQuery;
 		dataBundle.requestType = CardExplorerData.REQUEST_SEARCH;
-		
+
 		mMainActivity.addFilterData(new ArrayList<FilterMenudata>(), null);
-		
-		Set<String> keySet = obj.keySet(); 
-		for(String key: keySet){
-			CardData data =  obj.get(key);
-//			dataBundle.mEntries.add(data);
-//			if(dataBundle.mEntries.get(key) == null){
-				dataBundle.mEntries.put(key,data);
-				dataBundle.mMasterEntries.add(data);
-//			}
-			if(data.generalInfo !=null)
-				Log.i(TAG,"adding "+data._id+":"+data.generalInfo.title+" from Cache");
+
+		Set<String> keySet = obj.keySet();
+		for (String key : keySet) {
+			CardData data = obj.get(key);
+			// dataBundle.mEntries.add(data);
+			// if(dataBundle.mEntries.get(key) == null){
+			dataBundle.mEntries.put(key, data);
+			dataBundle.mMasterEntries.add(data);
+			// }
+			if (data.generalInfo != null)
+				Log.i(TAG, "adding " + data._id + ":" + data.generalInfo.title
+						+ " from Cache");
 		}
 		mCacheManager.unRegisterCallback();
 		mMainActivity.hideActionBarProgressBar();
-		BaseFragment fragment = mMainActivity.createFragment(MainActivity.CARDEXPLORER);
+		BaseFragment fragment = mMainActivity
+				.createFragment(MainActivity.CARDEXPLORER);
 		mMainActivity.bringFragment(fragment);
 	}
 
 	@Override
 	public void OnOnlineResults(List<CardData> dataList) {
-		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void OnOnlineError(VolleyError error) {
-		mMainActivity.hideActionBarProgressBar();		
+		mMainActivity.hideActionBarProgressBar();
 	}
 
 }

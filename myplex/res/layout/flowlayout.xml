@@ -9,8 +9,8 @@
         android:id="@+id/buttongroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        localns:horizontalSpacing="15dp"
-        localns:verticalSpacing="10dp" >
+        localns:horizontalSpacing="@dimen/margin_gap_12"
+        localns:verticalSpacing="@dimen/margin_gap_12" >
     </com.apalya.myplex.views.FlowLayout>
 
 </RelativeLayout>

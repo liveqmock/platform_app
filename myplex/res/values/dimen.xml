@@ -46,6 +46,8 @@
 <!-- dimenesion for search layout -->
 	<dimen name="layoutleftpadding">15dp</dimen>
     <dimen name="buttonpadding">30dp</dimen>
+    <dimen name="searchfieldheight">48dp</dimen>
+    <dimen name="searchqualiferheight">30dp</dimen>
 <!-- dimenesion for search layout -->
 
 
