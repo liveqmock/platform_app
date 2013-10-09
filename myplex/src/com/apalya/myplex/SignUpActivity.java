@@ -35,6 +35,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.apalya.myplex.data.DeviceDetails;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.Analytics;
+import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
@@ -220,7 +221,7 @@ public class SignUpActivity extends Activity{
 		Analytics.trackEvent("REGISTRATION-REQUEST",true);
 		RequestQueue queue = MyVolley.getRequestQueue();
 
-		String url=getString(R.string.url)+contextPath;
+		String url=ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+ConsumerApi.USER_CONTEXT+ConsumerApi.SLASH+contextPath;
 		StringRequest myReq = new StringRequest(Method.POST,
 				url,
 				RegisterUserSuccessListener(),

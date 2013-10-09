@@ -52,7 +52,7 @@
     <string name="loginerr">Unable to process your request due to network. Use let me in option to browse the app</string>
     <string name="clientsecret">ApalyaAndroid</string>
     <!-- URLS -->
-    <string name="url">http://alpha.myplex.in:8866/user/v2/</string>
+    <!-- <string name="url">http://alpha.myplex.in:8866/user/v2/</string> -->
     <string name="devRegPath">registerDevice</string>
     <string name="genKeyReqPath">generateKey</string>
     <string name="signin">signIn</string>

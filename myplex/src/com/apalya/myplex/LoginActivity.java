@@ -431,7 +431,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 	protected void userLoginRequest(String contextPath, final Map<String, String> bodyParams) {
 		RequestQueue queue = MyVolley.getRequestQueue();
 
-		String url=getString(R.string.url)+contextPath;
+		String url=ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+ConsumerApi.USER_CONTEXT+ConsumerApi.SLASH+contextPath;
 		StringRequest myReq = new StringRequest(Method.POST,
 				url,
 				userLoginSuccessListener(),
@@ -850,7 +850,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		Analytics.trackEvent("FACEBOOK-LOGIN-AUTH-REQUEST",true);
 		RequestQueue queue = MyVolley.getRequestQueue();
 
-		String url=getString(R.string.url)+contextPath;
+		String url=ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+ConsumerApi.USER_CONTEXT+ConsumerApi.SLASH+contextPath;
 		StringRequest myReq = new StringRequest(Method.POST,
 				url,
 				fbLoginSuccessListener(),
@@ -1003,7 +1003,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 		RequestQueue queue = MyVolley.getRequestQueue();
 		// showToast("GOOGLE LOGIN REQ");
-		String url=getString(R.string.url)+contextPath;
+		String url=ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+ConsumerApi.USER_CONTEXT+ConsumerApi.SLASH+contextPath;
 		Log.d(TAG, url);
 		Log.d(TAG,bodyParams.toString());
 		StringRequest myReq = new StringRequest(Method.POST,
@@ -1230,6 +1230,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			if (person != null) {
 				AccountUtils.setPlusProfileId(this, person.getId());
 				mUserInfo.setGoogleId(person.getId());
+				//mUserInfo.setUserEmail(person.getName());
+				mUserInfo.setProfilePic("https://plus.google.com/s2/photos/profile/"+person.getId()+"?sz=300");
 				tryAuthenticate();
 				
 			}
@@ -1354,7 +1356,7 @@ private boolean isTokenValid(String clientKeyExp) {
 		
 		RequestQueue queue = MyVolley.getRequestQueue();
 
-		String url=getString(R.string.url)+contextPath;
+		String url=ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+ConsumerApi.USER_CONTEXT+ConsumerApi.SLASH+contextPath;
 		StringRequest myReq = new StringRequest(Method.POST,
 				url,
 				DevRegSuccessListener(),
@@ -1522,7 +1524,7 @@ private boolean isTokenValid(String clientKeyExp) {
 	private void genKeyRequest(String contextPath, final Map<String, String> bodyParams) {
 		RequestQueue queue = MyVolley.getRequestQueue();
 
-		String url=getString(R.string.url)+contextPath;
+		String url=ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+ConsumerApi.USER_CONTEXT+ConsumerApi.SLASH+contextPath;
 		StringRequest myReq = new StringRequest(Method.POST,
 				url,
 				genKeyRegSuccessListener(),
