@@ -483,11 +483,15 @@ public class CardView extends ScrollView {
 		public void onDelayedClick(View v) {
 			mMotionConsumedByClick = true;
 			Log.e(TAG, "mDeleteListener onClick");
-			CardData data = (CardData) v.getTag();
-			if(data == null ){
+			CardDataHolder dataHolder = null;
+			if(v.getTag() instanceof CardDataHolder){
+				dataHolder = (CardDataHolder) v.getTag();
+				if(dataHolder == null){return;}
+				if(dataHolder.mDataObject == null){return;}
+			}else{
 				return;
 			}
-			int index = mDataList.indexOf(data);
+			int index = mDataList.indexOf(dataHolder.mDataObject);
 			mDataList.remove(index);
 			mNumberofItems = mDataList.size();
 			View localv = mCardsLayout.mCardViewReusePool.getView(index);

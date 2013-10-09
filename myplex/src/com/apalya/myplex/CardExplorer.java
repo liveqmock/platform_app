@@ -136,7 +136,6 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				if(verifyResume()){
 					fetchMinData();	
 				}
-				applyData();
 			}
 		});
 	}
@@ -264,7 +263,11 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	}
 
 	private void applyData() {
-		if(mData.mMasterEntries.size() == 0){return;}
+		if(mData.mMasterEntries.size() == 0){
+			mMainActivity.hideActionBarProgressBar();
+			dismissProgressBar();
+			return;
+		}
 		updateText("preparing ui");
 		mCardView.addData(mData.mMasterEntries);
 		mCardView.show();
