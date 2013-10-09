@@ -4,6 +4,7 @@
     android:background="?android:attr/activatedBackgroundIndicator" >
 
     <ImageView
+        android:contentDescription="@string/hello_world"
         android:id="@+id/drawer_list_item_image"
         android:layout_width="32dp"
         android:layout_height="32dp"
@@ -19,7 +20,7 @@
         android:minHeight="?android:attr/listPreferredItemHeightSmall"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-        android:text="Settings"
+        android:text="@string/navigationmenu_settings"
         android:textAppearance="?android:attr/textAppearanceListItemSmall"
         android:textColor="#fff" />
 

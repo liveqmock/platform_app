@@ -20,7 +20,6 @@ import java.util.Formatter;
 import java.util.Locale;
 
 import android.content.Context;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Message;
@@ -32,24 +31,21 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.SeekBar;
-import android.widget.Toast;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.apalya.myplex.R;
-import com.apalya.myplex.media.VideoView;
 
 public class MediaController2 extends LinearLayout {
 
     private VideoView  mPlayer;
     private Context             mContext;    
     private View                mRoot;    
-    private ProgressBar         mProgress;
+    private SeekBar         mProgress;
     private TextView            mEndTime, mCurrentTime;
     private boolean             mShowing;
     private boolean             mDragging;
@@ -252,13 +248,13 @@ public class MediaController2 extends LinearLayout {
 //						audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,set_volume, 0);
 						
 						if(!mMuteEnabled){
-							Toast toast = Toast.makeText(mContext, "Muted", 30000);
+							Toast toast = Toast.makeText(mContext, "Muted", Toast.LENGTH_LONG);
 							toast.show();
 							mMuteButton.setImageResource(R.drawable.player_icon_volume_mute);
 							mMediaPlayer.setVolume(0,0);
 							mMuteEnabled = true;
 						}else{
-							Toast toast = Toast.makeText(mContext, "Unmuted", 30000);
+							Toast toast = Toast.makeText(mContext, "Unmuted", Toast.LENGTH_LONG);
 							toast.show();
 							mMuteButton.setImageResource(R.drawable.player_icon_volume_max);
 							mMediaPlayer.setVolume(1,1);
@@ -300,12 +296,10 @@ public class MediaController2 extends LinearLayout {
 //            mPrevButton.setVisibility(View.GONE);
 //        }
 
-        mProgress = (ProgressBar) v.findViewById(R.id.mediacontroller_progress);
+        mProgress = (SeekBar) v.findViewById(R.id.mediacontroller_progress);
         if (mProgress != null) {
-            if (mProgress instanceof SeekBar) {
-                SeekBar seeker = (SeekBar) mProgress;
-                seeker.setOnSeekBarChangeListener(mSeekListener);
-            }
+            SeekBar seeker = (SeekBar) mProgress;
+            seeker.setOnSeekBarChangeListener(mSeekListener);
             mProgress.setMax(1000);
         }
 

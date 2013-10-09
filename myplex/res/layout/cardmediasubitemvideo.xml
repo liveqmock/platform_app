@@ -18,6 +18,7 @@
         android:visibility="gone" />
 
     <ImageView
+        android:contentDescription="@string/hello_world"
         android:id="@+id/cardmediasubitemvideo_play"
         android:layout_width="@dimen/size_48"
         android:layout_height="@dimen/size_48"

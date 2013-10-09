@@ -13,6 +13,7 @@
         android:layout_margin="@dimen/margin_gap_12" >
 
         <ImageView
+            android:contentDescription="@string/hello_world"
             android:id="@+id/carddetailmedia_expand"
             android:layout_width="@dimen/size_24"
             android:layout_height="@dimen/size_24"
@@ -32,7 +33,7 @@
         android:layout_marginLeft="@dimen/margin_gap_12"
         android:layout_marginTop="@dimen/margin_gap_12"
         android:singleLine="true"
-        android:text="Related Multimedia"
+        android:text="@string/carddetailsectionheader_relatedMultimedia"
         android:textColor="#4b4b4b"
         android:textSize="@dimen/textsize_16" />
 

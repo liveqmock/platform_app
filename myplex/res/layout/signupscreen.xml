@@ -203,7 +203,7 @@
                     android:paddingRight="@dimen/margin_gap_16"
                     android:paddingTop="14dp"
                     android:text="@string/msgUpdate"
-                    android:textSize="14dp"
+                    android:textSize="@dimen/textsize_14"
                     android:thumb="@drawable/switch_thumb" />
 
                 <Switch
@@ -218,7 +218,7 @@
                     android:paddingRight="@dimen/margin_gap_16"
                     android:paddingTop="14dp"
                     android:text="@string/mailUpdate"
-                    android:textSize="14dp"
+                    android:textSize="@dimen/textsize_14"
                     android:thumb="@drawable/switch_thumb" />
             </RelativeLayout>
 

@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/margin_gap_12"
         android:layout_marginTop="12dp"
-        android:text="Myplex Description"
+        android:text="@string/carddetailsectionheader_myplexdescription"
         android:textColor="#4b4b4b"
         android:textSize="@dimen/textsize_18" />
 

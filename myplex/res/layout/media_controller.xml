@@ -37,6 +37,7 @@
         -->
 
         <ImageView
+            android:contentDescription="@string/hello_world"
             android:id="@+id/playerquality"
             android:layout_width="32dp"
             android:layout_height="32dp"
@@ -64,6 +65,7 @@
                 android:layout_toRightOf="@+id/playerstop" />
 
             <ImageView
+                android:contentDescription="@string/hello_world"
                 android:id="@+id/playpause"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
@@ -74,6 +76,7 @@
                 android:src="@drawable/player_icon_pause" />
 
             <ImageView
+                android:contentDescription="@string/hello_world"
                 android:id="@+id/playerstop"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
@@ -105,6 +108,7 @@
         
 
         <ImageView
+            android:contentDescription="@string/hello_world"
             android:id="@+id/playervolume"
             android:layout_width="32dp"
             android:layout_height="32dp"

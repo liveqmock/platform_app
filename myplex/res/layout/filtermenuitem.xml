@@ -25,7 +25,6 @@
         android:layout_toRightOf="@+id/filtermenuicon"
         android:ellipsize="end"
         android:singleLine="true"
-        android:text="test"
         android:textColor="#ffffff"
         android:textSize="22sp" />
 

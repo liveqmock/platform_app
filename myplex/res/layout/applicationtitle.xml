@@ -4,6 +4,7 @@
     android:layout_height="match_parent" >
 
     <ImageView
+        android:contentDescription="@string/hello_world"
         android:id="@+id/customactionbar_drawer"
         android:layout_width="48dp"
         android:layout_height="48dp"
@@ -24,11 +25,12 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
-            android:text="Myplex"
+            android:text="@string/app_name"
             android:textColor="#ffffff"
-            android:textSize="22dp" />
+            android:textSize="22sp" />
 
         <ImageView
+            android:contentDescription="@string/hello_world"
             android:id="@+id/customactionbar_filter_button"
             android:layout_width="24dp"
             android:layout_height="24dp"
@@ -39,6 +41,7 @@
     </RelativeLayout>
 
     <ImageView
+        android:contentDescription="@string/hello_world"
         android:id="@+id/customactionbar_search_button"
         android:layout_width="48dp"
         android:layout_height="48dp"

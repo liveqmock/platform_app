@@ -1,6 +1,5 @@
 package com.apalya.myplex.data;
 
-import java.io.File;
 
 public class ApplicationConfig {
 	public static final String LDPI = "ldpi";

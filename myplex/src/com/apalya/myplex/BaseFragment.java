@@ -1,15 +1,8 @@
 package com.apalya.myplex;
 
-import java.util.List;
-
-import com.apalya.myplex.data.FilterMenudata;
-
 import android.app.ActionBar;
 import android.app.Fragment;
 import android.content.Context;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 
 public class BaseFragment extends Fragment {
 

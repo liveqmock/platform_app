@@ -1,25 +1,14 @@
 package com.apalya.myplex.utils;
 
 import java.io.IOException;
-import java.util.EventListener;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import android.app.Activity;
-import android.content.Context;
 import android.util.Log;
 
-import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.apalya.myplex.data.CardResponseData;
-import com.apalya.myplex.utils.MediaUtil.MediaUtilEventListener;
-import com.apalya.myplex.utils.WidevineDrm.WidevineDrmLogEventListener;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 

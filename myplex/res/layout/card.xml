@@ -12,6 +12,7 @@
         android:layout_alignParentTop="true" >
 
         <ImageView
+            android:contentDescription="@string/hello_world"
             android:id="@+id/card_title_delete"
             android:layout_width="24dp"
             android:layout_height="24dp"
@@ -22,6 +23,7 @@
             android:src="@drawable/card_iconclose" />
 
         <ImageView
+            android:contentDescription="@string/hello_world"
             android:id="@+id/card_title_fav"
             android:layout_width="24dp"
             android:layout_height="24dp"
@@ -48,7 +50,6 @@
             android:layout_centerInParent="true"
             android:gravity="center"
             android:singleLine="true"
-            android:text="title"
             android:textColor="#343433"
             android:textSize="16sp"/>
     </RelativeLayout>
@@ -69,6 +70,7 @@
             android:scaleType="centerInside" />
 
         <ImageView
+            android:contentDescription="@string/hello_world"
             android:id="@+id/card_play"
             android:layout_width="24dp"
             android:layout_height="24dp"
@@ -87,6 +89,7 @@
         android:layout_below="@+id/card_preview_layout" >
 
         <ImageView
+            android:contentDescription="@string/hello_world"
             android:id="@+id/card_status_comments"
             android:layout_width="24dp"
             android:layout_height="24dp"
@@ -96,6 +99,7 @@
             android:src="@drawable/card_iconcomment" />
 
         <ImageView
+            android:contentDescription="@string/hello_world"
             android:id="@+id/card_status_people"
             android:layout_width="24dp"
             android:layout_height="24dp"
@@ -112,7 +116,6 @@
             android:layout_toLeftOf="@+id/card_status_people"
             android:gravity="center_vertical"
             android:singleLine="true"
-            android:text="13,514"
             android:textColor="#58b4e5"
             android:textSize="14sp" />
 
@@ -125,7 +128,6 @@
             android:layout_toRightOf="@+id/card_status_comments"
             android:gravity="center_vertical"
             android:singleLine="true"
-            android:text="5,514"
             android:textColor="#58b4e5"
             android:textSize="14sp" />
     </RelativeLayout>
@@ -150,7 +152,6 @@
             android:layout_gravity="center"
             android:layout_marginLeft="7dp"
             android:singleLine="true"
-            android:text="Starts with Rs 199"
             android:textColor="#6b6b6b"
             android:textSize="14sp" />
     </LinearLayout>

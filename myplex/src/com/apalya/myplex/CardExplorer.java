@@ -3,32 +3,20 @@ package com.apalya.myplex;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.provider.ContactsContract.Data;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.LinearLayout;
-import android.widget.PopupWindow;
-import android.widget.RatingBar;
-import android.widget.RelativeLayout.LayoutParams;
-import android.widget.Space;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -39,9 +27,7 @@ import com.apalya.myplex.adapters.CardActionListener;
 import com.apalya.myplex.cache.CacheManager;
 import com.apalya.myplex.cache.IndexHandler;
 import com.apalya.myplex.data.CardData;
-import com.apalya.myplex.data.CardDataCertifiedRatingsItem;
 import com.apalya.myplex.data.CardDataGenre;
-import com.apalya.myplex.data.CardDataPackages;
 import com.apalya.myplex.data.CardExplorerData;
 import com.apalya.myplex.data.CardResponseData;
 import com.apalya.myplex.data.FilterMenudata;
@@ -49,7 +35,6 @@ import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.listboxanimation.OnDismissCallback;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FavouriteUtil;
-import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.FavouriteUtil.FavouriteCallback;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
@@ -136,6 +121,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				if(verifyResume()){
 					fetchMinData();	
 				}
+				applyData();
 			}
 		});
 	}
@@ -264,8 +250,6 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 
 	private void applyData() {
 		if(mData.mMasterEntries.size() == 0){
-			mMainActivity.hideActionBarProgressBar();
-			dismissProgressBar();
 			return;
 		}
 		updateText("preparing ui");
@@ -341,7 +325,10 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	@Override
 	public void OnCacheResults(HashMap<String, CardData> object ) {
 		if(object == null){return;}
+		mMainActivity.hideActionBarProgressBar();
+		dismissProgressBar();
 		Set<String> keySet = object.keySet();
+			
 		for(String key:keySet){
 //			mData.mEntries.add(object.get(key));
 			if(mData.mEntries.get(key) == null){

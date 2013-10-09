@@ -3,6 +3,7 @@ package com.apalya.myplex.views;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -183,8 +184,8 @@ public class CardDetailViewFactory {
 		if(mData.comments.values == null ){return null;}
 		if(mData.comments.values.size() == 0){return null;}
 		View v = mInflator.inflate(R.layout.carddetailbriefcomment, null);
-		mComments = v;
 		final LinearLayout layout = (LinearLayout)v.findViewById(R.id.carddetailcomment_contentlayout);
+		mComments = layout;
 		addSpace(layout, (int)mContext.getResources().getDimension(R.dimen.margin_gap_16));
 		if(type == CARDDETAIL_COMMENTS){
 			fillCommentSectionData(COMMENTSECTION_COMMENTS,-1,layout);
@@ -677,6 +678,7 @@ public class CardDetailViewFactory {
 		}else if(label.equalsIgnoreCase("RelatedMultimedia")){
 			return (int)mMultimedia.getY();
 		}else if(label.equalsIgnoreCase("Comments")){
+			Rect rect = new Rect();
 			return (int)mComments.getY();
 		}else if(label.equalsIgnoreCase("Myplex Descrition")){
 			return (int)mMyPlexDescription.getY();

@@ -4,6 +4,7 @@
     android:layout_height="match_parent" >
 
     <ImageView
+        android:contentDescription="@string/hello_world"
         android:id="@+id/imageView1"
         android:layout_width="@dimen/size_24"
         android:layout_height="@dimen/size_24"
@@ -34,7 +35,6 @@
                 android:id="@+id/carddetailcomment_personname"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Name"
                 android:textColor="#6d6e71"
                 android:textSize="@dimen/textsize_12" />
 
@@ -43,7 +43,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/margin_gap_8"
-                android:text="time"
                 android:textColor="#939597"
                 android:textSize="@dimen/textsize_10" />
         </LinearLayout>
@@ -54,7 +53,6 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/titlelayout"
             android:layout_marginLeft="@dimen/margin_gap_8"
-            android:text="one of the best movies this year"
             android:textColor="#4b4b4c"
             android:textSize="@dimen/textsize_10" />
     </RelativeLayout>

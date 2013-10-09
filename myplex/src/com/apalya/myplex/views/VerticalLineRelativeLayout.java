@@ -40,14 +40,16 @@ public class VerticalLineRelativeLayout extends RelativeLayout {
 		paint.setStrokeWidth(6f);
 		paint.setStyle(Paint.Style.FILL);
 	}
+	Rect mRect = new Rect();
+	int mStartX;
 	@Override
 	protected void onDraw(Canvas canvas) {
-		int startX =(int)getContext().getResources().getDimension(R.dimen.margin_gap_4);
-		View child = getChildAt(0);
-		Rect rect = new Rect();
-		child.getGlobalVisibleRect(rect);
-		
-		canvas.drawLine((startX+(rect.width()/2)), rect.height(), (startX+(rect.width()/2)), getHeight(), paint);
+		if(mRect.isEmpty()){
+			mStartX = (int)getContext().getResources().getDimension(R.dimen.margin_gap_4);
+			View child = getChildAt(0);
+			child.getGlobalVisibleRect(mRect);
+		}
+		canvas.drawLine((mStartX+(mRect.width()/2)), mRect.height(), (mStartX+(mRect.width()/2)), getHeight(), paint);
 		super.onDraw(canvas);
 	}
 

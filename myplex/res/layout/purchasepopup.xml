@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="match_parent"     
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="all"
     android:background="#CC000000" >
 
     <RelativeLayout
@@ -17,7 +19,6 @@
             android:layout_marginLeft="30dp"
             android:layout_marginTop="45dp"
             android:singleLine="true"
-            android:text="Riddick"
             android:textColor="#ffffff"
             android:textSize="@dimen/textsize_20" />
 
@@ -47,11 +48,11 @@
                 android:layout_gravity="center_vertical"
                 android:layout_marginRight="15dp"
                 android:singleLine="true"
-                android:text="PG-13"
                 android:textColor="#ffffff"
                 android:textSize="@dimen/textsize_12" />
 
             <ImageView
+                android:contentDescription="@string/hello_world"
                 android:layout_width="18dp"
                 android:layout_height="12dp"
                 android:layout_gravity="center_vertical"
@@ -65,7 +66,7 @@
                 android:layout_gravity="center_vertical"
                 android:layout_marginRight="15dp"
                 android:singleLine="true"
-                android:text="1:42:13"
+                android:text=""
                 android:textColor="#ffffff"
                 android:textSize="@dimen/textsize_12" />
 
@@ -75,7 +76,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:singleLine="true"
-                android:text="July 29,2013"
                 android:textColor="#ffffff"
                 android:textSize="@dimen/textsize_12" />
         </LinearLayout>
@@ -101,7 +101,6 @@
             android:layout_marginRight="30dp"
             android:layout_marginTop="40dp"
             android:lineSpacingExtra="2dp"
-            android:text="When Keller Dover&apos;s daughter and her friend go missing, he takes matters into his own hands as the police pursue multiple leads and the pressure mounts. But just how far will this desperate father go to protect his family"
             android:textColor="#ffffff"
             android:textSize="@dimen/textsize_12" />
     </RelativeLayout>

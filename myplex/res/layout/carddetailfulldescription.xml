@@ -13,6 +13,7 @@
         android:layout_margin="@dimen/margin_gap_12" >
 
         <ImageView
+            android:contentDescription="@string/hello_world"
             android:id="@+id/carddetailfulldescription_expand"
             android:layout_width="@dimen/size_24"
             android:layout_height="@dimen/size_24"
@@ -76,6 +77,7 @@
             android:textSize="@dimen/textsize_12" />
 
         <ImageView
+            android:contentDescription="@string/hello_world"
             android:layout_width="18dp"
             android:layout_height="8dp"
             android:layout_gravity="center_vertical"
@@ -114,7 +116,6 @@
         android:background="@drawable/carddetailbutton_bg"
         android:paddingLeft="4dp"
         android:paddingRight="4dp"
-        android:text="Starts from 199 onwards"
         android:textColor="#54b5e9"
         android:textSize="@dimen/textsize_12" />
 
@@ -136,7 +137,7 @@
         android:layout_marginLeft="@dimen/margin_gap_12"
         android:layout_marginTop="12dp"
         android:lineSpacingExtra="2dp"
-        android:text="Description"
+        android:text="@string/carddetailsectionheader_description"
         android:textColor="#4b4b4c"
         android:textSize="@dimen/textsize_16" />
 

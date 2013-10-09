@@ -4,13 +4,14 @@ import com.android.volley.toolbox.NetworkImageView;
 
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class CardViewHolder {
-	public LinearLayout mFavourite;
+	public ImageView mFavourite;
 	public ImageView mFavourite_Image;
-	public LinearLayout mFavouriteProgress;
-	public LinearLayout mDelete;
+	public ProgressBar mFavouriteProgress;
+	public ImageView mDelete;
 	public ImageView mRent;
 	public LinearLayout mInfo;
 	public TextView mText;

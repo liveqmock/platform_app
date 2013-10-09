@@ -13,6 +13,7 @@
         android:padding="@dimen/margin_gap_12" >
 
         <ImageView
+            android:contentDescription="@string/hello_world"
             android:id="@+id/carddetailcomment_expand"
             android:layout_width="@dimen/size_24"
             android:layout_height="@dimen/size_24"
@@ -40,6 +41,7 @@
             android:layout_alignParentTop="true" >
 
             <ImageView
+                android:contentDescription="@string/hello_world"
                 android:id="@+id/carddetailcomment_commentimage"
                 android:layout_width="@dimen/size_24"
                 android:layout_height="@dimen/size_24" android:layout_marginRight="@dimen/margin_gap_6"
@@ -50,7 +52,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="Comments"
+                android:text="@string/carddetailsectionheader_comment"
                 android:textSize="@dimen/textsize_14" />
         </LinearLayout>
 
@@ -95,6 +97,7 @@
             android:layout_centerHorizontal="true" >
 
             <ImageView
+                android:contentDescription="@string/hello_world"
                 android:layout_width="@dimen/size_24"
                 android:layout_height="@dimen/size_24"
                 android:layout_marginRight="@dimen/margin_gap_6"
@@ -104,7 +107,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="Rate"
+                android:text="@string/carddetailsectionheader_rate"
                 android:textSize="@dimen/textsize_14" />
         </LinearLayout>
 
@@ -116,6 +119,7 @@
             android:layout_alignRight="@+id/carddetailcomment_contentlayout" >
 
             <ImageView
+                android:contentDescription="@string/hello_world"
                  android:id="@+id/carddetailcomment_reviewimage"
                 android:layout_width="@dimen/size_24"
                 android:layout_height="@dimen/size_24"
@@ -127,7 +131,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
-                android:text="Reviews"
+                android:text="@string/carddetailsectionheader_reviews"
                 android:textSize="@dimen/textsize_14" />
         </LinearLayout>
 

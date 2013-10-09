@@ -600,10 +600,10 @@ public class SearchActivity extends BaseFragment implements OpenCallBackListener
 		for(String key: keySet){
 			CardData data =  obj.get(key);
 //			dataBundle.mEntries.add(data);
-			if(dataBundle.mEntries.get(key) == null){
+//			if(dataBundle.mEntries.get(key) == null){
 				dataBundle.mEntries.put(key,data);
 				dataBundle.mMasterEntries.add(data);
-			}
+//			}
 			if(data.generalInfo !=null)
 				Log.i(TAG,"adding "+data._id+":"+data.generalInfo.title+" from Cache");
 		}

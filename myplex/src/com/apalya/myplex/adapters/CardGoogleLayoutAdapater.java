@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.NetworkImageView;
@@ -84,9 +85,9 @@ public class CardGoogleLayoutAdapater extends BaseAdapter{
 		if (tagData == null) {
 			tagData = new CardViewMeta();
 			tagData.mUiHolder = new CardViewHolder();
-			tagData.mUiHolder.mDelete = (LinearLayout) v.findViewById(R.id.card_title_delete);
-			tagData.mUiHolder.mFavourite = (LinearLayout) v.findViewById(R.id.card_title_fav);
-			tagData.mUiHolder.mFavouriteProgress = (LinearLayout) v.findViewById(R.id.card_title_fav_progress);
+			tagData.mUiHolder.mDelete = (ImageView) v.findViewById(R.id.card_title_delete);
+			tagData.mUiHolder.mFavourite = (ImageView) v.findViewById(R.id.card_title_fav);
+			tagData.mUiHolder.mFavouriteProgress = (ProgressBar) v.findViewById(R.id.card_title_fav_progress);
 //			tagData.mUiHolder.mFavourite_Image = (ImageView) v.findViewById(R.id.card_title_fav_image);
 			tagData.mUiHolder.mRent = (ImageView) v.findViewById(R.id.card_info_rent);
 //			tagData.mUiHolder.mInfo = (LinearLayout) v.findViewById(R.id.card_info_more);

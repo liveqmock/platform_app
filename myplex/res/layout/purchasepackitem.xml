@@ -18,7 +18,7 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="12dp"
             android:singleLine="true"
-            android:text="Rent"
+            android:text="@string/pricepopuprent"
             android:textColor="#ffffff"
             android:textSize="12sp" />
 
@@ -30,7 +30,6 @@
             android:layout_marginLeft="5dp"
             android:layout_toRightOf="@+id/purchasepackItem1_type"
             android:singleLine="true"
-            android:text="HD"
             android:textColor="#ff0000"
             android:textSize="12sp"
             android:textStyle="italic" />
@@ -43,7 +42,6 @@
             android:layout_marginLeft="5dp"
             android:layout_toRightOf="@+id/purchasepackItem1_quality"
             android:singleLine="true"
-            android:text="Rs99"
             android:textColor="#ffffff"
             android:textSize="12sp" />
     </RelativeLayout>
@@ -64,7 +62,7 @@
             android:layout_marginLeft="1dp"
             android:layout_weight="1"
             android:singleLine="true"
-            android:text="50%"
+            android:text=""
             android:textColor="#ffffff"
             android:textSize="12sp" />
 
@@ -74,7 +72,7 @@
             android:layout_gravity="center"
             android:layout_weight="1"
             android:singleLine="true"
-            android:text="off"
+            android:text="@string/pricepopupdiscount"
             android:textColor="#ffffff"
             android:textSize="8sp" />
     </LinearLayout>

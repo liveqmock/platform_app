@@ -19,7 +19,7 @@
         android:layout_marginTop="12dp"
         android:layout_marginLeft="12dp"
         android:singleLine="true"
-        android:text="Credits"
+        android:text="@string/carddetailsectionheader_credits"
         android:textColor="#4b4b4c"
         android:textSize="@dimen/textsize_16" />
 

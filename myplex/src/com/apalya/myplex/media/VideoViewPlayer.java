@@ -2,7 +2,6 @@ package com.apalya.myplex.media;
 
 
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.drm.DrmErrorEvent;
@@ -26,8 +25,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.apalya.myplex.data.ErrorManagerData;
-import com.apalya.myplex.data.myplexapplication;
-import com.apalya.myplex.media.VideoView;
 
 public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 		MediaPlayer.OnCompletionListener, OnPreparedListener,
