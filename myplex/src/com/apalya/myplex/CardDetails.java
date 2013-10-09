@@ -180,7 +180,7 @@ public class CardDetails extends BaseFragment implements
 					}
 					Uri uri = Uri.parse("rtsp://59.162.166.216:554/AAJTAK_QVGA.sdp");
 					uri = Uri.parse("rtsp://46.249.213.87:554/playlists/bollywood-action_qcif.hpl.3gp");
-//					uri = Uri.parse(url);
+					uri = Uri.parse(url);
 					
 					VideoViewPlayer.StreamType streamType = StreamType.VOD;
 					if(mVideoViewPlayer == null){
