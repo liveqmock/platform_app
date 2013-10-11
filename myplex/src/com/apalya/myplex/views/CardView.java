@@ -2,7 +2,9 @@ package com.apalya.myplex.views;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.Stack;
 
 import android.animation.Animator;
@@ -10,6 +12,12 @@ import android.animation.Animator.AnimatorListener;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.Rect;
+import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.SparseArray;
@@ -26,17 +34,19 @@ import android.widget.ScrollView;
 import android.widget.Scroller;
 import android.widget.TextView;
 
-import com.android.volley.toolbox.NetworkImageView;
+import com.android.volley.toolbox.CardNetworkImageView;
 import com.apalya.myplex.R;
 import com.apalya.myplex.adapters.CardActionListener;
 import com.apalya.myplex.adapters.CardItemClickListener;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDataHolder;
 import com.apalya.myplex.data.CardDataImagesItem;
+import com.apalya.myplex.data.CardImageView;
 import com.apalya.myplex.data.CardDataPackagePriceDetailsItem;
 import com.apalya.myplex.data.CardDataPackages;
 import com.apalya.myplex.data.CardViewMeta;
 import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.utils.CardImageLoader;
 import com.apalya.myplex.utils.FavouriteUtil;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
@@ -214,7 +224,9 @@ public class CardView extends ScrollView {
 	public View createCardView() {
 		return mInflater.inflate(R.layout.card, null);		
 	}
-	
+	private String mPriceStarts = "Starts from ";
+	private String mRupeeCode  = null;
+	private HashMap<String,String> ImageUrlMap = new HashMap<String, String>();
 	public void applyData(View v, int position) {
 		if (v == null || !(position >= 0 && position < mNumberofItems)) {
 			return;
@@ -222,47 +234,74 @@ public class CardView extends ScrollView {
 		CardData data = mDataList.get(position);
 		v.setId(position);
 		CardDataHolder dataHolder = (CardDataHolder)v.getTag();
-//		if(dataHolder == null){
+		if(dataHolder == null){
 			dataHolder = new CardDataHolder();
-			dataHolder.mTitleLayout = (RelativeLayout)v.findViewById(R.id.card_title_layout); 
+			dataHolder.mTitleLayout = (LinearLayout)v.findViewById(R.id.card_title_layout); 
 			dataHolder.mTitle = (TextView)v.findViewById(R.id.card_title_name);
-			dataHolder.mDelete = (ImageView)v.findViewById(R.id.card_title_delete);
-			dataHolder.mFavourite = (ImageView)v.findViewById(R.id.card_title_fav);
-			dataHolder.mPreview = (NetworkImageView)v.findViewById(R.id.card_preview_image);
-			dataHolder.mOverLayPlay = (ImageView)v.findViewById(R.id.card_play);
-			dataHolder.mComments = (ImageView)v.findViewById(R.id.card_title_delete);
-			dataHolder.mReviews = (ImageView)v.findViewById(R.id.card_title_delete);
+			dataHolder.mDelete = (TextView)v.findViewById(R.id.card_title_delete);
+			dataHolder.mFavourite = (TextView)v.findViewById(R.id.card_title_fav);
+			dataHolder.mPreview = (CardImageView)v.findViewById(R.id.card_preview_image);
+			dataHolder.mOverLayPlay = (TextView)v.findViewById(R.id.card_play);
+			dataHolder.mComments = (TextView)v.findViewById(R.id.card_status_comments);
+			dataHolder.mReviews = (TextView)v.findViewById(R.id.card_status_people);
 			dataHolder.mCommentsText = (TextView)v.findViewById(R.id.card_status_comments_text);
 			dataHolder.mReviewsText = (TextView)v.findViewById(R.id.card_status_people_text);
-			dataHolder.mRentLayout = (LinearLayout)v.findViewById(R.id.card_rent_layout);
+//			dataHolder.mRentLayout = (LinearLayout)v.findViewById(R.id.card_rent_layout);
 			dataHolder.mRentText = (TextView)v.findViewById(R.id.card_rent_text);
 			dataHolder.mFavProgressBar = (ProgressBar) v.findViewById(R.id.card_title_fav_progress);
 			
 			// fonts
+			
 			
 			dataHolder.mTitle.setTypeface(FontUtil.Roboto_Medium);
 			dataHolder.mRentText.setTypeface(FontUtil.Roboto_Medium);
 			dataHolder.mCommentsText.setTypeface(FontUtil.Roboto_Medium);
 			dataHolder.mReviewsText.setTypeface(FontUtil.Roboto_Medium);
 			
+			
+			dataHolder.mDelete.setTypeface(FontUtil.ss_symbolicons_line);
+			dataHolder.mFavourite.setTypeface(FontUtil.ss_symbolicons_line);
+			dataHolder.mComments.setTypeface(FontUtil.ss_symbolicons_line);
+			dataHolder.mReviews.setTypeface(FontUtil.ss_symbolicons_line);
+			dataHolder.mOverLayPlay.setTypeface(FontUtil.ss_symbolicons_line);
+			
+//			dataHolder.mOverLayPlay.setText(R.string.card_play);
+//			dataHolder.mDelete.setText(R.string.card_delete);
+//			dataHolder.mFavourite.setText(R.string.card_heart);
+			dataHolder.mComments.bringToFront();
+//			dataHolder.mReviews.setText(R.string.card_people);
+			
 //			CardData dataHolder.mDataObject = (TextView)v.findViewById(id);
 			v.setTag(dataHolder);
-//		}
+		}
 		dataHolder.mDataObject = data;
-		
+		dataHolder.mPreview.mCardId = position;
+		dataHolder.mPreview.mImageUrl = null;
 //		dataHolder.mTitleLayout.setBackgroundColor(color)
+		
+//		ImageUrlMap.put(""+position,null);
 		
 		if(data.generalInfo != null && data.generalInfo.title != null){
 			dataHolder.mTitle.setText(data.generalInfo.title);
 		}
+		
+		Random rnd = new Random();
+		int Low = 100;
+		int High = 196;
+		
+        int color = Color.argb(255, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low); 
+        dataHolder.mPreview.setBackgroundColor(color);
+        dataHolder.mPreview.setImageBitmap(null);
+		Log.e("CardView","Erasing "+position+" for "+dataHolder.mTitle.getText());
 		if(data.images != null){
 			for(CardDataImagesItem imageItem:data.images.values){
-				if(imageItem.profile != null && imageItem.profile.equalsIgnoreCase(myplexapplication.getApplicationConfig().type)){
-					if (imageItem.link == null || imageItem.link.compareTo("Images/NoImage.jpg") == 0) {
-						dataHolder.mPreview.setImageResource(0);
-					} else if (imageItem.link != null){
-						Log.d("CardExplorer","imageItem.link ="+imageItem.link+" profile = "+imageItem.profile);
-						dataHolder.mPreview.setImageUrl(imageItem.link,MyVolley.getImageLoader());
+				if(imageItem.profile != null && imageItem.profile.equalsIgnoreCase("xxhdpi")){
+					if (imageItem.link != null && !(imageItem.link.compareTo("Images/NoImage.jpg") == 0)) {
+						dataHolder.mPreview.mImageUrl = imageItem.link;
+//						Log.d("CardExplorer","imageItem.link ="+imageItem.link+" profile = "+imageItem.profile);
+						CardImageLoader ImageLoader = new CardImageLoader(this,position);
+						ImageLoader.loadImage(dataHolder.mPreview);
+//						dataHolder.mPreview.setImageUrl(imageItem.link,MyVolley.getImageLoader());
 					}
 					break;
 				}
@@ -271,9 +310,9 @@ public class CardView extends ScrollView {
 		dataHolder.mFavProgressBar.setVisibility(View.INVISIBLE);
 		dataHolder.mFavourite.setVisibility(View.VISIBLE);
 		if(data.currentUserData != null && data.currentUserData.favorite){
-			dataHolder.mFavourite.setImageResource(R.drawable.card_iconheartblue);
+			dataHolder.mFavourite.setText(R.string.card_filledheart);
 		}else{
-			dataHolder.mFavourite.setImageResource(R.drawable.card_iconheart);
+			dataHolder.mFavourite.setText(R.string.card_heart);
 		}
 		if(data.userReviews != null){
 			dataHolder.mReviewsText.setText(""+data.userReviews.values.size());	
@@ -296,27 +335,34 @@ public class CardView extends ScrollView {
 							price = priceDetailItem.price;
 						}
 					}
-					dataHolder.mRentText.setText("Start from Rs "+price);
+					if(mRupeeCode == null){
+						mRupeeCode = mContext.getResources().getString(R.string.price_rupeecode); 
+					}
+					dataHolder.mRentText.setText(mPriceStarts + mRupeeCode + " "+price);
 				}else{
-					dataHolder.mRentText.setText("free");
+					dataHolder.mRentText.setText("Free");
 				}
 			}	
 		}
-		
-		
-		
-		
+//		int reqsize = (int) mContext.getResources().getDimension(R.dimen.margin_gap_24);
+//		reqsize = 40;
+//		 ShapeDrawable biggerCircle= new ShapeDrawable( new OvalShape());
+//	        biggerCircle.setIntrinsicHeight( reqsize );
+//	        biggerCircle.setIntrinsicWidth( reqsize);
+//	        biggerCircle.setBounds(new Rect(0, 0, reqsize, reqsize));
+//	        biggerCircle.getPaint().setColor(Color.BLUE);
+//
+//	        dataHolder.mOverLayPlay.setBackgroundDrawable(biggerCircle);
 		dataHolder.mDelete.setOnClickListener(mDeleteListener);
 		dataHolder.mDelete.setTag(dataHolder);
 		dataHolder.mOverLayPlay.setOnClickListener(mOpenCardListener);
 		dataHolder.mOverLayPlay.setTag(dataHolder);
 		dataHolder.mPreview.setOnClickListener(mOpenCardListener);
 		dataHolder.mPreview.setTag(dataHolder);
-		dataHolder.mRentLayout.setOnClickListener(mPurchaseListener);
-		dataHolder.mRentLayout.setTag(dataHolder);
+		dataHolder.mRentText.setOnClickListener(mPurchaseListener);
+		dataHolder.mRentText.setTag(dataHolder);
 		dataHolder.mFavourite.setOnClickListener(mFavListener);
 		dataHolder.mFavourite.setTag(dataHolder);
-		
 	}
 	public void show() {
 		mCardsLayout.updateCardsPosition(getScrollY());
@@ -468,7 +514,7 @@ public class CardView extends ScrollView {
     	if(mMotionConsumedByClick){
     		return mMotionConsumedByClick;
     	}
-    	Log.e(TAG, "overScrollBy " +mMotionConsumedByClick);
+//    	Log.e(TAG, "overScrollBy " +mMotionConsumedByClick);
         return super.overScrollBy(deltaX, deltaY, scrollX, scrollY, scrollRangeX, scrollRangeY,
         		maxOverScrollX, mMaxYOverscrollDistance, isTouchEvent);  
     }
@@ -617,10 +663,13 @@ class ViewReusePool {
 	public View getView(int index){
 		return mViewsFromLastUpdate.get(index);
 	}
+	public SparseArray<View> getViewList(){
+		return mViewsFromLastUpdate;
+	}
 	public void refresh(){
-		mViewsToReuse.clear();
-		mViewsFromLastUpdate.clear();
-		mViewsFromThisUpdate.clear();
+		mViewsToReuse = new Stack<View>();
+		mViewsFromLastUpdate =  new SparseArray<View>();
+		mViewsFromThisUpdate = new SparseArray<View>();
 	}
 	public View reuseView(int i) {
 		if (mViewsToReuse.size() == 0) {
@@ -643,7 +692,7 @@ class ViewReusePool {
 			mViewsToReuse.push(view);
 		}
 		
-		mViewsFromLastUpdate.clear();
+		mViewsFromLastUpdate = new SparseArray<View>();
 
 		SparseArray<View> temp = mViewsFromLastUpdate;
 	    mViewsFromLastUpdate = mViewsFromThisUpdate;
@@ -701,7 +750,7 @@ class CardsLayout extends FrameLayout {
 		    	addView(cardView);
 		    	mCardViewReusePool.addView(i, cardView);
 	        }
-    		mAlterCardView.applyData(cardView, i);
+	        mAlterCardView.applyData(cardView, i);
 	    }
 //	    printTitle(cardView,i);
 	    cardView.layout(0, pos, getWidth(), (int)(pos + mAlterCardView.getCardHeight()));

@@ -7,6 +7,8 @@ public class CardExplorerData {
 	public static final int REQUEST_RECOMMENDATION = 1;
 	public static final int REQUEST_SEARCH = 2;
 	public static final int REQUEST_FAVOURITE = 3;
+	public static final int REQUEST_SIMILARCONTENT = 4;
+	public String requestUrl = new String();
 	public int currentSelectedCard = 0;
 	public  HashMap<String,CardData> mEntries = new HashMap<String,CardData>();
 	public ArrayList<CardData> mMasterEntries = new ArrayList<CardData>();

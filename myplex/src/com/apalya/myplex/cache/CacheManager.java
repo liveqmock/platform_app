@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
+import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.apalya.myplex.adapters.CacheManagerCallback;
@@ -65,7 +66,28 @@ public class CacheManager {
 		RequestQueue queue = MyVolley.getRequestQueue();
 		StringRequest myReg = new StringRequest(url, onlineRequestSuccessListener(), onlineRequestErrorListener());
 		myReg.setShouldCache(true);
+		myReg.setRetryPolicy(new CacheRetry());
 		queue.add(myReg);
+		Log.d(TAG,"issueOnlineRequest :"+url+" timeout "+myReg.getRetryPolicy().getCurrentTimeout());
+	}
+	private class CacheRetry implements RetryPolicy{
+
+		@Override
+		public int getCurrentTimeout() {
+			return 10000;
+		}
+
+		@Override
+		public int getCurrentRetryCount() {
+			return 0;
+		}
+
+		@Override
+		public void retry(VolleyError error) throws VolleyError {
+			// TODO Auto-generated method stub
+			
+		}
+		
 	}
 	private void addToCache(final CardResponseData minResultSet){
 		if(mAutoSave){
@@ -104,6 +126,7 @@ public class CacheManager {
 		return new Response.ErrorListener() {
 			@Override
 			public void onErrorResponse(VolleyError error) {
+				Log.d(TAG,"Error for server  :"+error);
 				if(mListener != null){
 					mListener.OnOnlineError(error);
 				}

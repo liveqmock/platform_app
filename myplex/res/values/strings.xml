@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="all">
-
-    <string name="domain_name">api.beta.myplex.in</string>
-    <!-- <string name="domain_name">alpha.myplex.in:8866</string> -->
-    <string name="app_name">Myplex</string>
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="all">
+	<!-- <string name="domain_name">alpha.myplex.in:8866</string> -->
+	<string name="domain_name">api.beta.myplex.in</string>
+    <string name="app_name">myplex</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
     <string name="fbapp_id">582364305158936</string>
@@ -16,26 +16,27 @@
     <string name="password">Password:</string>
     <string name="facebook">Sign In with Facebook</string>
     <string name="google">Sign In with Google+</string>
-    <string name="letme">Let me in &#8230;</string>
+    <string name="letme">browse as guest</string>
     <string name="progress_message">Loading &#8230;</string>
     <string name="or">or</string>
     <string name="phone">Phone:</string>
     <string name="login">Login</string>
-    <string name="signup">Register</string>
     <string name="fname">Full Name:</string>
     <string name="uName">Username:</string>
     <string name="msgUpdate">Receive SMS Updates</string>
     <string name="mailUpdate">Receive Mail Updates</string>
+    <string name="signup">Create Account</string>
     <string name="submit">Continue to Myplex</string>
-    <string name="hinttextemail">This will be your username</string>
+    <string name="hinttextemail">"Email address / phone number"</string>
     <string name="hinttextphone">10 digit mobile number</string>
-    <string name="hinttextpwd">should be more than 6 digits</string>
+    <string name="hinttextpwd">Password</string>
     <string name="hinttextname">display name</string>
     <string name="forgetPwd">Forgot Password? Let\'s fix it here</string>
     <string name="userCancelled">User has cancelled the request</string>
     <string name="send_to">Share Via</string>
     <string name="carddetailcommentsection_editcomment">Add a comment</string>
     <string name="carddetailcommentsection_editreview">Add a review</string>
+    <string name="tnc">"By creating an account and signing up to myplex, I accept the Terms of Service and Privacy Policy"</string>
     <string name="carddetailsectionheader_comment">Comments</string>
     <string name="carddetailsectionheader_credits">Credits</string>
     <string name="carddetailsectionheader_description">Description</string>
@@ -46,8 +47,18 @@
     <string name="pricepopuprent">Rent</string>
     <string name="carddetailsectionheader_reviews">Reviews</string>
     <string name="navigationmenu_settings">Settings</string>
+    <string name="card_delete">&#x2421;</string>
+    <string name="card_heart">&#xE1A2;</string>
+    <string name="card_filledheart">&#x2665;</string>
+    <string name="card_comment">&#xE390;</string>
+    <string name="card_people">&#xE972;</string>
+    <string name="card_play">&#x25B6;</string>
+    <string name="card_pause">&#xE8A0;</string>
+    <string name="card_duration">&#x1F4F9;</string>
+    <string name="price_rupeecode">&#x20B9; </string>
     <string name="listempty">No Data</string>
-
+    
+    
     <string-array name="hometabletanim">
         <item>Bottom-In</item>
         <item>Right-In</item>
@@ -55,13 +66,13 @@
         <item>Scale</item>
         <item>Alpha-In</item>
     </string-array>
-
-    <string name="searchhint">Search&#8230;</string>
+    	<string name="searchhint">Search&#8230;</string>
     <string name="tag1">1</string>
-    <string name="tag2">2</string>
+	<string name="tag2">2</string>
+
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
-    <string name="osname">Android</string>
+     <string name="osname">Android</string>
     <string name="interneterr">Hey, It seems your internet connection is not active, Please check</string>
     <string name="loginerr">Unable to process your request due to network. Use let me in option to browse the app</string>
     <string name="clientsecret">ApalyaAndroid</string>
@@ -76,15 +87,16 @@
     <string name="gplusloginpath">social/login/Google</string>
     <string name="getVideoPathUrl">generateKey</string>
     <!-- URLS -->
-    <!-- P.storage -->
+    <!-- P.storage --> 
     <string name="encryptkey">encrypt_random_key</string>
     <string name="devclientkey">devClientKey</string>
-    <string name="devclientdevid">devClientDevId</string>
-    <string name="devclientkeyexp">devClientKeyExp</string>
-    <string name="devusername">username</string>
-    <string name="devpassword">password</string>
-
-    <!-- P.storage -->
+	<string name="devclientdevid">devClientDevId</string>
+	<string name="devclientkeyexp">devClientKeyExp</string>
+	<string name="devusername">username</string>
+	<string name="devpassword">password</string>
+	
+	<!-- P.storage -->
+    
 
     <string-array name="jazzy_effects">
         <item>Standard</item>

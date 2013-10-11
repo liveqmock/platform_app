@@ -21,6 +21,8 @@ import com.facebook.Session;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.util.Log;
 
 public class LogOutUtil {
@@ -28,12 +30,13 @@ public class LogOutUtil {
 	private static Context logoutContext;
 	private static String TAG="LogOut";
 	private static ProgressDialog mProgressDialog = null;
+	static final String PREF_KEY_OAUTH_TOKEN= "oauth_token";
+	static final String PREF_KEY_OAUTH_SECRET= "oauth_token_secret";
 
 	private static boolean signOutRequest(String aUrlPath,final Map<String, String> bodyParams) {
 		Analytics.trackEvent("SIGN-OUT-REQUEST",true);
 
 		RequestQueue queue = MyVolley.getRequestQueue();
-		
 		StringRequest myReq = new StringRequest(Method.POST,
 				aUrlPath,
 				signOutSuccessListener(),
@@ -63,14 +66,18 @@ public class LogOutUtil {
 	public static void onClickLogout(Context mContext) {
 
 		//Log.d("BASE ACTIVITY", "@@@@@@@@@@@@@@ LOGOUT ACTIVITY @@@@@@@@@@@@@@@@@@@@@");
-		
+		Analytics.trackEvent("SIGN-OUT-SELECTED");
 		logoutContext=mContext;
-		showProgressBar();
-
+		
 		Session session = Session.getActiveSession();
 
-		if(AccountUtils.isAuthenticated(logoutContext) || session!=null)
+		String username=SharedPrefUtils.getFromSharedPreference(mContext,
+				mContext.getString(R.string.devusername));
+		
+		if(AccountUtils.isAuthenticated(logoutContext) || session!=null || username!=null)
 		{
+			showProgressBar();
+
 			if(session.isOpened())
 			{
 				Analytics.trackEvent("FACEBOOK-SIGN-OUT-SELECTED");
@@ -82,14 +89,36 @@ public class LogOutUtil {
 				Analytics.trackEvent("GOOGLE-SIGN-OUT-SELECTED");
 				AccountUtils.signOut(logoutContext);
 			}
+			
+			twitterlogOut();
+			
+			Log.d("Main ACTIVITY", "@@@@@@@@@@@@@@ LOGOUT ACTIVITY 3@@@@@@@@@@@@@@@@@@@@@");
+			Map<String, String> params = new HashMap<String, String>();
+			params.put("profile","work");
+			params.put("clientKey",myplexapplication.getDevDetailsInstance().getClientKey());
+			signOutRequest(ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+ConsumerApi.USER_CONTEXT+ConsumerApi.SLASH+ConsumerApi.SIGN_OUT_ACTION, params);
 
 		}
-		Analytics.trackEvent("SIGN-OUT-SELECTED");
-		Log.d("Main ACTIVITY", "@@@@@@@@@@@@@@ LOGOUT ACTIVITY 3@@@@@@@@@@@@@@@@@@@@@");
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("profile","work");
-		params.put("clientKey",myplexapplication.getDevDetailsInstance().getClientKey());
-		signOutRequest(ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+ConsumerApi.USER_CONTEXT+ConsumerApi.SLASH+ConsumerApi.SIGN_OUT_ACTION, params);
+		else
+		{
+			
+			((Activity) logoutContext).finish();
+			Util.launchActivity(LoginActivity.class,((Activity) logoutContext) , null);
+		}
+		
+		
+	}
+	public static void twitterlogOut(){
+		SharedPreferences prefs = logoutContext.getSharedPreferences("TWITTERTIME", 0);
+		String access_token= prefs.getString(PREF_KEY_OAUTH_TOKEN, null);
+		String access_token_secret= prefs.getString(PREF_KEY_OAUTH_SECRET, null);
+		if(access_token!=null && access_token_secret!=null)
+		{
+			Editor e= prefs.edit();
+			e.putString(PREF_KEY_OAUTH_TOKEN, null);
+			e.putString(PREF_KEY_OAUTH_SECRET, null);
+			e.commit();
+		}
 	}
 	private static ErrorListener signOutErrorListener() {
 		return new Response.ErrorListener() {
@@ -131,7 +160,7 @@ public class LogOutUtil {
 								((Activity) logoutContext).getString(R.string.devusername), "");
 						SharedPrefUtils.writeToSharedPref(logoutContext,
 								((Activity) logoutContext).getString(R.string.devpassword),"");
-
+						
 						myplexapplication.getUserProfileInstance().setLoginStatus(false);
 						myplexapplication.getUserProfileInstance().setName("");
 						myplexapplication.getUserProfileInstance().setProfilePic("");

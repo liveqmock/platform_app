@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -15,7 +15,7 @@
         android:layout_marginLeft="60dp"
         android:layout_marginRight="20dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/social_send_now" />
+        android:src="@drawable/icontv" />
 
     <TextView
         android:id="@+id/filtermenutext"
@@ -24,8 +24,9 @@
         android:layout_alignBottom="@+id/filtermenuicon"
         android:layout_toRightOf="@+id/filtermenuicon"
         android:ellipsize="end"
+        android:text="sadsdaf"
         android:singleLine="true"
         android:textColor="#ffffff"
         android:textSize="22sp" />
 
-</RelativeLayout>
+</LinearLayout>

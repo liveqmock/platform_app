@@ -12,6 +12,8 @@ public class FontUtil {
 	public static Typeface RobotoCondensed_BoldItalic;
 	public static Typeface RobotoCondensed_Light;
 	public static Typeface Roboto_Light;
+	public static Typeface ss_gizmo;
+	public static Typeface ss_symbolicons_line;
 	
 	public static boolean isFontsLoaded = false;
 	
@@ -24,6 +26,8 @@ public class FontUtil {
 		RobotoCondensed_BoldItalic = Typeface.createFromAsset(mgr, "fonts/RobotoCondensed-BoldItalic.ttf");
 		RobotoCondensed_Light = Typeface.createFromAsset(mgr, "fonts/RobotoCondensed-Light.ttf");
 		Roboto_Light = Typeface.createFromAsset(mgr, "fonts/Roboto-Light.ttf");
+		ss_gizmo = Typeface.createFromAsset(mgr, "fonts/ss-gizmo.ttf");
+		ss_symbolicons_line = Typeface.createFromAsset(mgr, "fonts/ss-symbolicons-line.ttf");
 		isFontsLoaded = true;
 	}
 

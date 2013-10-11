@@ -3,20 +3,18 @@ package com.apalya.myplex.data;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.android.volley.toolbox.NetworkImageView;
 
 public class CardDataHolder {
 	public TextView mTitle;
-	public RelativeLayout mTitleLayout;
-	public ImageView mDelete;
-	public ImageView mFavourite;
-	public NetworkImageView mPreview;
-	public ImageView mOverLayPlay;
-	public ImageView mComments;
-	public ImageView mReviews;
+	public LinearLayout mTitleLayout;
+	public TextView mDelete;
+	public TextView mFavourite;
+	public CardImageView mPreview;
+	public TextView mOverLayPlay;
+	public TextView mComments;
+	public TextView mReviews;
 	public TextView mCommentsText;
 	public TextView mReviewsText;
 	public TextView mRentText;

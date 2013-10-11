@@ -22,7 +22,12 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapShader;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -33,6 +38,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.apalya.myplex.R;
@@ -244,49 +250,63 @@ public class Util {
 			//Download Manager is not available
 		}
 	}
-	public void sendRequestDialog(final Context mContext) {
-		Bundle params = new Bundle();
+	public static void InviteFriends(final Context mContext) {
+		
+		if(Session.getActiveSession()!=null)
+		{
+			if(Session.getActiveSession().isOpened())
+			{
+			Bundle params = new Bundle();
 
-		params.putString("message", "Learn how to make your Android apps social");
-		params.putString("data",
-				"{\"badge_of_awesomeness\":\"1\"," +
-				"\"social_karma\":\"5\"}");
-		WebDialog requestsDialog = (
-				new WebDialog.RequestsDialogBuilder(mContext,
-						Session.getActiveSession(),
-						params))
-						.setOnCompleteListener(new OnCompleteListener() {
+			params.putString("message", "Hey, Check out this cool app where we can watch movies and live tv shows.");
+			/*params.putString("data",
+					"{\"badge_of_awesomeness\":\"1\"," +
+					"\"social_karma\":\"5\"}");*/
+			WebDialog requestsDialog = (
+					new WebDialog.RequestsDialogBuilder(mContext,
+							Session.getActiveSession(),
+							params))
+							.setOnCompleteListener(new OnCompleteListener() {
 
-							@Override
-							public void onComplete(Bundle values,
-									FacebookException error) {
-								if (error != null) {
-									if (error instanceof FacebookOperationCanceledException) {
-										Toast.makeText(mContext, 
-												"Request cancelled", 
-												Toast.LENGTH_SHORT).show();
+								@Override
+								public void onComplete(Bundle values,
+										FacebookException error) {
+									if (error != null) {
+										if (error instanceof FacebookOperationCanceledException) {
+											Toast.makeText(mContext, 
+													"Request cancelled", 
+													Toast.LENGTH_SHORT).show();
+										} else {
+											Toast.makeText(mContext, 
+													"Network Error", 
+													Toast.LENGTH_SHORT).show();
+										}
 									} else {
-										Toast.makeText(mContext, 
-												"Network Error", 
-												Toast.LENGTH_SHORT).show();
-									}
-								} else {
-									final String requestId = values.getString("request");
-									if (requestId != null) {
-										Toast.makeText(mContext, 
-												"Request sent",  
-												Toast.LENGTH_SHORT).show();
-									} else {
-										Toast.makeText(mContext, 
-												"Request cancelled", 
-												Toast.LENGTH_SHORT).show();
-									}
-								}   
-							}
+										final String requestId = values.getString("request");
+										if (requestId != null) {
+											Toast.makeText(mContext, 
+													"Request sent",  
+													Toast.LENGTH_SHORT).show();
+										} else {
+											Toast.makeText(mContext, 
+													"Request cancelled", 
+													Toast.LENGTH_SHORT).show();
+										}
+									}   
+								}
 
-						})
-						.build();
-		requestsDialog.show();
+							})
+							.build();
+			requestsDialog.show();
+			}else
+			{
+				showToast("Please Login with Facebook to invite your friends!!!", mContext);
+			}
+		}
+		else
+		{
+			showToast("Please Login with Facebook to invite your friends!!!", mContext);
+		}
 	}
 	public static void animate(float fromX, float toX, final View v,
 			final boolean showlist, int animationType,Context mContext) {
@@ -356,5 +376,23 @@ public class Util {
 		
 		mContext.startActivity(Intent.createChooser(sendIntent,  mContext.getResources().getText(R.string.send_to)));
 	}
-
+	public static void FitToRound(Context mContext,ImageView View,Bitmap bm){
+		try {
+			Bitmap bitmap = bm;
+			Bitmap bitmapRounded = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), bitmap.getConfig());
+			Canvas canvas = new Canvas(bitmapRounded);
+			Paint paint = new Paint();
+			paint.setAntiAlias(true);
+			paint.setShader(new BitmapShader(bitmap, BitmapShader.TileMode.CLAMP, BitmapShader.TileMode.CLAMP));
+			canvas.drawRoundRect((new RectF(0.0f, 0.0f, bitmap.getWidth(), bitmap.getHeight())), 10, 10, paint);
+			View.setImageBitmap(bitmapRounded);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
+	public static void showDownloads(Context mContext) {
+		Intent i = new Intent();
+		i.setAction(DownloadManager.ACTION_VIEW_DOWNLOADS);
+		mContext.startActivity(i);
+	}
 }

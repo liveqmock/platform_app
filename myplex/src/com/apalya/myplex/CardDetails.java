@@ -3,9 +3,12 @@ package com.apalya.myplex;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
+import java.util.logging.Handler;
 
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
@@ -24,6 +27,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Space;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 import com.apalya.myplex.adapters.CacheManagerCallback;
@@ -44,6 +49,7 @@ import com.apalya.myplex.media.VideoView;
 import com.apalya.myplex.media.VideoViewExtn;
 import com.apalya.myplex.media.VideoViewPlayer;
 import com.apalya.myplex.media.VideoViewPlayer.StreamType;
+import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MediaUtil;
 import com.apalya.myplex.utils.MediaUtil.MediaUtilEventListener;
 import com.apalya.myplex.utils.MyVolley;
@@ -106,10 +112,10 @@ public class CardDetails extends BaseFragment implements
 		mCardDetailViewFactory = new CardDetailViewFactory(getContext());
 		mCardDetailViewFactory.setOnCardDetailExpandListener(this);
 //		prepareContent();
-		if(mCardData.generalInfo != null){
-			mMainActivity.setActionBarTitle(mCardData.generalInfo.title);
-			mMainActivity.updateActionBarTitle();
-		}
+//		if(mCardData.generalInfo != null){
+//			mMainActivity.setActionBarTitle(mCardData.generalInfo.title);
+//			mMainActivity.updateActionBarTitle();
+//		}
 		return rootView;
 	}
 
@@ -117,7 +123,7 @@ public class CardDetails extends BaseFragment implements
 	private FadeInNetworkImageView mPreviewImage;
 	private VideoViewExtn mVideoView;
 	private boolean mPlaying = false;
-	private ImageView mPlay;
+	private TextView mPlay;
 	private RelativeLayout mProgressBar;
 	VideoViewPlayer mVideoViewPlayer;
 	private RelativeLayout mVideoViewLayout;
@@ -134,23 +140,30 @@ public class CardDetails extends BaseFragment implements
 		mPreviewImage.setLayoutParams(params);
 		mVideoView = (VideoViewExtn)v.findViewById(R.id.cardmediasubitemvideo_videopreview);
 		mVideoView.setLayoutParams(params);
-		mPlay = (ImageView) v.findViewById(R.id.cardmediasubitemvideo_play);
+		mPlay = (TextView) v.findViewById(R.id.cardmediasubitemvideo_play);
+		mPlay.setTypeface(FontUtil.ss_symbolicons_line);
+		Random rnd = new Random();
+		int Low = 100;
+		int High = 196;
+		
+        int color = Color.argb(255, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low); 
+        mPreviewImage.setBackgroundColor(color);
 		mProgressBar = (RelativeLayout) v.findViewById(R.id.cardmediasubitemvideo_progressbarLayout);
 		if(mCardData.images != null){
 			for(CardDataImagesItem imageItem:mCardData.images.values){
-//				if(imageItem.profile != null && imageItem.profile.equalsIgnoreCase(myplexapplication.getApplicationConfig().type)){
+				if(imageItem.profile != null && imageItem.profile.equalsIgnoreCase("xxhdpi")){
 					if (imageItem.link == null || imageItem.link.compareTo("Images/NoImage.jpg") == 0) {
 						mPreviewImage.setImageResource(0);
 					} else if (imageItem.link != null){
 						mPreviewImage.setImageUrl(imageItem.link, MyVolley.getImageLoader());
 					}
 					break;
-//				}
+				}
 			}
 		}
-		Util.showFeedback(mPlay);
-//		v.setOnClickListener(mPlayListener);
-		mPlay.setOnClickListener(mPlayListener);
+//		Util.showFeedback(mPlay);
+		v.setOnClickListener(mPlayListener);
+//		mPlay.setOnClickListener(mPlayListener);
 		return v;
 	}
 	private OnClickListener mPlayListener = new OnClickListener() {
@@ -158,7 +171,9 @@ public class CardDetails extends BaseFragment implements
 		@Override
 		public void onClick(View v) {
 			if(mPlaying){
-				mVideoViewPlayer.closeSession();
+				if(mVideoViewPlayer != null){
+					mVideoViewPlayer.closeSession();
+				}
 				mProgressBar.setVisibility(View.GONE);
 				showImagePreview();
 				mPlaying = false;
@@ -172,10 +187,23 @@ public class CardDetails extends BaseFragment implements
 				@Override
 				public void urlReceived(boolean aStatus, String url) {
 					if(!aStatus){
-						mVideoViewPlayer.closeSession();
+						if(mVideoViewPlayer != null){
+							mVideoViewPlayer.closeSession();
+						}
 						mProgressBar.setVisibility(View.GONE);
 						showImagePreview();
 						mPlaying = false;
+						Toast.makeText(getContext(), "Failed in fetching the url.", Toast.LENGTH_SHORT).show();
+						return;
+					}
+					if(url == null){
+						if(mVideoViewPlayer != null){
+							mVideoViewPlayer.closeSession();
+						}
+						mProgressBar.setVisibility(View.GONE);
+						showImagePreview();
+						mPlaying = false;
+						Toast.makeText(getContext(), "No url to play.", Toast.LENGTH_SHORT).show();
 						return;
 					}
 					Uri uri = Uri.parse("rtsp://59.162.166.216:554/AAJTAK_QVGA.sdp");
@@ -217,7 +245,9 @@ public class CardDetails extends BaseFragment implements
 //		mMainActivity.setPotrait();
 	}
 	public void playInLandscape(){
-		mVideoViewPlayer.showMediaController();
+		if(mVideoViewPlayer!= null){
+			mVideoViewPlayer.showMediaController();
+		}
 		mVideoView.resizeVideo(myplexapplication.getApplicationConfig().screenHeight,myplexapplication.getApplicationConfig().screenWidth-Util.getStatusBarHeight(getContext()));
 		mVideoView.requestLayout();
 //		mVideoViewLayout.setLayoutParams(new LayoutParams(myplexapplication.getApplicationConfig().screenHeight,myplexapplication.getApplicationConfig().screenWidth-Util.getStatusBarHeight(getContext())));
@@ -226,7 +256,9 @@ public class CardDetails extends BaseFragment implements
 		mBottomActionBar.setVisibility(View.INVISIBLE);
 	}
 	public void playInPotrait(){
-		mVideoViewPlayer.hideMediaController();
+		if(mVideoViewPlayer!= null){
+			mVideoViewPlayer.hideMediaController();
+		}
 		int width = myplexapplication.getApplicationConfig().screenWidth;
 		int height = (width * 9)/16; 
 		mVideoView.resizeVideo(width,height);
@@ -290,13 +322,13 @@ public class CardDetails extends BaseFragment implements
 	private void showImagePreview(){
 		mPreviewImage.setVisibility(View.VISIBLE);
 		mVideoView.setVisibility(View.INVISIBLE);
-		mPlay.setImageResource(R.drawable.card_iconplay);
+		mPlay.setText(R.string.card_play);
 		
 	}
 	private void hideImagePreview(){
 		mPreviewImage.setVisibility(View.INVISIBLE);
 		mVideoView.setVisibility(View.VISIBLE);
-		mPlay.setImageResource(R.drawable.player_icon_pause);
+		mPlay.setText(R.string.card_pause);
 	}
 	@Override
 	public void onResume() {
@@ -310,22 +342,26 @@ public class CardDetails extends BaseFragment implements
 
 	private void prepareFilterData() {
 		List<FilterMenudata> filteroptions = new ArrayList<FilterMenudata>();
-		filteroptions.add(new FilterMenudata(FilterMenudata.SECTION,"Details", 1));
-		if(mDescriptionExpanded){
-			filteroptions.add(new FilterMenudata(FilterMenudata.ITEM,"Description", 2));
-			if(mCardData.generalInfo != null && mCardData.generalInfo.myplexDescription != null){
-				filteroptions.add(new FilterMenudata(FilterMenudata.ITEM,"Myplex Descrition", 3));	
-			}
-			if(mCardData.generalInfo != null && mCardData.generalInfo.studioDescription!= null){
-				filteroptions.add(new FilterMenudata(FilterMenudata.ITEM,"Studio Descrition", 3));	
-			}
-			if(mCardData.relatedCast != null && mCardData.relatedCast.size() > 0){
-				filteroptions.add(new FilterMenudata(FilterMenudata.ITEM,"Credits", 3));	
-			}
+		if(mCardDetailViewFactory.getSubSection(CardDetailViewFactory.SECTION_DETAILS) != null){
+			filteroptions.add(new FilterMenudata(FilterMenudata.SECTION,CardDetailViewFactory.SECTION_DETAILS, mCardDetailViewFactory.getSectionHeight(CardDetailViewFactory.SECTION_DETAILS)));
 		}
-//		filteroptions.add(new FilterMenudata(FilterMenudata.SECTION,"Related Multimedia", 5));
-		if(mCardData.comments != null && mCardData.comments.values != null && mCardData.comments.values.size() > 0){
-			filteroptions.add(new FilterMenudata(FilterMenudata.SECTION,"Comments", 6));
+		if(mCardDetailViewFactory.getSubSection(CardDetailViewFactory.SECTION_DESCRIPTION) != null){
+			filteroptions.add(new FilterMenudata(FilterMenudata.ITEM,CardDetailViewFactory.SECTION_DESCRIPTION, mCardDetailViewFactory.getSectionHeight(CardDetailViewFactory.SECTION_DESCRIPTION)));
+		}
+		if(mCardDetailViewFactory.getSubSection(CardDetailViewFactory.SECTION_MYPLEXDESCRITION) != null){
+			filteroptions.add(new FilterMenudata(FilterMenudata.ITEM,CardDetailViewFactory.SECTION_MYPLEXDESCRITION, mCardDetailViewFactory.getSectionHeight(CardDetailViewFactory.SECTION_MYPLEXDESCRITION)));
+		}
+		if(mCardDetailViewFactory.getSubSection(CardDetailViewFactory.SECTION_STUDIODESCRITION) != null){
+			filteroptions.add(new FilterMenudata(FilterMenudata.ITEM,CardDetailViewFactory.SECTION_STUDIODESCRITION, mCardDetailViewFactory.getSectionHeight(CardDetailViewFactory.SECTION_STUDIODESCRITION)));
+		}
+		if(mCardDetailViewFactory.getSubSection(CardDetailViewFactory.SECTION_CREDITS) != null){
+			filteroptions.add(new FilterMenudata(FilterMenudata.ITEM,CardDetailViewFactory.SECTION_CREDITS, mCardDetailViewFactory.getSectionHeight(CardDetailViewFactory.SECTION_CREDITS)));
+		}
+		if(mCardDetailViewFactory.getSubSection(CardDetailViewFactory.SECTION_RELATEDMULTIMEDIA) != null){
+			filteroptions.add(new FilterMenudata(FilterMenudata.SECTION,CardDetailViewFactory.SECTION_RELATEDMULTIMEDIA, mCardDetailViewFactory.getSectionHeight(CardDetailViewFactory.SECTION_RELATEDMULTIMEDIA)));
+		}
+		if(mCardDetailViewFactory.getSubSection(CardDetailViewFactory.SECTION_COMMENTS) != null){
+			filteroptions.add(new FilterMenudata(FilterMenudata.SECTION,CardDetailViewFactory.SECTION_COMMENTS, mCardDetailViewFactory.getSectionHeight(CardDetailViewFactory.SECTION_COMMENTS)));
 		}
 		if(isVisible()){
 			mMainActivity.addFilterData(filteroptions, mFilterMenuClickListener);
@@ -337,17 +373,18 @@ public class CardDetails extends BaseFragment implements
 		public void onClick(View v) {
 			if (v.getTag() instanceof FilterMenudata) {
 				FilterMenudata menuData = (FilterMenudata)v.getTag();
-				int moveTo = mCardDetailViewFactory.getYPosition(menuData.label);
+				int moveTo = mCardDetailViewFactory.getSectionHeight(menuData.label);
+				int totalHeight = mParentContentLayout.getHeight();
 				int currentY = mScrollView.getScrollY();
-				int moveTo1 = -currentY + moveTo;
+				int moveTo1 =  -currentY+moveTo;
 //				int diff = Math.abs(moveTo - currentY);
 //				if(currentY < moveTo){
 //					moveTo = currentY + diff;
 //				}else{
 //					moveTo = currentY - diff;
 //				}
-				Log.d("CardDetail"," value for "+menuData.label+" = "+mCardDetailViewFactory.getYPosition(menuData.label)+" scrollY = "+mScrollView.getScrollY());
-				mScrollView.smoothScrollBy(0, moveTo1);
+				Log.d("CardDetail"," value for "+menuData.label+" = "+mCardDetailViewFactory.getSectionHeight(menuData.label)+" scrollY = "+mScrollView.getScrollY());
+				mScrollView.smoothScrollTo(0, moveTo1);
 			}
 		}
 	};
@@ -650,5 +687,14 @@ public class CardDetails extends BaseFragment implements
 	@Override
 	public void OnOnlineError(VolleyError error) {
 		mMainActivity.hideActionBarProgressBar();		
+	}
+	@Override
+	public void onSimilarContentAction() {
+		BaseFragment fragment = mMainActivity.createFragment(MainActivity.CARDEXPLORER);
+		CardExplorerData data = myplexapplication.getCardExplorerData();
+		data.reset();
+		data.requestType = CardExplorerData.REQUEST_SIMILARCONTENT;
+		data.mMasterEntries =  (ArrayList<CardData>) mCardData.similarContent.values;
+		mMainActivity.bringFragment(fragment);
 	}
 }

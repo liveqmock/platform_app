@@ -24,11 +24,14 @@ import com.apalya.myplex.R;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDataCertifiedRatingsItem;
 import com.apalya.myplex.data.CardDataCommentsItem;
+import com.apalya.myplex.data.CardDataImagesItem;
 import com.apalya.myplex.data.CardDataRelatedCastItem;
 import com.apalya.myplex.data.CardDataUserReviewsItem;
 import com.apalya.myplex.data.CardDetailBaseData;
 import com.apalya.myplex.data.CardDetailMultiMediaGroup;
 import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.utils.CardImageLoader;
+import com.apalya.myplex.utils.CircleImageLoader;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MessagePost;
 import com.apalya.myplex.utils.MessagePost.MessagePostCallback;
@@ -37,6 +40,24 @@ import com.apalya.myplex.utils.Util;
 
 public class CardDetailViewFactory {
 	
+	public static final String SECTION_DETAILS = "Details";
+	public static final String SECTION_DESCRIPTION = "Description";
+	public static final String SECTION_MYPLEXDESCRITION = "Myplex Descrition";
+	public static final String SECTION_STUDIODESCRITION = "Studio Descrition";
+	public static final String SECTION_CREDITS = "Credits";
+	public static final String SECTION_COMMENTS = "Comments";
+	public static final String SECTION_RELATEDMULTIMEDIA = "Related Multimedia";
+	
+	private View mDetails;
+	private View mDescription;
+	private View mMyPlexDescription;
+	private View mStudioDescription;
+	private View mCredits;
+	private View mExtras;
+	private View mMultimedia;
+	private View mComments;
+	
+	
 	public interface CardDetailViewFactoryListener{
 		public void onDescriptionExpanded();
 		public void onCommentsExpanded();
@@ -44,6 +65,7 @@ public class CardDetailViewFactory {
 		public void onDescriptionCollapsed();
 		public void onTextSelected(String key);
 		public void onMediaGroupSelected(CardDetailMultiMediaGroup group);
+		public void onSimilarContentAction();
 	}
 	public void setOnCardDetailExpandListener(CardDetailViewFactoryListener listener){
 		this.mCardExpandListener = listener;
@@ -64,14 +86,7 @@ public class CardDetailViewFactory {
 	private Context mContext;
 	private LayoutInflater mInflator;
 	private CardData mData;
-	private View mDetails;
-	private View mDescription;
-	private View mMyPlexDescription;
-	private View mStudioDescription;
-	private View mCredits;
-	private View mExtras;
-	private View mMultimedia;
-	private View mComments;
+	
 
 	public void SetData(CardData data){
 		this.mData = data;
@@ -180,6 +195,7 @@ public class CardDetailViewFactory {
 		}
 	}
 	private View createCommentsView(final int type) {
+		mComments = null;
 		if(mData.comments == null){return null;}
 		if(mData.comments.values == null ){return null;}
 		if(mData.comments.values.size() == 0){return null;}
@@ -310,17 +326,64 @@ public class CardDetailViewFactory {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
+	private View createSimillarContent(){
+		if(mData.similarContent == null){return null;}
+		if(mData.similarContent.values == null ){return null;}
+		if(mData.similarContent.values.size() == 0 ){return null;}
+		CardData simillarData = mData.similarContent.values.get(0);
+		View child = mInflator.inflate(R.layout.carddetails_fullmultimediaitem, null);
+		TextView groupname = (TextView)child.findViewById(R.id.carddetailmultimedia_groupname);
+		groupname.setText("Similar Content");
+		groupname.setTypeface(FontUtil.Roboto_Medium);
+		TextView secondaryname = (TextView)child.findViewById(R.id.carddetailmultimedia_secondaryname);
+		secondaryname.setTypeface(FontUtil.Roboto_Medium);
+//		secondaryname.setText("description for smillar content");
+		ImageView view  = (ImageView)child.findViewById(R.id.carddetailmultimedia_stackview);
+		view.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				if(mCardExpandListener != null){
+					mCardExpandListener.onSimilarContentAction();
+				}
+			}
+		});
+		String requesturl = null;
+		if(simillarData.images != null){
+			for(CardDataImagesItem imageItem:simillarData.images.values){
+				if(imageItem.type != null && imageItem.type.equalsIgnoreCase("thumbnail")){
+					if (imageItem.link != null && !(imageItem.link.compareTo("Images/NoImage.jpg") == 0)) {
+						requesturl = imageItem.link;
+					}
+					break;
+				}
+			}
+		}
+		if(requesturl !=null){
+			CircleImageLoader imageLoader = new CircleImageLoader();
+			imageLoader.loadImage(mContext, view, requesturl);
+		}
+		return child;
+	}
+	
 	private View createBriefRelatedView() {
-		if(true){return null;}
+		mMultimedia = null;	 
+		boolean itemsAdded = false;
 		View v = mInflator.inflate(R.layout.carddetailmedia, null);
 		TextView text = (TextView)v.findViewById(R.id.carddetailmedia_title);
 		text.setTypeface(FontUtil.Roboto_Light);
-		mMultimedia = text;		
+			
 		ImageView expand = (ImageView)v.findViewById(R.id.carddetailmedia_expand);
 //		expand.setOnClickListener(mOnMultiMediaExpand);
-		Util.showFeedback(expand);
+//		Util.showFeedback(expand);
 		LinearLayout contentLayout = (LinearLayout)v.findViewById(R.id.carddetailmedia_contentlayout);
+		
+		View simillarView  = createSimillarContent();
+		if(simillarView != null){
+			contentLayout.addView(simillarView);
+			mMultimedia = simillarView;
+			itemsAdded = true;
+		}
 //		for(CardDetailMultiMediaGroup group:mData.mMultiMediaGroup){
 //			View child = mInflator.inflate(R.layout.carddetails_fullmultimediaitem, null);
 //			TextView groupname = (TextView)child.findViewById(R.id.carddetailmultimedia_groupname);
@@ -338,7 +401,10 @@ public class CardDetailViewFactory {
 //			imageView1.setOnClickListener(mMediaGroupClickListener);
 //			contentLayout.addView(child);
 //		}
-		return v;
+		if(itemsAdded){
+			return v;
+		}
+		return null;
 	}
 	private void addSpace(ViewGroup v,int space){
 		Space gap = new Space(mContext);
@@ -445,14 +511,18 @@ public class CardDetailViewFactory {
 	}
 
 	private View createCastCrewView() {
+		mCredits = null;
+		if(mData.relatedCast == null){return null;}
+		if(mData.relatedCast.values == null){return null;}
+		if(mData.relatedCast.values.size() == 0){return null;}
 		View v = (LinearLayout)mInflator.inflate(R.layout.carddetailcastcrew, null);
-		mCredits = v;
+	
 		TextView title = (TextView)v.findViewById(R.id.carddetailcastandcrew_credits);
 		title.setTypeface(FontUtil.Roboto_Light);
-		
+		mCredits = title;
 		LinearLayout leftLayout = (LinearLayout)v.findViewById(R.id.carddetailcastcrew_leftlayout);
 		LinearLayout rightLayout = (LinearLayout)v.findViewById(R.id.carddetailcastcrew_rightlayout);
-		for(CardDataRelatedCastItem relatedCastItem: mData.relatedCast){
+		for(CardDataRelatedCastItem relatedCastItem: mData.relatedCast.values){
 			
 			String LeftString = new String();
 			for(String role:relatedCastItem.types){
@@ -510,11 +580,10 @@ public class CardDetailViewFactory {
 		View v = mInflator.inflate(R.layout.carddetailstudiodesc, null);
 		TextView title = (TextView)v.findViewById(R.id.carddetaildesc_studiotitle);
 		title.setText("Studio Description");
+		mStudioDescription = title;
 		title.setTypeface(FontUtil.Roboto_Light);
-		mStudioDescription = v;
-		title.setTypeface(FontUtil.Roboto_Medium);
 		TextView text = (TextView)v.findViewById(R.id.carddetaildesc_studiodescription);
-		text.setTypeface(FontUtil.RobotoCondensed_Light);
+		text.setTypeface(FontUtil.Roboto_Regular);
 		text.setText(mData.generalInfo.studioDescription);
 		return v;
 	}
@@ -524,22 +593,22 @@ public class CardDetailViewFactory {
 		TextView title = (TextView)v.findViewById(R.id.carddetaildesc_studiotitle);
 		title.setText("Myplex Description");
 		title.setTypeface(FontUtil.Roboto_Light);
-		mMyPlexDescription = v;
+		mMyPlexDescription = title;
 		TextView text = (TextView)v.findViewById(R.id.carddetaildesc_studiodescription);
 		text.setText(mData.generalInfo.myplexDescription);
-		text.setTypeface(FontUtil.RobotoCondensed_Light);
+		text.setTypeface(FontUtil.Roboto_Regular);
 		return v;
 	}
 
 	private View createFullDescriptionView() {
-		if(mData.generalInfo == null){return null;}
+		if(mData.generalInfo == null){mDetails = null; return null;}
 		View v = mInflator.inflate(R.layout.carddetailfulldescription, null);
 		mDetails  = v;
 		TextView movieName = (TextView)v.findViewById(R.id.carddetaildesc_movename);
 		if(mData.generalInfo.title != null){
 			movieName.setText(mData.generalInfo.title);	
 		}
-		movieName.setTypeface(FontUtil.Roboto_Regular);
+		movieName.setTypeface(FontUtil.Roboto_Light);
 		TextView parentalRating = (TextView)v.findViewById(R.id.carddetaildesc_parentalRating);
 		if(mData.content != null && mData.content.certifiedRatings != null && mData.content.certifiedRatings.values != null){
 			for(CardDataCertifiedRatingsItem ratingItem:mData.content.certifiedRatings.values){
@@ -547,7 +616,7 @@ public class CardDetailViewFactory {
 				break;
 			}
 		}
-		parentalRating.setTypeface(FontUtil.Roboto_Regular);
+		parentalRating.setTypeface(FontUtil.Roboto_Medium);
 		RatingBar ratingBar = (RatingBar)v.findViewById(R.id.carddetaildesc_setRating);
 		if(mData.userReviews != null){
 			ratingBar.setRating(mData.userReviews.averageRating);	
@@ -556,7 +625,7 @@ public class CardDetailViewFactory {
 		if(mData.content != null && mData.content.releaseDate != null){
 			relaseDate.setText(mData.content.releaseDate);
 		}
-		relaseDate.setTypeface(FontUtil.Roboto_Regular);
+		relaseDate.setTypeface(FontUtil.Roboto_Medium);
 		
 		TextView contentDuration = (TextView)v.findViewById(R.id.carddetaildesc_duration);
 		if(mData.content != null ){
@@ -572,7 +641,7 @@ public class CardDetailViewFactory {
 		if(mData.generalInfo.briefDescription != null){
 			moviedescription.setText(mData.generalInfo.description);
 		}
-		moviedescription.setTypeface(FontUtil.RobotoCondensed_Light);
+		moviedescription.setTypeface(FontUtil.Roboto_Regular);
 		
 		ImageView expand = (ImageView)v.findViewById(R.id.carddetailfulldescription_expand);
 		expand.setOnClickListener(new OnClickListener() {
@@ -586,13 +655,14 @@ public class CardDetailViewFactory {
 		});
 		Util.showFeedback(expand);
 		LinearLayout layout = (LinearLayout)v.findViewById(R.id.carddetaildesc_contentlayout);
-		if(mData.generalInfo != null && mData.generalInfo.myplexDescription != null){
+		if(mData.generalInfo != null && mData.generalInfo.myplexDescription != null && mData.generalInfo.myplexDescription.length() >0){
 			layout.addView(createMyplexDescriptionView());
 		}
-		if(mData.generalInfo != null && mData.generalInfo.studioDescription != null){
+		if(mData.generalInfo != null && mData.generalInfo.studioDescription != null && mData.generalInfo.studioDescription.length() >0){
 			layout.addView(createStudioDescriptionView());
 		}
-		if(mData.relatedCast != null && mData.relatedCast.size() > 0){
+		View credits = createCastCrewView();
+		if(credits != null){
 			layout.addView(createCastCrewView());
 		}
 		Button packageButton = (Button)v.findViewById(R.id.carddetaildesc_purchasebutton);
@@ -602,7 +672,13 @@ public class CardDetailViewFactory {
 		return v;
 	}
 	private View createBriefDescriptionView() {
-		if(mData.generalInfo == null){return null;}
+		mCredits = null;
+		mDetails = null;
+		mDescription = null;
+		mMyPlexDescription = null;
+		mStudioDescription = null;
+		if(mData.generalInfo == null){  return null;}
+		
 		View v = mInflator.inflate(R.layout.carddetailbreifdescription, null);
 		mDetails = v;
 		TextView movieName = (TextView)v.findViewById(R.id.carddetailbreifdescription_movename);
@@ -666,25 +742,68 @@ public class CardDetailViewFactory {
 			popup.showPackDialog(mData, ((Activity)mContext).getActionBar().getCustomView());			
 		}
 	};
-	public int getYPosition(String label) {
-		if(label.equalsIgnoreCase("Details")){
-			return (int)mDetails.getY();
-		}else if(label.equalsIgnoreCase("Description")){
-			return (int)mDescription.getY();
-		}else if(label.equalsIgnoreCase("Credits")){
-			return (int)mCredits.getY();
-		}else if(label.equalsIgnoreCase("Extra")){
-			return (int)mExtras.getY();
-		}else if(label.equalsIgnoreCase("RelatedMultimedia")){
-			return (int)mMultimedia.getY();
-		}else if(label.equalsIgnoreCase("Comments")){
-			Rect rect = new Rect();
-			return (int)mComments.getY();
-		}else if(label.equalsIgnoreCase("Myplex Descrition")){
-			return (int)mMyPlexDescription.getY();
-		}else if(label.equalsIgnoreCase("Studio Descrition")){
-			return (int)mStudioDescription.getY();
-		}		
+	public View getSubSection(String label){
+		if(label.equalsIgnoreCase(SECTION_DETAILS)){
+			return mDetails;
+		}else if(label.equalsIgnoreCase(SECTION_DESCRIPTION)){
+			return mDescription;
+		}else if(label.equalsIgnoreCase(SECTION_MYPLEXDESCRITION)){
+			return mMyPlexDescription;
+		}else if(label.equalsIgnoreCase(SECTION_STUDIODESCRITION)){
+			return mStudioDescription;
+		}else if(label.equalsIgnoreCase(SECTION_CREDITS)){
+			return mCredits;
+		}else if(label.equalsIgnoreCase(SECTION_RELATEDMULTIMEDIA)){
+			return mMultimedia;
+		}else if(label.equalsIgnoreCase(SECTION_COMMENTS)){
+			return mComments;
+		}
+		return null;
+	}
+	public int getSectionItemHeight(View v){
+		if(v != null){
+			return (int) v.getHeight();
+		}
 		return 0;
+	}
+	public int getSectionHeight(String label) {
+		int returnValue =  0;
+		if(label.equalsIgnoreCase(SECTION_DETAILS)){
+			returnValue = getSectionItemHeight(mDetails);
+		}else if(label.equalsIgnoreCase(SECTION_DESCRIPTION)){
+			returnValue = getSectionItemHeight(mDetails);
+			returnValue += getSectionItemHeight(mDescription);
+		}else if(label.equalsIgnoreCase(SECTION_MYPLEXDESCRITION)){
+			returnValue = getSectionItemHeight(mDetails);
+			returnValue += getSectionItemHeight(mDescription);
+			returnValue += getSectionItemHeight(mMyPlexDescription);
+		}else if(label.equalsIgnoreCase(SECTION_STUDIODESCRITION)){
+			returnValue = getSectionItemHeight(mDetails);
+			returnValue += getSectionItemHeight(mDescription);
+			returnValue += getSectionItemHeight(mMyPlexDescription);
+			returnValue += getSectionItemHeight(mStudioDescription);
+		}else if(label.equalsIgnoreCase(SECTION_CREDITS)){
+			returnValue = getSectionItemHeight(mDetails);
+			returnValue += getSectionItemHeight(mDescription);
+			returnValue += getSectionItemHeight(mMyPlexDescription);
+			returnValue += getSectionItemHeight(mStudioDescription);
+			returnValue += getSectionItemHeight(mCredits);
+		}else if(label.equalsIgnoreCase(SECTION_RELATEDMULTIMEDIA)){
+			returnValue = getSectionItemHeight(mDetails);
+			returnValue += getSectionItemHeight(mDescription);
+			returnValue += getSectionItemHeight(mMyPlexDescription);
+			returnValue += getSectionItemHeight(mStudioDescription);
+			returnValue += getSectionItemHeight(mCredits);
+			returnValue += getSectionItemHeight(mMultimedia);
+		}else if(label.equalsIgnoreCase(SECTION_COMMENTS)){
+			returnValue = getSectionItemHeight(mDetails);
+			returnValue += getSectionItemHeight(mDescription);
+			returnValue += getSectionItemHeight(mMyPlexDescription);
+			returnValue += getSectionItemHeight(mStudioDescription);
+			returnValue += getSectionItemHeight(mCredits);
+			returnValue += getSectionItemHeight(mMultimedia);
+			returnValue += getSectionItemHeight(mComments);
+		}	
+		return returnValue;
 	}
 }

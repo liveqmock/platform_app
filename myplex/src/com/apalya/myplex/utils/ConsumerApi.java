@@ -6,7 +6,7 @@ public class ConsumerApi {
 	public static final String TAG_ACTION = "tags";
 	public static final String CONTENT_TAG = "content";
 	public static final String FAVORITELIST_ACTION = "contentList/favorites";
-	public static final String FAVORITE_ACTION = "favorite";
+	public static final String FAVORITE_ACTION  = "favorite";
 	public static final String RECOMMENDATIONS_ACTION = "recommendations";
 	public static final String SIGN_OUT_ACTION = "signOut";
 	public static final String CONTENTDETAILS_ACTION = "contentDetail";
@@ -29,7 +29,7 @@ public class ConsumerApi {
 	public static final String BILLING_TAG = "billing";
 	public static final String MODES_TAG = "modes";
 	public static final String CONTENTID = "contenId=";
-
+	
 	// min: returns only content ids.
 	// static: returns static sub-entities.
 	// dynamic: returns dynamic sub-entities.
@@ -42,68 +42,60 @@ public class ConsumerApi {
 	public static final String LEVELSTATIC_DYNAMIC = "static_dynamic";
 	public static final String LEVELDEVICEMIN = "devicemin";
 	public static final String LEVELDEVICEMAX = "devicemax";
-
-	public static String DEBUGCLIENTKEY = "c86f79514ec7976bd20de36f1c6f15900d8e09f699818024283bad1bf0609650";
-
-	public static String getSearch(String queryStr, String level, int startIndex) {
-		if (queryStr == null || (queryStr != null && queryStr.length() == 0)) {
+	
+	public static String DEBUGCLIENTKEY = "dcb11454ccdafdd4706c7186d37abd2ff96cd02dc998d1111d16d4778a797f85";//"c86f79514ec7976bd20de36f1c6f15900d8e09f699818024283bad1bf0609650";
+	
+	public static String getSearch(String queryStr, String level,int startIndex) {
+		if(queryStr == null||(queryStr != null && queryStr.length() ==0)){
 			queryStr = "*";
 		}
 		queryStr.replace(" ", "%20");
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH
-				+ SEARCH_ACTION + SLASH + QUESTION_MARK + CLIENTKEY
-				+ DEBUGCLIENTKEY + AMPERSAND + QUERY + queryStr + AMPERSAND
-				+ STARTINDEX + startIndex + AMPERSAND + LEVEL + level;
+				+ SEARCH_ACTION + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY
+				+  AMPERSAND + QUERY + queryStr + AMPERSAND + STARTINDEX
+				+ startIndex + AMPERSAND + LEVEL
+				+ level;
 	}
-
-	public static String getRecommendation(String level, int startIndex) {
+	public static String getRecommendation(String level,int startIndex) {
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH
-				+ RECOMMENDATIONS_ACTION + SLASH + QUESTION_MARK + CLIENTKEY
-				+ DEBUGCLIENTKEY + AMPERSAND + STARTINDEX + startIndex
-				+ AMPERSAND + LEVEL + level;
+				+ RECOMMENDATIONS_ACTION + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY
+				+  AMPERSAND + STARTINDEX
+				+ startIndex + AMPERSAND + LEVEL
+				+ level;
 	}
 
 	public static String getCommentPostUrl(String contentID) {
-		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + CONTENT_TAG
-				+ SLASH + contentID + SLASH + QUESTION_MARK + CLIENTKEY
-				+ DEBUGCLIENTKEY;
-	}
-
-	public static String getFavourites(String level, int startIndex) {
-		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + CONTENT_TAG
-				+ SLASH + FAVORITELIST_ACTION + SLASH + QUESTION_MARK
-				+ CLIENTKEY + DEBUGCLIENTKEY + AMPERSAND + STARTINDEX
-				+ startIndex + AMPERSAND + LEVEL + level;
-	}
-
-	public static String getFavourite(String contentId) {
-		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + CONTENT_TAG
-				+ SLASH + contentId + SLASH + FAVORITE_ACTION + SLASH
+		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + CONTENT_TAG + SLASH + contentID +SLASH
 				+ QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY;
 	}
+	public static String getFavourites(String level,int startIndex) {
+		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + CONTENT_TAG + SLASH
+				+ FAVORITELIST_ACTION + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY
+				+  AMPERSAND + STARTINDEX
+				+ startIndex + AMPERSAND + LEVEL
+				+ level;
+	}
+	public static String getFavourite(String contentId) {
+		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + CONTENT_TAG +SLASH + contentId +SLASH
+				+ FAVORITE_ACTION + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY;
+	}
 
-	public static String getSearchTags(String querystr, String level) {
+	public static String getSearchTags(String startLetterstr,
+			String level) {
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH + TAG_ACTION
-				+ SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY
-				+ AMPERSAND + QUALIFIERS + querystr + AMPERSAND
-				+ NUMPERQUALIFIER + "-1" + AMPERSAND + STARTLETTER + querystr
-				+ AMPERSAND + NUMPERLETTERS + "-1" + AMPERSAND + LEVEL + level;
+				+ SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY +  AMPERSAND + STARTLETTER + startLetterstr
+				+ AMPERSAND + LEVEL + level;
 	}
-
-	public static String getContentDetail(String contentID, String level) {
-		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH
-				+ CONTENTDETAILS_ACTION + SLASH + contentID + SLASH
-				+ QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY + AMPERSAND
-				+ LEVEL + level;
+	public static String getContentDetail(String contentID,String level){
+		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH + CONTENTDETAILS_ACTION
+				+ SLASH + contentID + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY  + AMPERSAND
+		        + LEVEL + level;
 	}
-
-	public static String getVideosDetail(String contentID) {
-		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH
-				+ CONTENTDETAILS_ACTION + SLASH + contentID + SLASH
-				+ QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY + AMPERSAND
-				+ FIELDS + VIDEOS;
+	public static String getVideosDetail(String contentID){
+		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH + CONTENTDETAILS_ACTION
+				+ SLASH + contentID + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY  + AMPERSAND
+		        + FIELDS + VIDEOS;
 	}
-
 	public static String getBillingMode(String contentID) {
 		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + BILLING_TAG
 				+ SLASH + MODES_TAG + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY + AMPERSAND+ CONTENTID +contentID;

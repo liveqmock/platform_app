@@ -5,54 +5,56 @@
     android:layout_height="@dimen/cardvideosize"
     android:background="@drawable/card_background" >
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/card_title_layout"
         android:layout_width="fill_parent"
         android:layout_height="@dimen/cardtitleheight"
-        android:layout_alignParentTop="true" >
+        android:layout_alignParentTop="true"
+        android:orientation="horizontal" >
 
-        <ImageView
-            android:contentDescription="@string/hello_world"
+        <TextView
             android:id="@+id/card_title_delete"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
-            android:layout_gravity="center_vertical"
-            android:layout_marginLeft="14dp"
-            android:src="@drawable/card_iconclose" />
-
-        <ImageView
-            android:contentDescription="@string/hello_world"
-            android:id="@+id/card_title_fav"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_gravity="center_vertical"
-            android:layout_marginRight="14dp"
-            android:src="@drawable/card_iconheart" />
-
-        <ProgressBar
-            android:id="@+id/card_title_fav_progress"
-            android:layout_width="24dp"
-            android:layout_height="24dp" 
-            android:visibility="invisible"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_gravity="center_vertical"
-            android:layout_marginRight="14dp" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingLeft="14dp"
+            android:text="@string/card_delete"
+            android:textColor="#343433"
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/card_title_name"
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="@dimen/cardtitleheight"
-            android:layout_centerInParent="true"
+            android:layout_weight="2.88"
             android:gravity="center"
             android:singleLine="true"
             android:textColor="#343433"
-            android:textSize="16sp"/>
-    </RelativeLayout>
+            android:textSize="16sp" />
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingRight="14dp" >
+
+            <TextView
+                android:id="@+id/card_title_fav"
+                android:layout_width="wrap_content"
+                android:layout_height="@dimen/cardtitleheight"
+                android:gravity="center_vertical"
+                android:text="@string/card_heart"
+                android:textColor="#343433"
+                android:textSize="16sp" />
+
+            <ProgressBar
+                android:id="@+id/card_title_fav_progress"
+                android:layout_width="16dp"
+                android:layout_height="@dimen/cardtitleheight"
+                android:gravity="center_vertical"
+                android:visibility="gone" />
+        </RelativeLayout>
+    </LinearLayout>
 
     <RelativeLayout
         android:id="@+id/card_preview_layout"
@@ -63,23 +65,25 @@
         android:layout_marginRight="4dp"
         android:background="#000000" >
 
-        <com.android.volley.toolbox.NetworkImageView
+        <com.apalya.myplex.data.CardImageView
             android:id="@+id/card_preview_image"
             android:layout_width="fill_parent"
             android:layout_height="@dimen/cardplayheight"
-            android:scaleType="centerInside" />
+            android:scaleType="fitXY" />
 
-        <ImageView
-            android:contentDescription="@string/hello_world"
+        <TextView
             android:id="@+id/card_play"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
+            android:gravity="center"
             android:layout_marginRight="14dp"
             android:layout_marginTop="14dp"
-            android:src="@drawable/play" />
-
+            android:text="@string/card_play"
+                android:textColor="#000000"
+                android:textSize="24sp"
+            />
     </RelativeLayout>
 
     <RelativeLayout
@@ -88,25 +92,28 @@
         android:layout_height="@dimen/cardstatusheight"
         android:layout_below="@+id/card_preview_layout" >
 
-        <ImageView
-            android:contentDescription="@string/hello_world"
+        <TextView
             android:id="@+id/card_status_comments"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
             android:layout_marginLeft="14dp"
-            android:src="@drawable/card_iconcomment" />
+            android:text="@string/card_comment"
+            android:textColor="#58b4e5"
+            android:textSize="16sp" />
 
-        <ImageView
-            android:contentDescription="@string/hello_world"
+        <TextView
             android:id="@+id/card_status_people"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
             android:layout_marginRight="14dp"
-            android:src="@drawable/card_iconuser" />
+            android:text="@string/card_people"
+            android:textColor="#58b4e5"
+            android:textSize="16sp" />
 
         <TextView
             android:id="@+id/card_status_people_text"
@@ -150,9 +157,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginLeft="7dp"
             android:singleLine="true"
             android:textColor="#6b6b6b"
             android:textSize="14sp" />
     </LinearLayout>
+
 </RelativeLayout>

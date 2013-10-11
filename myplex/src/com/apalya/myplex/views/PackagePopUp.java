@@ -69,7 +69,7 @@ public class PackagePopUp {
 		promotionalLayout.setVisibility(View.INVISIBLE);
 		TextView amount = (TextView)v.findViewById(R.id.purchasepackItem1_price);
 		amount.setTypeface(FontUtil.Roboto_Medium);
-		amount.setText("Rs "+priceDetailItem.price);
+		amount.setText(mContext.getResources().getString(R.string.price_rupeecode)+" "+priceDetailItem.price);
 		TextView quality = (TextView)v.findViewById(R.id.purchasepackItem1_quality);
 		quality.setTypeface(FontUtil.Roboto_Medium);
 		quality.setText(packageitem.contentType);

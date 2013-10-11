@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -157,6 +158,10 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 
 	private void fetchMinData() {
 		mMainActivity.showActionBarProgressBar();
+		if(mData.requestType == CardExplorerData.REQUEST_SIMILARCONTENT){
+			mCacheManager.getCardDetails(mData.mMasterEntries,IndexHandler.OperationType.IDSEARCH,CardExplorer.this);
+			return;	
+		}
 		RequestQueue queue = MyVolley.getRequestQueue();
 		String requestUrl = new String();
 		if(mData.requestType == CardExplorerData.REQUEST_SEARCH){
@@ -177,6 +182,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			@Override
 			public void onResponse(String response) {
 				try {
+//					Log.d(TAG,"server response "+response);
 					updateText("parsing results");
 					CardResponseData minResultSet  =(CardResponseData) Util.fromJson(response, CardResponseData.class);
 					if(minResultSet.results != null){
@@ -204,10 +210,10 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			}
 		}
 		if(tempList.size() > 1){
-			filteroptions.add(new FilterMenudata(FilterMenudata.SECTION, "All", 0));
+			filteroptions.add(new FilterMenudata(FilterMenudata.ITEM, "All", 0));
 		}
 		for(String filterName:tempList){
-			filteroptions.add(new FilterMenudata(FilterMenudata.SECTION, filterName, 0));
+			filteroptions.add(new FilterMenudata(FilterMenudata.ITEM, filterName, 0));
 		}
 		if(isVisible()){
 			mMainActivity.addFilterData(filteroptions, mFilterMenuClickListener);
@@ -271,6 +277,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		return new Response.ErrorListener() {
 			@Override
 			public void onErrorResponse(VolleyError error) {
+				
+				Log.d(TAG,"Error from server "+error.networkResponse);
 				showErrorDialog();
 				mMainActivity.hideActionBarProgressBar();
 				dismissProgressBar();
@@ -335,6 +343,9 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				mData.mEntries.put(key,object.get(key));
 				mData.mMasterEntries.add(object.get(key));
 			}
+		}
+		if(mData.mMasterEntries.size() == 0){
+			Toast.makeText(getContext(), "No data found,Please try again.", Toast.LENGTH_SHORT).show();
 		}
 		applyData();
 	}

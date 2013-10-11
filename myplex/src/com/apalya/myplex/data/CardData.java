@@ -10,7 +10,7 @@ public class CardData {
 	public CardDataContent content;
 	public CardDataUserReviews userReviews;
 	public CardDataVideos videos;
-	public List<CardDataRelatedCastItem> relatedCast;
+	public CardDataRelatedCast relatedCast;
 	public CardDataCurrentUserData currentUserData;
 	public CardDataRelatedContent relatedContent;
 	public CardDataComments comments;
@@ -23,6 +23,7 @@ public class CardData {
 	public String _lastModifiedAt;
 	public CardDataGenralInfo generalInfo;
 	public CardDataImages images;
+	public CardDataSimilarContent similarContent;
 	public String _id;
 
 	

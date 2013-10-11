@@ -32,11 +32,16 @@ import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewTreeObserver;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.EditText;
+import android.widget.HorizontalScrollView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -58,6 +63,7 @@ import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.PlayServicesUtils;
 import com.apalya.myplex.utils.SharedPrefUtils;
+import com.apalya.myplex.utils.Twitter11;
 import com.apalya.myplex.utils.Util;
 import com.facebook.FacebookAuthorizationException;
 import com.facebook.FacebookOperationCanceledException;
@@ -77,13 +83,13 @@ import com.google.android.gms.plus.model.people.Person;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 
 
+
+
 public class LoginActivity extends Activity implements OnClickListener, AccountUtils.AuthenticateCallback, GooglePlayServicesClient.ConnectionCallbacks,
 GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedListener {
 
-	private EditText mEmailField;
-	private EditText mPwdField;
-	private Button mFacebookButton,mSignup,mLogin,mGoogleLogin;
-	private TextView mLetMeIn,mText,mForgetMsg;
+	private Button mFacebookButton,mGoogleLogin,mTwitterLogin;
+	private TextView mLetMeIn,mLoginText,mSignupText;
 	private Session.StatusCallback statusCallback = new SessionStatusCallback();
 	private static final String TAG = "LoginActivity";
 	private RelativeLayout mSlideNotificationLayout;
@@ -100,6 +106,12 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 	public static final String EXTRA_FINISH_INTENT
 	= "com.google.android.iosched.extra.FINISH_INTENT";
 
+	
+	private static final String TWITTER_CONSUMER_KEY= "0ZHTN70CDo8JdwEKQWBag";
+	private static final String TWITTER_CONSUMER_SECRET= "hX13meHYmTHb07gt78lwKZG97YJgcx1FyOg8MDDhzo";
+
+	private static final int MESSAGE_SENT= 14;
+	public static final int TWITTER_CALLBACK= 31;
 
 	private static final String KEY_CHOSEN_ACCOUNT = "chosen_account";
 
@@ -119,6 +131,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 	private DeviceDetails mDevInfo;
 	private UserProfile mUserInfo;
 	private MixpanelAPI mMixpanel;
+	private Twitter11 twitter11;
+	private static int scrollWidth;
 	
 	  /*
      * In order for your app to receive push notifications, you will need to enable
@@ -149,6 +163,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		FontUtil.loadFonts(getAssets());
 		String trackingDistinctId = getTrackingDistinctId();
 		mMixpanel=myplexapplication.getMixPanel();
 		// We also identify the current user with a distinct ID, and
@@ -176,84 +191,107 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		// and identifying the user with that id as early as possible.
 		getActionBar().hide();
 		setContentView(R.layout.loginscreen);
+		
+		
+		
+		SharedPreferences prefs = getSharedPreferences("TWITTERTIME", 0);
+		twitter11= new Twitter11(this, R.string.app_name, prefs, TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET);
 
 		prepareSlideNotifiation();
 
 		mDevInfo=myplexapplication.getDevDetailsInstance();
 		mUserInfo=myplexapplication.getUserProfileInstance();
-		//mUserFields = (LinearLayout)findViewById(R.id.userfields);
-		TextView pwdName= (TextView) findViewById(R.id.passwordField);
-		pwdName.setTypeface(FontUtil.Roboto_Regular);
-		TextView loginName= (TextView) findViewById(R.id.loginname);
-		loginName.setTypeface(FontUtil.Roboto_Regular);
-		//mOptionFields = (LinearLayout) findViewById(R.id.linearLayout1);
-		//mTitleIcon = (ImageView) findViewById(R.id.logo);
-		mEmailField = (EditText)findViewById(R.id.editEmail);
-		mGoogleLogin = (Button)findViewById(R.id.googlelogin);
+		mGoogleLogin = (Button)findViewById(R.id.google);
 		mGoogleLogin.setOnClickListener(this);
 		mGoogleLogin.setTypeface(FontUtil.Roboto_Regular);
+		
+		mTwitterLogin = (Button)findViewById(R.id.twitter);
+		mTwitterLogin.setOnClickListener(this);
+		mTwitterLogin.setTypeface(FontUtil.Roboto_Regular);
+		
 
-		mFacebookButton = (Button) findViewById(R.id.fblogin);
+		mFacebookButton = (Button) findViewById(R.id.fb);
 		mFacebookButton.setOnClickListener(this);
 		mFacebookButton.setTypeface(FontUtil.Roboto_Regular);
+		
+		
+		final HorizontalScrollView parentScrollView= (HorizontalScrollView) findViewById(R.id.parentScrollview);
+		parentScrollView.setOnTouchListener(new View.OnTouchListener() {
 
-		mSignup = (Button) findViewById(R.id.signup);
-		mSignup.setTypeface(FontUtil.Roboto_Regular);
+	           
+			@Override
+			public boolean onTouch(View arg0, MotionEvent arg1) {
+				// TODO Auto-generated method stub
+				//parentScrollView.requestDisallowInterceptTouchEvent(false);
+				return true;
+			}
+            });
+		
+		ViewTreeObserver vto = parentScrollView.getViewTreeObserver();
+		vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+		    @Override
+		    public void onGlobalLayout() {
+		    	parentScrollView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+		    	scrollWidth=parentScrollView.getChildAt(0).getMeasuredWidth()-getWindowManager().getDefaultDisplay().getWidth();
+		    	//Util.showToast(Integer.toString(scrollWidth),LoginActivity.this);
+		        LinearLayout backgroundScrollLayout= (LinearLayout)findViewById(R.id.llayout);
+		        backgroundScrollLayout.clearAnimation();
+		        TranslateAnimation translateAnim = new TranslateAnimation(-scrollWidth,0, 0, 0);  
+		        translateAnim.setDuration(80000);   
+		        translateAnim.setRepeatCount(8);
+		        translateAnim.setRepeatMode(2);
+		        translateAnim.setFillEnabled(true);
+		        backgroundScrollLayout.startAnimation(translateAnim);
 
-		mText=(TextView)findViewById(R.id.Msg);
-		mText.setTypeface(FontUtil.Roboto_Regular);
-		mForgetMsg = (TextView)findViewById(R.id.forgetPwdMsg);
-		mForgetMsg.setTypeface(FontUtil.Roboto_Regular);
-		mForgetMsg.setOnClickListener(new OnClickListener() {
-
+		    }
+		});
+        
+	        
+        mLoginText=(TextView)findViewById(R.id.logintext);
+        mLoginText.setTypeface(FontUtil.Roboto_Regular);
+        
+        mLoginText.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-
-				ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(mForgetMsg, "alpha", 0.5f, 1f);
-				fadeAnim2.setDuration(800);
+				ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(mLoginText, "alpha", 0.5f, 1f);
+				fadeAnim2.setDuration(300);
 				fadeAnim2.start();
-				hideKeypad();
-				
-				Analytics.trackEvent("FORGET_PASSWORD-SELECTED");
+				Analytics.trackEvent("SIGNED-IN-AS-GUEST-SELECTED");
+				finish();
+				Map<String, String> map = new HashMap<String, String>();
+				String param1 = "login";
+				map.put(param1, "true");
+				Util.launchActivity(SignUpActivity.class,LoginActivity.this , map);
 
-				if( mEmailField.getText().toString().length() == 0 )
-					mEmailField.setError( "Username is required!" );
+			}
+		});
+        
+        mSignupText=(TextView)findViewById(R.id.signuptext);
+        mSignupText.setTypeface(FontUtil.Roboto_Regular);
+        
+        mSignupText.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(mSignupText, "alpha", 0.5f, 1f);
+				fadeAnim2.setDuration(300);
+				fadeAnim2.start();
+				Analytics.trackEvent("SIGNED-IN-AS-GUEST-SELECTED");
+				finish();
+				Util.launchActivity(SignUpActivity.class,LoginActivity.this , null);
 
-
-				if(mEmailField.getText().toString().length() > 0)
-				{
-					if(mEmailField.getText().toString().contains("@")&& mEmailField.getText().toString().contains("."))
-					{
-						/*Map<String, String> params = new HashMap<String, String>();
-						params.put("userid", mEmailField.getText().toString());
-						params.put("clientKey",mDevInfo.getClientKey());
-						mRequestType=2;
-						Log.d(TAG, "clientKey-----------: "+mDevInfo.getClientKey());
-						sendApiRequest(getString(R.string.signin), params);*/
-						//finish();
-						//Util.launchActivity(CardExplorer.class,LoginActivity.this , null);
-					}
-					else
-					{
-						sendNotification("Email id might be invalid, Please check");
-						mEmailField.setError( "Enter Valid Email!" );
-
-					}
-
-				}
 			}
 		});
 
 		mLetMeIn=(TextView)findViewById(R.id.letmeinMsg);
 		mLetMeIn.setTypeface(FontUtil.Roboto_Regular);
 
-		mPwdField =(EditText) findViewById(R.id.editPassword);
+		
 
 		mLetMeIn.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(mLetMeIn, "alpha", 0.5f, 1f);
-				fadeAnim2.setDuration(800);
+				fadeAnim2.setDuration(300);
 				fadeAnim2.start();
 				Analytics.trackEvent("SIGNED-IN-AS-GUEST-SELECTED");
 				finish();
@@ -262,104 +300,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			}
 		});
 
-		mPwdField.setTypeface(FontUtil.Roboto_Regular);
-		mEmailField.setTypeface(FontUtil.Roboto_Regular);
-		mLogin = (Button) findViewById(R.id.login);
-		mLogin.setTypeface(FontUtil.Roboto_Regular);
-		mLogin.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-
-				ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(mLogin, "alpha", 0.5f, 1f);
-				fadeAnim2.setDuration(800);
-				fadeAnim2.start();
-				hideKeypad();
-
-				Analytics.trackEvent("USER-LOGIN-SELECTED");
-				if(mEmailField.getText().toString().length() > 0 &&  mPwdField.getText().toString().length()>0)
-				{
-					if(mEmailField.getText().toString().contains("@")&& mEmailField.getText().toString().contains("."))
-					{
-						Map<String, String> params = new HashMap<String, String>();
-						params.put("userid", mEmailField.getText().toString());
-						params.put("password", mPwdField.getText().toString());
-						params.put("profile", "work");
-						params.put("clientKey",mDevInfo.getClientKey());
-						Log.d(TAG, "clientKey-----------: "+mDevInfo.getClientKey());
-						Analytics.trackEvent("USER-LOGIN-REQUEST",true);
-						showProgressBar();
-						userLoginRequest(getString(R.string.signin), params);
-						//finish();
-						//Util.launchActivity(CardExplorer.class,LoginActivity.this , null);
-					}
-					else
-					{
-						mEmailField.setError( "Enter Valid Email!" );
-						sendNotification("Hey, you might have entered wrong mail id!");
-
-					}
-
-				}
-				else
-				{
-					if( mEmailField.getText().toString().length() == 0 )
-					{
-						mEmailField.setError( "Username is required!" );
-					}
-					if( mPwdField.getText().toString().length() == 0 )
-					{
-						mPwdField.setError( "Password is required!" );
-					}
-					sendNotification("Username and password are required");
-				}
-			}
-		});
-
-		mSignup.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(mSignup, "alpha", 0.5f, 1f);
-				fadeAnim2.setDuration(800);
-				fadeAnim2.start();
-
-				Analytics.trackEvent("REGISTER-OPTION-SELECTED");
-				if(mEmailField.getText().toString().length() > 0 &&  mPwdField.getText().toString().length()>0)
-				{
-					if(mEmailField.getText().toString().contains("@"))
-					{
-
-						Map<String, String> intentBundle = new HashMap<String, String>();
-						String intentParam1 = "username";
-						String intentParam2 = "userpwd";
-
-						intentBundle.put(intentParam1,mEmailField.getText().toString() );
-						intentBundle.put(intentParam2,mPwdField.getText().toString());
-
-						finish();
-						Util.launchActivity(SignUpActivity.class,LoginActivity.this , intentBundle);
-
-						/*Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
-						startActivity(intent);*/	
-					}
-					else
-					{
-						finish();
-						Util.launchActivity(SignUpActivity.class,LoginActivity.this , null);
-					}
-
-				}
-				else
-				{
-					finish();
-					Util.launchActivity(SignUpActivity.class,LoginActivity.this , null);	
-				}
-				/*Intent intent = new Intent(LoginActivity.this, SignUpActivity.class);
-				startActivity(intent);*/
-			}
-		});
-
+	
 		Settings.addLoggingBehavior(LoggingBehavior.INCLUDE_ACCESS_TOKENS);
 		Session session = Session.getActiveSession();
 		if (session == null) {
@@ -398,8 +339,16 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				.setScopes(AccountUtils.AUTH_SCOPES)
 				.build();
 
+		if(AccountUtils.isAuthenticated(LoginActivity.this) )
+		{
+        	
+    		mPlusClient.connect();
+        	
+		}
+        
+		
 		//Check if Keyboard is visible or not
-		mRootLayout = findViewById(R.id.rootlayout);  
+		//mRootLayout = findViewById(R.id.rootlayout);  
 
 	}
 
@@ -428,91 +377,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		});
 	}
 
-	protected void userLoginRequest(String contextPath, final Map<String, String> bodyParams) {
-		RequestQueue queue = MyVolley.getRequestQueue();
-
-		String url=ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+ConsumerApi.USER_CONTEXT+ConsumerApi.SLASH+contextPath;
-		StringRequest myReq = new StringRequest(Method.POST,
-				url,
-				userLoginSuccessListener(),
-				userLoginErrorListener()) {
-
-			protected Map<String, String> getParams() throws com.android.volley.AuthFailureError {
-				Map<String, String> params = new HashMap<String, String>();
-				params=bodyParams;
-				return params;
-			};
-		};
-		Log.d(TAG,"Request sent ");
-		queue.add(myReq);
-	}
-	protected ErrorListener userLoginErrorListener() {
-		dismissProgressBar();
-		return new Response.ErrorListener() {
-			@Override
-			public void onErrorResponse(VolleyError error) {
-				Analytics.endTimedEvent("USER-LOGIN-REQUEST");
-				Analytics.trackEvent("USER-LOGIN-REQUEST-ERROR");
-				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-				Log.d(TAG,"Error: "+error.toString());
-				if(error.toString().indexOf("NoConnectionError")>0)
-				{
-					sendNotification(getString(R.string.interneterr));
-					finish();
-					Util.launchActivity(MainActivity.class,LoginActivity.this , null);
-
-				}
-				else
-				{
-					sendNotification(error.toString());	
-				}
-				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-			}
-		};
-	}
-
-	protected Listener<String> userLoginSuccessListener() {
-		dismissProgressBar();
-		return new Response.Listener<String>() {
-			@Override
-			public void onResponse(String response) {
-				Analytics.endTimedEvent("USER-LOGIN-REQUEST");
-
-				Log.d(TAG,"Response: "+response);
-				try {	
-					Log.d(TAG, "########################################################");
-					JSONObject jsonResponse= new JSONObject(response);
-
-					if(jsonResponse.getString("status").equalsIgnoreCase("SUCCESS"))
-					{
-						Analytics.trackEvent("USER-LOGIN-REQUEST-SUCCESS");
-						Log.d(TAG, "status: "+jsonResponse.getString("status"));
-						Log.d(TAG, "code: "+jsonResponse.getString("code"));
-						Log.d(TAG, "message: "+jsonResponse.getString("message"));
-						Log.d(TAG, "########################################################");
-						Log.d(TAG, "---------------------------------------------------------");
-
-						SharedPrefUtils.writeToSharedPref(LoginActivity.this,
-								getString(R.string.devusername), mEmailField.getText().toString());
-						SharedPrefUtils.writeToSharedPref(LoginActivity.this,
-								getString(R.string.devpassword), mPwdField.getText().toString());
-
-						finish();
-						Util.launchActivity(MainActivity.class,LoginActivity.this , null);
-					}
-					else
-					{
-						Analytics.trackEvent("USER-LOGIN-REQUEST-SERVER-ERROR");
-						Log.d(TAG, "code: "+jsonResponse.getString("code"));
-						Log.d(TAG, "message: "+jsonResponse.getString("message"));
-						sendNotification("Err: "+jsonResponse.getString("code")+" \nErr Msg: "+jsonResponse.getString("message"));
-					}
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}
-		};
-	}
+	
 
 
 	public void showSoftKeyboard(View view) {
@@ -750,19 +615,14 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
         }
         
         CheckUserStatus();
-		
         
-        
-        if(AccountUtils.isAuthenticated(LoginActivity.this))
-		{
-			finish();
+       if(isAuthTwitter())
+        {
+        	finish();
 			Intent intent = new Intent(LoginActivity.this, MainActivity.class);
 			LoginActivity.this.startActivity(intent);
-		}
-		
-		
-
-	}
+        }
+   	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {     
@@ -810,6 +670,9 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			//showToast(tokenExpiry.toString());
 
 			showProgressBar();
+			
+			if(mProgressDialog!=null)
+				mProgressDialog.setMessage("Getting details from facebook....");
 
 			//finish();
 			//Util.launchActivity(MainActivity.class,LoginActivity.this , null);
@@ -823,7 +686,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					mUserInfo.setName(user.getName());
 					mUserInfo.setLoginStatus(true);
 					//mUserInfo.setProfilePic("http://graph.facebook.com/"+fbUserId+"/picture?type=large");
-					mUserInfo.setProfilePic("https://graph.facebook.com/"+fbUserId+"/picture?width=300&height=300");
+					mUserInfo.setProfilePic("https://graph.facebook.com/"+fbUserId+"/picture?width=480&height=320");
 
 					Log.d(TAG, "Facebook User Id:   "+fbUserId);
 					Map<String, String> params = new HashMap<String, String>();
@@ -849,6 +712,9 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 		Analytics.trackEvent("FACEBOOK-LOGIN-AUTH-REQUEST",true);
 		RequestQueue queue = MyVolley.getRequestQueue();
+		
+		if(mProgressDialog!=null)
+			mProgressDialog.setMessage("Logging using facebook....");
 
 		String url=ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+ConsumerApi.USER_CONTEXT+ConsumerApi.SLASH+contextPath;
 		StringRequest myReq = new StringRequest(Method.POST,
@@ -949,7 +815,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		fadeAnim2.setDuration(800);
 		fadeAnim2.start();
 
-		if (view.getId() == R.id.fblogin){
+		if (view.getId() == R.id.fb){
 
 			if(Session.getActiveSession().isOpened())
 			{
@@ -961,7 +827,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				onClickLogin();				
 			}
 		}
-		else if (view.getId() == R.id.googlelogin ) {
+		else if (view.getId() == R.id.google ) {
 
 			if(!AccountUtils.isAuthenticated(LoginActivity.this))
 			{
@@ -974,9 +840,11 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					mPlusClient.connect();
 		        }
 			}
-			else
-			{
-				//sendNotification("Already Connected");
+		}
+		else if(view.getId()==R.id.twitter)
+		{
+			if (!isAuthTwitter()){
+				twitter11.login();
 			}
 		}
 	}
@@ -998,7 +866,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 	private void googleLoginRequest(String contextPath,
 			final Map<String, String> bodyParams) {
-
+		if(mProgressDialog!=null)
+			mProgressDialog.setMessage("Logging using google....");
 		Analytics.trackEvent("GOOGLE-LOGIN-AUTH-REQUEST",true);
 
 		RequestQueue queue = MyVolley.getRequestQueue();
@@ -1113,6 +982,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		// It is possible that the authenticated account doesn't have a profile.
 		Analytics.trackEvent("GOOGLE-LOGIN-CONNECTED");
 		showProgressBar();
+		if(mProgressDialog!=null)
+			mProgressDialog.setMessage("Getting details from google....");
 		mPlusClient.loadPerson(this, "me");
 		
 	}
@@ -1207,17 +1078,53 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				}
 			}
 		} else {
-			super.onActivityResult(requestCode, resultCode, data);
-			Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
+			
+			if (requestCode == MESSAGE_SENT ||
+					requestCode == TWITTER_CALLBACK)
+			{
+				if (resultCode == Activity.RESULT_OK){
+					switch(requestCode){
+					case MESSAGE_SENT:
+						final String smsg= data.getExtras().getString(Twitter11.COM_REPLY);
+						Toast.makeText(this, smsg, Toast.LENGTH_SHORT).show();
+						break;
+					case TWITTER_CALLBACK:
+						if(data.getData() != null){	
+							twitter11.logincallback(data, new Runnable(){
+								public void run(){
+									Log.i(TAG, "after ActivityResult ");
+									Toast.makeText(LoginActivity.this, isAuthTwitter()? "Logged In" : "Not Logged In", Toast.LENGTH_SHORT).show();
+								}
+							});
+							
+						}else
+							Toast.makeText(this, data.getExtras().getString(Twitter11.COM_REPLY), Toast.LENGTH_SHORT).show();
+						break;
+					}
+				}else if(resultCode == Activity.RESULT_CANCELED){
+					if(requestCode==TWITTER_CALLBACK)
+						Toast.makeText(LoginActivity.this, isAuthTwitter()? "Logged In" : "Request Cancelled", Toast.LENGTH_SHORT).show();
+				}	
+			}
+			else
+			{
+				super.onActivityResult(requestCode, resultCode, data);
+				Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);	
+			}
+			
+			
 		}
 	}
-
+	private boolean isAuthTwitter(){
+		return twitter11.isloggedin();
+	}
 	@Override
 	public void onStop() {
 		super.onStop();
 		if (mAuthInProgress) mCancelAuth = true;
 		if (mPlusClient != null)
 			mPlusClient.disconnect();
+		if(Session.getActiveSession()!=null)
 		Session.getActiveSession().removeCallback(statusCallback);
 
 		FlurryAgent.onEndSession(this);
@@ -1231,7 +1138,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				AccountUtils.setPlusProfileId(this, person.getId());
 				mUserInfo.setGoogleId(person.getId());
 				//mUserInfo.setUserEmail(person.getName());
-				mUserInfo.setProfilePic("https://plus.google.com/s2/photos/profile/"+person.getId()+"?sz=300");
+				mUserInfo.setProfilePic("https://plus.google.com/s2/photos/profile/"+person.getId()+"?sz=480");
 				tryAuthenticate();
 				
 			}
@@ -1425,7 +1332,7 @@ private boolean isTokenValid(String clientKeyExp) {
 						mDevInfo.setClientKeyExp(jsonResponse.getString("expiresAt"));
 						Log.d(TAG, "---------------------------------------------------------");
 
-						ConsumerApi.DEBUGCLIENTKEY=jsonResponse.getString("clientKey");
+						ConsumerApi.DEBUGCLIENTKEY = jsonResponse.getString("clientKey");
 
 						SharedPrefUtils.writeToSharedPref(LoginActivity.this,
 								getString(R.string.devclientkey), jsonResponse.getString("clientKey"));
@@ -1451,10 +1358,10 @@ private boolean isTokenValid(String clientKeyExp) {
 	}
 	private void CheckUserStatus(){
 
+		SetDeviceDetails();
+		
 		
 		ConsumerApi.DOMAIN=getString(R.string.domain_name);
-		
-		SetDeviceDetails();
 		
 		String clientKey=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
 				getString(R.string.devclientkey));

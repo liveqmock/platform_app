@@ -16,25 +16,26 @@
 
 package com.apalya.myplex.utils;
 
-import java.io.IOException;
-
 import android.accounts.Account;
+import android.accounts.AccountManager;
+import android.accounts.AccountManagerCallback;
+import android.accounts.AccountManagerFuture;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 
 import com.apalya.myplex.LoginActivity;
-import com.google.android.gms.auth.GoogleAuthException;
-import com.google.android.gms.auth.GoogleAuthUtil;
-import com.google.android.gms.auth.GooglePlayServicesAvailabilityException;
-import com.google.android.gms.auth.UserRecoverableAuthException;
-import com.google.android.gms.auth.UserRecoverableNotifiedException;
+import com.google.android.gms.auth.*;
 import com.google.android.gms.common.Scopes;
+
+import java.io.IOException;
 
 
 

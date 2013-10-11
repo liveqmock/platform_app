@@ -26,7 +26,7 @@
             android:visibility="invisible" />
     </RelativeLayout>
 
-    <LinearLayout
+    <com.apalya.myplex.views.FlowLayout
         android:id="@+id/carddetailbriefdescriptiontitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -41,7 +41,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginRight="@dimen/margin_gap_8"
-            android:singleLine="true"
             android:text=""
             android:textColor="#4b4b4c"
             android:textSize="@dimen/textsize_16" />
@@ -53,7 +52,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="@dimen/margin_gap_12" />
-    </LinearLayout>
+    </com.apalya.myplex.views.FlowLayout>
 
     <LinearLayout
         android:id="@+id/carddetailbriefdescriptionsubtitle"

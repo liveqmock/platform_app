@@ -6,6 +6,5 @@ public class CardDataImagesItem {
 	public String profile;
 	public String link;
 	public String type;
-	public String format;
 	public CardDataImagesItem(){}
 }

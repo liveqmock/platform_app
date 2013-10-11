@@ -8,6 +8,9 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.apalya.myplex.data.CardData;
+import com.apalya.myplex.data.CardDataVideos;
+import com.apalya.myplex.data.CardDataVideosItem;
 import com.apalya.myplex.data.CardResponseData;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -35,6 +38,11 @@ public class MediaUtil {
 		myReq.setShouldCache(true);
 		queue.add(myReq);
 	}
+	private static void sendResponse(boolean status,String url){
+		if (urlEventListener != null) {
+			urlEventListener.urlReceived(status,url);
+		}
+	}
 	private static Response.Listener<String> getVideoUrlSuccessListener() {
 		return new Response.Listener<String>() {
 			@Override
@@ -45,29 +53,19 @@ public class MediaUtil {
 					//Analytics.trackEvent("RECOMMENDATIONS-REQUEST-SUCCESS");
 
 					CardResponseData minResultSet  =(CardResponseData) Util.fromJson(response, CardResponseData.class);
-					String url=null;
-					for(int i=0; i<minResultSet.results.size();i++)
-					{
-						int urlCount=minResultSet.results.get(i).videos.values.size();
-						if(urlCount==1){
-							url=minResultSet.results.get(0).videos.values.get(0).link;
-						}
-						else
-						{
-						for(int j=0;j<urlCount;j++)
-						{
-							String urlType=minResultSet.results.get(i).videos.values.get(j).type;
-							if(urlType.equalsIgnoreCase(bitrateType))
-							{
-								url=minResultSet.results.get(i).videos.values.get(j).link;
+					if(minResultSet.results == null){
+						sendResponse(false,null);
+					}
+					for(CardData data:minResultSet.results){
+						if(data.videos == null){sendResponse(false,null);}
+						if(data.videos.values == null){sendResponse(false,null);}
+						for(CardDataVideosItem video:data.videos.values){
+							if(video.profile != null && video.profile.equalsIgnoreCase(bitrateType) && video.link != null){
+								sendResponse(true,video.link);
+								return;
 							}
 						}
-						}
 					}
-					if (urlEventListener != null) {
-						urlEventListener.urlReceived(true,url);
-					}
-
 				} catch (JsonMappingException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

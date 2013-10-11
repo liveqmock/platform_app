@@ -5,13 +5,13 @@
     android:paddingBottom="16dp" >
 
     <ImageView
-        android:contentDescription="@string/hello_world"
         android:id="@+id/imageView1"
         android:layout_width="@dimen/size_24"
         android:layout_height="@dimen/size_24"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_marginLeft="@dimen/margin_gap_4"
+        android:contentDescription="@string/hello_world"
         android:src="@drawable/card_icontimeline" />
 
     <LinearLayout
@@ -26,32 +26,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_weight="1" >
+           >
 
-            <com.apalya.myplex.views.FadeInNetworkImageView
-                android:id="@+id/carddetailmultimedia_stackview2"
-                android:layout_width="150dp"
-                android:layout_height="150dp"
-                android:layout_gravity="center_vertical"
-                android:layout_margin="10dp"
-                android:rotation="350"
-                android:alpha="50"
-                android:scaleType="centerCrop"
-                android:src="@drawable/menu_profile" />
-
-            <com.apalya.myplex.views.FadeInNetworkImageView
-                android:id="@+id/carddetailmultimedia_stackview1"
-                android:layout_width="150dp"
-                android:layout_height="150dp"
-                android:layout_alignParentRight="true"
+            <ImageView
+                android:id="@+id/carddetailmultimedia_stackview"
+                  android:background="@drawable/frame"
+                android:layout_width="48dp"
+                android:layout_height="64dp"
+                android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
-                android:layout_margin="10dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/menu_profile" />
+                android:scaleType="centerInside"
+                android:src="@drawable/radiohead_in_rainbows" />
+
         </RelativeLayout>
 
         <LinearLayout
-            android:layout_width="132dp"
+            android:layout_width="fill_parent"
+            android:layout_marginLeft="14dp"
+            android:layout_marginRight="14dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:orientation="vertical" >
@@ -64,18 +56,18 @@
                 android:layout_marginRight="@dimen/margin_gap_4"
                 android:gravity="center_vertical"
                 android:textColor="#4b4b4c"
-                android:textSize="@dimen/textsize_16" />
+        		android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/carddetailmultimedia_secondaryname"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="@dimen/margin_gap_4"
-                android:layout_marginTop="@dimen/margin_gap_4"
                 android:layout_marginRight="@dimen/margin_gap_2"
+                android:layout_marginTop="@dimen/margin_gap_4"
                 android:textColor="#4b4b4c"
-                android:textSize="@dimen/textsize_12"
-                android:textStyle="italic" />
+                android:textStyle="italic"
+        		android:textSize="14sp" />
         </LinearLayout>
     </LinearLayout>
 
