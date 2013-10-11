@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
 
@@ -89,7 +90,7 @@ public class SearchListAdapter extends BaseAdapter implements
 					headerHolder = new HeaderHolder();
 					convertView = inflater.inflate(R.layout.list, null);
 					headerHolder.categoryText = (TextView) convertView.findViewById(R.id.searchgroup);
-					headerHolder.categoryText.setTypeface(FontUtil.Roboto_Regular);
+					headerHolder.categoryText.setTypeface(FontUtil.Roboto_Light);
 					convertView.setTag(headerHolder);
 				}
 				else

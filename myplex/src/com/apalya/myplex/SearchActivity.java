@@ -36,6 +36,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+import android.widget.Toast;
 
 import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
@@ -56,6 +57,7 @@ import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
+import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.views.PinnedSectionListView;
 
 public class SearchActivity extends BaseFragment implements
@@ -86,6 +88,7 @@ public class SearchActivity extends BaseFragment implements
 		rootView = inflater.inflate(R.layout.searchlayout, container, false);
 		mSearchInput = (EditText) rootView.findViewById(R.id.inputSearch);
 		mSearchInput.setTypeface(FontUtil.Roboto_Regular);
+		mMainActivity.setSearchBarVisibilty(View.INVISIBLE);
 		mSearchInput.setOnEditorActionListener(new OnEditorActionListener() {
 
 			@Override
@@ -161,7 +164,10 @@ public class SearchActivity extends BaseFragment implements
 	public void searchButtonClicked() {
 
 		if (mSearchbleTags == null || mSearchbleTags.size() <= 0)
+		{
+			Toast.makeText(mContext,  "Select search tags or enter text for search ",  Toast.LENGTH_LONG).show();
 			return;
+		}
 		mMainActivity.showActionBarProgressBar();
 
 		String searchQuery = new String();
@@ -191,6 +197,11 @@ public class SearchActivity extends BaseFragment implements
 			mSearchbleTags.add(tagData);
 		else
 			mSearchbleTags.remove(tagData);
+		
+		if (mSearchbleTags.size() == 0)
+			mMainActivity.setSearchBarVisibilty(View.INVISIBLE);
+		else
+			mMainActivity.setSearchBarVisibilty(View.VISIBLE);
 	}
 
 	private void ClearSearchTags() {
@@ -206,9 +217,12 @@ public class SearchActivity extends BaseFragment implements
 		mListData.clear();
 		mMainActivity.showActionBarProgressBar();
 		showProgressBar();
+		TextView empty = (TextView) rootView.findViewById(R.id.empty);
+		empty.setVisibility(View.GONE);
+		
 		RequestQueue queue = MyVolley.getRequestQueue();
 		JsonObjectRequest myReq = new JsonObjectRequest(Method.GET,
-				ConsumerApi.getSearchTags("", ConsumerApi.LEVELDEVICEMAX),
+				ConsumerApi.getSearchTags("all", ConsumerApi.LEVELDEVICEMAX),
 				null, createMyReqSuccessListener(), createMyReqErrorListener());
 		myReq.setShouldCache(true);
 
@@ -410,6 +424,9 @@ public class SearchActivity extends BaseFragment implements
 		return new Response.ErrorListener() {
 			@Override
 			public void onErrorResponse(VolleyError error) {
+				TextView empty = (TextView) rootView.findViewById(R.id.empty);
+				empty.setTypeface(FontUtil.Roboto_Light);
+				empty.setVisibility(View.VISIBLE);
 				mMainActivity.hideActionBarProgressBar();
 				dismissProgressBar();
 			}
@@ -659,5 +676,4 @@ public class SearchActivity extends BaseFragment implements
 	public void OnOnlineError(VolleyError error) {
 		mMainActivity.hideActionBarProgressBar();
 	}
-
 }

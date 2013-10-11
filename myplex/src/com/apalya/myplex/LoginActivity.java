@@ -1425,7 +1425,7 @@ private boolean isTokenValid(String clientKeyExp) {
 						mDevInfo.setClientKeyExp(jsonResponse.getString("expiresAt"));
 						Log.d(TAG, "---------------------------------------------------------");
 
-
+						ConsumerApi.DEBUGCLIENTKEY=jsonResponse.getString("clientKey");
 
 						SharedPrefUtils.writeToSharedPref(LoginActivity.this,
 								getString(R.string.devclientkey), jsonResponse.getString("clientKey"));
@@ -1451,6 +1451,9 @@ private boolean isTokenValid(String clientKeyExp) {
 	}
 	private void CheckUserStatus(){
 
+		
+		ConsumerApi.DOMAIN=getString(R.string.domain_name);
+		
 		SetDeviceDetails();
 		
 		String clientKey=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,

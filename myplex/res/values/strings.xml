@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools"
-    tools:ignore="all">
-	<string name="domain_name">api.beta.myplex.in</string>
+<resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="all">
+
+    <string name="domain_name">api.beta.myplex.in</string>
+    <!-- <string name="domain_name">alpha.myplex.in:8866</string> -->
     <string name="app_name">Myplex</string>
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
@@ -45,6 +46,8 @@
     <string name="pricepopuprent">Rent</string>
     <string name="carddetailsectionheader_reviews">Reviews</string>
     <string name="navigationmenu_settings">Settings</string>
+    <string name="listempty">No Data</string>
+
     <string-array name="hometabletanim">
         <item>Bottom-In</item>
         <item>Right-In</item>
@@ -52,13 +55,13 @@
         <item>Scale</item>
         <item>Alpha-In</item>
     </string-array>
-    	<string name="searchhint">Search&#8230;</string>
-    <string name="tag1">1</string>
-	<string name="tag2">2</string>
 
+    <string name="searchhint">Search&#8230;</string>
+    <string name="tag1">1</string>
+    <string name="tag2">2</string>
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
-     <string name="osname">Android</string>
+    <string name="osname">Android</string>
     <string name="interneterr">Hey, It seems your internet connection is not active, Please check</string>
     <string name="loginerr">Unable to process your request due to network. Use let me in option to browse the app</string>
     <string name="clientsecret">ApalyaAndroid</string>
@@ -73,16 +76,15 @@
     <string name="gplusloginpath">social/login/Google</string>
     <string name="getVideoPathUrl">generateKey</string>
     <!-- URLS -->
-    <!-- P.storage --> 
+    <!-- P.storage -->
     <string name="encryptkey">encrypt_random_key</string>
     <string name="devclientkey">devClientKey</string>
-	<string name="devclientdevid">devClientDevId</string>
-	<string name="devclientkeyexp">devClientKeyExp</string>
-	<string name="devusername">username</string>
-	<string name="devpassword">password</string>
-	
-	<!-- P.storage -->
-    
+    <string name="devclientdevid">devClientDevId</string>
+    <string name="devclientkeyexp">devClientKeyExp</string>
+    <string name="devusername">username</string>
+    <string name="devpassword">password</string>
+
+    <!-- P.storage -->
 
     <string-array name="jazzy_effects">
         <item>Standard</item>

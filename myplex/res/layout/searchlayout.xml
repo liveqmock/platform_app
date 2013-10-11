@@ -10,7 +10,8 @@
 
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="48dp">
+        android:layout_height="48dp" 
+        >
 
         <HorizontalScrollView
             android:id="@+id/selectionscroll"
@@ -21,7 +22,7 @@
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
-                android:orientation="horizontal">
+                android:orientation="horizontal" >
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -33,9 +34,9 @@
                     android:id="@+id/spannable"
                     android:layout_width="wrap_content"
                     android:layout_height="fill_parent"
-                    android:orientation="horizontal" 
-                    android:paddingTop="10dp"
-                    android:paddingBottom="10dp">
+                    android:orientation="horizontal"
+                    android:paddingBottom="10dp"
+                    android:paddingTop="10dp" >
                 </LinearLayout>
 
                 <EditText
@@ -57,10 +58,10 @@
             android:layout_gravity="right"
             android:layout_weight="0.2"
             android:contentDescription="@string/hello_world"
-            android:paddingTop="12dp"
             android:paddingBottom="12dp"
-            android:paddingRight="4dp"
             android:paddingLeft="4dp"
+            android:paddingRight="4dp"
+            android:paddingTop="12dp"
             android:src="@drawable/card_iconclose"
             android:visibility="gone" />
     </LinearLayout>
@@ -85,6 +86,17 @@
             android:headerDividersEnabled="false"
             android:listSelector="@android:color/transparent" >
         </com.apalya.myplex.views.PinnedSectionListView>
+
+        <TextView
+            android:id="@+id/empty"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="@string/listempty"
+            android:textColor="#000000"
+            android:textSize="@dimen/textsize_22"
+            android:visibility="visible" />
+        
     </com.apalya.myplex.views.CustomFastScrollView>
 
 </LinearLayout>

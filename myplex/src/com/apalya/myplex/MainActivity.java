@@ -337,6 +337,21 @@ public class MainActivity extends Activity {
 		mCustomActionBarProgressBar = (ProgressBar) v
 				.findViewById(R.id.customactionbar_progressBar);
 	}
+	
+	public void setSearchBarVisibilty(int visibility) {
+		if (mCustomActionBarSearch != null) {
+
+			if(mCustomActionBarSearch.getVisibility() != View.VISIBLE && visibility == View.VISIBLE)
+			{
+				mCustomActionBarSearch.setVisibility(visibility);
+				ValueAnimator fadeinAnimation = ObjectAnimator.ofFloat(mCustomActionBarSearch, "alpha",0f, 1f);
+				fadeinAnimation.setDuration(800);
+				fadeinAnimation.start();
+			}
+			else
+				mCustomActionBarSearch.setVisibility(visibility);
+		}
+	}
 
 	public void showActionBarProgressBar() {
 		if (mCustomActionBarProgressBar != null) {
@@ -391,6 +406,7 @@ public class MainActivity extends Activity {
 
 	@Override
 	public void onBackPressed() {
+		setSearchBarVisibilty(View.VISIBLE);
 		try {
 			BaseFragment fragment = mFragmentStack.peek();
 			if (fragment instanceof CardExplorer) {
@@ -427,6 +443,7 @@ public class MainActivity extends Activity {
 		case SEARCH:
 			mSearchActivity = new SearchActivity();
 			fragment = mSearchActivity;
+			setSearchBarVisibilty(View.GONE);
 			break;
 		default:
 			mCardDetails = new CardDetails();
@@ -503,6 +520,7 @@ public class MainActivity extends Activity {
 		// android.R.animator.fade_out);
 		// transaction.
 		setActionBarTitle("Myplex");
+		setSearchBarVisibilty(View.VISIBLE);
 		updateActionBarTitle();
 		transaction.replace(R.id.content_frame, mCurrentFragment);
 		transaction.addToBackStack(null);
