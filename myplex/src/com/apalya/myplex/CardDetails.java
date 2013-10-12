@@ -111,6 +111,7 @@ public class CardDetails extends BaseFragment implements
 		mParentContentLayout = (LinearLayout) rootView.findViewById(R.id.carddetail_detaillayout);
 		mCardDetailViewFactory = new CardDetailViewFactory(getContext());
 		mCardDetailViewFactory.setOnCardDetailExpandListener(this);
+		mMainActivity.setSearchBarVisibilty(View.VISIBLE);
 //		prepareContent();
 //		if(mCardData.generalInfo != null){
 //			mMainActivity.setActionBarTitle(mCardData.generalInfo.title);
@@ -128,6 +129,7 @@ public class CardDetails extends BaseFragment implements
 	VideoViewPlayer mVideoViewPlayer;
 	private RelativeLayout mVideoViewLayout;
 	private int mPerBuffer = 0;
+	private TextView mBufferPercentageTextView;
 	private View createVideoPreview(){
 		View v = mInflater.inflate(R.layout.cardmediasubitemvideo, null);
 		mVideoViewLayout = (RelativeLayout)v;
@@ -142,6 +144,7 @@ public class CardDetails extends BaseFragment implements
 		mVideoView.setLayoutParams(params);
 		mPlay = (TextView) v.findViewById(R.id.cardmediasubitemvideo_play);
 		mPlay.setTypeface(FontUtil.ss_symbolicons_line);
+		mBufferPercentageTextView = (TextView)v.findViewById(R.id.carddetaildesc_movename);
 		Random rnd = new Random();
 		int Low = 100;
 		int High = 196;
@@ -209,7 +212,7 @@ public class CardDetails extends BaseFragment implements
 					Uri uri = Uri.parse("rtsp://59.162.166.216:554/AAJTAK_QVGA.sdp");
 					uri = Uri.parse("rtsp://46.249.213.87:554/playlists/bollywood-action_qcif.hpl.3gp");
 					uri = Uri.parse(url);
-					
+//					Toast.makeText(getContext(), "URL:"+url, Toast.LENGTH_SHORT).show();
 					VideoViewPlayer.StreamType streamType = StreamType.VOD;
 					if(mVideoViewPlayer == null){
 						mVideoViewPlayer = new VideoViewPlayer(mVideoView,mContext, uri, streamType);
@@ -241,6 +244,7 @@ public class CardDetails extends BaseFragment implements
 //		mMainActivity.setSensor();
 	}
 	public void playStopped(){
+		mPerBuffer = 0;
 		mPlayStarted = false;
 //		mMainActivity.setPotrait();
 	}
@@ -282,6 +286,9 @@ public class CardDetails extends BaseFragment implements
 		Log.e("player",perBuffer +" loading ");
 		if(this.mPerBuffer <= perBuffer){
 			this.mPerBuffer = perBuffer;
+		}
+		if(mBufferPercentageTextView != null){
+			mBufferPercentageTextView.setText(""+mPerBuffer);
 		}
 		int currentseekposition = mVideoView.getCurrentPosition();
 		if(currentseekposition < 0){

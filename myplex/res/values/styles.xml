@@ -7,8 +7,12 @@
             res/values-vXX/styles.xml, while customizations related to
             backward-compatibility can go here.
         -->
+   		 <item name="android:actionBarStyle">@style/action_bar_theme</item>
     </style>
-    
+
+	<style name="action_bar_theme" parent="@android:style/Widget.Holo.ActionBar">
+    	<item name="android:background">#19384F</item>
+	</style>
         
     <style name="YaSeekBar">
 		<item name="android:indeterminateOnly">false</item>
@@ -22,6 +26,7 @@
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppBaseTheme">
         <item name="android:windowBackground">@layout/grey_bg</item>
+   		 <item name="android:actionBarStyle">@style/action_bar_theme</item>
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
 	<color name="com_facebook_blue">#3B5998</color>

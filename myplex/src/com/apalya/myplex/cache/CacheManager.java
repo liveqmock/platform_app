@@ -36,7 +36,9 @@ public class CacheManager {
 			@Override
 			public void searchComplete(HashMap<String, CardData> resultMap) {
 				if(resultMap == null){
-					
+					if(mListener != null){
+						mListener.OnCacheResults(null);
+					}
 				}else{
 					if(mListener != null){
 						mListener.OnCacheResults(resultMap);

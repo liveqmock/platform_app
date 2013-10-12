@@ -107,6 +107,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		mCardView.setCardActionListener(this);
 		mMainActivity.setTitle("Home");
 		mMainActivity.setPotrait();
+		mMainActivity.setSearchBarVisibilty(View.VISIBLE);
 		delayedAction();
 		return mRootView;
 	}
@@ -185,9 +186,14 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 //					Log.d(TAG,"server response "+response);
 					updateText("parsing results");
 					CardResponseData minResultSet  =(CardResponseData) Util.fromJson(response, CardResponseData.class);
+					if(minResultSet.code != 200){
+						Toast.makeText(getContext(), minResultSet.message, Toast.LENGTH_SHORT).show();
+					}
 					if(minResultSet.results != null){
 						Log.d(TAG,"Number of Result for the MIN request:"+minResultSet.results.size());
 					}
+					if(minResultSet.results ==  null){showNoDataMessage();return;}
+					if(minResultSet.results.size() ==  0){showNoDataMessage();return;}
 					mCacheManager.getCardDetails(minResultSet.results,IndexHandler.OperationType.IDSEARCH,CardExplorer.this);
 				} catch (JsonParseException e) {
 					e.printStackTrace();
@@ -197,7 +203,13 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			}
 		};
 	}
-	
+	private void showNoDataMessage(){
+		mMainActivity.hideActionBarProgressBar();
+		dismissProgressBar();
+		if(mData.mMasterEntries.size() == 0){
+			Toast.makeText(getContext(), "No data found,Please try again.", Toast.LENGTH_SHORT).show();
+		}
+	}
 	private void prepareFilterData() {
 		List<FilterMenudata> filteroptions = new ArrayList<FilterMenudata>();
 		List<String> tempList = new ArrayList<String>();
@@ -332,9 +344,11 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 
 	@Override
 	public void OnCacheResults(HashMap<String, CardData> object ) {
-		if(object == null){return;}
-		mMainActivity.hideActionBarProgressBar();
-		dismissProgressBar();
+		if(object == null){
+			showNoDataMessage();
+			return;
+		}
+		
 		Set<String> keySet = object.keySet();
 			
 		for(String key:keySet){
@@ -344,8 +358,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				mData.mMasterEntries.add(object.get(key));
 			}
 		}
-		if(mData.mMasterEntries.size() == 0){
-			Toast.makeText(getContext(), "No data found,Please try again.", Toast.LENGTH_SHORT).show();
+		if(mData.mMasterEntries.size() != 0){
+			showNoDataMessage();
 		}
 		applyData();
 	}
@@ -361,12 +375,12 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			}
 			
 		}
+		showNoDataMessage();
 		applyData();		
 	}
 
 	@Override
 	public void OnOnlineError(VolleyError error) {
-		// TODO Auto-generated method stub
-		
+		showNoDataMessage();
 	}
 }

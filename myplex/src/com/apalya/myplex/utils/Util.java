@@ -42,6 +42,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.apalya.myplex.R;
+import com.apalya.myplex.R.color;
 import com.apalya.myplex.data.ApplicationConfig;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.myplexapplication;
@@ -166,7 +167,7 @@ public class Util {
 			public boolean onTouch(View v, MotionEvent event) {
 				switch (event.getAction()) {
 				case MotionEvent.ACTION_DOWN:
-					v.setBackgroundColor(Color.CYAN);
+					v.setBackgroundColor(color.searchtags_color);
 					break;
 				case MotionEvent.ACTION_UP:
 					v.setBackgroundColor(Color.TRANSPARENT);
@@ -391,8 +392,13 @@ public class Util {
 		}
 	}
 	public static void showDownloads(Context mContext) {
-		Intent i = new Intent();
-		i.setAction(DownloadManager.ACTION_VIEW_DOWNLOADS);
-		mContext.startActivity(i);
+		try {
+			Intent i = new Intent();
+			i.setAction(DownloadManager.ACTION_VIEW_DOWNLOADS);
+			mContext.startActivity(i);	
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		
 	}
 }

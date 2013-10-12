@@ -35,6 +35,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -77,6 +78,7 @@ public class MainActivity extends Activity {
 	public final static int SEARCH = 2;
 	public final static int LOGOUT = 4;
 	public final static int NOFOCUS = 5;
+	public final static int DOWNLOADS = 5;
 	public final static String FAVOURITE = "Favourite";
 	public final static String RECOMMENDED = "Recommended";
 	public final static String MOVIES = "Movies";
@@ -132,7 +134,7 @@ public class MainActivity extends Activity {
 		mMenuItemList.add(new NavigationOptionsMenu("Purchases",R.drawable.iconpurchases, null, NOACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu("Downloads",R.drawable.icondnload, null, NOACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu("Settings",R.drawable.iconsearch, null, NOACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu("Friends",R.drawable.iconfriends, null, NOACTION,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu("Invite Friends",R.drawable.iconfriends, null, NOACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu("Logout",R.drawable.menu_logout, null, LOGOUT,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu("ApplicationLogo",R.drawable.menu_logout, null, NOFOCUS,R.layout.applicationlogolayout));
 		mMenuItemList.add(new NavigationOptionsMenu(RECOMMENDED,R.drawable.menu_home, null, CARDEXPLORER,R.layout.navigation_menuitemsmall));
@@ -193,7 +195,7 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+//		getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 		mContext = this;
 		Util.prepareDisplayinfo(this);
 //		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
@@ -233,6 +235,13 @@ public class MainActivity extends Activity {
 		getActionBar().setHomeButtonEnabled(true);
 		// getActionBar().setDisplayShowHomeEnabled(true);
 		getActionBar().setIcon(new ColorDrawable(Color.TRANSPARENT));
+		
+//		
+//		ActionBar actionBar = getActionBar();
+//		actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#8C000000")));
+//		actionBar.setStackedBackgroundDrawable(new ColorDrawable(Color.parseColor("#550000ff")));
+//		 getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#19384F")));
+//		 getActionBar().setStackedBackgroundDrawable(new ColorDrawable(Color.parseColor("#5519384F")));
 
 		prepareCustomActionBar();
 
@@ -259,7 +268,7 @@ public class MainActivity extends Activity {
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
 
 		if (savedInstanceState == null) {
-			selectItem(1);
+			selectItem(8);
 		}
 	}
 
@@ -410,6 +419,7 @@ public class MainActivity extends Activity {
 	@Override
 	public void onBackPressed() {
 		try {
+			setSearchBarVisibilty(View.VISIBLE);
 			BaseFragment fragment = mFragmentStack.peek();
 			if (fragment instanceof CardExplorer) {
 				if (closeApplication()) {
@@ -471,6 +481,10 @@ public class MainActivity extends Activity {
 		NavigationOptionsMenu menu = mMenuItemList.get(position);
 		
 		switch (menu.mScreenType) {
+		case DOWNLOADS:{
+			Util.showDownloads(this);
+			return;
+		}
 		case NOACTION: {
 			return;
 		}
@@ -553,9 +567,9 @@ public class MainActivity extends Activity {
 		// getMenuInflater().inflate(R.menu.activity_main, menu);
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.activity_main, menu);
-
-		// getActionBar().setBackgroundDrawable(new
-		// ColorDrawable(Color.parseColor("#FAAC58")));
+//
+//		 getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#19384F")));
+//		 getActionBar().setStackedBackgroundDrawable(new ColorDrawable(Color.parseColor("#5519384F")));
 		// mCardView.setActionBarHeight(getActionBar().getHeight());
 		mCurrentFragment.setActionBarHeight(getActionBar().getHeight());
 		return super.onCreateOptionsMenu(menu);
@@ -566,6 +580,8 @@ public class MainActivity extends Activity {
 		// If the nav drawer is open, hide action items related to the content
 		// view
 		// boolean drawerOpen =
+//		 getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#19384F")));
+//		 getActionBar().setStackedBackgroundDrawable(new ColorDrawable(Color.parseColor("#5519384F")));
 		mDrawerLayout.isDrawerOpen(mDrawerList);
 		// menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
 		return super.onPrepareOptionsMenu(menu);

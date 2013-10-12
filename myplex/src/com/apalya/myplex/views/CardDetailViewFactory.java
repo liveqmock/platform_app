@@ -148,6 +148,9 @@ public class CardDetailViewFactory {
 	public static final int  COMMENTSECTION_COMMENTS = 101;
 	public static final int COMMENTSECTION_REVIEW = 102;
 	private void fillCommentSectionData(int type,int numberofItems,LinearLayout layout){
+		if(mData.comments == null){return ;}
+		if(mData.comments.values == null ){return ;}
+		if(mData.comments.values.size() == 0){return ;}
 		layout.removeAllViews();
 		int count = 0;
 		if(type == COMMENTSECTION_COMMENTS){
@@ -196,9 +199,9 @@ public class CardDetailViewFactory {
 	}
 	private View createCommentsView(final int type) {
 		mComments = null;
-		if(mData.comments == null){return null;}
-		if(mData.comments.values == null ){return null;}
-		if(mData.comments.values.size() == 0){return null;}
+//		if(mData.comments == null){return null;}
+//		if(mData.comments.values == null ){return null;}
+//		if(mData.comments.values.size() == 0){return null;}
 		View v = mInflator.inflate(R.layout.carddetailbriefcomment, null);
 		final LinearLayout layout = (LinearLayout)v.findViewById(R.id.carddetailcomment_contentlayout);
 		mComments = layout;
