@@ -39,6 +39,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
@@ -63,6 +64,7 @@ import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.MainBaseOptions;
 import com.apalya.myplex.views.PinnedSectionListView;
 import com.apalya.myplex.views.PinnedSectionListView.PinnedSectionListAdapter;
+import com.facebook.Session;
 
 public class MainActivity extends Activity implements MainBaseOptions {
 	private DrawerLayout mDrawerLayout;
@@ -403,13 +405,47 @@ public class MainActivity extends Activity implements MainBaseOptions {
 	private CardExplorer mCardExplorer;
 	private CardDetails mCardDetails;
 	private SearchActivity mSearchActivity;
-
+	private DownloadsActivity mDownloadsActivity;
 	private void selectItem(int position) {
 		NavigationOptionsMenu menu = mMenuItemList.get(position);
 		
 		switch (menu.mScreenType) {
 		case NavigationOptionsMenuAdapter.DOWNLOADS:{
 			Util.showDownloads(this);
+		case DOWNLOADS:{
+			if (mDownloadsActivity == null) {
+				/*List<String> cardids = new ArrayList<String>();
+				cardids.add("AAJTAK");
+				cardids.add("TIMESNOW");
+				cardids.add("NDTV");
+
+				SharedPrefUtils.writeList(MainActivity.this, cardids, "cardids");
+				
+				List<String> cardimgs = new ArrayList<String>();
+				cardimgs.add("http://myplexv2betaimages.s3.amazonaws.com/190/180x320_d8658644-5d1b-4227-be13-20c8abbe4d3e.jpg");
+				cardimgs.add("http://myplexv2betaimages.s3.amazonaws.com/197/180x320_018cdd7e-66c2-4a56-8511-f65fa12cf008.jpg");
+				cardimgs.add("http://myplexv2betaimages.s3.amazonaws.com/183/180x320_fc8037cc-f570-46ac-bc2d-e53886b4acbd.jpg");
+
+				SharedPrefUtils.writeList(MainActivity.this, cardimgs, "cardimgs");
+				
+				long dwnlId1=Util.startDownload("http://122.248.233.48/wvm/100_ff_4.wvm","Test1",MainActivity.this);
+				long dwnlId2=Util.startDownload("http://122.248.233.48/wvm/100_ff_4.wvm","Test2",MainActivity.this);
+				long dwnlId3=Util.startDownload("http://122.248.233.48/wvm/100_ff_4.wvm","Test3",MainActivity.this);
+				
+				List<String> downloads = new ArrayList<String>();
+				downloads.add(String.valueOf(dwnlId1));
+				downloads.add(String.valueOf(dwnlId2));
+				downloads.add(String.valueOf(dwnlId3));
+				
+				SharedPrefUtils.writeList(MainActivity.this, downloads, "downloads");*/
+				
+				mDownloadsActivity = new DownloadsActivity();
+			}
+			mCurrentFragment = mDownloadsActivity;
+			break;
+		}
+		case INVITE:{
+			Util.InviteFriends(MainActivity.this);
 			return;
 		}
 		case NavigationOptionsMenuAdapter.NOACTION: {

@@ -1,5 +1,8 @@
 package com.apalya.myplex.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -80,5 +83,37 @@ public class SharedPrefUtils {
 					null, Context.MODE_PRIVATE);
 		return myPrefs.getBoolean(key, false);
 	}
+	public static void writeList(Context context, List<String> list, String key)
+	{
+		if (myPrefs == null)
+			myPrefs = context.getSharedPreferences(
+					null, Context.MODE_PRIVATE);
+	    SharedPreferences.Editor editor = myPrefs.edit();
 
+	    int size = myPrefs.getInt(key+"_size", 0);
+
+	    // clear the previous data if exists
+	    for(int i=0; i<size; i++)
+	        editor.remove(key+"_"+i);
+
+	    // write the current list
+	    for(int i=0; i<list.size(); i++)
+	        editor.putString(key+"_"+i, list.get(i));
+
+	    editor.putInt(key+"_size", list.size());
+	    editor.commit();
+	}
+	public static List<String> readList (Context context, String key)
+	{
+		if (myPrefs == null)
+			myPrefs = context.getSharedPreferences(
+					null, Context.MODE_PRIVATE);
+	    int size = myPrefs.getInt(key+"_size", 0);
+
+	    List<String> data = new ArrayList<String>(size);
+	    for(int i=0; i<size; i++)
+	        data.add(myPrefs.getString(key+"_"+i, null));
+
+	    return data;
+	}
 }
