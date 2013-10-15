@@ -411,8 +411,6 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		
 		switch (menu.mScreenType) {
 		case NavigationOptionsMenuAdapter.DOWNLOADS:{
-			Util.showDownloads(this);
-		case DOWNLOADS:{
 			if (mDownloadsActivity == null) {
 				/*List<String> cardids = new ArrayList<String>();
 				cardids.add("AAJTAK");
@@ -444,7 +442,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 			mCurrentFragment = mDownloadsActivity;
 			break;
 		}
-		case INVITE:{
+		case NavigationOptionsMenuAdapter.INVITE:{
 			Util.InviteFriends(MainActivity.this);
 			return;
 		}

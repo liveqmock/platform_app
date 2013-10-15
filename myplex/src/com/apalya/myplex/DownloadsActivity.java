@@ -104,8 +104,8 @@ public class DownloadsActivity extends BaseFragment {
 
 
 
-		List<String> cardIds = SharedPrefUtils.readList(mMainActivity, "cardids");
-		List<String> cardImgs = SharedPrefUtils.readList(mMainActivity, "cardimgs");
+		List<String> cardIds = SharedPrefUtils.readList(getContext(), "cardids");
+		List<String> cardImgs = SharedPrefUtils.readList(getContext(), "cardimgs");
 
 
 		for(int i=0;i<cardIds.size()&& i<cardImgs.size();i++)
@@ -114,7 +114,7 @@ public class DownloadsActivity extends BaseFragment {
 
 		}
 		mAdapter.notifyDataSetChanged();
-		List<String> downloads = SharedPrefUtils.readList(mMainActivity, "downloads");
+		List<String> downloads = SharedPrefUtils.readList(getContext(), "downloads");
 		 for(int i=0;i<downloads.size();i++)
 		{
 			showProgress(i, Long.parseLong(downloads.get(i)));
@@ -123,7 +123,7 @@ public class DownloadsActivity extends BaseFragment {
 		
 		if(cardIds.size()==0)
 		{
-			Util.showToast("No Downloads", mMainActivity);
+			Util.showToast("No Downloads", getContext());
 		}
 		/* for(int i=0;i<cardIds.size()&& i<cardImgs.size();i++)
       	{
@@ -325,7 +325,7 @@ public class DownloadsActivity extends BaseFragment {
 			/*if(per!=null)
 				per.setText(String.valueOf(Status));*/
 			
-			mMainActivity.runOnUiThread(new Runnable() {
+			((Activity)getContext()).runOnUiThread(new Runnable() {
 
                 @Override
                 public void run() {
@@ -350,7 +350,7 @@ public class DownloadsActivity extends BaseFragment {
 		}
 	}
 	private void showProgress(final int index,final long dwnlId){
-		final DownloadManager manager = (DownloadManager) mMainActivity.getSystemService(Context.DOWNLOAD_SERVICE);
+		final DownloadManager manager = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
 
 		new Thread(new Runnable() {
 

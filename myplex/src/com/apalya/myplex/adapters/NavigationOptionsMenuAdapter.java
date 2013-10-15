@@ -26,7 +26,8 @@ public class NavigationOptionsMenuAdapter extends BaseAdapter {
 	public final static int SEARCH = 2;
 	public final static int LOGOUT = 4;
 	public final static int NOFOCUS = 5;
-	public final static int DOWNLOADS = 5;
+	public final static int DOWNLOADS = 6;
+	public final static int INVITE = 7;
 	public final static String FAVOURITE = "Favourite";
 	public final static String RECOMMENDED = "Recommended";
 	public final static String MOVIES = "Movies";

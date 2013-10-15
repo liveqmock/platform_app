@@ -43,7 +43,7 @@ public class ConsumerApi {
 	public static final String LEVELDEVICEMIN = "devicemin";
 	public static final String LEVELDEVICEMAX = "devicemax";
 	
-	public static String DEBUGCLIENTKEY = "dcb11454ccdafdd4706c7186d37abd2ff96cd02dc998d1111d16d4778a797f85";//"c86f79514ec7976bd20de36f1c6f15900d8e09f699818024283bad1bf0609650";
+	public static String DEBUGCLIENTKEY = "c86f79514ec7976bd20de36f1c6f15900d8e09f699818024283bad1bf0609650";//"dcb11454ccdafdd4706c7186d37abd2ff96cd02dc998d1111d16d4778a797f85";//
 	
 	public static String getSearch(String queryStr, String level,int startIndex) {
 		if(queryStr == null||(queryStr != null && queryStr.length() ==0)){
