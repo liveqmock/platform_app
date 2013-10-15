@@ -42,6 +42,7 @@ import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
@@ -51,6 +52,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.toolbox.NetworkImageView;
+import com.apalya.myplex.data.CardData;
+import com.apalya.myplex.data.CardDataGenralInfo;
+import com.apalya.myplex.data.CardDataImages;
+import com.apalya.myplex.data.CardDataImagesItem;
 import com.apalya.myplex.data.CardExplorerData;
 import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.myplexapplication;
@@ -60,9 +65,11 @@ import com.apalya.myplex.utils.Blur.BlurResponse;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.LogOutUtil;
 import com.apalya.myplex.utils.MyVolley;
+import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.views.PinnedSectionListView;
 import com.apalya.myplex.views.PinnedSectionListView.PinnedSectionListAdapter;
+import com.facebook.Session;
 
 public class MainActivity extends Activity {
 	private DrawerLayout mDrawerLayout;
@@ -78,7 +85,8 @@ public class MainActivity extends Activity {
 	public final static int SEARCH = 2;
 	public final static int LOGOUT = 4;
 	public final static int NOFOCUS = 5;
-	public final static int DOWNLOADS = 5;
+	public final static int DOWNLOADS = 6;
+	public final static int INVITE = 7;
 	public final static String FAVOURITE = "Favourite";
 	public final static String RECOMMENDED = "Recommended";
 	public final static String MOVIES = "Movies";
@@ -132,9 +140,11 @@ public class MainActivity extends Activity {
 				R.drawable.menu_profile, myplexapplication.getUserProfileInstance().getProfilePic(),CARDDETAILS,R.layout.navigation_menuitemlarge));
 		mMenuItemList.add(new NavigationOptionsMenu(FAVOURITE,R.drawable.iconfav, null, CARDEXPLORER,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu("Purchases",R.drawable.iconpurchases, null, NOACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu("Downloads",R.drawable.icondnload, null, NOACTION,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu("Downloads",R.drawable.icondnload, null, DOWNLOADS,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu("Settings",R.drawable.iconsearch, null, NOACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu("Invite Friends",R.drawable.iconfriends, null, NOACTION,R.layout.navigation_menuitemsmall));
+		Session fbSession=Session.getActiveSession();
+		if(fbSession!=null && fbSession.isOpened())
+			mMenuItemList.add(new NavigationOptionsMenu("Invite Friends",R.drawable.iconfriends, null, INVITE,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu("Logout",R.drawable.menu_logout, null, LOGOUT,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu("ApplicationLogo",R.drawable.menu_logout, null, NOFOCUS,R.layout.applicationlogolayout));
 		mMenuItemList.add(new NavigationOptionsMenu(RECOMMENDED,R.drawable.menu_home, null, CARDEXPLORER,R.layout.navigation_menuitemsmall));
@@ -180,6 +190,8 @@ public class MainActivity extends Activity {
 				NetworkImageView image = (NetworkImageView) v.findViewById(R.id.drawer_list_item_image);
 				image.setDefaultImageResId(menu.mDefaultResId);
 				image.setImageUrl(menu.mIconUrl, MyVolley.getImageLoader());
+				if(menu.mIconUrl!=null)
+					image.setScaleType(ScaleType.CENTER_CROP);
 			} else if (menu.mResourceLayoutId == R.layout.navigation_menuitemsmall) {
 				TextView text = (TextView) v.findViewById(R.id.drawer_list_item_text);
 				ImageView image = (ImageView) v.findViewById(R.id.drawer_list_item_image);
@@ -476,13 +488,45 @@ public class MainActivity extends Activity {
 	private CardExplorer mCardExplorer;
 	private CardDetails mCardDetails;
 	private SearchActivity mSearchActivity;
-
+	private DownloadsActivity mDownloadsActivity;
 	private void selectItem(int position) {
 		NavigationOptionsMenu menu = mMenuItemList.get(position);
 		
 		switch (menu.mScreenType) {
 		case DOWNLOADS:{
-			Util.showDownloads(this);
+			if (mDownloadsActivity == null) {
+				/*List<String> cardids = new ArrayList<String>();
+				cardids.add("AAJTAK");
+				cardids.add("TIMESNOW");
+				cardids.add("NDTV");
+
+				SharedPrefUtils.writeList(MainActivity.this, cardids, "cardids");
+				
+				List<String> cardimgs = new ArrayList<String>();
+				cardimgs.add("http://myplexv2betaimages.s3.amazonaws.com/190/180x320_d8658644-5d1b-4227-be13-20c8abbe4d3e.jpg");
+				cardimgs.add("http://myplexv2betaimages.s3.amazonaws.com/197/180x320_018cdd7e-66c2-4a56-8511-f65fa12cf008.jpg");
+				cardimgs.add("http://myplexv2betaimages.s3.amazonaws.com/183/180x320_fc8037cc-f570-46ac-bc2d-e53886b4acbd.jpg");
+
+				SharedPrefUtils.writeList(MainActivity.this, cardimgs, "cardimgs");
+				
+				long dwnlId1=Util.startDownload("http://122.248.233.48/wvm/100_ff_4.wvm","Test1",MainActivity.this);
+				long dwnlId2=Util.startDownload("http://122.248.233.48/wvm/100_ff_4.wvm","Test2",MainActivity.this);
+				long dwnlId3=Util.startDownload("http://122.248.233.48/wvm/100_ff_4.wvm","Test3",MainActivity.this);
+				
+				List<String> downloads = new ArrayList<String>();
+				downloads.add(String.valueOf(dwnlId1));
+				downloads.add(String.valueOf(dwnlId2));
+				downloads.add(String.valueOf(dwnlId3));
+				
+				SharedPrefUtils.writeList(MainActivity.this, downloads, "downloads");*/
+				
+				mDownloadsActivity = new DownloadsActivity();
+			}
+			mCurrentFragment = mDownloadsActivity;
+			break;
+		}
+		case INVITE:{
+			Util.InviteFriends(MainActivity.this);
 			return;
 		}
 		case NOACTION: {
@@ -493,6 +537,23 @@ public class MainActivity extends Activity {
 			return;
 		}
 		case CARDDETAILS: {
+			CardData profile=new CardData();
+			CardDataGenralInfo profileInfo = new CardDataGenralInfo();
+			profileInfo.title=myplexapplication.getUserProfileInstance().getName();
+			CardDataImagesItem profileImages= new CardDataImagesItem();
+			profileImages.profile="xxhdpi";
+			profileImages.link=myplexapplication.getUserProfileInstance().getProfilePic();
+			CardDataImages profilePicDetails = new CardDataImages();
+			profilePicDetails.values.add(profileImages);
+			
+			
+			profile._id="0";
+			profile.generalInfo=profileInfo;
+			profile.images=profilePicDetails;
+			
+			mCardDetails = (CardDetails) createFragment(CARDDETAILS);
+			mCurrentFragment = mCardDetails;
+			mCurrentFragment.setDataObject(profile);
 			break;
 		}
 		case CARDEXPLORER: {

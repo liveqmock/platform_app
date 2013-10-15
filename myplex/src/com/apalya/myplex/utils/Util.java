@@ -23,6 +23,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -120,16 +121,16 @@ public class Util {
 			myplexapplication.getApplicationConfig().screenHeight = dm.heightPixels;
 			myplexapplication.getApplicationConfig().screenWidth = dm.widthPixels;
 			myplexapplication.getApplicationConfig().type = findDpi(dm.densityDpi);
-			
+
 			File internalPath = activity.getFilesDir();
 			StringBuilder appDirectory = new StringBuilder();
 			appDirectory.append(Environment.getExternalStorageDirectory().getAbsolutePath());
 			appDirectory.append(File.separator).append("Android").append(File.separator).append("data").append(File.separator).append(activity.getPackageName());
 			appDirectory.toString();
-	        //Replace internalPath with appDirectory to store in memory card.
-	        //Remember to add WRITE_EXTERNAL_STORAGE permission in Manifest file
+			//Replace internalPath with appDirectory to store in memory card.
+			//Remember to add WRITE_EXTERNAL_STORAGE permission in Manifest file
 			myplexapplication.getApplicationConfig().indexFilePath = ""+internalPath;
-			
+
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
@@ -184,19 +185,19 @@ public class Util {
 	 * @return true if the download manager is available
 	 */
 	public static boolean isDownloadManagerAvailable(Context context) {
-	    try {
-	        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.GINGERBREAD) {
-	            return false;
-	        }
-	        Intent intent = new Intent(Intent.ACTION_MAIN);
-	        intent.addCategory(Intent.CATEGORY_LAUNCHER);
-	        intent.setClassName("com.android.providers.downloads.ui", "com.android.providers.downloads.ui.DownloadList");
-	        List<ResolveInfo> list = context.getPackageManager().queryIntentActivities(intent,
-	                PackageManager.MATCH_DEFAULT_ONLY);
-	        return list.size() > 0;
-	    } catch (Exception e) {
-	        return false;
-	    }
+		try {
+			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.GINGERBREAD) {
+				return false;
+			}
+			Intent intent = new Intent(Intent.ACTION_MAIN);
+			intent.addCategory(Intent.CATEGORY_LAUNCHER);
+			intent.setClassName("com.android.providers.downloads.ui", "com.android.providers.downloads.ui.DownloadList");
+			List<ResolveInfo> list = context.getPackageManager().queryIntentActivities(intent,
+					PackageManager.MATCH_DEFAULT_ONLY);
+			return list.size() > 0;
+		} catch (Exception e) {
+			return false;
+		}
 	}
 	public static void launchActivity(
 			Class<? extends Activity> nextActivityClass,
@@ -217,88 +218,109 @@ public class Util {
 				aMsg, 
 				Toast.LENGTH_LONG).show();
 	}
-	public void startDownload(String aUrl,String aMovieName,Context mContext)
+	public static long startDownload(String aUrl,String aMovieName,Context mContext)
 	{
+		long lastDownloadId=-1L;
 		if(isDownloadManagerAvailable(mContext))
 		{
-			
-			//String url = "http://220.226.22.120:9090/aptv3-downloads/appdevclip.wvm";
-			String url=aUrl;
-			
-			int val=url.length()-url.lastIndexOf("/");
-			String filename="";
-			if(val>0)
-				filename= url.substring(val, url.length()-1);
-			else
-				filename= aMovieName+".wvm";
-			
-			DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-			request.setDescription(aMovieName);
-			request.setTitle("Myplex Downloads");
-			// in order for this if to run, you must use the android 3.2 to compile your app
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			    request.allowScanningByMediaScanner();
-			    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-			}
-			request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
-
 			// get download service and enqueue file
 			DownloadManager manager = (DownloadManager) mContext.getSystemService(Context.DOWNLOAD_SERVICE);
-			manager.enqueue(request);
+
+
+			Uri uri=Uri.parse("http://commonsware.com/misc/test.mp4");
+
+			Environment
+			.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+			.mkdirs();
+
+			lastDownloadId=
+					manager.enqueue(new DownloadManager.Request(uri)
+					.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI |
+							DownloadManager.Request.NETWORK_MOBILE)
+							.setAllowedOverRoaming(false)
+							.setTitle("Demo")
+							.setDescription("Something useful. No, really.")
+							.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,
+									"test.mp4"));
+
+			//			//String url = "http://220.226.22.120:9090/aptv3-downloads/appdevclip.wvm";
+			//			String url=aUrl;
+			//			
+			//			/*int val=url.length()-url.lastIndexOf("/");
+			//			String filename="";
+			//			if(val>0)
+			//				filename= url.substring(val, url.length()-1);
+			//			else*/
+			//			String filename= aMovieName+".wvm";
+			//			
+			//			DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+			//			request.setDescription(aMovieName);
+			//			request.setTitle("Myplex Downloads");
+			//			// in order for this if to run, you must use the android 3.2 to compile your app
+			//			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			//			    request.allowScanningByMediaScanner();
+			//			    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+			//			}
+			//			request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
+			//
+			//			// get download service and enqueue file
+			//			DownloadManager manager = (DownloadManager) mContext.getSystemService(Context.DOWNLOAD_SERVICE);
+			//			lastDownloadId=manager.enqueue(request);
 		}
 		else
 		{
 			//Download Manager is not available
 		}
+		return lastDownloadId;
 	}
 	public static void InviteFriends(final Context mContext) {
-		
+
 		if(Session.getActiveSession()!=null)
 		{
 			if(Session.getActiveSession().isOpened())
 			{
-			Bundle params = new Bundle();
+				Bundle params = new Bundle();
 
-			params.putString("message", "Hey, Check out this cool app where we can watch movies and live tv shows.");
-			/*params.putString("data",
+				params.putString("message", "Hey, Check out this cool app where we can watch movies and live tv shows.");
+				/*params.putString("data",
 					"{\"badge_of_awesomeness\":\"1\"," +
 					"\"social_karma\":\"5\"}");*/
-			WebDialog requestsDialog = (
-					new WebDialog.RequestsDialogBuilder(mContext,
-							Session.getActiveSession(),
-							params))
-							.setOnCompleteListener(new OnCompleteListener() {
+				WebDialog requestsDialog = (
+						new WebDialog.RequestsDialogBuilder(mContext,
+								Session.getActiveSession(),
+								params))
+								.setOnCompleteListener(new OnCompleteListener() {
 
-								@Override
-								public void onComplete(Bundle values,
-										FacebookException error) {
-									if (error != null) {
-										if (error instanceof FacebookOperationCanceledException) {
-											Toast.makeText(mContext, 
-													"Request cancelled", 
-													Toast.LENGTH_SHORT).show();
+									@Override
+									public void onComplete(Bundle values,
+											FacebookException error) {
+										if (error != null) {
+											if (error instanceof FacebookOperationCanceledException) {
+												Toast.makeText(mContext, 
+														"Request cancelled", 
+														Toast.LENGTH_SHORT).show();
+											} else {
+												Toast.makeText(mContext, 
+														"Network Error", 
+														Toast.LENGTH_SHORT).show();
+											}
 										} else {
-											Toast.makeText(mContext, 
-													"Network Error", 
-													Toast.LENGTH_SHORT).show();
-										}
-									} else {
-										final String requestId = values.getString("request");
-										if (requestId != null) {
-											Toast.makeText(mContext, 
-													"Request sent",  
-													Toast.LENGTH_SHORT).show();
-										} else {
-											Toast.makeText(mContext, 
-													"Request cancelled", 
-													Toast.LENGTH_SHORT).show();
-										}
-									}   
-								}
+											final String requestId = values.getString("request");
+											if (requestId != null) {
+												Toast.makeText(mContext, 
+														"Request sent",  
+														Toast.LENGTH_SHORT).show();
+											} else {
+												Toast.makeText(mContext, 
+														"Request cancelled", 
+														Toast.LENGTH_SHORT).show();
+											}
+										}   
+									}
 
-							})
-							.build();
-			requestsDialog.show();
+								})
+								.build();
+				requestsDialog.show();
 			}else
 			{
 				showToast("Please Login with Facebook to invite your friends!!!", mContext);
@@ -374,7 +396,7 @@ public class Util {
 		{
 			sendIntent.setType("text/plain");	
 		}
-		
+
 		mContext.startActivity(Intent.createChooser(sendIntent,  mContext.getResources().getText(R.string.send_to)));
 	}
 	public static void FitToRound(Context mContext,ImageView View,Bitmap bm){
@@ -399,6 +421,42 @@ public class Util {
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
-		
+
+	}
+	public static int calculateInSampleSize(
+			BitmapFactory.Options options, int reqWidth, int reqHeight) {
+		// Raw height and width of image
+		final int height = options.outHeight;
+		final int width = options.outWidth;
+		int inSampleSize = 1;
+
+		if (height > reqHeight || width > reqWidth) {
+
+			// Calculate ratios of height and width to requested height and width
+			final int heightRatio = Math.round((float) height / (float) reqHeight);
+			final int widthRatio = Math.round((float) width / (float) reqWidth);
+
+			// Choose the smallest ratio as inSampleSize value, this will guarantee
+			// a final image with both dimensions larger than or equal to the
+			// requested height and width.
+			inSampleSize = heightRatio < widthRatio ? heightRatio : widthRatio;
+		}
+
+		return inSampleSize;
+	}
+	public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
+	        int reqWidth, int reqHeight) {
+
+	    // First decode with inJustDecodeBounds=true to check dimensions
+	    final BitmapFactory.Options options = new BitmapFactory.Options();
+	    options.inJustDecodeBounds = true;
+	    BitmapFactory.decodeResource(res, resId, options);
+
+	    // Calculate inSampleSize
+	    options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+	    // Decode bitmap with inSampleSize set
+	    options.inJustDecodeBounds = false;
+	    return BitmapFactory.decodeResource(res, resId, options);
 	}
 }

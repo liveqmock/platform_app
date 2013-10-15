@@ -15,6 +15,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -26,10 +27,12 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.ImageView.ScaleType;
 
 import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
@@ -74,7 +77,7 @@ public class SignUpActivity extends Activity{
 		mDevInfo=myplexapplication.getDevDetailsInstance();
 
 		prepareSlideNotifiation();
-
+		
 		//String login;
 
 		if(getIntent().getExtras()!=null)
@@ -248,6 +251,35 @@ public class SignUpActivity extends Activity{
 			});
 
 		}
+		
+		ImageView img1= (ImageView)findViewById(R.id.imageView1);
+		ImageView img2= (ImageView)findViewById(R.id.imageView2);
+		ImageView img3= (ImageView)findViewById(R.id.imageView3);
+		ImageView img4= (ImageView)findViewById(R.id.imageView4);
+		ImageView img5= (ImageView)findViewById(R.id.imageView5);
+		ImageView img6= (ImageView)findViewById(R.id.imageView6);
+		
+		DisplayMetrics dm = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+		final int height = dm.heightPixels;
+		final int width = dm.widthPixels;
+		
+		img1.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image1, width, height));
+		img2.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image2, width, height));
+		img3.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image3, width, height));
+		img4.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image4, width, height));
+		img5.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image5, width, height));
+		img6.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image6, width, height));
+		
+		img1.setScaleType(ScaleType.FIT_XY);
+		img2.setScaleType(ScaleType.FIT_XY);
+		img3.setScaleType(ScaleType.FIT_XY);
+		img4.setScaleType(ScaleType.FIT_XY);
+		img5.setScaleType(ScaleType.FIT_XY);
+		img6.setScaleType(ScaleType.FIT_XY);
+		
+		
 		final HorizontalScrollView parentScrollView= (HorizontalScrollView) findViewById(R.id.parentScrollview);
 		parentScrollView.setOnTouchListener(new View.OnTouchListener() {
 

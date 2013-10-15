@@ -41,6 +41,8 @@ import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
+import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -214,6 +216,33 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		mFacebookButton.setOnClickListener(this);
 		mFacebookButton.setTypeface(FontUtil.Roboto_Regular);
 		
+		ImageView img1= (ImageView)findViewById(R.id.imageView1);
+		ImageView img2= (ImageView)findViewById(R.id.imageView2);
+		ImageView img3= (ImageView)findViewById(R.id.imageView3);
+		ImageView img4= (ImageView)findViewById(R.id.imageView4);
+		ImageView img5= (ImageView)findViewById(R.id.imageView5);
+		ImageView img6= (ImageView)findViewById(R.id.imageView6);
+		
+		DisplayMetrics dm = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+		final int height = dm.heightPixels;
+		final int width = dm.widthPixels;
+		
+		img1.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image1, width, height));
+		img2.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image2, width, height));
+		img3.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image3, width, height));
+		img4.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image4, width, height));
+		img5.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image5, width, height));
+		img6.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image6, width, height));
+		
+		img1.setScaleType(ScaleType.FIT_XY);
+		img2.setScaleType(ScaleType.FIT_XY);
+		img3.setScaleType(ScaleType.FIT_XY);
+		img4.setScaleType(ScaleType.FIT_XY);
+		img5.setScaleType(ScaleType.FIT_XY);
+		img6.setScaleType(ScaleType.FIT_XY);
+		
 		
 		final HorizontalScrollView parentScrollView= (HorizontalScrollView) findViewById(R.id.parentScrollview);
 		parentScrollView.setOnTouchListener(new View.OnTouchListener() {
@@ -294,6 +323,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				fadeAnim2.setDuration(300);
 				fadeAnim2.start();
 				Analytics.trackEvent("SIGNED-IN-AS-GUEST-SELECTED");
+				mUserInfo.setName("Guest");
 				finish();
 				Util.launchActivity(MainActivity.class,LoginActivity.this , null);
 
@@ -315,7 +345,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				//session.openForRead(new Session.OpenRequest(this).setCallback(statusCallback));
 				if (!session.isOpened() && !session.isClosed()) {
 					session.openForRead(new Session.OpenRequest(this)
-					.setPermissions(Arrays.asList("basic_info","email","read_friendlists"))
+					.setPermissions(Arrays.asList("basic_info","email","read_friendlists","user_about_me","friends_about_me"))
 					.setCallback(statusCallback));
 				} else {
 					Session.openActiveSession(this, true, statusCallback);
@@ -682,12 +712,14 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				@Override
 				public void onCompleted(GraphUser user,
 						com.facebook.Response response) {
+					if(user!=null)
+					{
 					fbUserId=user.getId();
 					mUserInfo.setName(user.getName());
 					mUserInfo.setLoginStatus(true);
-					//mUserInfo.setProfilePic("http://graph.facebook.com/"+fbUserId+"/picture?type=large");
 					mUserInfo.setProfilePic("https://graph.facebook.com/"+fbUserId+"/picture?width=480&height=320");
-
+					
+					
 					Log.d(TAG, "Facebook User Id:   "+fbUserId);
 					Map<String, String> params = new HashMap<String, String>();
 					params.put("facebookId", fbUserId);
@@ -696,7 +728,24 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					params.put("tokenExpiry", tokenExpiry.toGMTString());
 					params.put("clientKey",mDevInfo.getClientKey());
 					facebookLoginRequest(getString(R.string.fbloginpath), params);
-
+					}
+					else
+					{
+						if(response.getError().getErrorCode()==-1)
+						{
+							dismissProgressBar();
+							Util.showToast("No Internet Connection...", LoginActivity.this);	
+							finish();
+							Util.launchActivity(MainActivity.class, LoginActivity.this, null);
+							
+						}
+						else
+						{
+							Util.showToast(response.getError().getErrorMessage(), LoginActivity.this);
+						}
+						
+					}
+				
 				}
 			});
 			request.executeAsync();
@@ -1144,7 +1193,20 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			}
 		} else {
 			Log.e(TAG, "Got " + connectionResult.getErrorCode() + ". Could not load plus profile.");
-			mPlusClient.connect();
+			dismissProgressBar();
+			if(connectionResult.getErrorCode()==7)
+			{
+				Util.showToast("No Internet Connection...", LoginActivity.this);
+				finish();
+				Util.launchActivity(MainActivity.class, LoginActivity.this, null);
+			}
+			else
+			{
+				Util.showToast("Can't establish a reliable connection to server, error code: "+String.valueOf(connectionResult.getErrorCode()), LoginActivity.this);
+			}
+			
+			/*if(!mPlusClient.isConnected())
+				mPlusClient.connect();*/
 		}
 	}
 	////////////////////////////////////////////////////

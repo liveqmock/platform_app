@@ -23,6 +23,7 @@ import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Space;
@@ -98,8 +99,9 @@ public class CardDetails extends BaseFragment implements
 			Bundle savedInstanceState) {
 		if(mDataObject instanceof CardData){
 			mCardData = (CardData) mDataObject;
+			Log.d(TAG,"content ID ="+mCardData._id);
 		}
-		Log.d(TAG,"content ID ="+mCardData._id);
+		
 		mMainActivity.setPotrait();
 		mInflater = LayoutInflater.from(getContext());
 		rootView = inflater.inflate(R.layout.carddetails, container, false);
@@ -152,6 +154,7 @@ public class CardDetails extends BaseFragment implements
         int color = Color.argb(255, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low); 
         mPreviewImage.setBackgroundColor(color);
 		mProgressBar = (RelativeLayout) v.findViewById(R.id.cardmediasubitemvideo_progressbarLayout);
+		
 		if(mCardData.images != null){
 			for(CardDataImagesItem imageItem:mCardData.images.values){
 				if(imageItem.profile != null && imageItem.profile.equalsIgnoreCase("xxhdpi")){
@@ -164,9 +167,20 @@ public class CardDetails extends BaseFragment implements
 				}
 			}
 		}
+	
 //		Util.showFeedback(mPlay);
-		v.setOnClickListener(mPlayListener);
-//		mPlay.setOnClickListener(mPlayListener);
+		
+		
+		if(mCardData._id.equalsIgnoreCase("0"))
+		{
+			mPlay.setVisibility(View.GONE);
+			mPreviewImage.setScaleType(ScaleType.FIT_XY);
+		}
+		else
+		{
+			v.setOnClickListener(mPlayListener);
+		}
+		//		mPlay.setOnClickListener(mPlayListener);
 		return v;
 	}
 	private OnClickListener mPlayListener = new OnClickListener() {
