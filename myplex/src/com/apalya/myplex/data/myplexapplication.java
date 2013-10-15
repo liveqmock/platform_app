@@ -9,6 +9,7 @@ import com.mixpanel.android.mpmetrics.MixpanelAPI;
 public class myplexapplication extends Application {
 	public static ApplicationConfig mDisplayInfo; 
 	public static CardExplorerData mCardExplorerData;
+	public static CardData mSelectedCard;
 	private static UserProfile mUserProfile;
 	private static DeviceDetails mDeviceDetails;
 	private static CacheHolder mCache ;

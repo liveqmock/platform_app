@@ -42,11 +42,13 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.apalya.myplex.MainActivity;
 import com.apalya.myplex.R;
 import com.apalya.myplex.R.color;
 import com.apalya.myplex.data.ApplicationConfig;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.tablet.MultiPaneActivity;
 import com.facebook.FacebookException;
 import com.facebook.FacebookOperationCanceledException;
 import com.facebook.Session;
@@ -421,7 +423,20 @@ public class Util {
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
-
+	}
+	public static void launchMainActivity(Activity activity){
+		try {
+			if(activity.getResources().getBoolean(R.bool.isTablet)){
+				activity.startActivity(new Intent(activity,MultiPaneActivity.class));	
+			}
+			else{
+				activity.startActivity(new Intent(activity,MainActivity.class));
+			}
+		} catch (Exception e) {
+			if(e != null){
+				e.printStackTrace();
+			}
+		}
 	}
 	public static int calculateInSampleSize(
 			BitmapFactory.Options options, int reqWidth, int reqHeight) {

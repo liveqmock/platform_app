@@ -299,7 +299,7 @@ public class CardView extends ScrollView {
 					if (imageItem.link != null && !(imageItem.link.compareTo("Images/NoImage.jpg") == 0)) {
 						dataHolder.mPreview.mImageUrl = imageItem.link;
 //						Log.d("CardExplorer","imageItem.link ="+imageItem.link+" profile = "+imageItem.profile);
-						CardImageLoader ImageLoader = new CardImageLoader(this,position);
+						CardImageLoader ImageLoader = new CardImageLoader(position);
 						ImageLoader.loadImage(dataHolder.mPreview);
 //						dataHolder.mPreview.setImageUrl(imageItem.link,MyVolley.getImageLoader());
 					}

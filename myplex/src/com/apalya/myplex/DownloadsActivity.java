@@ -107,46 +107,8 @@ public class DownloadsActivity extends BaseFragment implements CacheManagerCallb
 		loadLocalData();
 	}
 	private void loadLocalData(){
-
-		//182,201,203
-		ArrayList<CardData> downloadCardIds = new ArrayList<CardData>();
-		CardData cardId1= new CardData();
-		cardId1._id="193";
-		CardData cardId2= new CardData();
-		cardId2._id="201";
-		CardData cardId3= new CardData();
-		cardId3._id="203";
-		downloadCardIds.add(cardId1);
-		downloadCardIds.add(cardId2);
-		downloadCardIds.add(cardId3);
-		
-		CacheManager mCacheManager=new CacheManager();
-		mCacheManager.getCardDetails(downloadCardIds,IndexHandler.OperationType.IDSEARCH,DownloadsActivity.this);
-		
-		/*List<String> cardIds = SharedPrefUtils.readList(mMainActivity, "cardids");
-		List<String> cardImgs = SharedPrefUtils.readList(mMainActivity, "cardimgs");
-
-
-		for(int i=0;i<cardIds.size()&& i<cardImgs.size();i++)
-		{
-			mEntries.add(new PicasaEntry(cardIds.get(i), cardImgs.get(i)));
-
-		}
-		mAdapter.notifyDataSetChanged();
-		List<String> downloads = SharedPrefUtils.readList(mMainActivity, "downloads");
-		 for(int i=0;i<downloads.size();i++)
-		{
-			showProgress(i, Long.parseLong(downloads.get(i)));
-		}
-		prepareFilterData();
-		
-		if(cardIds.size()==0)
-		{
-			Util.showToast("No Downloads", mMainActivity);
-		}*/
 		
 	}
-
 	private void loadPage() {
 		RequestQueue queue = MyVolley.getRequestQueue();
 
@@ -265,7 +227,7 @@ public class DownloadsActivity extends BaseFragment implements CacheManagerCallb
 		profileFilter.add(new FilterMenudata(FilterMenudata.ITEM, "All", 0));
 		profileFilter.add(new FilterMenudata(FilterMenudata.ITEM, "Completed", 1));
 		profileFilter.add(new FilterMenudata(FilterMenudata.ITEM, "Inprogress", 2));
-		mMainActivity.addFilterData(profileFilter,mFilterMenuClickListener);
+//		addFilterData(profileFilter,mFilterMenuClickListener);
 
 	}
 
@@ -341,7 +303,7 @@ public class DownloadsActivity extends BaseFragment implements CacheManagerCallb
 			/*if(per!=null)
 				per.setText(String.valueOf(Status));*/
 			
-			mMainActivity.runOnUiThread(new Runnable() {
+			((Activity)getContext()).runOnUiThread(new Runnable() {
 
                 @Override
                 public void run() {
@@ -366,7 +328,7 @@ public class DownloadsActivity extends BaseFragment implements CacheManagerCallb
 		}
 	}
 	private void showProgress(final int index,final long dwnlId){
-		final DownloadManager manager = (DownloadManager) mMainActivity.getSystemService(Context.DOWNLOAD_SERVICE);
+		final DownloadManager manager = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
 
 		new Thread(new Runnable() {
 
@@ -419,7 +381,7 @@ public class DownloadsActivity extends BaseFragment implements CacheManagerCallb
 	@Override
 	public void OnCacheResults(HashMap<String, CardData> object) {
 		if(object == null){
-			Util.showToast("No Downloads", mMainActivity);
+			Util.showToast("No Downloads", getContext());
 			return;
 		}
 		

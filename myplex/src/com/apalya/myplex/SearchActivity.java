@@ -44,6 +44,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.apalya.myplex.adapters.CacheManagerCallback;
+import com.apalya.myplex.adapters.NavigationOptionsMenuAdapter;
 import com.apalya.myplex.adapters.OpenListener.OpenCallBackListener;
 import com.apalya.myplex.adapters.SearchListAdapter;
 import com.apalya.myplex.cache.CacheManager;
@@ -151,7 +152,7 @@ public class SearchActivity extends BaseFragment implements
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		mMainActivity.setTitle("Search");
+//		mMainActivity.setTitle("Search");
 
 		loadSearchTags();
 
@@ -663,7 +664,7 @@ public class SearchActivity extends BaseFragment implements
 		mCacheManager.unRegisterCallback();
 		mMainActivity.hideActionBarProgressBar();
 		BaseFragment fragment = mMainActivity
-				.createFragment(MainActivity.CARDEXPLORER);
+				.createFragment(NavigationOptionsMenuAdapter.CARDEXPLORER);
 		mMainActivity.bringFragment(fragment);
 	}
 

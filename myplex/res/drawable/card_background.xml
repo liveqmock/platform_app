@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
 
- 
     <item>
         <shape>
             <stroke
@@ -11,11 +10,8 @@
             <corners android:radius="4dp" />
 
             <gradient
-                android:centerY="0.0"
                 android:endColor="#FFFFFF"
-                android:gradientRadius="500"
-                android:startColor="#FFFFFF"
-                android:type="radial" >
+                android:startColor="#FFFFFF" >
             </gradient>
         </shape>
     </item>

@@ -1,4 +1,4 @@
-package com.apalya.myplex;
+package com.apalya.myplex.fragments;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -8,6 +8,7 @@ import java.util.Set;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -17,14 +18,21 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.GridView;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.apalya.myplex.BaseFragment;
+import com.apalya.myplex.R;
+import com.apalya.myplex.R.id;
+import com.apalya.myplex.R.layout;
 import com.apalya.myplex.adapters.CacheManagerCallback;
 import com.apalya.myplex.adapters.CardActionListener;
+import com.apalya.myplex.adapters.CardTabletAdapater;
+import com.apalya.myplex.adapters.NavigationOptionsMenuAdapter;
 import com.apalya.myplex.cache.CacheManager;
 import com.apalya.myplex.cache.IndexHandler;
 import com.apalya.myplex.data.CardData;
@@ -34,6 +42,7 @@ import com.apalya.myplex.data.CardResponseData;
 import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.listboxanimation.OnDismissCallback;
+import com.apalya.myplex.tablet.TabletCardDetails;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FavouriteUtil;
 import com.apalya.myplex.utils.FavouriteUtil.FavouriteCallback;
@@ -47,16 +56,23 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		OnDismissCallback {
 	public static final String TAG = "CardExplorer";
 	private CardView mCardView;
+	private GridView mGridView;
 	private CardExplorerData mData;
 	private CacheManager mCacheManager = new CacheManager();
+	private CardTabletAdapater mTabletAdapter;
 	private View mRootView;
 	private ProgressDialog mProgressDialog = null;
 
 	@Override
 	public void open(CardData object) {
-		BaseFragment fragment = mMainActivity.createFragment(MainActivity.CARDDETAILS);
-		fragment.setDataObject(object);
-		mMainActivity.bringFragment(fragment);
+		if(getResources().getBoolean(R.bool.isTablet)){
+			myplexapplication.mSelectedCard = object;
+			startActivity(new Intent(getContext(),TabletCardDetails.class));
+		}else{
+			BaseFragment fragment = mMainActivity.createFragment(NavigationOptionsMenuAdapter.CARDDETAILS);
+			fragment.setDataObject(object);
+			mMainActivity.bringFragment(fragment);	
+		}
 	}
 
 	@Override
@@ -98,14 +114,25 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		Log.d(TAG,"onCreateView");
 		mRootView = inflater.inflate(R.layout.cardbrowsing, container, false);
 		mCardView = (CardView) mRootView.findViewById(R.id.framelayout);
+		mGridView = (GridView)mRootView.findViewById(R.id.tabletview);
+		if(getResources().getBoolean(R.bool.isTablet)){
+			mTabletAdapter = new CardTabletAdapater(getContext());
+			mTabletAdapter.setCardActionListener(this);
+			mCardView.setVisibility(View.GONE);
+			mGridView.setVisibility(View.VISIBLE);
+			mGridView.setAdapter(mTabletAdapter);
+			
+		}else{
+			mCardView.setVisibility(View.VISIBLE);
+			mGridView.setVisibility(View.GONE);
+		}
 		// mGoogleCardListView.setAdapter(mGoogleCardListViewAdapter);
-		mCardView.setVisibility(View.VISIBLE);
 		mCardView.setVerticalScrollBarEnabled(false);
 		mCardView.setHorizontalScrollBarEnabled(false);
 		mCardView.setContext(getContext());
 		mCardView.setActionBarHeight(getActionBar().getHeight());
 		mCardView.setCardActionListener(this);
-		mMainActivity.setTitle("Home");
+//		mMainActivity.setTitle("Home");
 		mMainActivity.setPotrait();
 		mMainActivity.setSearchBarVisibilty(View.VISIBLE);
 		delayedAction();
@@ -263,7 +290,11 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	};
 
 	private void sort(ArrayList<CardData> localData) {
-		mCardView.forceUpdateData(localData);
+		if(getResources().getBoolean(R.bool.isTablet)){
+			mTabletAdapter.forceUpdateData(localData);
+		}else{
+			mCardView.forceUpdateData(localData);
+		}
 	}
 
 	private void applyData() {
@@ -271,9 +302,13 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			return;
 		}
 		updateText("preparing ui");
-		mCardView.addData(mData.mMasterEntries);
-		mCardView.show();
-		mCardView.sendViewReadyMsg(true);
+		if(getResources().getBoolean(R.bool.isTablet)){
+			mTabletAdapter.setData(mData.mMasterEntries);
+		}else{
+			mCardView.addData(mData.mMasterEntries);
+			mCardView.show();
+			mCardView.sendViewReadyMsg(true);
+		}
 		prepareFilterData();
 		dismissProgressBar();
 		mMainActivity.hideActionBarProgressBar();
@@ -309,7 +344,11 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				}else{
 //					Toast.makeText(getContext(), "Add as Favourite", Toast.LENGTH_SHORT).show();
 				}
-				mCardView.updateData(data);
+				if(getResources().getBoolean(R.bool.isTablet)){
+					mTabletAdapter.notifyDataSetChanged();
+				}else{
+					mCardView.updateData(data);
+				}
 			}
 		});
 	}
@@ -339,7 +378,11 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 
 	@Override
 	public void viewReady() {
-		mCardView.moveTo(mData.currentSelectedCard);		
+		if(getResources().getBoolean(R.bool.isTablet)){
+			
+		}else{
+			mCardView.moveTo(mData.currentSelectedCard);
+		}
 	}
 
 	@Override
