@@ -10,11 +10,9 @@ import com.apalya.myplex.views.CardView;
 
 public class CardImageLoader {
 	private int mCardId;
-	private CardView mParent;
 	private String requestUrl;
 	private CardImageView mView;
-	public CardImageLoader(CardView parent,int Id){
-		this.mParent = parent;
+	public CardImageLoader(int Id){
 		this.mCardId = Id;
 	}
 	public void loadImage(CardImageView View){

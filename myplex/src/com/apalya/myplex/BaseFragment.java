@@ -9,7 +9,7 @@ public class BaseFragment extends Fragment {
 	public Context mContext;
 	public ActionBar mActionBar;
 	public int mActionBarHeight;
-	public MainActivity mMainActivity;
+	public MainBaseOptions mMainActivity;
 	public Object mDataObject;
 
 	public Context getContext() {
@@ -32,7 +32,7 @@ public class BaseFragment extends Fragment {
 		this.mActionBarHeight = height;
 	}
 
-	public void setMainActivity(MainActivity activity) {
+	public void setMainActivity(MainBaseOptions activity) {
 		this.mMainActivity = activity;
 	}
 

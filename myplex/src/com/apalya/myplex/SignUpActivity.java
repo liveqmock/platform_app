@@ -402,7 +402,8 @@ public class SignUpActivity extends Activity{
 						SharedPrefUtils.writeToSharedPref(SignUpActivity.this,
 								getString(R.string.devpassword), mPassword.getText().toString());
 						finish();
-						Util.launchActivity(MainActivity.class,SignUpActivity.this , null);
+						Util.launchMainActivity(SignUpActivity.this);
+//						Util.launchActivity(MainActivity.class,SignUpActivity.this , null);
 					}
 					else
 					{
@@ -450,7 +451,8 @@ public class SignUpActivity extends Activity{
 				{
 					sendNotification(getString(R.string.interneterr));
 					finish();
-					Util.launchActivity(MainActivity.class,SignUpActivity.this , null);
+					Util.launchMainActivity(SignUpActivity.this);
+//					Util.launchActivity(MainActivity.class,SignUpActivity.this , null);
 
 				}
 				else
@@ -489,7 +491,8 @@ public class SignUpActivity extends Activity{
 								getString(R.string.devpassword), mPassword.getText().toString());
 
 						finish();
-						Util.launchActivity(MainActivity.class,SignUpActivity.this , null);
+						Util.launchMainActivity(SignUpActivity.this);
+//						Util.launchActivity(MainActivity.class,SignUpActivity.this , null);
 					}
 					else
 					{

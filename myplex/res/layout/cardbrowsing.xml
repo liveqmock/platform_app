@@ -11,4 +11,16 @@
         android:layout_height="match_parent"        android:layout_margin="@dimen/cardmargin" >
     </com.apalya.myplex.views.CardView>
 
+    <GridView
+        android:id="@+id/tabletview"
+        android:visibility="gone"
+        android:numColumns="2"
+        android:scrollbars="none"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:verticalSpacing="@dimen/cardmargin"
+   		android:horizontalSpacing="@dimen/cardmargin"
+        android:layout_margin="@dimen/cardmargin" >
+    </GridView>
+
 </RelativeLayout>

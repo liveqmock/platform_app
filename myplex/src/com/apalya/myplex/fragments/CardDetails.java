@@ -1,4 +1,4 @@
-package com.apalya.myplex;
+package com.apalya.myplex.fragments;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,7 +31,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.VolleyError;
+import com.apalya.myplex.BaseFragment;
+import com.apalya.myplex.R;
+import com.apalya.myplex.R.dimen;
+import com.apalya.myplex.R.id;
+import com.apalya.myplex.R.layout;
+import com.apalya.myplex.R.string;
 import com.apalya.myplex.adapters.CacheManagerCallback;
+import com.apalya.myplex.adapters.NavigationOptionsMenuAdapter;
 import com.apalya.myplex.adapters.ScrollingDirection;
 import com.apalya.myplex.cache.CacheManager;
 import com.apalya.myplex.cache.IndexHandler;
@@ -529,7 +536,7 @@ public class CardDetails extends BaseFragment implements
 
 		
 		
-		BaseFragment fragment = mMainActivity.createFragment(MainActivity.CARDEXPLORER);
+		BaseFragment fragment = mMainActivity.createFragment(NavigationOptionsMenuAdapter.CARDEXPLORER);
 		CardExplorerData data = myplexapplication.getCardExplorerData();
 		data.reset();
 		data.requestType = CardExplorerData.REQUEST_SEARCH;
@@ -682,7 +689,7 @@ public class CardDetails extends BaseFragment implements
 		}
 		mCacheManager.unRegisterCallback();
 		mMainActivity.hideActionBarProgressBar();
-		BaseFragment fragment = mMainActivity.createFragment(MainActivity.CARDEXPLORER);
+		BaseFragment fragment = mMainActivity.createFragment(NavigationOptionsMenuAdapter.CARDEXPLORER);
 		mMainActivity.bringFragment(fragment);
 		
 	}
@@ -697,7 +704,7 @@ public class CardDetails extends BaseFragment implements
 	}
 	@Override
 	public void onSimilarContentAction() {
-		BaseFragment fragment = mMainActivity.createFragment(MainActivity.CARDEXPLORER);
+		BaseFragment fragment = mMainActivity.createFragment(NavigationOptionsMenuAdapter.CARDEXPLORER);
 		CardExplorerData data = myplexapplication.getCardExplorerData();
 		data.reset();
 		data.requestType = CardExplorerData.REQUEST_SIMILARCONTENT;

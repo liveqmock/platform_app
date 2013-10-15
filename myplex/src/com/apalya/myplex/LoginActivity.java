@@ -295,7 +295,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				fadeAnim2.start();
 				Analytics.trackEvent("SIGNED-IN-AS-GUEST-SELECTED");
 				finish();
-				Util.launchActivity(MainActivity.class,LoginActivity.this , null);
+				Util.launchMainActivity(LoginActivity.this);
+//				Util.launchActivity(MainActivity.class,LoginActivity.this , null);
 
 			}
 		});
@@ -330,7 +331,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				Analytics.trackEvent("FACEBOOK-LOGIN-SESSION-ACTIVE");
 				//showToast("Already Logged In");
 				finish();
-				Util.launchActivity(MainActivity.class,LoginActivity.this , null);
+				Util.launchMainActivity(LoginActivity.this);
+//				Util.launchActivity(MainActivity.class,LoginActivity.this , null);
 			}
 
 		}
@@ -619,8 +621,9 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
        if(isAuthTwitter())
         {
         	finish();
-			Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-			LoginActivity.this.startActivity(intent);
+        	Util.launchMainActivity(LoginActivity.this);
+//			Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+//			LoginActivity.this.startActivity(intent);
         }
    	}
 
@@ -777,7 +780,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 						Log.d(TAG, "---------------------------------------------------------");
 						//sendNotification(jsonResponse.getString("message"));
 						finish();
-						Util.launchActivity(MainActivity.class,LoginActivity.this , null);
+						Util.launchMainActivity(LoginActivity.this);
+//						Util.launchActivity(MainActivity.class,LoginActivity.this , null);
 
 					}
 					else
@@ -942,8 +946,9 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 
 						finish();
-						Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-						LoginActivity.this.startActivity(intent);
+						Util.launchMainActivity(LoginActivity.this);
+//						Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+//						LoginActivity.this.startActivity(intent);
 
 					}
 					else
@@ -1393,7 +1398,8 @@ private boolean isTokenValid(String clientKeyExp) {
 				if(username!=null)
 				{
 					finish();
-					Util.launchActivity(MainActivity.class,LoginActivity.this , null);
+					Util.launchMainActivity(LoginActivity.this);
+//					Util.launchActivity(MainActivity.class,LoginActivity.this , null);
 				}
 					
 			}
@@ -1512,7 +1518,8 @@ private boolean isTokenValid(String clientKeyExp) {
 						if(username!=null)
 						{
 							finish();
-							Util.launchActivity(MainActivity.class,LoginActivity.this , null);
+							Util.launchMainActivity(LoginActivity.this);
+//							Util.launchActivity(MainActivity.class,LoginActivity.this , null);
 						}
 						
 					}
