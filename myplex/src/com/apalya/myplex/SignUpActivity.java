@@ -272,14 +272,6 @@ public class SignUpActivity extends Activity{
 		img5.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image5, width, height));
 		img6.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image6, width, height));
 		
-		img1.setScaleType(ScaleType.FIT_XY);
-		img2.setScaleType(ScaleType.FIT_XY);
-		img3.setScaleType(ScaleType.FIT_XY);
-		img4.setScaleType(ScaleType.FIT_XY);
-		img5.setScaleType(ScaleType.FIT_XY);
-		img6.setScaleType(ScaleType.FIT_XY);
-		
-		
 		final HorizontalScrollView parentScrollView= (HorizontalScrollView) findViewById(R.id.parentScrollview);
 		parentScrollView.setOnTouchListener(new View.OnTouchListener() {
 

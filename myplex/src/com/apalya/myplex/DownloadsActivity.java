@@ -3,8 +3,10 @@ package com.apalya.myplex;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,6 +18,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.Request.Method;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
+import com.apalya.myplex.adapters.CacheManagerCallback;
 import com.apalya.myplex.adapters.PicasaArrayAdapter;
 import com.apalya.myplex.cache.CacheManager;
 import com.apalya.myplex.cache.IndexHandler;
@@ -26,6 +29,7 @@ import com.apalya.myplex.data.CardExplorerData;
 import com.apalya.myplex.data.CardResponseData;
 import com.apalya.myplex.data.DownloadDetails;
 import com.apalya.myplex.data.FilterMenudata;
+import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.MyVolley;
@@ -59,13 +63,15 @@ import android.widget.Toast;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
 
-public class DownloadsActivity extends BaseFragment {
+public class DownloadsActivity extends BaseFragment implements CacheManagerCallback{
 	private ListView mLvDownloads;
 	private View rootView;
 	private boolean mHasData = false;
 	private boolean mInError = false;
-	private ArrayList<PicasaEntry> mEntries = new ArrayList<PicasaEntry>();
+	private ArrayList<PicasaEntry> mListEntries = new ArrayList<PicasaEntry>();
 	private PicasaArrayAdapter mAdapter;
+	public  HashMap<String,CardData> mEntries = new HashMap<String,CardData>();
+	public ArrayList<CardData> mMasterEntries = new ArrayList<CardData>();
 	int startIndex = 0;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -79,7 +85,7 @@ public class DownloadsActivity extends BaseFragment {
 		rootView = inflater.inflate(R.layout.listviewholder, container, false);
 
 		mLvDownloads = (ListView) rootView.findViewById(R.id.lv_picasa);
-		mAdapter = new PicasaArrayAdapter(getActivity(), 0, mEntries, MyVolley.getImageLoader());
+		mAdapter = new PicasaArrayAdapter(getActivity(), 0, mListEntries, MyVolley.getImageLoader());
 		mLvDownloads.setAdapter(mAdapter);
 		mLvDownloads.setOnScrollListener(new EndlessScrollListener());
 		
@@ -96,15 +102,28 @@ public class DownloadsActivity extends BaseFragment {
 
 		/*if (!mHasData && !mInError) {
             loadPage();
-            preapareFilterData();
+           
         }*/
 		loadLocalData();
 	}
 	private void loadLocalData(){
 
-
-
-		List<String> cardIds = SharedPrefUtils.readList(mMainActivity, "cardids");
+		//182,201,203
+		ArrayList<CardData> downloadCardIds = new ArrayList<CardData>();
+		CardData cardId1= new CardData();
+		cardId1._id="193";
+		CardData cardId2= new CardData();
+		cardId2._id="201";
+		CardData cardId3= new CardData();
+		cardId3._id="203";
+		downloadCardIds.add(cardId1);
+		downloadCardIds.add(cardId2);
+		downloadCardIds.add(cardId3);
+		
+		CacheManager mCacheManager=new CacheManager();
+		mCacheManager.getCardDetails(downloadCardIds,IndexHandler.OperationType.IDSEARCH,DownloadsActivity.this);
+		
+		/*List<String> cardIds = SharedPrefUtils.readList(mMainActivity, "cardids");
 		List<String> cardImgs = SharedPrefUtils.readList(mMainActivity, "cardimgs");
 
 
@@ -124,11 +143,8 @@ public class DownloadsActivity extends BaseFragment {
 		if(cardIds.size()==0)
 		{
 			Util.showToast("No Downloads", mMainActivity);
-		}
-		/* for(int i=0;i<cardIds.size()&& i<cardImgs.size();i++)
-      	{
-    	  showProgress(i, Long.parseLong(downloads.get(i)));
-      	}*/
+		}*/
+		
 	}
 
 	private void loadPage() {
@@ -137,7 +153,7 @@ public class DownloadsActivity extends BaseFragment {
 
 
 		String requestUrl = new String();
-		requestUrl = ConsumerApi.getRecommendation(ConsumerApi.LEVELDEVICEMAX,startIndex);
+		requestUrl = ConsumerApi.getFavourites(ConsumerApi.LEVELDEVICEMAX,startIndex);
 		StringRequest myReq = new StringRequest(requestUrl, createMyReqSuccessListener(), createMyReqErrorListener());
 
 
@@ -188,7 +204,7 @@ public class DownloadsActivity extends BaseFragment {
 								url=images.link;
 							}
 						}
-						mEntries.add(new PicasaEntry(title, url));	
+						//mEntries.add(new PicasaEntry(title, url));	
 					}
 
 					/*if(minResultSet.results != null){
@@ -399,5 +415,62 @@ public class DownloadsActivity extends BaseFragment {
 
 			}
 		}).start();
+	}
+	@Override
+	public void OnCacheResults(HashMap<String, CardData> object) {
+		if(object == null){
+			Util.showToast("No Downloads", mMainActivity);
+			return;
+		}
+		
+		Set<String> keySet = object.keySet();
+			
+		for(String key:keySet){
+//			mData.mEntries.add(object.get(key));
+			if(mEntries.get(key) == null){
+				mEntries.put(key,object.get(key));
+				mMasterEntries.add(object.get(key));
+			}
+		}
+		
+		if(mMasterEntries.size() == 0){
+			return;
+		}
+		
+		for (CardData data : mMasterEntries) 
+		{
+			String imgLink=null;
+			for(CardDataImagesItem imageItem: data.images.values)
+			{
+				if(imageItem.type.equalsIgnoreCase("thumbnail"))
+				imgLink=imageItem.link;//"http://myplexv2betaimages.s3.amazonaws.com/193/180x320_593621f9-9175-4d3d-95a6-1417249cee0b.jpg";
+			}
+			mListEntries.add(new PicasaEntry(data.generalInfo.title,imgLink));
+		}
+		mAdapter.notifyDataSetChanged();
+			
+		
+	}
+	@Override
+	public void OnOnlineResults(List<CardData> dataList) {
+		
+		
+		for (CardData data : dataList) 
+		{
+			String imgLink=null;
+			for(CardDataImagesItem imageItem: data.images.values)
+			{
+				if(imageItem.type.equalsIgnoreCase("thumbnail"))
+				imgLink=imageItem.link;//"http://myplexv2betaimages.s3.amazonaws.com/193/180x320_593621f9-9175-4d3d-95a6-1417249cee0b.jpg";
+			}
+			mListEntries.add(new PicasaEntry(data.generalInfo.title,imgLink));
+		}
+		mAdapter.notifyDataSetChanged();
+		
+	}
+	@Override
+	public void OnOnlineError(VolleyError error) {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -80,6 +80,7 @@ import com.flurry.android.FlurryAgent;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+
 import com.google.android.gms.plus.PlusClient;
 import com.google.android.gms.plus.model.people.Person;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
@@ -235,13 +236,6 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		img4.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image4, width, height));
 		img5.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image5, width, height));
 		img6.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image6, width, height));
-		
-		img1.setScaleType(ScaleType.FIT_XY);
-		img2.setScaleType(ScaleType.FIT_XY);
-		img3.setScaleType(ScaleType.FIT_XY);
-		img4.setScaleType(ScaleType.FIT_XY);
-		img5.setScaleType(ScaleType.FIT_XY);
-		img6.setScaleType(ScaleType.FIT_XY);
 		
 		
 		final HorizontalScrollView parentScrollView= (HorizontalScrollView) findViewById(R.id.parentScrollview);
@@ -883,7 +877,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				Analytics.trackEvent("GOOGLE-LOGIN-SELECTED");
 				
 				// Verifies the proper version of Google Play Services exists on the device.
-		        if(PlayServicesUtils.checkGooglePlaySevices(this))
+		       // if(PlayServicesUtils.checkGooglePlaySevices(this))
 		        {
 				if(mPlusClient!=null)
 					mPlusClient.connect();
@@ -1055,6 +1049,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		}
 		Analytics.trackEvent("GOOGLE-LOGIN-CONNECTION-FAILED");
 		final int errorCode = connectionResult.getErrorCode();
+		//Util.showToast(connectionResult., mContext)
 		if (GooglePlayServicesUtil.isUserRecoverableError(errorCode)) {
 			GooglePlayServicesUtil.getErrorDialog(errorCode, this,
 					REQUEST_PLAY_SERVICES_ERROR_DIALOG).show();
@@ -1157,8 +1152,15 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			}
 			else
 			{
-				super.onActivityResult(requestCode, resultCode, data);
-				Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);	
+				if(resultCode == -1)
+				{
+					Util.showToast("No Connection", LoginActivity.this);
+				}
+				else
+				{
+					super.onActivityResult(requestCode, resultCode, data);
+					Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
+				}
 			}
 			
 			
