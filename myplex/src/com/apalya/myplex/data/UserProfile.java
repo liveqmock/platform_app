@@ -1,5 +1,8 @@
 package com.apalya.myplex.data;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class UserProfile {
 	
 	private static String useremail;
@@ -10,6 +13,9 @@ public class UserProfile {
 	private static String profileDesc;
 	private static String name;
 	private static boolean loggedInStatus;
+	
+	public Map<String, String> downloadMap = new HashMap<String, String>();
+	
 	
 	
 	public void setUserEmail(String aUserEmail)

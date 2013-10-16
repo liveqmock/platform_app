@@ -68,6 +68,7 @@ import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.utils.Twitter11;
 import com.apalya.myplex.utils.Util;
 import com.facebook.FacebookAuthorizationException;
+import com.facebook.FacebookException;
 import com.facebook.FacebookOperationCanceledException;
 import com.facebook.LoggingBehavior;
 import com.facebook.Request;
@@ -76,6 +77,7 @@ import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.Settings;
 import com.facebook.model.GraphUser;
+import com.facebook.widget.WebDialog.OnCompleteListener;
 import com.flurry.android.FlurryAgent;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
@@ -568,13 +570,13 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		        });
 		 AlertDialog alert = builder.create();
 		 alert.show();*/
+		
+		/*Map<String, String> ids=myplexapplication.getUserProfileInstance().downloadMap;
+	    for (String s : ids.keySet()) {
+	        SharedPrefUtils.writeToSharedPref(this, s, ids.get(s));
+	    }*/
 
 		closeApplication();
-
-
-
-
-
 	}
 	/*	private void RunSlideDownAnimation() 
 	{
@@ -679,7 +681,14 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 		} else {
 
-			updateView();
+			/*if(state.equals(SessionState.OPENING))
+			{
+				session.close();
+			}
+			else*/
+			{
+				updateView();
+			}
 		}
 	}
 
@@ -749,6 +758,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 
 		} else {
+			
 			//showToast("Session is not active");
 		}
 	}
@@ -830,9 +840,27 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					else
 					{
 						Analytics.trackEvent("FACEBOOK-LOGIN-AUTH-REQUEST-SERVER-ERROR");
-						Log.d(TAG, "code: "+jsonResponse.getString("code"));
-						Log.d(TAG, "message: "+jsonResponse.getString("message"));
-						sendNotification("Err: "+jsonResponse.getString("code")+" \nErr Msg: "+jsonResponse.getString("message"));
+						if(jsonResponse.getString("code").equalsIgnoreCase("401"))
+						{
+							String devId=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
+									getString(R.string.devclientdevid));
+
+							Map<String, String> params = new HashMap<String, String>();
+							params.put("deviceId", devId);
+
+							Util.genKeyRequest(LoginActivity.this,getString(R.string.genKeyReqPath),params);
+							sendNotification("Err: "+jsonResponse.getString("code")+" \nErr Msg: "+jsonResponse.getString("message"));
+						}
+						else
+						{
+							
+							Log.d(TAG, "code: "+jsonResponse.getString("code"));
+							Log.d(TAG, "message: "+jsonResponse.getString("message"));
+							
+							if(Session.getActiveSession()!=null)
+								Session.getActiveSession().close();
+						}
+						
 					}
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -1010,10 +1038,21 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 							//mPlusClient.connect();
 							//getAndUseAuthTokenInAsyncTask();
 						}
-						else
+						else if(jsonResponse.getString("code").equalsIgnoreCase("401"))
 						{
-							sendNotification(jsonResponse.getString("message"));
+							String devId=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
+									getString(R.string.devclientdevid));
+
+							Map<String, String> params = new HashMap<String, String>();
+							params.put("deviceId", devId);
+
+							Util.genKeyRequest(LoginActivity.this,getString(R.string.genKeyReqPath),params);
 						}
+						//else
+						{
+							sendNotification(jsonResponse.getString("code")+" : "+jsonResponse.getString("message"));
+						}
+						AccountUtils.signOut(LoginActivity.this);
 						//(jsonResponse.getString("message"));
 						//showToast("Err: "+jsonResponse.getString("code")+" \nErr Msg: "+jsonResponse.getString("message"));
 					}
@@ -1157,11 +1196,11 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			}
 			else
 			{
-				if(resultCode == -1)
+				/*if(resultCode == -1)
 				{
 					Util.showToast("No Connection", LoginActivity.this);
 				}
-				else
+				else*/
 				{
 					super.onActivityResult(requestCode, resultCode, data);
 					Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
@@ -1193,7 +1232,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			if (person != null) {
 				AccountUtils.setPlusProfileId(this, person.getId());
 				mUserInfo.setGoogleId(person.getId());
-				//mUserInfo.setUserEmail(person.getName());
+				mUserInfo.setName(person.getName().getGivenName());
 				mUserInfo.setProfilePic("https://plus.google.com/s2/photos/profile/"+person.getId()+"?sz=480");
 				tryAuthenticate();
 				
@@ -1425,6 +1464,11 @@ private boolean isTokenValid(String clientKeyExp) {
 			}
 		};
 	}
+	private void OnCompleteListener(Bundle values, FacebookException error) {
+		Util.showToast("NO DOWNLOADS", LoginActivity.this);
+		// TODO Auto-generated method stub
+
+	}
 	private void CheckUserStatus(){
 
 		SetDeviceDetails();
@@ -1477,7 +1521,7 @@ private boolean isTokenValid(String clientKeyExp) {
 				Map<String, String> params = new HashMap<String, String>();
 				params.put("deviceId", devId);
 
-				genKeyRequest(getString(R.string.genKeyReqPath),params);
+				Util.genKeyRequest(LoginActivity.this,getString(R.string.genKeyReqPath),params);
 			}
 		}
 		else
@@ -1501,7 +1545,7 @@ private boolean isTokenValid(String clientKeyExp) {
 		}		
 	}
 	
-	private void genKeyRequest(String contextPath, final Map<String, String> bodyParams) {
+	/*private void genKeyRequest(String contextPath, final Map<String, String> bodyParams) {
 		RequestQueue queue = MyVolley.getRequestQueue();
 
 		String url=ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+ConsumerApi.USER_CONTEXT+ConsumerApi.SLASH+contextPath;
@@ -1599,5 +1643,5 @@ private boolean isTokenValid(String clientKeyExp) {
 				}
 			}
 		};
-	}
+	}*/
 }

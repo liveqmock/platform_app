@@ -10,16 +10,16 @@
 
     <LinearLayout
         android:id="@+id/thumbnail"
-        android:layout_width="60dp"
-        android:layout_height="80dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_marginRight="5dip"
         android:padding="3dip" >
 
         <com.apalya.myplex.views.FadeInNetworkImageView
             android:id="@+id/list_image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_width="75dp"
+            android:layout_height="100dp" />
     </LinearLayout>
 
     <!-- Title Of Content -->
@@ -44,8 +44,7 @@
         android:layout_below="@id/title"
         android:layout_marginRight="64dp"
         android:layout_marginTop="16dp"
-        android:layout_toRightOf="@+id/thumbnail"
-        android:progress="0" />
+        android:layout_toRightOf="@+id/thumbnail"/>
 
     <TextView
         android:id="@+id/percentage"
@@ -55,7 +54,6 @@
         android:layout_marginRight="64dp"
         android:layout_marginTop="8dp"
         android:layout_toRightOf="@+id/thumbnail"
-        android:text="0"
         android:textColor="#10bcc9"
         android:textSize="10dip"
         android:textStyle="bold" />

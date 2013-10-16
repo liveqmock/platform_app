@@ -1,7 +1,9 @@
 package com.apalya.myplex;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -26,6 +28,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -50,6 +53,10 @@ import android.widget.Toast;
 
 import com.apalya.myplex.adapters.FliterMenuAdapter;
 import com.apalya.myplex.adapters.NavigationOptionsMenuAdapter;
+import com.apalya.myplex.data.CardData;
+import com.apalya.myplex.data.CardDataGenralInfo;
+import com.apalya.myplex.data.CardDataImages;
+import com.apalya.myplex.data.CardDataImagesItem;
 import com.apalya.myplex.data.CardExplorerData;
 import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.NavigationOptionsMenu;
@@ -60,6 +67,7 @@ import com.apalya.myplex.menu.FilterMenuProvider;
 import com.apalya.myplex.utils.Blur;
 import com.apalya.myplex.utils.Blur.BlurResponse;
 import com.apalya.myplex.utils.LogOutUtil;
+import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.MainBaseOptions;
 import com.apalya.myplex.views.PinnedSectionListView;
@@ -74,13 +82,13 @@ public class MainActivity extends Activity implements MainBaseOptions {
 	// private CharSequence mTitle;
 	public LayoutInflater mInflater;
 	public BaseFragment mCurrentFragment;
-	
+
 	public FrameLayout mContentLayout;
 	public Context mContext;
 	private Stack<BaseFragment> mFragmentStack = new Stack<BaseFragment>();
 
 	NavigationOptionsMenuAdapter mNavigationAdapter;
-	
+
 
 	public void setLandscape(){
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
@@ -112,9 +120,11 @@ public class MainActivity extends Activity implements MainBaseOptions {
 				R.drawable.menu_profile, myplexapplication.getUserProfileInstance().getProfilePic(),NavigationOptionsMenuAdapter.CARDDETAILS,R.layout.navigation_menuitemlarge));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FAVOURITE,R.drawable.iconfav, null, NavigationOptionsMenuAdapter.CARDEXPLORER,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu("Purchases",R.drawable.iconpurchases, null, NavigationOptionsMenuAdapter.NOACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu("Downloads",R.drawable.icondnload, null, NavigationOptionsMenuAdapter.NOACTION,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu("Downloads",R.drawable.icondnload, null, NavigationOptionsMenuAdapter.DOWNLOADS,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu("Settings",R.drawable.iconsearch, null, NavigationOptionsMenuAdapter.NOACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu("Invite Friends",R.drawable.iconfriends, null, NavigationOptionsMenuAdapter.NOACTION,R.layout.navigation_menuitemsmall));
+		Session fbSession=Session.getActiveSession();
+		if(fbSession!=null && fbSession.isOpened())
+			mMenuItemList.add(new NavigationOptionsMenu("Invite Friends",R.drawable.iconfriends, null, NavigationOptionsMenuAdapter.INVITE,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu("Logout",R.drawable.menu_logout, null, NavigationOptionsMenuAdapter.LOGOUT,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu("ApplicationLogo",R.drawable.menu_logout, null, NavigationOptionsMenuAdapter.NOFOCUS,R.layout.applicationlogolayout));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.RECOMMENDED,R.drawable.menu_home, null, NavigationOptionsMenuAdapter.CARDEXPLORER,R.layout.navigation_menuitemsmall));
@@ -128,27 +138,27 @@ public class MainActivity extends Activity implements MainBaseOptions {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-//		getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
+		//		getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 		mContext = this;
 		Util.prepareDisplayinfo(this);
-//		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-//				.detectDiskReads().detectDiskWrites().detectNetwork() // or
-//																		// .detectAll()
-//																		// for
-//																		// all
-//																		// detectable
-//																		// problems
-//				.penaltyDialog().build());
-//		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-//				.detectLeakedSqlLiteObjects().detectLeakedClosableObjects()
-//				.penaltyLog().penaltyDeath().build());
+		//		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+		//				.detectDiskReads().detectDiskWrites().detectNetwork() // or
+		//																		// .detectAll()
+		//																		// for
+		//																		// all
+		//																		// detectable
+		//																		// problems
+		//				.penaltyDialog().build());
+		//		StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+		//				.detectLeakedSqlLiteObjects().detectLeakedClosableObjects()
+		//				.penaltyLog().penaltyDeath().build());
 
 		setContentView(R.layout.mainview);
-		
+
 		mContentLayout = (FrameLayout)findViewById(R.id.content_frame);
-		
+
 		mInflater = LayoutInflater.from(this);
-		
+
 		// mTitle = mDrawerTitle = getTitle();
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerList = (ListView) findViewById(R.id.left_drawer);
@@ -177,21 +187,21 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		// ActionBarDrawerToggle ties together the the proper interactions
 		// between the sliding drawer and the action bar app icon
 		mDrawerToggle = new ActionBarDrawerToggle(this, /* host Activity */
-		mDrawerLayout, /* DrawerLayout object */
-		R.drawable.ic_drawer, /* nav drawer image to replace 'Up' caret */
-		R.string.drawer_open, /* "open drawer" description for accessibility */
-		R.string.drawer_close /* "close drawer" description for accessibility */
-		) {
+				mDrawerLayout, /* DrawerLayout object */
+				R.drawable.ic_drawer, /* nav drawer image to replace 'Up' caret */
+				R.string.drawer_open, /* "open drawer" description for accessibility */
+				R.string.drawer_close /* "close drawer" description for accessibility */
+				) {
 			public void onDrawerClosed(View view) {
 				mNavigationDrawerOpened = false;
 				invalidateOptionsMenu(); // creates call to
-											// onPrepareOptionsMenu()
+				// onPrepareOptionsMenu()
 			}
 
 			public void onDrawerOpened(View drawerView) {
 				mNavigationDrawerOpened = true;
 				invalidateOptionsMenu(); // creates call to
-											// onPrepareOptionsMenu()
+				// onPrepareOptionsMenu()
 			}
 		};
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
@@ -282,7 +292,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 			@Override
 			public void onClick(View arg0) {
 				if ((mCurrentFragment instanceof SearchActivity)) {
-						mCurrentFragment.searchButtonClicked();
+					mCurrentFragment.searchButtonClicked();
 				} else {
 					SearchActivity fragment = new SearchActivity();
 					bringFragment(fragment);
@@ -307,7 +317,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 	}
 
 	private class DrawerItemClickListener implements
-			ListView.OnItemClickListener {
+	ListView.OnItemClickListener {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position,
 				long id) {
@@ -350,6 +360,11 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		try {
 			setSearchBarVisibilty(View.VISIBLE);
 			BaseFragment fragment = mFragmentStack.peek();
+			
+			/*Map<String, String> ids=myplexapplication.getUserProfileInstance().downloadMap;
+		    for (String s : ids.keySet()) {
+		        SharedPrefUtils.writeToSharedPref(this, s, ids.get(s));
+		    }*/
 			if (fragment instanceof CardExplorer) {
 				if (closeApplication()) {
 					mFragmentStack.pop();
@@ -408,39 +423,20 @@ public class MainActivity extends Activity implements MainBaseOptions {
 	private DownloadsActivity mDownloadsActivity;
 	private void selectItem(int position) {
 		NavigationOptionsMenu menu = mMenuItemList.get(position);
-		
+
 		switch (menu.mScreenType) {
 		case NavigationOptionsMenuAdapter.DOWNLOADS:{
+			if(mCurrentFragment != mDownloadsActivity){
 			if (mDownloadsActivity == null) {
-				/*List<String> cardids = new ArrayList<String>();
-				cardids.add("AAJTAK");
-				cardids.add("TIMESNOW");
-				cardids.add("NDTV");
-
-				SharedPrefUtils.writeList(MainActivity.this, cardids, "cardids");
-				
-				List<String> cardimgs = new ArrayList<String>();
-				cardimgs.add("http://myplexv2betaimages.s3.amazonaws.com/190/180x320_d8658644-5d1b-4227-be13-20c8abbe4d3e.jpg");
-				cardimgs.add("http://myplexv2betaimages.s3.amazonaws.com/197/180x320_018cdd7e-66c2-4a56-8511-f65fa12cf008.jpg");
-				cardimgs.add("http://myplexv2betaimages.s3.amazonaws.com/183/180x320_fc8037cc-f570-46ac-bc2d-e53886b4acbd.jpg");
-
-				SharedPrefUtils.writeList(MainActivity.this, cardimgs, "cardimgs");
-				
-				long dwnlId1=Util.startDownload("http://122.248.233.48/wvm/100_ff_4.wvm","Test1",MainActivity.this);
-				long dwnlId2=Util.startDownload("http://122.248.233.48/wvm/100_ff_4.wvm","Test2",MainActivity.this);
-				long dwnlId3=Util.startDownload("http://122.248.233.48/wvm/100_ff_4.wvm","Test3",MainActivity.this);
-				
-				List<String> downloads = new ArrayList<String>();
-				downloads.add(String.valueOf(dwnlId1));
-				downloads.add(String.valueOf(dwnlId2));
-				downloads.add(String.valueOf(dwnlId3));
-				
-				SharedPrefUtils.writeList(MainActivity.this, downloads, "downloads");*/
-				
 				mDownloadsActivity = new DownloadsActivity();
 			}
 			mCurrentFragment = mDownloadsActivity;
 			break;
+			}
+			else{
+				mDrawerLayout.closeDrawer(mDrawerList);
+				return;
+			}
 		}
 		case NavigationOptionsMenuAdapter.INVITE:{
 			Util.InviteFriends(MainActivity.this);
@@ -454,6 +450,28 @@ public class MainActivity extends Activity implements MainBaseOptions {
 			return;
 		}
 		case NavigationOptionsMenuAdapter.CARDDETAILS: {
+			if(mCurrentFragment!=mCardDetails)
+			{
+				mCardDetails = new CardDetails();
+				CardData profileData = new CardData();
+				profileData._id="0";
+				CardDataGenralInfo profileInfo=new CardDataGenralInfo();
+				profileInfo.title=myplexapplication.getUserProfileInstance().getName();
+				profileInfo.briefDescription="last visited: ";
+				CardDataImages pics=new CardDataImages();
+				CardDataImagesItem profilePic=new CardDataImagesItem();
+				profilePic.profile="xxhdpi";
+				profilePic.link=myplexapplication.getUserProfileInstance().getProfilePic();
+				pics.values.add(profilePic);
+				profileData.generalInfo=profileInfo;
+				profileData.images=pics;
+				mCurrentFragment=mCardDetails;
+				mCurrentFragment.mDataObject=profileData;
+			}else{
+				mDrawerLayout.closeDrawer(mDrawerList);
+				return;
+			}
+			
 			break;
 		}
 		case NavigationOptionsMenuAdapter.CARDEXPLORER: {
@@ -481,7 +499,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 			// mData.requestType = CardExplorerData.REQUEST_FAVOURITE;
 			// mCurrentFragment = mCardExplorer;
 		}
-			break;
+		break;
 		}
 		pushFragment();
 		mDrawerList.setItemChecked(position, true);
@@ -528,9 +546,9 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		// getMenuInflater().inflate(R.menu.activity_main, menu);
 		MenuInflater inflater = getMenuInflater();
 		inflater.inflate(R.menu.activity_main, menu);
-//
-//		 getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#19384F")));
-//		 getActionBar().setStackedBackgroundDrawable(new ColorDrawable(Color.parseColor("#5519384F")));
+		//
+		//		 getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#19384F")));
+		//		 getActionBar().setStackedBackgroundDrawable(new ColorDrawable(Color.parseColor("#5519384F")));
 		// mCardView.setActionBarHeight(getActionBar().getHeight());
 		mCurrentFragment.setActionBarHeight(getActionBar().getHeight());
 		return super.onCreateOptionsMenu(menu);
@@ -541,8 +559,8 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		// If the nav drawer is open, hide action items related to the content
 		// view
 		// boolean drawerOpen =
-//		 getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#19384F")));
-//		 getActionBar().setStackedBackgroundDrawable(new ColorDrawable(Color.parseColor("#5519384F")));
+		//		 getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#19384F")));
+		//		 getActionBar().setStackedBackgroundDrawable(new ColorDrawable(Color.parseColor("#5519384F")));
 		mDrawerLayout.isDrawerOpen(mDrawerList);
 		// menu.findItem(R.id.action_websearch).setVisible(!drawerOpen);
 		return super.onPrepareOptionsMenu(menu);
@@ -607,12 +625,12 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		if(mCurrentFragment.getView() == null){return;}
 		if(mFilterMenuPopup == null){return;}
 		try {
-//			mFilterListView.setVisibility(View.INVISIBLE);
+			//			mFilterListView.setVisibility(View.INVISIBLE);
 			ValueAnimator fadeAnim = ObjectAnimator.ofFloat(mFilterListView, "alpha", 0f,1f);
 			fadeAnim.setDuration(1200);
 			fadeAnim.addListener(new AnimatorListenerAdapter() {
 				public void onAnimationEnd(Animator animation) {
-//					mFilterListView.setVisibility(View.VISIBLE);
+					//					mFilterListView.setVisibility(View.VISIBLE);
 				}
 			});
 			fadeAnim.start();
@@ -622,7 +640,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 			Drawable bg = new ColorDrawable(Color.parseColor("#00000000"));
 			mPopBlurredLayout.setBackgroundDrawable(bg);
 			blur.fastblur(mContext, orginalBitmap, 12, new BlurResponse() {
-				
+
 				@Override
 				public void BlurredBitmap(Bitmap b) {
 					if( b == null || mFilterMenuPopup == null){return;}
@@ -632,7 +650,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 					fadeAnim.setDuration(500);
 					fadeAnim.addListener(new AnimatorListenerAdapter() {
 						public void onAnimationEnd(Animator animation) {
-//							mFilterListView.setVisibility(View.VISIBLE);
+							//							mFilterListView.setVisibility(View.VISIBLE);
 						}
 					});
 					fadeAnim.start();
@@ -658,21 +676,21 @@ public class MainActivity extends Activity implements MainBaseOptions {
 	public void addFilterData(List<FilterMenudata> datalist,
 			OnClickListener listener) {
 		mFilterDelegate = listener;
-		
+
 		mFilterMenuPopup = mInflater.inflate(R.layout.filtermenupopup, null);
-		
+
 		mPopBlurredLayout  = (RelativeLayout)mFilterMenuPopup.findViewById(R.id.fliterMenuBlurredLayout);
-		
+
 		mFilterListView = (PinnedSectionListView) mFilterMenuPopup.findViewById(R.id.listView1);
-		
+
 		mMenuDataList = datalist;
-		
+
 		FliterMenuAdapter adapter = new FliterMenuAdapter(this, android.R.layout.simple_list_item_1, android.R.id.text1,mMenuDataList);
-		
+
 		adapter.setDataList(mMenuDataList);
-		
+
 		mFilterListView.setAdapter(adapter);
-		
+
 		mFilterListView.setOnItemClickListener(mFilterItemClicked);
 
 		if (mFilterMenuProvider != null) {

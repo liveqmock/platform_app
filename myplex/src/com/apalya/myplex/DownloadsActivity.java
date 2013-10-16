@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.json.JSONArray;
@@ -73,6 +74,9 @@ public class DownloadsActivity extends BaseFragment implements CacheManagerCallb
 	public  HashMap<String,CardData> mEntries = new HashMap<String,CardData>();
 	public ArrayList<CardData> mMasterEntries = new ArrayList<CardData>();
 	int startIndex = 0;
+	
+	private ArrayList<CardData> downloadCardIds;
+	private ArrayList<String> downldReqIds;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -88,8 +92,8 @@ public class DownloadsActivity extends BaseFragment implements CacheManagerCallb
 		mAdapter = new PicasaArrayAdapter(getActivity(), 0, mListEntries, MyVolley.getImageLoader());
 		mLvDownloads.setAdapter(mAdapter);
 		mLvDownloads.setOnScrollListener(new EndlessScrollListener());
-		
-		
+
+
 
 		return rootView;
 	}
@@ -102,12 +106,38 @@ public class DownloadsActivity extends BaseFragment implements CacheManagerCallb
 
 		/*if (!mHasData && !mInError) {
             loadPage();
-           
+
         }*/
 		loadLocalData();
 	}
 	private void loadLocalData(){
+
+		mListEntries.clear();
 		
+		Map<String, String> ids=myplexapplication.getUserProfileInstance().downloadMap;
+
+		downldReqIds = new ArrayList<String>();
+		downloadCardIds = new ArrayList<CardData>();
+
+		for (Map.Entry<String,String> entry : ids.entrySet()) {
+			String key = entry.getKey();
+			String value = entry.getValue();
+			CardData cardId= new CardData();
+			cardId._id=key;
+			downloadCardIds.add(cardId);
+			downldReqIds.add(value);
+		}
+
+		if(downloadCardIds.size()>0)
+		{
+			CacheManager mCacheManager=new CacheManager();
+			mCacheManager.getCardDetails(downloadCardIds,IndexHandler.OperationType.IDSEARCH,DownloadsActivity.this);
+		}
+		else
+		{
+			Util.showToast("No Downloads",getContext());
+		}
+
 	}
 	private void loadPage() {
 		RequestQueue queue = MyVolley.getRequestQueue();
@@ -227,7 +257,7 @@ public class DownloadsActivity extends BaseFragment implements CacheManagerCallb
 		profileFilter.add(new FilterMenudata(FilterMenudata.ITEM, "All", 0));
 		profileFilter.add(new FilterMenudata(FilterMenudata.ITEM, "Completed", 1));
 		profileFilter.add(new FilterMenudata(FilterMenudata.ITEM, "Inprogress", 2));
-//		addFilterData(profileFilter,mFilterMenuClickListener);
+		mMainActivity.addFilterData(profileFilter,mFilterMenuClickListener);
 
 	}
 
@@ -299,32 +329,32 @@ public class DownloadsActivity extends BaseFragment implements CacheManagerCallb
 			final ProgressBar progress = (ProgressBar)v.findViewById(R.id.progressBar1);
 			progress.setProgress(Status);
 			final TextView per= (TextView)v.findViewById(R.id.percentage);
-			
+
 			/*if(per!=null)
 				per.setText(String.valueOf(Status));*/
-			
+
 			((Activity)getContext()).runOnUiThread(new Runnable() {
 
-                @Override
-                public void run() {
+				@Override
+				public void run() {
 
-                	if(Status>=100)
-        			{
-        				
-                		progress.setVisibility(View.GONE);
-                		per.setText("Downloaded");
-        			}
-                	else
-                	{
-                		per.setText("Downloading... "+String.valueOf(Status));
-                	}
+					if(Status>=100)
+					{
+
+						progress.setVisibility(View.GONE);
+						per.setText("Downloaded");
+					}
+					else
+					{
+						per.setText("Downloading... "+String.valueOf(Status));
+					}
 
 
-                }
-            });
-			
-			
-			
+				}
+			});
+
+
+
 		}
 	}
 	private void showProgress(final int index,final long dwnlId){
@@ -357,7 +387,7 @@ public class DownloadsActivity extends BaseFragment implements CacheManagerCallb
 						updateStatus(index,dl_progress);
 					}
 					//final double dl_progress = (bytes_downloaded / bytes_total) * 100;
-					
+
 
 					/*mProgressBar.setProgress((int) dl_progress);                    mMainActivity.runOnUiThread(new Runnable() {
 
@@ -384,55 +414,65 @@ public class DownloadsActivity extends BaseFragment implements CacheManagerCallb
 			Util.showToast("No Downloads", getContext());
 			return;
 		}
-		
+
 		Set<String> keySet = object.keySet();
-			
+
 		for(String key:keySet){
-//			mData.mEntries.add(object.get(key));
+			//			mData.mEntries.add(object.get(key));
 			if(mEntries.get(key) == null){
 				mEntries.put(key,object.get(key));
 				mMasterEntries.add(object.get(key));
 			}
 		}
-		
+
 		if(mMasterEntries.size() == 0){
 			return;
 		}
-		
+
 		for (CardData data : mMasterEntries) 
 		{
 			String imgLink=null;
 			for(CardDataImagesItem imageItem: data.images.values)
 			{
 				if(imageItem.type.equalsIgnoreCase("thumbnail"))
-				imgLink=imageItem.link;//"http://myplexv2betaimages.s3.amazonaws.com/193/180x320_593621f9-9175-4d3d-95a6-1417249cee0b.jpg";
+					imgLink=imageItem.link;//"http://myplexv2betaimages.s3.amazonaws.com/193/180x320_593621f9-9175-4d3d-95a6-1417249cee0b.jpg";
+			}
+			String id = null;
+			for(int i=0;i<downloadCardIds.size();i++)
+			{
+				CardData cdata=downloadCardIds.get(i);
+				if(data._id.equalsIgnoreCase(cdata._id))
+				{
+					id=downldReqIds.get(i);
+				}
 			}
 			mListEntries.add(new PicasaEntry(data.generalInfo.title,imgLink));
+			showProgress(mListEntries.size()-1, Long.parseLong(id));
 		}
 		mAdapter.notifyDataSetChanged();
-			
-		
+
+
 	}
 	@Override
 	public void OnOnlineResults(List<CardData> dataList) {
-		
-		
+
+
 		for (CardData data : dataList) 
 		{
 			String imgLink=null;
 			for(CardDataImagesItem imageItem: data.images.values)
 			{
 				if(imageItem.type.equalsIgnoreCase("thumbnail"))
-				imgLink=imageItem.link;//"http://myplexv2betaimages.s3.amazonaws.com/193/180x320_593621f9-9175-4d3d-95a6-1417249cee0b.jpg";
+					imgLink=imageItem.link;//"http://myplexv2betaimages.s3.amazonaws.com/193/180x320_593621f9-9175-4d3d-95a6-1417249cee0b.jpg";
 			}
 			mListEntries.add(new PicasaEntry(data.generalInfo.title,imgLink));
 		}
 		mAdapter.notifyDataSetChanged();
-		
+
 	}
 	@Override
 	public void OnOnlineError(VolleyError error) {
 		// TODO Auto-generated method stub
-		
+
 	}
 }

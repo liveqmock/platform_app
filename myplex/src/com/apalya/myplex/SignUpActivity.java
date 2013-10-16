@@ -520,6 +520,18 @@ public class SignUpActivity extends Activity{
 					}
 					else
 					{
+						if(jsonResponse.getString("code").equalsIgnoreCase("401"))
+						{
+							String devId=SharedPrefUtils.getFromSharedPreference(SignUpActivity.this,
+									getString(R.string.devclientdevid));
+
+							Map<String, String> params = new HashMap<String, String>();
+							params.put("deviceId", devId);
+
+							Util.genKeyRequest(SignUpActivity.this,getString(R.string.genKeyReqPath),params);
+							sendNotification("Err: "+jsonResponse.getString("code")+" \nErr Msg: "+jsonResponse.getString("message"));
+						}
+						
 						Analytics.trackEvent("USER-LOGIN-REQUEST-SERVER-ERROR");
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));

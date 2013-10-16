@@ -181,7 +181,8 @@ public class CardDetails extends BaseFragment implements
 		if(mCardData._id.equalsIgnoreCase("0"))
 		{
 			mPlay.setVisibility(View.GONE);
-			mPreviewImage.setScaleType(ScaleType.FIT_XY);
+			mPreviewImage.setScaleType(ScaleType.CENTER);
+			mPreviewImage.setBackgroundColor(Color.BLACK);
 		}
 		else
 		{
