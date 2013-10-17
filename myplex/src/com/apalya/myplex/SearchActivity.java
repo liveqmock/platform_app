@@ -245,6 +245,12 @@ public class SearchActivity extends BaseFragment implements
 	private void ParseJonsResponse(JSONObject response) {
 		try {
 			JSONObject tags = response.getJSONObject("tags");
+			if(tags ==null || tags.length()==0)
+			{
+				Toast.makeText(mContext,  "No data for tags",  Toast.LENGTH_LONG).show();
+				dismissProgressBar();
+				return;
+			}
 			JSONObject qualifiers = null;
 			JSONObject startletters = null;
 			JSONObject innerObj = null;
@@ -262,6 +268,7 @@ public class SearchActivity extends BaseFragment implements
 			mListData.clear();
 
 			for (int i = 0; i < 2; i++) {
+
 				switch (i) {
 				case 0:
 					innerObj = qualifiers;
@@ -300,6 +307,8 @@ public class SearchActivity extends BaseFragment implements
 			preapareFilterData();
 		} catch (JSONException e) {
 			Log.e("response Exception", e.getMessage());
+				Toast.makeText(mContext,  e.getMessage(),  Toast.LENGTH_LONG).show();
+				dismissProgressBar();
 		}
 	}
 
