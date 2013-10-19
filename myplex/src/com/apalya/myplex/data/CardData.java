@@ -7,6 +7,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class CardData {
 	
 	public static final String TAG = "CardData";
+	public static final int ESTDOWNLOADINPROGRESS = 1;
+	public static final int ESTDOWNLOADCOMPLETE = 2;
+	public static final int ESTDOWNLOADFAILED = 3;
+	
 	public CardDataContent content;
 	public CardDataUserReviews userReviews;
 	public CardDataVideos videos;
@@ -25,8 +29,10 @@ public class CardData {
 	public CardDataImages images;
 	public CardDataSimilarContent similarContent;
 	public String _id;
-
-	
+	public boolean isESTEnabled = false;
+	public int ESTStatus;
+	public int ESTProgressStatus;
+	public long ESTId;
 	public CardData(){
 		
 	}

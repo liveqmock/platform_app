@@ -8,6 +8,10 @@ import com.apalya.myplex.data.FilterMenudata;
 
 public interface MainBaseOptions {
 	public BaseFragment createFragment(int fragmentType);
+	
+	public void hidefilterMenu();
+	
+	public void showfilterMenu();
 
 	public void setPotrait();
 
@@ -25,4 +29,10 @@ public interface MainBaseOptions {
 	public void showActionBarProgressBar();
 
 	public void bringFragment(BaseFragment fragment);
+
+	public void enableFilterAction(boolean b);
+
+	public void setActionBarTitle(String title);
+
+	public void updateActionBarTitle();
 }

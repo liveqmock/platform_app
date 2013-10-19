@@ -48,24 +48,11 @@ public class MediaUtil {
 			@Override
 			public void onResponse(String response) {
 				Log.d("VIDEO URLS", response);
+				CardResponseData minResultSet = null;
 				try {
 					//Analytics.endTimedEvent("RECOMMENDATIONS-REQUEST");
 					//Analytics.trackEvent("RECOMMENDATIONS-REQUEST-SUCCESS");
-
-					CardResponseData minResultSet  =(CardResponseData) Util.fromJson(response, CardResponseData.class);
-					if(minResultSet.results == null){
-						sendResponse(false,null);
-					}
-					for(CardData data:minResultSet.results){
-						if(data.videos == null){sendResponse(false,null);}
-						if(data.videos.values == null){sendResponse(false,null);}
-						for(CardDataVideosItem video:data.videos.values){
-							if(video.profile != null && video.profile.equalsIgnoreCase(bitrateType) && video.link != null){
-								sendResponse(true,video.link);
-								return;
-							}
-						}
-					}
+					minResultSet  =(CardResponseData) Util.fromJson(response, CardResponseData.class);
 				} catch (JsonMappingException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -76,6 +63,19 @@ public class MediaUtil {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				if(minResultSet.results == null){
+					sendResponse(false,null);
+				}
+				for(CardData data:minResultSet.results){
+					if(data.videos == null || data.videos.values == null || data.videos.values.size() == 0){sendResponse(false,null);}
+					for(CardDataVideosItem video:data.videos.values){
+						if(video.profile != null && video.profile.equalsIgnoreCase(bitrateType) && video.link != null){
+							sendResponse(true,video.link);
+							return;
+						}
+					}
+				}
+
 			}
 		};
 	}

@@ -37,7 +37,7 @@ public class VerticalLineRelativeLayout extends RelativeLayout {
 	}
 	private void createPaint(){
 		paint.setColor(Color.parseColor("#efefef"));
-		paint.setStrokeWidth(6f);
+		paint.setStrokeWidth(4f);
 		paint.setStyle(Paint.Style.FILL);
 	}
 	Rect mRect = new Rect();

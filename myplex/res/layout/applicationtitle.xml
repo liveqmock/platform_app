@@ -11,12 +11,14 @@
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
         android:layout_margin="5dp"
-        android:src="@drawable/collections_sort_by_size" />
+        android:src="@drawable/iconmenu" />
 
     <RelativeLayout
         android:id="@+id/customactionbar_filter"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
+        android:layout_marginLeft="48dp"
+        android:layout_marginRight="80dp"
         android:layout_centerInParent="true" >
 
         <TextView
@@ -25,7 +27,9 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
+            android:singleLine="true"
             android:text="@string/app_name"
+            android:ellipsize="marquee"
             android:textColor="#ffffff"
             android:textSize="22sp" />
 
@@ -37,7 +41,7 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="5dp"
             android:layout_toRightOf="@+id/customactionbar_filter_text"
-            android:src="@drawable/actionbar_filter_down" />
+            android:src="@drawable/iconexpose" />
     </RelativeLayout>
 
     <ImageView
@@ -48,7 +52,7 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_margin="5dp"
-        android:src="@drawable/menu_search" />
+        android:src="@drawable/iconsearch" />
 
     <ProgressBar
         android:id="@+id/customactionbar_progressBar"

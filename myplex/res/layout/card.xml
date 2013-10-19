@@ -71,19 +71,16 @@
             android:layout_height="@dimen/cardplayheight"
             android:scaleType="fitXY" />
 
-        <TextView
+        <ImageView
             android:id="@+id/card_play"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:background="@drawable/cardplayselector"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-            android:gravity="center"
             android:layout_marginRight="14dp"
             android:layout_marginTop="14dp"
-            android:text="@string/card_play"
-                android:textColor="#000000"
-                android:textSize="24sp"
-            />
+            android:gravity="center" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -148,9 +145,9 @@
     <LinearLayout
         android:id="@+id/card_rent_layout"
         android:layout_width="wrap_content"
-        android:layout_centerHorizontal="true"
         android:layout_height="@dimen/cardmoreinfoheight"
-        android:layout_below="@+id/card_status_layout" >
+        android:layout_below="@+id/card_status_layout"
+        android:layout_centerHorizontal="true" >
 
         <TextView
             android:id="@+id/card_rent_text"

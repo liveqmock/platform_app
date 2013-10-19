@@ -15,7 +15,6 @@ import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -26,17 +25,14 @@ import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -57,15 +53,15 @@ import com.apalya.myplex.data.CardExplorerData;
 import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.NavigationOptionsMenu;
 import com.apalya.myplex.data.myplexapplication;
-import com.apalya.myplex.fragments.CardDetails;
+import com.apalya.myplex.fragments.CardDetailsTabletFrag;
 import com.apalya.myplex.fragments.CardExplorer;
 import com.apalya.myplex.menu.FilterMenuProvider;
 import com.apalya.myplex.utils.Blur;
 import com.apalya.myplex.utils.Blur.BlurResponse;
+import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.LogOutUtil;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.views.PinnedSectionListView;
-import com.apalya.myplex.views.PinnedSectionListView.PinnedSectionListAdapter;
 
 public class BaseActivity extends Activity implements MainBaseOptions{
 	protected DrawerLayout mDrawerLayout;
@@ -158,11 +154,22 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 
 		}
 		mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
-		OnSelectedOption(8);
+//		OnSelectedOption(8);
 	}
 
 	public void fillMenuItem() {
-
+		 mMenuItemList.add(new NavigationOptionsMenu(myplexapplication.getUserProfileInstance().getName(),R.drawable.menu_profile,myplexapplication.getUserProfileInstance().getProfilePic(),NavigationOptionsMenuAdapter.CARDDETAILS_ACTION,R.layout.navigation_menuitemlarge));
+		 mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FAVOURITE,R.drawable.iconfav,null,NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+		 mMenuItemList.add(new NavigationOptionsMenu("Purchases",R.drawable.iconpurchases, null,NavigationOptionsMenuAdapter.NOACTION_ACTION,R.layout.navigation_menuitemsmall));
+		 mMenuItemList.add(new NavigationOptionsMenu("Downloads",R.drawable.icondnload, null,NavigationOptionsMenuAdapter.NOACTION_ACTION,R.layout.navigation_menuitemsmall));
+		 mMenuItemList.add(new NavigationOptionsMenu("Settings",R.drawable.iconsearch, null,NavigationOptionsMenuAdapter.NOACTION_ACTION,R.layout.navigation_menuitemsmall));
+		 mMenuItemList.add(new NavigationOptionsMenu("Invite Friends",R.drawable.iconfriends, null,NavigationOptionsMenuAdapter.NOACTION_ACTION,R.layout.navigation_menuitemsmall));
+		 mMenuItemList.add(new NavigationOptionsMenu("Logout",R.drawable.iconrate, null,NavigationOptionsMenuAdapter.LOGOUT_ACTION,R.layout.navigation_menuitemsmall));
+		 mMenuItemList.add(new NavigationOptionsMenu("ApplicationLogo",R.drawable.iconrate, null,NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
+		 mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.RECOMMENDED,R.drawable.iconrate,null,NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+		 mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.MOVIES,R.drawable.iconmovie,null,NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+		 mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LIVETV,R.drawable.iconlivetv,null,NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+		 mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.TVSHOWS,R.drawable.icontv,null,NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 	}
 
 	public void updateActionBarTitle() {
@@ -233,6 +240,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 				.findViewById(R.id.customactionbar_filter_button);
 		mTitleTextView = (TextView) v
 				.findViewById(R.id.customactionbar_filter_text);
+		mTitleTextView.setTypeface(FontUtil.Roboto_Medium);
 		mCustomActionBarSearch = (ImageView) v
 				.findViewById(R.id.customactionbar_search_button);
 		mCustomActionBarSearch.setVisibility(View.INVISIBLE);
@@ -253,6 +261,15 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		mCustomActionBarProgressBar = (ProgressBar) v
 				.findViewById(R.id.customactionbar_progressBar);
 	}
+	public void enableFilterAction(boolean value){
+		if(value){
+			mCustomActionBarTitleLayout.setOnClickListener(mOnFilterClickListener);
+			mCustomActionBarFilterImage.setVisibility(View.VISIBLE);
+		}else{
+			mCustomActionBarTitleLayout.setOnClickListener(null);
+			mCustomActionBarFilterImage.setVisibility(View.INVISIBLE);
+		}
+	}
 	@Override
 	public void showActionBarProgressBar() {
 		if (mCustomActionBarProgressBar != null) {
@@ -271,7 +288,8 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position,
 				long id) {
-			OnSelectedOption(position);
+			NavigationOptionsMenu menu = mMenuItemList.get(position);
+			OnSelectedOption(menu.mScreenType,menu.mLabel);
 		}
 	}
 
@@ -333,20 +351,20 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 	public BaseFragment createFragment(int fragmentType) {
 		BaseFragment fragment;
 		switch (fragmentType) {
-		case NavigationOptionsMenuAdapter.CARDDETAILS:
-			mCardDetails = new CardDetails();
+		case NavigationOptionsMenuAdapter.CARDDETAILS_ACTION:
+			mCardDetails = new CardDetailsTabletFrag();
 			fragment = mCardDetails;
 			break;
-		case NavigationOptionsMenuAdapter.CARDEXPLORER:
+		case NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION:
 			mCardExplorer = new CardExplorer();
 			fragment = mCardExplorer;
 			break;
-		case NavigationOptionsMenuAdapter.SEARCH:
+		case NavigationOptionsMenuAdapter.SEARCH_ACTION:
 			mSearchActivity = new SearchActivity();
 			fragment = mSearchActivity;
 			break;
 		default:
-			mCardDetails = new CardDetails();
+			mCardDetails = new CardDetailsTabletFrag();
 			fragment = mCardDetails;
 			break;
 		}
@@ -362,58 +380,74 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 	}
 
 	private CardExplorer mCardExplorer;
-	private CardDetails mCardDetails;
+	private CardDetailsTabletFrag mCardDetails;
 	private SearchActivity mSearchActivity;
+	
+	protected void createCardExplorer(){
+		mCardExplorer = (CardExplorer) createFragment(NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION);
+		mCurrentFragment = mCardExplorer;
+		pushFragment();
+	}
 
-	public void OnSelectedOption(int position) {
-//		NavigationOptionsMenu menu = mMenuItemList.get(position);
-//
-//		switch (menu.mScreenType) {
-//		case NavigationOptionsMenuAdapter.DOWNLOADS: {
-//			Util.showDownloads(this);
-//			return;
-//		}
-//		case NavigationOptionsMenuAdapter.NOACTION: {
-//			return;
-//		}
-//		case NavigationOptionsMenuAdapter.LOGOUT: {
-//			LogOutUtil.onClickLogout(this);
-//			return;
-//		}
-//		case NavigationOptionsMenuAdapter.CARDDETAILS: {
-//			break;
-//		}
-//		case NavigationOptionsMenuAdapter.CARDEXPLORER: {
-//			mCardExplorer = (CardExplorer) createFragment(NavigationOptionsMenuAdapter.CARDEXPLORER);
-//			CardExplorerData data = myplexapplication.getCardExplorerData();
-//			data.reset();
-//			if (menu.mLabel
-//					.equalsIgnoreCase(NavigationOptionsMenuAdapter.FAVOURITE)) {
-//				data.requestType = CardExplorerData.REQUEST_FAVOURITE;
-//			} else if (menu.mLabel
-//					.equalsIgnoreCase(NavigationOptionsMenuAdapter.RECOMMENDED)) {
-//				data.requestType = CardExplorerData.REQUEST_RECOMMENDATION;
-//			} else if (menu.mLabel
-//					.equalsIgnoreCase(NavigationOptionsMenuAdapter.MOVIES)) {
-//				data.searchQuery = "movie";
-//			} else if (menu.mLabel
-//					.equalsIgnoreCase(NavigationOptionsMenuAdapter.LIVETV)) {
-//				data.searchQuery = "live";
-//			} else if (menu.mLabel
-//					.equalsIgnoreCase(NavigationOptionsMenuAdapter.TVSHOWS)) {
-//				data.searchQuery = "tvshows";
-//			}
-//			mCurrentFragment = mCardExplorer;
-//			break;
-//		}
-//		default: {
-//		}
-//			break;
-//		}
-//		pushFragment();
+	public void OnSelectedOption(int screenType,String label) {
+		
+		
+		switch (screenType) {
+		case NavigationOptionsMenuAdapter.NOACTION_ACTION: {
+			return;
+		}
+		case NavigationOptionsMenuAdapter.LOGOUT_ACTION: {
+			LogOutUtil.onClickLogout(this);
+			return;
+		}
+		case NavigationOptionsMenuAdapter.DOWNLOAD_ACTION: {
+			if(this instanceof TabletCardDetails){
+				myplexapplication.mSelectedOption_Tablet = screenType;
+				finish();
+				return;
+			}
+			Util.showDownloads(this);
+			return;
+		}
+		case NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION: {
+			mCardExplorer = (CardExplorer) createFragment(NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION);
+			CardExplorerData data = myplexapplication.getCardExplorerData();
+			data.reset();
+			if (label
+					.equalsIgnoreCase(NavigationOptionsMenuAdapter.FAVOURITE)) {
+				data.requestType = CardExplorerData.REQUEST_FAVOURITE;
+			} else if (label
+					.equalsIgnoreCase(NavigationOptionsMenuAdapter.RECOMMENDED)) {
+				data.requestType = CardExplorerData.REQUEST_RECOMMENDATION;
+			} else if (label
+					.equalsIgnoreCase(NavigationOptionsMenuAdapter.MOVIES)) {
+				data.searchQuery = "movie";
+			} else if (label
+					.equalsIgnoreCase(NavigationOptionsMenuAdapter.LIVETV)) {
+				data.searchQuery = "live";
+			} else if (label
+					.equalsIgnoreCase(NavigationOptionsMenuAdapter.TVSHOWS)) {
+				data.searchQuery = "tvshows";
+			}
+			if(this instanceof TabletCardDetails){
+				myplexapplication.mSelectedOption_Tablet = screenType;
+				finish();
+				return;
+			}
+			mCurrentFragment = mCardExplorer;
+			break;
+		}
+		default: {
+		}
+			break;
+		}
+		pushFragment();
 //		mDrawerList.setItemChecked(position, true);
 //		setTitle(mMenuItemList.get(position).mLabel);
-//		mDrawerLayout.closeDrawer(mDrawerList);
+		if(mDrawerLayout != null){
+			mDrawerLayout.closeDrawer(mDrawerList);
+		}
+		
 	}
 
 	protected void pushFragment() {
@@ -503,12 +537,12 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 			mFilterMenuPopupWindow = null;
 		}
 	}
-
+	private View mParentLayoutView;
+	public void setParentView(View v){
+		mParentLayoutView = v;
+	}
 	private void addBlur() {
-		if (mCurrentFragment == null) {
-			return;
-		}
-		if (mCurrentFragment.getView() == null) {
+		if (mParentLayoutView == null) {
 			return;
 		}
 		if (mFilterMenuPopup == null) {
@@ -525,8 +559,8 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 				}
 			});
 			fadeAnim.start();
-			mCurrentFragment.getView().setDrawingCacheEnabled(true);
-			Bitmap orginalBitmap = mCurrentFragment.getView().getDrawingCache();
+			mParentLayoutView.setDrawingCacheEnabled(true);
+			Bitmap orginalBitmap = mParentLayoutView.getDrawingCache();
 			Blur blur = new Blur();
 			Drawable bg = new ColorDrawable(Color.parseColor("#00000000"));
 			mPopBlurredLayout.setBackgroundDrawable(bg);
@@ -548,7 +582,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 						}
 					});
 					fadeAnim.start();
-					mCurrentFragment.getView().setDrawingCacheEnabled(false);
+					mParentLayoutView.setDrawingCacheEnabled(false);
 				}
 			});
 		} catch (Exception e) {
@@ -559,8 +593,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 	private void showFilterMenuPopup() {
 		dismissFilterMenuPopupWindow();
 		addBlur();
-		mFilterMenuPopupWindow = new PopupWindow(mFilterMenuPopup,
-				LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, true);
+		mFilterMenuPopupWindow = new PopupWindow(mFilterMenuPopup,LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, true);
 		mFilterMenuPopupWindowList.add(mFilterMenuPopupWindow);
 		mFilterMenuPopupWindow.setOutsideTouchable(true);
 		mFilterMenuPopupWindow.setBackgroundDrawable(new BitmapDrawable());
@@ -569,26 +602,16 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 
 	private RelativeLayout mPopBlurredLayout;
 	@Override
-	public void addFilterData(List<FilterMenudata> datalist,
-			OnClickListener listener) {
+	public void addFilterData(List<FilterMenudata> datalist,OnClickListener listener) {
 		mFilterDelegate = listener;
 
 		mFilterMenuPopup = mInflater.inflate(R.layout.filtermenupopup, null);
-
-		mPopBlurredLayout = (RelativeLayout) mFilterMenuPopup
-				.findViewById(R.id.fliterMenuBlurredLayout);
-
-		mFilterListView = (PinnedSectionListView) mFilterMenuPopup
-				.findViewById(R.id.listView1);
+		mPopBlurredLayout = (RelativeLayout) mFilterMenuPopup.findViewById(R.id.fliterMenuBlurredLayout);
+		mFilterListView = (PinnedSectionListView) mFilterMenuPopup.findViewById(R.id.listView1);
 
 		mMenuDataList = datalist;
-
-		FliterMenuAdapter adapter = new FliterMenuAdapter(this,
-				android.R.layout.simple_list_item_1, android.R.id.text1,
-				mMenuDataList);
-
+		FliterMenuAdapter adapter = new FliterMenuAdapter(this,android.R.layout.simple_list_item_1, android.R.id.text1,mMenuDataList);
 		adapter.setDataList(mMenuDataList);
-
 		mFilterListView.setAdapter(adapter);
 
 		mFilterListView.setOnItemClickListener(mFilterItemClicked);
@@ -600,17 +623,33 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 	@Override
 	public void setSearchBarVisibilty(int visibility) {
 		if (mCustomActionBarSearch != null) {
-
-			if (mCustomActionBarSearch.getVisibility() != View.VISIBLE
-					&& visibility == View.VISIBLE) {
+			if (mCustomActionBarSearch.getVisibility() != View.VISIBLE && visibility == View.VISIBLE) {
 				mCustomActionBarSearch.setVisibility(visibility);
-				ValueAnimator fadeinAnimation = ObjectAnimator.ofFloat(
-						mCustomActionBarSearch, "alpha", 0f, 1f);
+				ValueAnimator fadeinAnimation = ObjectAnimator.ofFloat(mCustomActionBarSearch, "alpha", 0f, 1f);
 				fadeinAnimation.setDuration(800);
 				fadeinAnimation.start();
-			} else
+			} else{
 				mCustomActionBarSearch.setVisibility(visibility);
+			}
 		}
 	}
-
+	@Override
+	public void hidefilterMenu() {
+		if(mCustomActionBarTitleLayout != null){
+			mCustomActionBarTitleLayout.setOnClickListener(null);
+		}
+		if(mCustomActionBarFilterImage != null){
+			mCustomActionBarFilterImage.setVisibility(View.INVISIBLE);
+		}
+	}
+	@Override
+	public void showfilterMenu() {
+		if(mCustomActionBarTitleLayout != null){
+			mCustomActionBarTitleLayout.setOnClickListener(mOnFilterClickListener);
+			Util.showFeedback(mCustomActionBarTitleLayout);
+		}
+		if(mCustomActionBarFilterImage != null){
+			mCustomActionBarFilterImage.setVisibility(View.VISIBLE);
+		}
+	}
 }

@@ -17,7 +17,7 @@
             android:id="@+id/carddetailcomment_expand"
             android:layout_width="@dimen/size_24"
             android:layout_height="@dimen/size_24"
-            android:src="@drawable/dark_navigation_expand" />
+            android:src="@drawable/icondown" />
 
         <ProgressBar
             android:id="@+id/carddetailcomment_expand_progress"
@@ -84,6 +84,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/carddetailcomment_editlayout"
             android:layout_marginLeft="@dimen/margin_gap_16"
+            android:layout_marginTop="@dimen/margin_gap_4"
             android:layout_marginRight="@dimen/margin_gap_8"
             android:orientation="vertical" >
         </LinearLayout>

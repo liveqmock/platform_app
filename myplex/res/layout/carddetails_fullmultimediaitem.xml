@@ -23,29 +23,32 @@
         android:orientation="horizontal" >
 
         <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="76dp"
+            android:layout_height="76dp"
             android:layout_gravity="center_vertical"
-           >
+            android:background="@drawable/frame" >
 
             <ImageView
                 android:id="@+id/carddetailmultimedia_stackview"
-                  android:background="@drawable/frame"
-                android:layout_width="48dp"
-                android:layout_height="64dp"
-                android:layout_centerHorizontal="true"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_marginLeft="24dp"
+                android:layout_marginTop="6dp"
+                android:layout_marginBottom="6dp"
+                android:layout_marginRight="6dp"
+                android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
-                android:scaleType="centerInside"
+                android:scaleType="fitXY"
                 android:src="@drawable/radiohead_in_rainbows" />
 
         </RelativeLayout>
 
         <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_marginLeft="14dp"
-            android:layout_marginRight="14dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
+            android:layout_marginLeft="14dp"
+            android:layout_marginRight="14dp"
             android:orientation="vertical" >
 
             <TextView
@@ -56,7 +59,7 @@
                 android:layout_marginRight="@dimen/margin_gap_4"
                 android:gravity="center_vertical"
                 android:textColor="#4b4b4c"
-        		android:textSize="14sp" />
+                android:textSize="14sp" />
 
             <TextView
                 android:id="@+id/carddetailmultimedia_secondaryname"
@@ -66,8 +69,8 @@
                 android:layout_marginRight="@dimen/margin_gap_2"
                 android:layout_marginTop="@dimen/margin_gap_4"
                 android:textColor="#4b4b4c"
-                android:textStyle="italic"
-        		android:textSize="14sp" />
+                android:textSize="14sp"
+                android:textStyle="italic" />
         </LinearLayout>
     </LinearLayout>
 

@@ -17,7 +17,7 @@
             android:id="@+id/carddetailmedia_expand"
             android:layout_width="@dimen/size_24"
             android:layout_height="@dimen/size_24"
-            android:src="@drawable/dark_navigation_expand" />
+            android:src="@drawable/icondown" />
 
         <ProgressBar
             android:id="@+id/carddetailmedia_expand_progress"

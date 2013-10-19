@@ -14,7 +14,7 @@ public class FontUtil {
 	public static Typeface Roboto_Light;
 	public static Typeface ss_gizmo;
 	public static Typeface ss_symbolicons_line;
-	
+	public static Typeface digital;
 	public static boolean isFontsLoaded = false;
 	
 	
@@ -28,6 +28,7 @@ public class FontUtil {
 		Roboto_Light = Typeface.createFromAsset(mgr, "fonts/Roboto-Light.ttf");
 		ss_gizmo = Typeface.createFromAsset(mgr, "fonts/ss-gizmo.ttf");
 		ss_symbolicons_line = Typeface.createFromAsset(mgr, "fonts/ss-symbolicons-line.ttf");
+		digital = Typeface.createFromAsset(mgr, "fonts/digital_7.ttf");
 		isFontsLoaded = true;
 	}
 

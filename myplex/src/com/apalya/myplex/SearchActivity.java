@@ -245,9 +245,8 @@ public class SearchActivity extends BaseFragment implements
 	private void ParseJonsResponse(JSONObject response) {
 		try {
 			JSONObject tags = response.getJSONObject("tags");
-			if(tags ==null || tags.length()==0)
+			if(tags ==null || tags.length() ==0)
 			{
-				Toast.makeText(mContext,  "No data for tags",  Toast.LENGTH_LONG).show();
 				dismissProgressBar();
 				return;
 			}
@@ -268,7 +267,6 @@ public class SearchActivity extends BaseFragment implements
 			mListData.clear();
 
 			for (int i = 0; i < 2; i++) {
-
 				switch (i) {
 				case 0:
 					innerObj = qualifiers;
@@ -307,8 +305,7 @@ public class SearchActivity extends BaseFragment implements
 			preapareFilterData();
 		} catch (JSONException e) {
 			Log.e("response Exception", e.getMessage());
-				Toast.makeText(mContext,  e.getMessage(),  Toast.LENGTH_LONG).show();
-				dismissProgressBar();
+			dismissProgressBar();
 		}
 	}
 
@@ -613,7 +610,7 @@ public class SearchActivity extends BaseFragment implements
 		btn.setTextColor(Color.parseColor("#FFFFFF"));
 		btn.setText(tagData.getButtonName());
 		btn.setTextSize(14f);
-		btn.setTypeface(FontUtil.Roboto_Light);
+		btn.setTypeface(FontUtil.Roboto_Medium);
 		btn.setBackgroundResource(R.drawable.roundedbutton);
 		Drawable drawableRight = getResources().getDrawable(R.drawable.tagclose);
 		drawableRight.setBounds(0, 0, (int) (drawableRight.getIntrinsicWidth()), (int) (drawableRight.getIntrinsicHeight()));
@@ -673,7 +670,7 @@ public class SearchActivity extends BaseFragment implements
 		mCacheManager.unRegisterCallback();
 		mMainActivity.hideActionBarProgressBar();
 		BaseFragment fragment = mMainActivity
-				.createFragment(NavigationOptionsMenuAdapter.CARDEXPLORER);
+				.createFragment(NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION);
 		mMainActivity.bringFragment(fragment);
 	}
 

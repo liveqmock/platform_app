@@ -10,6 +10,8 @@ public class ConsumerApi {
 	public static final String RECOMMENDATIONS_ACTION = "recommendations";
 	public static final String SIGN_OUT_ACTION = "signOut";
 	public static final String CONTENTDETAILS_ACTION = "contentDetail";
+	public static final String COMMENT_TAG= "comment";
+	public static final String RATING_TAG= "rating";
 	public static final String CONTENT_CONTEXT = "content/v2";
 	public static final String USER_CONTEXT = "user/v2";
 	public static final String SCHEME = "http://";
@@ -43,7 +45,7 @@ public class ConsumerApi {
 	public static final String LEVELDEVICEMIN = "devicemin";
 	public static final String LEVELDEVICEMAX = "devicemax";
 	
-	public static String DEBUGCLIENTKEY = "c86f79514ec7976bd20de36f1c6f15900d8e09f699818024283bad1bf0609650";//"dcb11454ccdafdd4706c7186d37abd2ff96cd02dc998d1111d16d4778a797f85";//
+	public static String DEBUGCLIENTKEY = "dcb11454ccdafdd4706c7186d37abd2ff96cd02dc998d1111d16d4778a797f85";//"c86f79514ec7976bd20de36f1c6f15900d8e09f699818024283bad1bf0609650";
 	
 	public static String getSearch(String queryStr, String level,int startIndex) {
 		if(queryStr == null||(queryStr != null && queryStr.length() ==0)){
@@ -65,7 +67,11 @@ public class ConsumerApi {
 	}
 
 	public static String getCommentPostUrl(String contentID) {
-		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + CONTENT_TAG + SLASH + contentID +SLASH
+		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + CONTENT_TAG + SLASH + contentID +SLASH+COMMENT_TAG+SLASH
+				+ QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY;
+	}
+	public static String getRatingPostUrl(String contentID) {
+		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + CONTENT_TAG + SLASH + contentID +SLASH+RATING_TAG+SLASH
 				+ QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY;
 	}
 	public static String getFavourites(String level,int startIndex) {

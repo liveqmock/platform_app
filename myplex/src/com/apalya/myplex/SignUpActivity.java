@@ -272,6 +272,14 @@ public class SignUpActivity extends Activity{
 		img5.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image5, width, height));
 		img6.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image6, width, height));
 		
+		img1.setScaleType(ScaleType.FIT_XY);
+		img2.setScaleType(ScaleType.FIT_XY);
+		img3.setScaleType(ScaleType.FIT_XY);
+		img4.setScaleType(ScaleType.FIT_XY);
+		img5.setScaleType(ScaleType.FIT_XY);
+		img6.setScaleType(ScaleType.FIT_XY);
+		
+		
 		final HorizontalScrollView parentScrollView= (HorizontalScrollView) findViewById(R.id.parentScrollview);
 		parentScrollView.setOnTouchListener(new View.OnTouchListener() {
 
@@ -520,18 +528,6 @@ public class SignUpActivity extends Activity{
 					}
 					else
 					{
-						if(jsonResponse.getString("code").equalsIgnoreCase("401"))
-						{
-							String devId=SharedPrefUtils.getFromSharedPreference(SignUpActivity.this,
-									getString(R.string.devclientdevid));
-
-							Map<String, String> params = new HashMap<String, String>();
-							params.put("deviceId", devId);
-
-							Util.genKeyRequest(SignUpActivity.this,getString(R.string.genKeyReqPath),params);
-							sendNotification("Err: "+jsonResponse.getString("code")+" \nErr Msg: "+jsonResponse.getString("message"));
-						}
-						
 						Analytics.trackEvent("USER-LOGIN-REQUEST-SERVER-ERROR");
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));

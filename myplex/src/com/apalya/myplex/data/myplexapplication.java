@@ -2,6 +2,7 @@ package com.apalya.myplex.data;
 
 import android.app.Application;
 
+import com.apalya.myplex.adapters.NavigationOptionsMenuAdapter;
 import com.apalya.myplex.cache.CacheHolder;
 import com.apalya.myplex.utils.MyVolley;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
@@ -14,6 +15,7 @@ public class myplexapplication extends Application {
 	private static DeviceDetails mDeviceDetails;
 	private static CacheHolder mCache ;
 	private static MixpanelAPI mixPanel;
+	public static int mSelectedOption_Tablet = NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION;
 	private static final String MIXPANEL_DISTINCT_ID_NAME = "Mixpanel Example $distinctid";
 	/*
 	 * You will use a Mixpanel API token to allow your app to send data to Mixpanel. To get your token

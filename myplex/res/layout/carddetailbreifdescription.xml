@@ -17,7 +17,7 @@
             android:id="@+id/carddetailbriefdescription_expand"
             android:layout_width="@dimen/size_24"
             android:layout_height="@dimen/size_24"
-            android:src="@drawable/dark_navigation_expand" />
+            android:src="@drawable/icondown" />
 
         <ProgressBar
             android:id="@+id/carddetailbriefdescription_expand_progress"
@@ -40,7 +40,7 @@
             android:id="@+id/carddetailbreifdescription_movename"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginRight="@dimen/margin_gap_8"
+            android:paddingRight="@dimen/margin_gap_8"
             android:text=""
             android:textColor="#4b4b4c"
             android:textSize="@dimen/textsize_16" />
@@ -51,7 +51,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:layout_marginTop="@dimen/margin_gap_12" />
+            android:paddingTop="@dimen/margin_gap_2" />
     </com.apalya.myplex.views.FlowLayout>
 
     <LinearLayout

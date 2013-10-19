@@ -227,6 +227,32 @@ public class CardView extends ScrollView {
 	private String mPriceStarts = "Starts from ";
 	private String mRupeeCode  = null;
 	private HashMap<String,String> ImageUrlMap = new HashMap<String, String>();
+	public void updateDownloadStatus(CardData data){
+		if(data == null){return;}
+		if(!data.isESTEnabled){return;}
+		int index = -1;
+		index = mDataList.indexOf(data);
+		
+		if(index == -1){return;}
+		View localv = mCardsLayout.mCardViewReusePool.getView(index);
+		if (localv == null) {
+			return;
+		}
+		CardDataHolder dataHolder = (CardDataHolder)localv.getTag();
+		if(dataHolder != null){
+			if(data.ESTStatus == CardData.ESTDOWNLOADINPROGRESS){
+				dataHolder.mESTDownloadBar.setVisibility(View.VISIBLE);
+				dataHolder.mESTDownloadStatus.setVisibility(View.VISIBLE);
+				dataHolder.mESTDownloadBar.setProgress(data.ESTProgressStatus);
+				dataHolder.mESTDownloadStatus.setText(data.ESTProgressStatus+"");
+				Log.e(TAG, "updateDownloadStatus " +data.ESTProgressStatus);
+			}else{
+				dataHolder.mESTDownloadBar.setVisibility(View.GONE);
+				dataHolder.mESTDownloadStatus.setVisibility(View.GONE);
+			}
+		}
+		applyData(localv, index);
+	}
 	public void applyData(View v, int position) {
 		if (v == null || !(position >= 0 && position < mNumberofItems)) {
 			return;
@@ -241,7 +267,7 @@ public class CardView extends ScrollView {
 			dataHolder.mDelete = (TextView)v.findViewById(R.id.card_title_delete);
 			dataHolder.mFavourite = (TextView)v.findViewById(R.id.card_title_fav);
 			dataHolder.mPreview = (CardImageView)v.findViewById(R.id.card_preview_image);
-			dataHolder.mOverLayPlay = (TextView)v.findViewById(R.id.card_play);
+			dataHolder.mOverLayPlay = (ImageView)v.findViewById(R.id.card_play);
 			dataHolder.mComments = (TextView)v.findViewById(R.id.card_status_comments);
 			dataHolder.mReviews = (TextView)v.findViewById(R.id.card_status_people);
 			dataHolder.mCommentsText = (TextView)v.findViewById(R.id.card_status_comments_text);
@@ -249,6 +275,8 @@ public class CardView extends ScrollView {
 //			dataHolder.mRentLayout = (LinearLayout)v.findViewById(R.id.card_rent_layout);
 			dataHolder.mRentText = (TextView)v.findViewById(R.id.card_rent_text);
 			dataHolder.mFavProgressBar = (ProgressBar) v.findViewById(R.id.card_title_fav_progress);
+//			dataHolder.mESTDownloadBar = (ProgressBar) v.findViewById(R.id.card_eststatus);
+//			dataHolder.mESTDownloadStatus = (TextView) v.findViewById(R.id.card_eststatus_text);
 			
 			// fonts
 			
@@ -258,12 +286,11 @@ public class CardView extends ScrollView {
 			dataHolder.mCommentsText.setTypeface(FontUtil.Roboto_Medium);
 			dataHolder.mReviewsText.setTypeface(FontUtil.Roboto_Medium);
 			
-			
+//			dataHolder.mESTDownloadStatus.setTypeface(FontUtil.Roboto_Medium);
 			dataHolder.mDelete.setTypeface(FontUtil.ss_symbolicons_line);
 			dataHolder.mFavourite.setTypeface(FontUtil.ss_symbolicons_line);
 			dataHolder.mComments.setTypeface(FontUtil.ss_symbolicons_line);
 			dataHolder.mReviews.setTypeface(FontUtil.ss_symbolicons_line);
-			dataHolder.mOverLayPlay.setTypeface(FontUtil.ss_symbolicons_line);
 			
 //			dataHolder.mOverLayPlay.setText(R.string.card_play);
 //			dataHolder.mDelete.setText(R.string.card_delete);
@@ -292,7 +319,7 @@ public class CardView extends ScrollView {
         int color = Color.argb(255, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low); 
         dataHolder.mPreview.setBackgroundColor(color);
         dataHolder.mPreview.setImageBitmap(null);
-		Log.e("CardView","Erasing "+position+" for "+dataHolder.mTitle.getText());
+//		Log.e("CardView","Erasing "+position+" for "+dataHolder.mTitle.getText());
 		if(data.images != null){
 			for(CardDataImagesItem imageItem:data.images.values){
 				if(imageItem.profile != null && imageItem.profile.equalsIgnoreCase("xxhdpi")){
@@ -311,8 +338,10 @@ public class CardView extends ScrollView {
 		dataHolder.mFavourite.setVisibility(View.VISIBLE);
 		if(data.currentUserData != null && data.currentUserData.favorite){
 			dataHolder.mFavourite.setText(R.string.card_filledheart);
+			dataHolder.mFavourite.setTextColor(Color.parseColor("#58b4e5"));
 		}else{
-			dataHolder.mFavourite.setText(R.string.card_heart);
+			dataHolder.mFavourite.setText(R.string.card_filledheart);
+			dataHolder.mFavourite.setTextColor(Color.parseColor("#000000"));
 		}
 		if(data.userReviews != null){
 			dataHolder.mReviewsText.setText(""+data.userReviews.values.size());	
@@ -363,6 +392,7 @@ public class CardView extends ScrollView {
 		dataHolder.mRentText.setTag(dataHolder);
 		dataHolder.mFavourite.setOnClickListener(mFavListener);
 		dataHolder.mFavourite.setTag(dataHolder);
+		updateDownloadStatus(data);
 	}
 	public void show() {
 		mCardsLayout.updateCardsPosition(getScrollY());
@@ -377,7 +407,7 @@ public class CardView extends ScrollView {
 					mCardActionListener.loadmore(mNumberofItems);
 					mLoadMoreLastCalledNumberofItems = mNumberofItems;
 				}
-				mCardActionListener.selectedCard(currentSelectedIndex);
+				mCardActionListener.selectedCard(mDataList.get(currentSelectedIndex),currentSelectedIndex);
 			}
 		}
 	}
@@ -500,7 +530,7 @@ public class CardView extends ScrollView {
     	
     	super.computeScroll();
 
-    	if (mScroller.computeScrollOffset()) {
+    	if (mScroller!= null && mScroller.computeScrollOffset()) {
             int x = mScroller.getCurrX();
             int y = mScroller.getCurrY();
             scrollTo(x, y);
@@ -582,10 +612,10 @@ public class CardView extends ScrollView {
 		@Override
 		public void onDelayedClick(View v) {
 			mMotionConsumedByClick = true;
+			Log.e(TAG, "mFavListener onClick");
 			if (mCardActionListener == null){
 				return;
 			}
-			Log.e(TAG, "mFavListener onClick");
 			if(v.getTag() instanceof CardDataHolder){
 				CardDataHolder dataHolder = (CardDataHolder) v.getTag();
 				if(dataHolder == null){return;}

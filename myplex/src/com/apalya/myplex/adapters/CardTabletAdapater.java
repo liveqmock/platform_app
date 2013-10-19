@@ -99,7 +99,7 @@ public class CardTabletAdapater extends BaseAdapter{
 			dataHolder.mDelete = (TextView)v.findViewById(R.id.card_title_delete);
 			dataHolder.mFavourite = (TextView)v.findViewById(R.id.card_title_fav);
 			dataHolder.mPreview = (CardImageView)v.findViewById(R.id.card_preview_image);
-			dataHolder.mOverLayPlay = (TextView)v.findViewById(R.id.card_play);
+			dataHolder.mOverLayPlay = (ImageView)v.findViewById(R.id.card_play);
 			dataHolder.mComments = (TextView)v.findViewById(R.id.card_status_comments);
 			dataHolder.mReviews = (TextView)v.findViewById(R.id.card_status_people);
 			dataHolder.mCommentsText = (TextView)v.findViewById(R.id.card_status_comments_text);
@@ -121,7 +121,6 @@ public class CardTabletAdapater extends BaseAdapter{
 			dataHolder.mFavourite.setTypeface(FontUtil.ss_symbolicons_line);
 			dataHolder.mComments.setTypeface(FontUtil.ss_symbolicons_line);
 			dataHolder.mReviews.setTypeface(FontUtil.ss_symbolicons_line);
-			dataHolder.mOverLayPlay.setTypeface(FontUtil.ss_symbolicons_line);
 			
 //			dataHolder.mOverLayPlay.setText(R.string.card_play);
 //			dataHolder.mDelete.setText(R.string.card_delete);

@@ -65,17 +65,6 @@
             android:src="@drawable/card_iconclose"
             android:visibility="gone" />
     </LinearLayout>
-
-    <com.apalya.myplex.views.CustomFastScrollView
-        android:id="@+id/fast_scroll_view"
-        android:layout_width="wrap_content"
-        android:layout_height="0px"
-        android:layout_weight="1"
-        demoapp:overlayHeight="110dp"
-        demoapp:overlayScrollThumbWidth="60dp"
-        demoapp:overlayTextSize="24dp"
-        demoapp:overlayWidth="225dp" >
-
         <com.apalya.myplex.views.PinnedSectionListView
             android:id="@+id/list_view"
             android:layout_width="fill_parent"
@@ -84,6 +73,7 @@
             android:fadingEdgeLength="0dp"
             android:footerDividersEnabled="false"
             android:headerDividersEnabled="false"
+            android:fastScrollEnabled="true"
             android:listSelector="@android:color/transparent" >
         </com.apalya.myplex.views.PinnedSectionListView>
 
@@ -97,6 +87,4 @@
             android:textSize="@dimen/textsize_22"
             android:visibility="visible" />
         
-    </com.apalya.myplex.views.CustomFastScrollView>
-
 </LinearLayout>

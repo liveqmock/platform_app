@@ -13,10 +13,7 @@ public class UserProfile {
 	private static String profileDesc;
 	private static String name;
 	private static boolean loggedInStatus;
-	
-	public Map<String, String> downloadMap = new HashMap<String, String>();
-	
-	
+	public Map<String, Long> downloadMap = new HashMap<String, Long>();
 	
 	public void setUserEmail(String aUserEmail)
 	{

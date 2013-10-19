@@ -56,7 +56,7 @@ public class PicasaArrayAdapter extends ArrayAdapter<PicasaEntry> {
             holder.image.setImageUrl(entry.getThumbnailUrl(), mImageLoader);
            
         } else {
-            holder.image.setImageResource(R.drawable.card_delete);
+            holder.image.setImageResource(R.drawable.iconrate);
         	
         }
         

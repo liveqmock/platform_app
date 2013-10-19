@@ -8,13 +8,15 @@ public class CardExplorerData {
 	public static final int REQUEST_SEARCH = 2;
 	public static final int REQUEST_FAVOURITE = 3;
 	public static final int REQUEST_SIMILARCONTENT = 4;
+	public static final int REQUEST_DOWNLOADS = 5;
+	public static final int REQUEST_PURCHASES = 6;
 	public String requestUrl = new String();
 	public int currentSelectedCard = 0;
 	public  HashMap<String,CardData> mEntries = new HashMap<String,CardData>();
 	public ArrayList<CardData> mMasterEntries = new ArrayList<CardData>();
 	public int mStartIndex = 0;
 	public String searchQuery = new String(); 
-	public int requestType = REQUEST_SEARCH;
+	public int requestType = REQUEST_RECOMMENDATION;
 	public boolean continueWithExisting = false;
 	
 	public void reset(){

@@ -7,7 +7,7 @@ public interface CardActionListener {
 	
 	public void viewReady();
 
-	public void selectedCard(int index);
+	public void selectedCard(CardData data,int index);
 	
 	public void favouriteAction(CardData data,int type);
 

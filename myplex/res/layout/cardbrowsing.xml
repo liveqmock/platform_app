@@ -5,22 +5,30 @@
     android:layout_height="match_parent"
     android:background="#e6e6e6" >
 
+     <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:src="@drawable/watermark" />
     <com.apalya.myplex.views.CardView
         android:id="@+id/framelayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"        android:layout_margin="@dimen/cardmargin" >
     </com.apalya.myplex.views.CardView>
 
+   
+
     <GridView
         android:id="@+id/tabletview"
-        android:visibility="gone"
-        android:numColumns="2"
-        android:scrollbars="none"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_margin="@dimen/cardmargin"
+        android:horizontalSpacing="@dimen/cardmargin"
+        android:numColumns="2"
+        android:scrollbars="none"
         android:verticalSpacing="@dimen/cardmargin"
-   		android:horizontalSpacing="@dimen/cardmargin"
-        android:layout_margin="@dimen/cardmargin" >
+        android:visibility="gone" >
     </GridView>
 
 </RelativeLayout>

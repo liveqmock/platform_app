@@ -17,18 +17,16 @@
         android:layout_height="match_parent"
         android:visibility="gone" />
 
-    <TextView
+    <ImageView
         android:id="@+id/cardmediasubitemvideo_play"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_marginRight="14dp"
         android:layout_marginTop="14dp"
-        android:gravity="center"
-        android:text="@string/card_play"
-        android:textColor="#000000"
-        android:textSize="24sp" />
+        android:background="@drawable/cardplayselector"
+        android:gravity="center" />
 
     <RelativeLayout
         android:id="@+id/cardmediasubitemvideo_progressbarLayout"

@@ -146,7 +146,7 @@ public class SearchListAdapter extends BaseAdapter implements
 		int text_color = mlocalContext.getResources().getColor(R.color.searchtags_color);
 		searchButton.setTextColor(text_color);
 		searchButton.setTextSize(14f);
-		searchButton.setTypeface(FontUtil.Roboto_Light);
+		searchButton.setTypeface(FontUtil.Roboto_Medium);
 		searchButton.setId(buttonid);
 		searchButton.setText(searchTag);
 		if(clicked)

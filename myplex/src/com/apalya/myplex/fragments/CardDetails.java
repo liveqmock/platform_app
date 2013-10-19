@@ -121,11 +121,13 @@ public class CardDetails extends BaseFragment implements
 		mCardDetailViewFactory = new CardDetailViewFactory(getContext());
 		mCardDetailViewFactory.setOnCardDetailExpandListener(this);
 		mMainActivity.setSearchBarVisibilty(View.VISIBLE);
+		mMainActivity.enableFilterAction(false);
 //		prepareContent();
-//		if(mCardData.generalInfo != null){
-//			mMainActivity.setActionBarTitle(mCardData.generalInfo.title);
-//			mMainActivity.updateActionBarTitle();
-//		}
+		if(mCardData.generalInfo != null){
+			mMainActivity.setActionBarTitle(mCardData.generalInfo.title);
+			mMainActivity.updateActionBarTitle();
+		}
+		prepareContent();
 		return rootView;
 	}
 
@@ -133,7 +135,7 @@ public class CardDetails extends BaseFragment implements
 	private FadeInNetworkImageView mPreviewImage;
 	private VideoViewExtn mVideoView;
 	private boolean mPlaying = false;
-	private TextView mPlay;
+	private ImageView mPlay;
 	private RelativeLayout mProgressBar;
 	VideoViewPlayer mVideoViewPlayer;
 	private RelativeLayout mVideoViewLayout;
@@ -151,8 +153,7 @@ public class CardDetails extends BaseFragment implements
 		mPreviewImage.setLayoutParams(params);
 		mVideoView = (VideoViewExtn)v.findViewById(R.id.cardmediasubitemvideo_videopreview);
 		mVideoView.setLayoutParams(params);
-		mPlay = (TextView) v.findViewById(R.id.cardmediasubitemvideo_play);
-		mPlay.setTypeface(FontUtil.ss_symbolicons_line);
+		mPlay = (ImageView) v.findViewById(R.id.cardmediasubitemvideo_play);
 		mBufferPercentageTextView = (TextView)v.findViewById(R.id.carddetaildesc_movename);
 		Random rnd = new Random();
 		int Low = 100;
@@ -181,8 +182,7 @@ public class CardDetails extends BaseFragment implements
 		if(mCardData._id.equalsIgnoreCase("0"))
 		{
 			mPlay.setVisibility(View.GONE);
-			mPreviewImage.setScaleType(ScaleType.CENTER);
-			mPreviewImage.setBackgroundColor(Color.BLACK);
+			mPreviewImage.setScaleType(ScaleType.FIT_XY);
 		}
 		else
 		{
@@ -351,22 +351,21 @@ public class CardDetails extends BaseFragment implements
 	private void showImagePreview(){
 		mPreviewImage.setVisibility(View.VISIBLE);
 		mVideoView.setVisibility(View.INVISIBLE);
-		mPlay.setText(R.string.card_play);
+		mPlay.setBackgroundResource(R.drawable.cardplayselector);
 		
 	}
 	private void hideImagePreview(){
 		mPreviewImage.setVisibility(View.INVISIBLE);
 		mVideoView.setVisibility(View.VISIBLE);
-		mPlay.setText(R.string.card_pause);
+		mPlay.setBackgroundResource(R.drawable.cardpauseselector);
 	}
 	@Override
 	public void onResume() {
-		prepareContent();
 		super.onResume();
 	}
 	private void prepareContent() {
 		fillData();
-		prepareFilterData();
+//		prepareFilterData();
 	}
 
 	private void prepareFilterData() {
@@ -551,7 +550,7 @@ public class CardDetails extends BaseFragment implements
 
 		
 		
-		BaseFragment fragment = mMainActivity.createFragment(NavigationOptionsMenuAdapter.CARDEXPLORER);
+		BaseFragment fragment = mMainActivity.createFragment(NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION);
 		CardExplorerData data = myplexapplication.getCardExplorerData();
 		data.reset();
 		data.requestType = CardExplorerData.REQUEST_SEARCH;
@@ -648,7 +647,7 @@ public class CardDetails extends BaseFragment implements
 		if(v != null){
 			mDescriptionContentLayout.addView(v);
 		}
-		prepareFilterData();
+//		prepareFilterData();
 	}
 	
 	@Override
@@ -677,7 +676,7 @@ public class CardDetails extends BaseFragment implements
 		if(v != null){
 			mDescriptionContentLayout.addView(v);
 		}		
-		prepareFilterData();
+//		prepareFilterData();
 	}
 	@Override
 	public void OnCacheResults(HashMap<String, CardData> obj) {
@@ -704,7 +703,7 @@ public class CardDetails extends BaseFragment implements
 		}
 		mCacheManager.unRegisterCallback();
 		mMainActivity.hideActionBarProgressBar();
-		BaseFragment fragment = mMainActivity.createFragment(NavigationOptionsMenuAdapter.CARDEXPLORER);
+		BaseFragment fragment = mMainActivity.createFragment(NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION);
 		mMainActivity.bringFragment(fragment);
 		
 	}
@@ -719,7 +718,7 @@ public class CardDetails extends BaseFragment implements
 	}
 	@Override
 	public void onSimilarContentAction() {
-		BaseFragment fragment = mMainActivity.createFragment(NavigationOptionsMenuAdapter.CARDEXPLORER);
+		BaseFragment fragment = mMainActivity.createFragment(NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION);
 		CardExplorerData data = myplexapplication.getCardExplorerData();
 		data.reset();
 		data.requestType = CardExplorerData.REQUEST_SIMILARCONTENT;
