@@ -249,7 +249,11 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 
 			@Override
 			public void onClick(View arg0) {
-				if ((mCurrentFragment instanceof SearchActivity)) {
+				if(getResources().getBoolean(R.bool.isTablet))
+				{
+					searchButtonClicked();
+				}
+				else if ((mCurrentFragment instanceof SearchActivity)) {
 					mCurrentFragment.searchButtonClicked();
 				} else {
 					SearchActivity fragment = new SearchActivity();
@@ -651,5 +655,9 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		if(mCustomActionBarFilterImage != null){
 			mCustomActionBarFilterImage.setVisibility(View.VISIBLE);
 		}
+	}
+	@Override
+	public void searchButtonClicked() {
+		// TODO Auto-generated method stub
 	}
 }

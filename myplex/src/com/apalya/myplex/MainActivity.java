@@ -681,5 +681,10 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		// TODO Auto-generated method stub
 		
 	}
+	@Override
+	public void searchButtonClicked() {
+		// TODO Auto-generated method stub
+		
+	}
 
 }
