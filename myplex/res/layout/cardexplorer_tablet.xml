@@ -4,21 +4,65 @@
     android:layout_height="match_parent"
     android:orientation="horizontal" >
 
-    <ListView
-        android:id="@+id/left_drawer"
+    <RelativeLayout
         android:layout_width="280dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:background="@drawable/navigation"
-        android:choiceMode="singleChoice"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="0dp"
-        android:listSelector="@drawable/listitem_selector" />
+        android:layout_height="match_parent" >
+
+        <include
+            android:id="@+id/searchlayoutinclude"
+            android:layout_height="50dp"
+            layout="@layout/searchlayout"
+            android:visibility="gone" >
+        </include>
+
+        <RelativeLayout android:id="@+id/drawerlayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/tablayoutchanger" 
+             android:background="@drawable/navigation">
+            
+            <TextView
+                android:id="@+id/searchBox"
+                android:layout_width="fill_parent"
+                android:layout_height="48dp"
+                android:drawableRight="@drawable/iconsearchgrey"
+                android:textSize="@dimen/textsize_14"
+                android:gravity="center"/>
+
+            <ListView
+                android:id="@+id/left_drawer"
+                android:layout_width="280dp"
+                android:layout_height="fill_parent"
+                android:layout_below="@id/searchBox"
+                android:layout_gravity="start"
+
+                android:choiceMode="singleChoice"
+                android:divider="@android:color/transparent"
+                android:dividerHeight="0dp"
+                android:listSelector="@drawable/listitem_selector" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@id/tablayoutchanger"
+            android:layout_width="fill_parent"
+            android:layout_height="30dp"
+            android:layout_alignParentBottom="true"
+            android:background="#555555"
+            android:gravity="bottom"
+            android:visibility="gone" >
+
+            <Button
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_centerInParent="true"
+                android:background="@drawable/iconexposegrey"
+                android:rotation="180" />
+        </RelativeLayout>
+    </RelativeLayout>
 
     <FrameLayout
         android:id="@+id/content_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
-
 
 </LinearLayout>
