@@ -16,12 +16,13 @@
 
 package com.facebook;
 
+import com.apalya.myplex.R;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import com.apalya.myplex.R;
+
 
 /**
  * This Activity is a necessary part of the overall Facebook login process
@@ -39,7 +40,6 @@ import com.apalya.myplex.R;
 public class LoginActivity extends Activity {
     static final String RESULT_KEY = "com.facebook.LoginActivity:Result";
 
-    private static final String TAG = LoginActivity.class.getName();
     private static final String NULL_CALLING_PKG_ERROR_MSG =
             "Cannot call LoginActivity with a null calling package. " +
                     "This can occur if the launchMode of the caller is singleInstance.";
@@ -107,11 +107,9 @@ public class LoginActivity extends Activity {
 
         // If the calling package is null, this generally means that the callee was started
         // with a launchMode of singleInstance. Unfortunately, Android does not allow a result
-        // to be set when the callee is a singleInstance, so we log an error and return.
+        // to be set when the callee is a singleInstance, so we throw an exception here.
         if (callingPackage == null) {
-            Log.e(TAG, NULL_CALLING_PKG_ERROR_MSG);
-            finish();
-            return;
+            throw new FacebookException(NULL_CALLING_PKG_ERROR_MSG);
         }
 
         authorizationClient.startOrContinueAuth(request);

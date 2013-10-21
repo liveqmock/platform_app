@@ -52,10 +52,28 @@ public class RatingDialog {
 		dialog.setContentView(R.layout.feedbacklayout);
 		mHeadingTextView  = (TextView)dialog.findViewById(R.id.feedback_heading);
 		mHeadingTextView.setTypeface(FontUtil.Roboto_Medium);
-		mHeadingTextView.setText(mHeader);
+		if(data._id.equalsIgnoreCase("0"))
+		{
+			mHeadingTextView.setText("Love using myplex?");
+		}
+		else
+		{
+			mHeadingTextView.setText(mHeader);	
+		}
+		
 		mMessageHeadingTextView = (TextView)dialog.findViewById(R.id.feedback_messageheading);
 		mMessageHeadingTextView.setTypeface(FontUtil.Roboto_Medium);
-		mMessageHeadingTextView.setText(mMessageHeader);
+		
+		if(data._id.equalsIgnoreCase("0"))
+		{
+			mMessageHeadingTextView.setText("Share your experience");
+		}
+		else
+		{
+			mMessageHeadingTextView.setText(mMessageHeader);	
+		}
+		
+		
 		mMessageRatingLow = (TextView)dialog.findViewById(R.id.feedback_ratingtext_low);
 		mMessageRatingLow.setTypeface(FontUtil.ss_symbolicons_line);
 		mMessageRatingHigh = (TextView)dialog.findViewById(R.id.feedback_ratingtext_high);

@@ -836,9 +836,27 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					else
 					{
 						Analytics.trackEvent("FACEBOOK-LOGIN-AUTH-REQUEST-SERVER-ERROR");
-						Log.d(TAG, "code: "+jsonResponse.getString("code"));
-						Log.d(TAG, "message: "+jsonResponse.getString("message"));
-						sendNotification("Err: "+jsonResponse.getString("code")+" \nErr Msg: "+jsonResponse.getString("message"));
+						if(jsonResponse.getString("code").equalsIgnoreCase("401"))
+						{
+							String devId=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
+									getString(R.string.devclientdevid));
+
+							Map<String, String> params = new HashMap<String, String>();
+							params.put("deviceId", devId);
+
+							Util.genKeyRequest(LoginActivity.this,getString(R.string.genKeyReqPath),params);
+							sendNotification("Err: "+jsonResponse.getString("code")+" \nErr Msg: "+jsonResponse.getString("message"));
+						}
+						else
+						{
+							
+							Log.d(TAG, "code: "+jsonResponse.getString("code"));
+							Log.d(TAG, "message: "+jsonResponse.getString("message"));
+							
+							if(Session.getActiveSession()!=null)
+								Session.getActiveSession().close();
+						}
+						
 					}
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -1016,10 +1034,21 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 							//mPlusClient.connect();
 							//getAndUseAuthTokenInAsyncTask();
 						}
-						else
+						else if(jsonResponse.getString("code").equalsIgnoreCase("401"))
 						{
-							sendNotification(jsonResponse.getString("message"));
+							String devId=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
+									getString(R.string.devclientdevid));
+
+							Map<String, String> params = new HashMap<String, String>();
+							params.put("deviceId", devId);
+
+							Util.genKeyRequest(LoginActivity.this,getString(R.string.genKeyReqPath),params);
 						}
+						//else
+						{
+							sendNotification(jsonResponse.getString("code")+" : "+jsonResponse.getString("message"));
+						}
+						AccountUtils.signOut(LoginActivity.this);
 						//(jsonResponse.getString("message"));
 						//showToast("Err: "+jsonResponse.getString("code")+" \nErr Msg: "+jsonResponse.getString("message"));
 					}
@@ -1191,7 +1220,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			if (person != null) {
 				AccountUtils.setPlusProfileId(this, person.getId());
 				mUserInfo.setGoogleId(person.getId());
-				//mUserInfo.setUserEmail(person.getName());
+				mUserInfo.setName(person.getName().getGivenName());
 				mUserInfo.setProfilePic("https://plus.google.com/s2/photos/profile/"+person.getId()+"?sz=480");
 				tryAuthenticate();
 				
@@ -1398,6 +1427,11 @@ private boolean isTokenValid(String clientKeyExp) {
 						mDevInfo.setClientDeviceId(jsonResponse.getString("deviceId"));
 						mDevInfo.setClientKeyExp(jsonResponse.getString("expiresAt"));
 						Log.d(TAG, "---------------------------------------------------------");
+						
+						long nowinms=System.currentTimeMillis();
+						Date now=new Date(nowinms);
+						mUserInfo.joinedDate=now.toLocaleString();
+						mUserInfo.lastVisitedDate=now.toLocaleString();
 
 						ConsumerApi.DEBUGCLIENTKEY = jsonResponse.getString("clientKey");
 
@@ -1441,6 +1475,13 @@ private boolean isTokenValid(String clientKeyExp) {
 		//Check if client is available, if not give device registration request
 		if(clientKey!=null)
 		{
+			mUserInfo.firstVisitStatus=false;
+			
+			long nowinms=System.currentTimeMillis();
+			Date now=new Date(nowinms);
+			mUserInfo.lastVisitedDate=now.toLocaleString();
+			Util.deserializeData(LoginActivity.this);
+			
 			//Analytics.trackEvent("CLIENT-KEY-AVAILABLE");
 			//check if the client key is valid or not, if expired give generate key request
 			if(isTokenValid(clientKeyExp))
@@ -1475,11 +1516,13 @@ private boolean isTokenValid(String clientKeyExp) {
 				Map<String, String> params = new HashMap<String, String>();
 				params.put("deviceId", devId);
 
-				genKeyRequest(getString(R.string.genKeyReqPath),params);
+				Util.genKeyRequest(LoginActivity.this,getString(R.string.genKeyReqPath),params);
 			}
 		}
 		else
 		{
+			
+			mUserInfo.firstVisitStatus=true;
 			//Analytics.trackEvent("DEVICE-REGISTRATION-REQUEST",true);
 			Log.d(TAG, "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 			Map<String, String> params = new HashMap<String, String>();
@@ -1499,7 +1542,7 @@ private boolean isTokenValid(String clientKeyExp) {
 		}		
 	}
 	
-	private void genKeyRequest(String contextPath, final Map<String, String> bodyParams) {
+	/*private void genKeyRequest(String contextPath, final Map<String, String> bodyParams) {
 		RequestQueue queue = MyVolley.getRequestQueue();
 
 		String url=ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+ConsumerApi.USER_CONTEXT+ConsumerApi.SLASH+contextPath;
@@ -1597,5 +1640,5 @@ private boolean isTokenValid(String clientKeyExp) {
 				}
 			}
 		};
-	}
+	}*/
 }

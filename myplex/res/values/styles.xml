@@ -44,7 +44,8 @@
     <dimen name="com_facebook_loginview_compound_drawable_padding">12dp</dimen>
     <color name="com_facebook_loginview_text_color">#FFFFFF</color>
     <dimen name="com_facebook_loginview_text_size">16.0sp</dimen>
-
+    <dimen name="com_facebook_loginview_width">205dp</dimen>
+    <dimen name="com_facebook_loginview_height">44dp</dimen>
     <dimen name="com_facebook_profilepictureview_preset_size_small">50dp</dimen>
     <dimen name="com_facebook_profilepictureview_preset_size_normal">100dp</dimen>
     <dimen name="com_facebook_profilepictureview_preset_size_large">180dp</dimen>

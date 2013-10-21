@@ -16,6 +16,7 @@
 
 package com.facebook;
 
+
 import com.apalya.myplex.R;
 import com.facebook.internal.Utility;
 import org.json.JSONException;
@@ -340,7 +341,7 @@ public final class FacebookRequestError {
                 .append(", errorType: ")
                 .append(errorType)
                 .append(", errorMessage: ")
-                .append(getErrorMessage())
+                .append(errorMessage)
                 .append("}")
                 .toString();
     }

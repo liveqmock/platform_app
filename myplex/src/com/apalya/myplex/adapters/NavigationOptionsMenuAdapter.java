@@ -9,11 +9,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.NetworkImageView;
 import com.apalya.myplex.R;
 import com.apalya.myplex.data.NavigationOptionsMenu;
+import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
 
@@ -77,6 +79,8 @@ public class NavigationOptionsMenuAdapter extends BaseAdapter {
 			NetworkImageView image = (NetworkImageView) v.findViewById(R.id.drawer_list_item_image);
 			image.setDefaultImageResId(menu.mDefaultResId);
 			image.setImageUrl(menu.mIconUrl, MyVolley.getImageLoader());
+			if(!myplexapplication.getUserProfileInstance().getName().equalsIgnoreCase("Guest"))
+				image.setScaleType(ScaleType.CENTER_CROP);
 		} else if (menu.mResourceLayoutId == R.layout.navigation_menuitemsmall) {
 			TextView text = (TextView) v.findViewById(R.id.drawer_list_item_text);
 			ImageView image = (ImageView) v.findViewById(R.id.drawer_list_item_image);

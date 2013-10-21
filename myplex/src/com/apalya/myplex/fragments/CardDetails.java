@@ -182,7 +182,8 @@ public class CardDetails extends BaseFragment implements
 		if(mCardData._id.equalsIgnoreCase("0"))
 		{
 			mPlay.setVisibility(View.GONE);
-			mPreviewImage.setScaleType(ScaleType.FIT_XY);
+			mPreviewImage.setScaleType(ScaleType.CENTER);
+			mPreviewImage.setBackgroundColor(Color.BLACK);
 		}
 		else
 		{
@@ -258,6 +259,7 @@ public class CardDetails extends BaseFragment implements
 					
 				}
 			});
+			myplexapplication.getUserProfileInstance().lastVisitedCardData.add(mCardData);
 			MediaUtil.getVideoUrl(mCardData._id, "low");
 		}
 	};

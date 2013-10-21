@@ -92,7 +92,9 @@ public class SignUpActivity extends Activity{
 			mTnc=(TextView)findViewById(R.id.tnc);
 
 			mFpwd.setVisibility(View.VISIBLE);
+			mFpwd.setTypeface(FontUtil.Roboto_Medium);
 			mTnc.setVisibility(View.GONE);
+			mTnc.setTypeface(FontUtil.Roboto_Medium);
 
 			mEmail = (EditText) findViewById(R.id.loginEmail);
 			mEmail.setTypeface(FontUtil.Roboto_Regular);
@@ -186,11 +188,12 @@ public class SignUpActivity extends Activity{
 			signupLayout.setVisibility(View.VISIBLE);
 
 			mFpwd=(TextView)findViewById(R.id.fpwd);
+			mFpwd.setTypeface(FontUtil.Roboto_Medium);
 			mTnc=(TextView)findViewById(R.id.tnc);
 
 			mFpwd.setVisibility(View.GONE);
 			mTnc.setVisibility(View.VISIBLE);
-
+			mTnc.setTypeface(FontUtil.Roboto_Medium);
 			mEmail = (EditText) findViewById(R.id.editEmail);
 			mEmail.setTypeface(FontUtil.Roboto_Regular);
 			mPassword = (EditText) findViewById(R.id.editPassword);
@@ -272,12 +275,12 @@ public class SignUpActivity extends Activity{
 		img5.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image5, width, height));
 		img6.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image6, width, height));
 		
-		img1.setScaleType(ScaleType.FIT_XY);
-		img2.setScaleType(ScaleType.FIT_XY);
-		img3.setScaleType(ScaleType.FIT_XY);
-		img4.setScaleType(ScaleType.FIT_XY);
-		img5.setScaleType(ScaleType.FIT_XY);
-		img6.setScaleType(ScaleType.FIT_XY);
+		img1.setScaleType(ScaleType.CENTER_INSIDE);
+		img2.setScaleType(ScaleType.CENTER_INSIDE);
+		img3.setScaleType(ScaleType.CENTER_INSIDE);
+		img4.setScaleType(ScaleType.CENTER_INSIDE);
+		img5.setScaleType(ScaleType.CENTER_INSIDE);
+		img6.setScaleType(ScaleType.CENTER_INSIDE);
 		
 		
 		final HorizontalScrollView parentScrollView= (HorizontalScrollView) findViewById(R.id.parentScrollview);
@@ -528,6 +531,18 @@ public class SignUpActivity extends Activity{
 					}
 					else
 					{
+						if(jsonResponse.getString("code").equalsIgnoreCase("401"))
+						{
+							String devId=SharedPrefUtils.getFromSharedPreference(SignUpActivity.this,
+									getString(R.string.devclientdevid));
+
+							Map<String, String> params = new HashMap<String, String>();
+							params.put("deviceId", devId);
+
+							Util.genKeyRequest(SignUpActivity.this,getString(R.string.genKeyReqPath),params);
+							sendNotification("Err: "+jsonResponse.getString("code")+" \nErr Msg: "+jsonResponse.getString("message"));
+						}
+						
 						Analytics.trackEvent("USER-LOGIN-REQUEST-SERVER-ERROR");
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));

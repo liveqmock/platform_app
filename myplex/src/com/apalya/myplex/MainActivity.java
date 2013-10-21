@@ -47,6 +47,11 @@ import android.widget.Toast;
 
 import com.apalya.myplex.adapters.FliterMenuAdapter;
 import com.apalya.myplex.adapters.NavigationOptionsMenuAdapter;
+import com.apalya.myplex.data.CardData;
+import com.apalya.myplex.data.CardDataGenralInfo;
+import com.apalya.myplex.data.CardDataImages;
+import com.apalya.myplex.data.CardDataImagesItem;
+import com.apalya.myplex.data.CardDataSimilarContent;
 import com.apalya.myplex.data.CardExplorerData;
 import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.NavigationOptionsMenu;
@@ -56,10 +61,13 @@ import com.apalya.myplex.fragments.CardExplorer;
 import com.apalya.myplex.menu.FilterMenuProvider;
 import com.apalya.myplex.utils.Blur;
 import com.apalya.myplex.utils.Blur.BlurResponse;
+import com.apalya.myplex.utils.MessagePost.MessagePostCallback;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.LogOutUtil;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.views.PinnedSectionListView;
+import com.apalya.myplex.views.RatingDialog;
+import com.facebook.Session;
 
 public class MainActivity extends Activity implements MainBaseOptions {
 	private DrawerLayout mDrawerLayout;
@@ -109,6 +117,8 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		mMenuItemList.add(new NavigationOptionsMenu("Purchases",R.drawable.iconpurchases, null, NavigationOptionsMenuAdapter.NOACTION_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.DOWNLOADS,R.drawable.icondnload, null, NavigationOptionsMenuAdapter.NOACTION_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu("Settings",R.drawable.iconsearch, null, NavigationOptionsMenuAdapter.NOACTION_ACTION,R.layout.navigation_menuitemsmall));
+		Session fbSession=Session.getActiveSession();
+		if(fbSession!=null && fbSession.isOpened())
 		mMenuItemList.add(new NavigationOptionsMenu("Invite Friends",R.drawable.iconfriends, null, NavigationOptionsMenuAdapter.INVITE_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu("Logout",R.drawable.iconfriends, null, NavigationOptionsMenuAdapter.LOGOUT_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu("ApplicationLogo",R.drawable.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
@@ -324,24 +334,53 @@ public class MainActivity extends Activity implements MainBaseOptions {
 	private boolean mShowExitToast = true;
 
 	private boolean closeApplication() {
-		if (mShowExitToast) {
-			Toast.makeText(this, "Press back again to close the application.",
-					Toast.LENGTH_LONG).show();
-			mShowExitToast = false;
-			Timer timer = new Timer();
-			timer.schedule(new TimerTask() {
-
+		Util.serializeData(MainActivity.this);
+		
+		
+		if(myplexapplication.getUserProfileInstance().firstVisitStatus)
+		{
+			final boolean exitStatus=false;
+			CardData profileData=new CardData();
+			profileData._id="0";
+			RatingDialog dialog = new RatingDialog(mContext);
+			dialog.prepareRating();
+			dialog.showDialog(new MessagePostCallback() {
+				
 				@Override
-				public void run() {
-					mShowExitToast = true;
+				public void sendMessage(boolean status) {
+					if(status){
+						Toast.makeText(mContext, "Review has posted successfully.", Toast.LENGTH_SHORT).show();
+						
+					}else{
+						Toast.makeText(mContext, "Unable to post your review.", Toast.LENGTH_SHORT).show();
+					}
+					exitApp();
 				}
-			}, 3000);
-			return false;
-		} else {
-			exitApp();
-			return true;
+				
+			}, profileData);
+		
+			return exitStatus;
 		}
+		else
+		{
+			if (mShowExitToast) {
+				Toast.makeText(this, "Press back again to close the application.",
+						Toast.LENGTH_LONG).show();
+				mShowExitToast = false;
+				Timer timer = new Timer();
+				timer.schedule(new TimerTask() {
 
+					@Override
+					public void run() {
+						mShowExitToast = true;
+					}
+				}, 3000);
+				return false;
+			} else {
+				exitApp();
+				return true;
+			}	
+		}
 	}
 
 	private void exitApp() {
@@ -427,6 +466,33 @@ public class MainActivity extends Activity implements MainBaseOptions {
 			return;
 		}
 		case NavigationOptionsMenuAdapter.CARDDETAILS_ACTION: {
+if(mCurrentFragment!=mCardDetails)
+			{
+				mCardDetails = new CardDetails();
+				CardData profileData = new CardData();
+				profileData._id="0";
+				CardDataGenralInfo profileInfo=new CardDataGenralInfo();
+				profileInfo.title=myplexapplication.getUserProfileInstance().getName();
+				if(myplexapplication.getUserProfileInstance().joinedDate==null)
+					myplexapplication.getUserProfileInstance().joinedDate=myplexapplication.getUserProfileInstance().lastVisitedDate;
+				profileInfo.briefDescription="Joined myplex on: "+myplexapplication.getUserProfileInstance().joinedDate+" \n Last Visited on: "+myplexapplication.getUserProfileInstance().lastVisitedDate+" ";
+				profileInfo.description="Joined myplex on: "+myplexapplication.getUserProfileInstance().joinedDate+" \n Last Visited on: "+myplexapplication.getUserProfileInstance().lastVisitedDate+" ";
+				CardDataImages pics=new CardDataImages();
+				CardDataImagesItem profilePic=new CardDataImagesItem();
+				profilePic.profile="xxhdpi";
+				profilePic.link=myplexapplication.getUserProfileInstance().getProfilePic();
+				pics.values.add(profilePic);
+				CardDataSimilarContent lastVisited=new CardDataSimilarContent();
+				lastVisited.values=myplexapplication.getUserProfileInstance().lastVisitedCardData;
+				profileData.similarContent=lastVisited;
+				profileData.generalInfo=profileInfo;
+				profileData.images=pics;
+				mCurrentFragment=mCardDetails;
+				mCurrentFragment.mDataObject=profileData;
+			}else{
+				mDrawerLayout.closeDrawer(mDrawerList);
+				return;
+			}
 			break;
 		}
 		case NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION: {
@@ -678,6 +744,11 @@ public class MainActivity extends Activity implements MainBaseOptions {
 	}
 	@Override
 	public void showfilterMenu() {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void searchButtonClicked() {
 		// TODO Auto-generated method stub
 		
 	}

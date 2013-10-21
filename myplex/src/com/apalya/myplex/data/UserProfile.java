@@ -1,10 +1,14 @@
 package com.apalya.myplex.data;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class UserProfile {
-	
+public class UserProfile implements Serializable{
+	private static final long serialVersionUID = 1L;
 	private static String useremail;
 	private static String userid;
 	private static String facebookid;
@@ -13,6 +17,10 @@ public class UserProfile {
 	private static String profileDesc;
 	private static String name;
 	private static boolean loggedInStatus;
+	public String joinedDate;
+	public String lastVisitedDate;
+	public boolean firstVisitStatus;
+	public List<CardData> lastVisitedCardData=new ArrayList<CardData>();
 	public Map<String, Long> downloadMap = new HashMap<String, Long>();
 	
 	public void setUserEmail(String aUserEmail)
@@ -86,5 +94,14 @@ public class UserProfile {
 	public boolean getLoginStatus()
 	{
 		return loggedInStatus;
+	}
+	
+	public void writeObject(java.io.ObjectOutputStream out) throws IOException{
+
+	    out.writeObject(joinedDate);
+	}
+	public void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException{
+
+		joinedDate=(String)in.readObject();
 	}
 }

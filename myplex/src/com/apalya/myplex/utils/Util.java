@@ -1,14 +1,21 @@
 package com.apalya.myplex.utils;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.animation.Animator;
@@ -34,6 +41,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
@@ -42,12 +50,24 @@ import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.Request.Method;
+import com.android.volley.Response.ErrorListener;
+import com.android.volley.Response.Listener;
+import com.android.volley.toolbox.StringRequest;
+import com.apalya.myplex.LoginActivity;
 import com.apalya.myplex.MainActivity;
 import com.apalya.myplex.R;
 import com.apalya.myplex.R.color;
+import com.apalya.myplex.adapters.CacheManagerCallback;
+import com.apalya.myplex.cache.CacheManager;
+import com.apalya.myplex.cache.IndexHandler;
 import com.apalya.myplex.data.ApplicationConfig;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.fragments.CardExplorer;
 import com.apalya.myplex.tablet.MultiPaneActivity;
 import com.facebook.FacebookException;
 import com.facebook.FacebookOperationCanceledException;
@@ -62,6 +82,9 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Util {
+	
+	
+	
 	public static int getStatusBarHeight(Context context) {
 		if(context == null){return 48;}
 		int result = 0;
@@ -284,6 +307,7 @@ public class Util {
 				Bundle params = new Bundle();
 
 				params.putString("message", "Hey, Check out this cool app where we can watch movies and live tv shows.");
+				params.putBoolean("new_style_message", true);
 				/*params.putString("data",
 					"{\"badge_of_awesomeness\":\"1\"," +
 					"\"social_karma\":\"5\"}");*/
@@ -474,4 +498,152 @@ public class Util {
 	    options.inJustDecodeBounds = false;
 	    return BitmapFactory.decodeResource(res, resId, options);
 	}
+	private static String TAG="GENERATE KEY";
+	private static Context mContext;
+	public static void genKeyRequest(Context context,String contextPath, final Map<String, String> bodyParams) {
+		mContext=context;
+		RequestQueue queue = MyVolley.getRequestQueue();
+
+		String url=ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+ConsumerApi.USER_CONTEXT+ConsumerApi.SLASH+contextPath;
+		StringRequest myReq = new StringRequest(Method.POST,
+				url,
+				genKeyRegSuccessListener(),
+				genKeyRegErrorListener()) {
+
+			protected Map<String, String> getParams() throws com.android.volley.AuthFailureError {
+				Map<String, String> params = new HashMap<String, String>();
+				params=bodyParams;
+				return params;
+			};
+		};
+		Log.d(TAG,"Request sent ");
+		queue.add(myReq);
+	}
+
+	protected static ErrorListener genKeyRegErrorListener() {
+		return new Response.ErrorListener() {
+			public void onErrorResponse(VolleyError error) {
+				//Analytics.endTimedEvent("NEW-CLIENT-KEY-GENERATION");
+				//Analytics.trackEvent("NEW-CLIENT-KEY-GENERATION-ERROR");
+				Log.d(TAG,"Error: "+error.toString());
+				if(error.toString().indexOf("NoConnectionError")>0)
+				{
+					//Util.showToast(getString(R.string.interneterr),LoginActivity.this);
+					//finish();
+					//Util.launchActivity(MainActivity.class,LoginActivity.this , null);
+
+				}
+				else
+				{
+					//Util.showToast(error.toString(),LoginActivity.this);	
+				}
+
+				Log.d(TAG, "@@@@@@@@@@@@@@@ LOGIN ACTIVITY @@@@@@@@@@@@@@@@@@@@");
+			}
+		};
+	}
+
+
+	protected static Listener<String> genKeyRegSuccessListener() {
+		return new Response.Listener<String>() {
+			@Override
+			public void onResponse(String response) {
+				Log.d(TAG,"Response: "+response);
+				//Analytics.endTimedEvent("NEW-CLIENT-KEY-GENERATION");
+				
+				try {	
+					Log.d(TAG, "########################################################");
+					JSONObject jsonResponse= new JSONObject(response);
+
+					if(jsonResponse.getString("status").equalsIgnoreCase("SUCCESS"))
+					{
+						//Analytics.trackEvent("NEW-CLIENT-KEY-GENERATION-Success");
+						Log.d(TAG, "status: "+jsonResponse.getString("status"));
+						Log.d(TAG, "expiresAt: "+jsonResponse.getString("expiresAt"));
+						Log.d(TAG, "code: "+jsonResponse.getString("code"));
+						Log.d(TAG, "message: "+jsonResponse.getString("message"));
+						Log.d(TAG, "clientKey: "+jsonResponse.getString("clientKey"));
+						Log.d(TAG, "########################################################");
+						myplexapplication.getDevDetailsInstance().setClientKey(jsonResponse.getString("clientKey"));
+						myplexapplication.getDevDetailsInstance().setClientKeyExp(jsonResponse.getString("expiresAt"));
+						Log.d(TAG, "---------------------------------------------------------");
+
+
+
+						SharedPrefUtils.writeToSharedPref(mContext,
+								mContext.getString(R.string.devclientkey), jsonResponse.getString("clientKey"));
+						SharedPrefUtils.writeToSharedPref(mContext,
+								mContext.getString(R.string.devclientkeyexp), jsonResponse.getString("expiresAt"));
+
+						
+					}
+					else
+					{
+						
+						SharedPrefUtils.writeToSharedPref(mContext,
+								mContext.getString(R.string.devclientkey), "");
+						SharedPrefUtils.writeToSharedPref(mContext,
+								mContext.getString(R.string.devclientkeyexp), "");
+						
+						//Analytics.trackEvent("NEW-CLIENT-KEY-GENERATION-SERVER-ERROR");
+						Log.d(TAG, "code: "+jsonResponse.getString("code"));
+						Log.d(TAG, "message: "+jsonResponse.getString("message"));
+						Util.showToast("Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),mContext);
+					}
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+		};
+	}
+	public static void serializeData(Context context) {
+	    try {
+	    	String joinedDate;
+	    	joinedDate=myplexapplication.getUserProfileInstance().joinedDate;
+	    	String dir=context.getCacheDir().toString()+"/uprofile.dat";
+	    	 FileOutputStream fStream = new FileOutputStream(context.getCacheDir()+"/uprofile.dat");
+	    	//FileOutputStream fStream = context.openFileOutput("downloaddetails.dat", Context.MODE_PRIVATE) ;
+	        ObjectOutputStream oStream = new ObjectOutputStream(fStream);
+
+	        oStream.writeObject(joinedDate);    
+	        List<CardData> cd=myplexapplication.getUserProfileInstance().lastVisitedCardData;
+	        List<String> cardIds=new ArrayList<String>();
+	        for(CardData data:cd)
+	        	cardIds.add(data._id);
+	        oStream.writeObject(cardIds);
+	        oStream.flush();
+	        oStream.close();
+
+	        Log.v("Serialization success", "Success");
+	    } catch (Exception e) {
+	        Log.v("IO Exception", e.getMessage());
+	    }
+	}  
+	public static void deserializeData(Context context){
+		File file=new File(context.getCacheDir(), "uprofile.dat");
+
+	    try {
+
+	      FileInputStream fint = new FileInputStream(file);
+	      ObjectInputStream ois = new ObjectInputStream(fint);
+	      myplexapplication.getUserProfileInstance().joinedDate =(String) ois.readObject();
+	      //myplexapplication.getUserProfileInstance().lastVisitedCardData=(List<CardData>)  ois.readObject();
+	      List<String> cardIds=new ArrayList<String>();
+	      cardIds=(List<String>) ois.readObject();
+	      ois.close();
+	      for(String id:cardIds)
+	      {
+	    	  CardData cd=new CardData();
+	    	  cd._id=id;
+	    	  myplexapplication.getUserProfileInstance().lastVisitedCardData.add(cd);
+	      }
+	      
+	    }
+	      catch (Exception e) {
+	    	  e.printStackTrace(); 
+	    	  }
+		}
+	
+	
+	
 }

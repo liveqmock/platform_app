@@ -27,12 +27,15 @@ import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+
+import com.apalya.myplex.R;
 import com.facebook.FacebookException;
 import com.facebook.LoggingBehavior;
-import com.apalya.myplex.R;
-import com.facebook.internal.*;
 
-import java.net.URISyntaxException;
+import com.facebook.internal.Logger;
+import com.facebook.internal.Utility;
+
+import java.net.MalformedURLException;
 
 /**
  * View that displays the profile photo of a supplied profile ID, while conforming
@@ -110,7 +113,6 @@ public class ProfilePictureView extends FrameLayout {
     private int presetSizeType = CUSTOM;
     private ImageRequest lastRequest;
     private OnErrorListener onErrorListener;
-    private Bitmap customizedDefaultProfilePicture = null;
 
     /**
      * Constructor
@@ -240,20 +242,10 @@ public class ProfilePictureView extends FrameLayout {
      * Sets an OnErrorListener for this instance of ProfilePictureView to call into when
      * certain exceptions occur.
      *
-     * @param onErrorListener The Listener object to set
+     * @param onErrorListener The listener object to set
      */
     public final void setOnErrorListener(OnErrorListener onErrorListener) {
-      this.onErrorListener = onErrorListener;
-    }
-
-    /**
-     * The ProfilePictureView will display the provided image while the specified
-     * profile is being loaded, or if the specified profile is not available.
-     *
-     * @param inputBitmap The bitmap to render until the actual profile is loaded.
-     */
-    public final void setDefaultProfilePicture(Bitmap inputBitmap) {
-        customizedDefaultProfilePicture = inputBitmap;
+        this.onErrorListener = onErrorListener;
     }
 
     /**
@@ -402,18 +394,10 @@ public class ProfilePictureView extends FrameLayout {
     }
 
     private void setBlankProfilePicture() {
-        if (customizedDefaultProfilePicture == null) {
-          int blankImageResource = isCropped() ?
-                  R.drawable.com_facebook_profile_picture_blank_square :
-                  R.drawable.com_facebook_profile_picture_blank_portrait;
-          setImageBitmap( BitmapFactory.decodeResource(getResources(), blankImageResource));
-	} else {
-          // Update profile image dimensions.
-          updateImageQueryParameters();
-          // Resize inputBitmap to new dimensions of queryWidth and queryHeight.
-          Bitmap scaledBitmap = Bitmap.createScaledBitmap(customizedDefaultProfilePicture, queryWidth, queryHeight, false);
-          setImageBitmap(scaledBitmap);
-	}
+        int blankImageResource = isCropped() ?
+                R.drawable.com_facebook_profile_picture_blank_square :
+                R.drawable.com_facebook_profile_picture_blank_portrait;
+        setImageBitmap( BitmapFactory.decodeResource(getResources(), blankImageResource));
     }
 
     private void setImageBitmap(Bitmap imageBitmap) {
@@ -449,7 +433,7 @@ public class ProfilePictureView extends FrameLayout {
             lastRequest = request;
 
             ImageDownloader.downloadAsync(request);
-        } catch (URISyntaxException e) {
+        } catch (MalformedURLException e) {
             Logger.log(LoggingBehavior.REQUESTS, Log.ERROR, TAG, e.toString());
         }
     }
