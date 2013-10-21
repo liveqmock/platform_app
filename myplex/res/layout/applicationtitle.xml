@@ -3,23 +3,38 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <ImageView
-        android:contentDescription="@string/hello_world"
-        android:id="@+id/customactionbar_drawer"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+    <LinearLayout
+        android:id="@+id/customactionbar_drawerLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
-        android:layout_margin="5dp"
-        android:src="@drawable/iconmenu" />
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/customactionbar_drawer"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_gravity="center_vertical"
+            android:contentDescription="@string/hello_world"
+            android:src="@drawable/iconmenu" />
+
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_margin="4dp"
+            android:layout_gravity="center_vertical"
+            android:contentDescription="@string/hello_world"
+            android:src="@drawable/watermark" />
+    </LinearLayout>
 
     <RelativeLayout
         android:id="@+id/customactionbar_filter"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
+        android:layout_centerInParent="true"
         android:layout_marginLeft="48dp"
-        android:layout_marginRight="80dp"
-        android:layout_centerInParent="true" >
+        android:layout_marginRight="80dp" >
 
         <TextView
             android:id="@+id/customactionbar_filter_text"
@@ -27,39 +42,39 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
+            android:ellipsize="marquee"
             android:singleLine="true"
             android:text="@string/app_name"
-            android:ellipsize="marquee"
             android:textColor="#ffffff"
             android:textSize="22sp" />
 
         <ImageView
-            android:contentDescription="@string/hello_world"
             android:id="@+id/customactionbar_filter_button"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:layout_centerVertical="true"
             android:layout_marginLeft="5dp"
             android:layout_toRightOf="@+id/customactionbar_filter_text"
+            android:contentDescription="@string/hello_world"
             android:src="@drawable/iconexpose" />
     </RelativeLayout>
 
     <ImageView
-        android:contentDescription="@string/hello_world"
         android:id="@+id/customactionbar_search_button"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_margin="5dp"
+        android:contentDescription="@string/hello_world"
         android:src="@drawable/iconsearch" />
 
     <ProgressBar
         android:id="@+id/customactionbar_progressBar"
         android:layout_width="32dp"
         android:layout_height="32dp"
-        android:layout_margin="5dp"
         android:layout_centerVertical="true"
+        android:layout_margin="5dp"
         android:layout_toLeftOf="@+id/customactionbar_search_button" />
 
 </RelativeLayout>

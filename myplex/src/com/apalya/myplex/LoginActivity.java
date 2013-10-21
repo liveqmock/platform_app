@@ -1433,7 +1433,7 @@ private boolean isTokenValid(String clientKeyExp) {
 						mUserInfo.joinedDate=now.toLocaleString();
 						mUserInfo.lastVisitedDate=now.toLocaleString();
 
-						ConsumerApi.DEBUGCLIENTKEY = jsonResponse.getString("clientKey");
+//						ConsumerApi.DEBUGCLIENTKEY = jsonResponse.getString("clientKey");
 
 						SharedPrefUtils.writeToSharedPref(LoginActivity.this,
 								getString(R.string.devclientkey), jsonResponse.getString("clientKey"));
@@ -1467,7 +1467,7 @@ private boolean isTokenValid(String clientKeyExp) {
 		String clientKey=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
 				getString(R.string.devclientkey));
 		if(clientKey != null && clientKey.length() >10){
-			ConsumerApi.DEBUGCLIENTKEY = clientKey;
+//			ConsumerApi.DEBUGCLIENTKEY = clientKey;
 		}
 		String clientKeyExp=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
 				getString(R.string.devclientkeyexp));

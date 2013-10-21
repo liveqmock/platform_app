@@ -3,6 +3,7 @@ package com.apalya.myplex.data;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 
@@ -12,6 +13,7 @@ public class CardDataHolder {
 	public TextView mDelete;
 	public TextView mFavourite;
 	public CardImageView mPreview;
+	public RelativeLayout mPreviewLayout;
 	public ImageView mOverLayPlay;
 	public TextView mComments;
 	public TextView mReviews;

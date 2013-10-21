@@ -1,5 +1,10 @@
 package com.apalya.myplex.utils;
 
+import android.content.Context;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.TransitionDrawable;
 import android.util.Log;
 
 import com.android.volley.VolleyError;
@@ -9,11 +14,14 @@ import com.apalya.myplex.data.CardImageView;
 import com.apalya.myplex.views.CardView;
 
 public class CardImageLoader {
+	private static final int FADE_IN_TIME_MS = 450;
 	private int mCardId;
 	private String requestUrl;
 	private CardImageView mView;
-	public CardImageLoader(int Id){
+	private Context mContext;
+	public CardImageLoader(int Id,Context cxt){
 		this.mCardId = Id;
+		this.mContext = cxt;
 	}
 	public void loadImage(CardImageView View){
 		mView = View;
@@ -32,7 +40,14 @@ public class CardImageLoader {
 				if(response == null){return;}
 				if(response.getBitmap() == null){return;}
 				if(requestUrl.equalsIgnoreCase(mView.mImageUrl)&& mCardId == mView.mCardId){
-					mView.setImageBitmap(response.getBitmap());
+					TransitionDrawable td = new TransitionDrawable(new Drawable[]{
+			                new ColorDrawable(android.R.color.transparent),
+			                new BitmapDrawable(mContext.getResources(), response.getBitmap())
+			        });
+
+					mView.setImageDrawable(td);
+			        td.startTransition(FADE_IN_TIME_MS);
+//					mView.setImageBitmap(response.getBitmap());
 //					mView.setImageDrawable(new BitmapDrawable(response.getBitmap()));
 				}else{
 					Log.w("CardView","View mismatch");

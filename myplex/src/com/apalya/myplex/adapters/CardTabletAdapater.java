@@ -159,7 +159,7 @@ public class CardTabletAdapater extends BaseAdapter{
 					if (imageItem.link != null && !(imageItem.link.compareTo("Images/NoImage.jpg") == 0)) {
 						dataHolder.mPreview.mImageUrl = imageItem.link;
 //						Log.d("CardExplorer","imageItem.link ="+imageItem.link+" profile = "+imageItem.profile);
-						CardImageLoader ImageLoader = new CardImageLoader(position);
+						CardImageLoader ImageLoader = new CardImageLoader(position,mContext);
 						ImageLoader.loadImage(dataHolder.mPreview);
 //						dataHolder.mPreview.setImageUrl(imageItem.link,MyVolley.getImageLoader());
 					}

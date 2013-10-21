@@ -8,13 +8,16 @@ import java.util.TimerTask;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.animation.Animator.AnimatorListener;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -33,10 +36,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
@@ -61,6 +66,7 @@ import com.apalya.myplex.fragments.CardExplorer;
 import com.apalya.myplex.menu.FilterMenuProvider;
 import com.apalya.myplex.utils.Blur;
 import com.apalya.myplex.utils.Blur.BlurResponse;
+import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.MessagePost.MessagePostCallback;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.LogOutUtil;
@@ -188,12 +194,14 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		R.string.drawer_close /* "close drawer" description for accessibility */
 		) {
 			public void onDrawerClosed(View view) {
+				showNavigationFullImage(true);
 				mNavigationDrawerOpened = false;
 				invalidateOptionsMenu(); // creates call to
 											// onPrepareOptionsMenu()
 			}
 
 			public void onDrawerOpened(View drawerView) {
+				showNavigationFullImage(false);
 				mNavigationDrawerOpened = true;
 				invalidateOptionsMenu(); // creates call to
 											// onPrepareOptionsMenu()
@@ -206,6 +214,19 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		}
 	}
 
+	private void showNavigationFullImage(boolean value){
+		AnimatorSet set = new AnimatorSet();
+		int fromX = 0;
+		int toX = -(mNavigationMenu.getWidth()/2);
+		if(value){
+			fromX = -(mNavigationMenu.getWidth()/2);
+			toX = 0;
+		}
+		set.play(ObjectAnimator.ofFloat(mNavigationMenu, View.TRANSLATION_X, fromX,toX));
+		set.setDuration(200);
+		set.setInterpolator(new DecelerateInterpolator());
+		set.start();
+	}
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		Log.e("pref","onSaveInstanceState");
@@ -249,6 +270,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		}
 	};
 
+	private ImageView mNavigationMenu;
 	public void prepareCustomActionBar() {
 		getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
 		getActionBar().setCustomView(R.layout.applicationtitle);
@@ -256,9 +278,9 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		if (v == null) {
 			return;
 		}
-		ImageView navigationDrawer = (ImageView) v
-				.findViewById(R.id.customactionbar_drawer);
-		navigationDrawer.setOnClickListener(new OnClickListener() {
+		LinearLayout navigationMenuLayout = (LinearLayout)v.findViewById(R.id.customactionbar_drawerLayout);
+		mNavigationMenu = (ImageView) v.findViewById(R.id.customactionbar_drawer);
+		navigationMenuLayout.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
@@ -271,7 +293,6 @@ public class MainActivity extends Activity implements MainBaseOptions {
 				}
 			}
 		});
-		Util.showFeedback(navigationDrawer);
 		mCustomActionBarTitleLayout = (RelativeLayout) v
 				.findViewById(R.id.customactionbar_filter);
 		mCustomActionBarTitleLayout.setOnClickListener(mOnFilterClickListener);
@@ -541,7 +562,7 @@ if(mCurrentFragment!=mCardDetails)
 		// transaction.setCustomAnimations(android.R.animator.fade_in,
 		// android.R.animator.fade_out);
 		// transaction.
-		setActionBarTitle("Myplex");
+		setActionBarTitle("myplex");
 		updateActionBarTitle();
 		transaction.replace(R.id.content_frame, mCurrentFragment);
 		transaction.addToBackStack(null);
@@ -752,5 +773,11 @@ if(mCurrentFragment!=mCardDetails)
 		// TODO Auto-generated method stub
 		
 	}
-
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if(requestCode == ConsumerApi.SUBSCRIPTIONREQUEST){
+			
+		}
+	}
 }

@@ -12,9 +12,12 @@ public class ConsumerApi {
 	public static final String CONTENTDETAILS_ACTION = "contentDetail";
 	public static final String COMMENT_TAG= "comment";
 	public static final String RATING_TAG= "rating";
+	public static final String SUBSCRIBE_TAG= "subscribe";
 	public static final String FIELD_COMMENTS = "comments";
 	public static final String FIELD_USERREVIEWS = "userReviews";
 	public static final String FIELD_VIDEOS = "videos";
+	public static final String PAYMENTCHANNEL = "paymentChannel=";
+	public static final String PACKAGEID = "packageId=";
 	public static final String CONTENT_CONTEXT = "content/v2";
 	public static final String USER_CONTEXT = "user/v2";
 	public static final String SCHEME = "http://";
@@ -33,6 +36,9 @@ public class ConsumerApi {
 	public static final String BILLING_TAG = "billing";
 	public static final String MODES_TAG = "modes";
 	public static final String CONTENTID = "contenId=";
+	public static final int SUBSCRIPTIONERROR = 1;
+	public static final int SUBSCRIPTIONSUCCESS = 2;
+	public static final int SUBSCRIPTIONREQUEST = 3;
 	
 	// min: returns only content ids.
 	// static: returns static sub-entities.
@@ -46,7 +52,6 @@ public class ConsumerApi {
 	public static final String LEVELSTATIC_DYNAMIC = "static_dynamic";
 	public static final String LEVELDEVICEMIN = "devicemin";
 	public static final String LEVELDEVICEMAX = "devicemax";
-	
 	public static String DEBUGCLIENTKEY = "dcb11454ccdafdd4706c7186d37abd2ff96cd02dc998d1111d16d4778a797f85";//"c86f79514ec7976bd20de36f1c6f15900d8e09f699818024283bad1bf0609650";
 	
 	public static String getSearch(String queryStr, String level,int startIndex) {
@@ -107,5 +112,9 @@ public class ConsumerApi {
 	public static String getBillingMode(String contentID) {
 		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + BILLING_TAG
 				+ SLASH + MODES_TAG + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY + AMPERSAND+ CONTENTID +contentID;
+	}
+	public static String getSusbcriptionRequesr(String paymentChannel,String packageId){
+		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + BILLING_TAG
+				+ SLASH + SUBSCRIBE_TAG+ SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY + AMPERSAND+ PAYMENTCHANNEL +paymentChannel+ AMPERSAND +PACKAGEID+packageId;
 	}
 }

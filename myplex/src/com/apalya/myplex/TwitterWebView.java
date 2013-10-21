@@ -1,9 +1,5 @@
 package com.apalya.myplex;
 
-import java.util.Calendar;
-
-import com.apalya.myplex.utils.Twitter11;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -13,6 +9,8 @@ import android.util.Log;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+
+import com.apalya.myplex.utils.Twitter11;
 
 public class TwitterWebView extends Activity {
 	private static final String TAG="TwitterWebView";

@@ -1,13 +1,38 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content" >
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
 
-    <com.android.volley.toolbox.NetworkImageView
-        android:id="@+id/drawer_list_item_image"
-        android:layout_width="280dp"
-        android:layout_height="216dp"
-        android:layout_gravity="center_vertical"
-        android:scaleType="centerInside"
-        android:src="@drawable/radiohead_in_rainbows" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:orientation="horizontal"
+        android:paddingLeft="16dp" >
+
+        <com.android.volley.toolbox.NetworkImageView
+            android:id="@+id/drawer_list_item_image"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="center_vertical"
+            android:scaleType="centerInside"
+            android:src="@drawable/radiohead_in_rainbows" />
+
+        <TextView
+            android:id="@+id/drawer_list_item_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:textColor="#fff"
+            android:textSize="@dimen/textsize_16" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_margin="2dp"
+        android:background="#464A4F"
+        android:paddingTop="16dp" />
 
 </LinearLayout>

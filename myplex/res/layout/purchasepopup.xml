@@ -123,7 +123,7 @@
                 </RadioGroup>
             </LinearLayout>
         </LinearLayout>
-
+        
         <TextView
             android:id="@+id/purchasepopup_packsDescription"
             android:layout_width="fill_parent"
@@ -135,6 +135,7 @@
             android:lineSpacingExtra="2dp"
             android:textColor="#ffffff"
             android:textSize="@dimen/textsize_12" />
+
     </RelativeLayout>
 
 </ScrollView>

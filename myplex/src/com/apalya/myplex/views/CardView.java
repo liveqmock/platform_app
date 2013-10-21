@@ -267,6 +267,7 @@ public class CardView extends ScrollView {
 			dataHolder.mDelete = (TextView)v.findViewById(R.id.card_title_delete);
 			dataHolder.mFavourite = (TextView)v.findViewById(R.id.card_title_fav);
 			dataHolder.mPreview = (CardImageView)v.findViewById(R.id.card_preview_image);
+			dataHolder.mPreviewLayout = (RelativeLayout)v.findViewById(R.id.card_preview_layout);
 			dataHolder.mOverLayPlay = (ImageView)v.findViewById(R.id.card_play);
 			dataHolder.mComments = (TextView)v.findViewById(R.id.card_status_comments);
 			dataHolder.mReviews = (TextView)v.findViewById(R.id.card_status_people);
@@ -279,7 +280,11 @@ public class CardView extends ScrollView {
 //			dataHolder.mESTDownloadStatus = (TextView) v.findViewById(R.id.card_eststatus_text);
 			
 			// fonts
-			
+			Random rnd = new Random();
+			int Low = 100;
+			int High = 196;
+	        int color = Color.argb(255, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low); 
+	        dataHolder.mPreviewLayout.setBackgroundColor(color);
 			
 			dataHolder.mTitle.setTypeface(FontUtil.Roboto_Medium);
 			dataHolder.mRentText.setTypeface(FontUtil.Roboto_Medium);
@@ -312,12 +317,7 @@ public class CardView extends ScrollView {
 			dataHolder.mTitle.setText(data.generalInfo.title);
 		}
 		
-		Random rnd = new Random();
-		int Low = 100;
-		int High = 196;
-		
-        int color = Color.argb(255, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low); 
-        dataHolder.mPreview.setBackgroundColor(color);
+
         dataHolder.mPreview.setImageBitmap(null);
 //		Log.e("CardView","Erasing "+position+" for "+dataHolder.mTitle.getText());
 		if(data.images != null){
@@ -326,7 +326,7 @@ public class CardView extends ScrollView {
 					if (imageItem.link != null && !(imageItem.link.compareTo("Images/NoImage.jpg") == 0)) {
 						dataHolder.mPreview.mImageUrl = imageItem.link;
 //						Log.d("CardExplorer","imageItem.link ="+imageItem.link+" profile = "+imageItem.profile);
-						CardImageLoader ImageLoader = new CardImageLoader(position);
+						CardImageLoader ImageLoader = new CardImageLoader(position,mContext);
 						ImageLoader.loadImage(dataHolder.mPreview);
 //						dataHolder.mPreview.setImageUrl(imageItem.link,MyVolley.getImageLoader());
 					}
@@ -353,26 +353,7 @@ public class CardView extends ScrollView {
 		}else{
 			dataHolder.mCommentsText.setText("0");
 		}
-		float price = 10000f;
-		if(data.packages == null){
-			dataHolder.mRentText.setText("free");
-		}else{
-			for(CardDataPackages packageitem:data.packages){
-				if(packageitem.priceDetails != null){
-					for(CardDataPackagePriceDetailsItem priceDetailItem:packageitem.priceDetails){
-						if(priceDetailItem.price < price){
-							price = priceDetailItem.price;
-						}
-					}
-					if(mRupeeCode == null){
-						mRupeeCode = mContext.getResources().getString(R.string.price_rupeecode); 
-					}
-					dataHolder.mRentText.setText(mPriceStarts + mRupeeCode + " "+price);
-				}else{
-					dataHolder.mRentText.setText("Free");
-				}
-			}	
-		}
+		
 //		int reqsize = (int) mContext.getResources().getDimension(R.dimen.margin_gap_24);
 //		reqsize = 40;
 //		 ShapeDrawable biggerCircle= new ShapeDrawable( new OvalShape());
@@ -392,7 +373,32 @@ public class CardView extends ScrollView {
 		dataHolder.mRentText.setTag(dataHolder);
 		dataHolder.mFavourite.setOnClickListener(mFavListener);
 		dataHolder.mFavourite.setTag(dataHolder);
-		updateDownloadStatus(data);
+		
+		float price = 10000f;
+		if(data.packages == null){
+			dataHolder.mRentText.setText("free");
+		}else{
+			if(data.currentUserData != null && data.currentUserData.purchase != null && data.currentUserData.purchase.size() != 0){
+				dataHolder.mRentText.setText("Watch now");
+			}else{
+				for(CardDataPackages packageitem:data.packages){
+					if(packageitem.priceDetails != null){
+						for(CardDataPackagePriceDetailsItem priceDetailItem:packageitem.priceDetails){
+							if(priceDetailItem.price < price){
+								price = priceDetailItem.price;
+							}
+						}
+						if(mRupeeCode == null){
+							mRupeeCode = mContext.getResources().getString(R.string.price_rupeecode); 
+						}
+						dataHolder.mRentText.setText(mPriceStarts + mRupeeCode + " "+price);
+					}else{
+						dataHolder.mRentText.setText("Free");
+					}
+				}	
+			}
+		}
+//		updateDownloadStatus(data);
 	}
 	public void show() {
 		mCardsLayout.updateCardsPosition(getScrollY());

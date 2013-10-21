@@ -77,6 +77,9 @@ public class NavigationOptionsMenuAdapter extends BaseAdapter {
 		v = mInflater.inflate(menu.mResourceLayoutId, null);
 		if (menu.mResourceLayoutId == R.layout.navigation_menuitemlarge) {
 			NetworkImageView image = (NetworkImageView) v.findViewById(R.id.drawer_list_item_image);
+			TextView text = (TextView) v.findViewById(R.id.drawer_list_item_text);
+			text.setTypeface(FontUtil.Roboto_Light);
+			text.setText(menu.mLabel);
 			image.setDefaultImageResId(menu.mDefaultResId);
 			image.setImageUrl(menu.mIconUrl, MyVolley.getImageLoader());
 			if(!myplexapplication.getUserProfileInstance().getName().equalsIgnoreCase("Guest"))
@@ -85,7 +88,7 @@ public class NavigationOptionsMenuAdapter extends BaseAdapter {
 			TextView text = (TextView) v.findViewById(R.id.drawer_list_item_text);
 			ImageView image = (ImageView) v.findViewById(R.id.drawer_list_item_image);
 			text.setText(menu.mLabel);
-			text.setTypeface(FontUtil.Roboto_Regular);
+			text.setTypeface(FontUtil.Roboto_Light);
 			image.setImageResource(menu.mDefaultResId);
 		}
 		return v;

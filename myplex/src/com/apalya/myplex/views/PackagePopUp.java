@@ -3,12 +3,17 @@ package com.apalya.myplex.views;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RadioButton;
@@ -19,15 +24,19 @@ import android.widget.Space;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.apalya.myplex.LoginActivity;
 import com.apalya.myplex.R;
+import com.apalya.myplex.SubscriptionView;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDataCertifiedRatingsItem;
 import com.apalya.myplex.data.CardDataPackagePriceDetailsItem;
 import com.apalya.myplex.data.CardDataPackages;
 import com.apalya.myplex.data.CardDataPromotionDetailsItem;
+import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FontUtil;
 
 public class PackagePopUp {
+	private String TAG  = "PackagePopUp";
 	private PopupWindow mFilterMenuPopupWindow = null;
 	private List<PopupWindow> mFilterMenuPopupWindowList = new ArrayList<PopupWindow>();
 	private Context mContext;
@@ -60,6 +69,7 @@ public class PackagePopUp {
 		mPaymentModeHeading.setVisibility(View.INVISIBLE);
 		mPaymentModeGroup = (RadioGroup)v.findViewById(R.id.purchasepopup_selectedpaymentmodegroup);
 		mPaymentModeGroup.setVisibility(View.INVISIBLE);
+		
 		
 		addPack(data,susblayout);
 		showPopup(v,anchorView);
@@ -96,22 +106,32 @@ public class PackagePopUp {
 					paymentModeText.setTypeface(FontUtil.Roboto_Medium);
 					paymentModeText.setText(priceItem.name);
 					mPaymentModeGroup.addView(paymentModeItem);
-					count++;
 					paymentModeItem.setId(count);
+					count++;
 					paymentModeItem.setTag(packageitem);
 					paymentModeItem.setOnClickListener(new OnClickListener() {
-						
+
 						@Override
 						public void onClick(View arg0) {
-							if(arg0.getTag() instanceof CardDataPackages){
-								CardDataPackages packageitem = (CardDataPackages)arg0.getTag();
-								int id = arg0.getId();
-								Toast.makeText(mContext, "Selected "+packageitem.priceDetails.get(arg0.getId()).name+" for the pack "+packageitem.packageName, Toast.LENGTH_SHORT).show();	
+							try {
+								if(arg0.getTag() instanceof CardDataPackages){
+									CardDataPackages packageitem = (CardDataPackages)arg0.getTag();
+									int id = arg0.getId();
+									CardDataPackagePriceDetailsItem priceItem = packageitem.priceDetails.get(id);
+									String requestUrl = ConsumerApi.getSusbcriptionRequesr(priceItem.paymentChannel, packageitem.packageId);
+									Log.e(TAG, "RequestURL = "+requestUrl);
+									Intent i = new Intent(mContext,SubscriptionView.class);
+									Bundle b = new Bundle();
+									b.putString("url", requestUrl);
+									i.putExtras(b);
+									((Activity) mContext).startActivityForResult(i, ConsumerApi.SUBSCRIPTIONREQUEST);
+									dismissFilterMenuPopupWindow();
+								}
+							} catch (Exception e) {
+								// TODO: handle exception
 							}
-							
 						}
 					});
-				
 				}
 			}
 		}

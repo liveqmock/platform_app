@@ -5,8 +5,8 @@
 
     <ImageView
         android:id="@+id/drawer_list_item_image"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         
         android:layout_gravity="center_vertical"
         android:scaleType="centerInside"
@@ -16,13 +16,11 @@
         android:id="@+id/drawer_list_item_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:minHeight="?android:attr/listPreferredItemHeightSmall"
+        android:layout_gravity="center_vertical"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:text="Settings"
         android:textSize="@dimen/textsize_16"
-        android:textAppearance="?android:attr/textAppearanceListItemSmall"
         android:textColor="#fff" />
 
 </LinearLayout>
