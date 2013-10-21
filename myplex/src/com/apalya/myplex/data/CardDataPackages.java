@@ -10,7 +10,7 @@ public class CardDataPackages {
 	public boolean couponFlag;
 	public String contentId;
 	public String packageName;
-	public List<CardDataPromotionDetails> promotionDetails;
+	public List<CardDataPromotionDetailsItem> promotionDetails;
 	public String bbDescription;
 	public String packageId;
 	public String duration;

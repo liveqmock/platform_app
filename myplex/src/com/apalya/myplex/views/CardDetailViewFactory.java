@@ -9,6 +9,8 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.EditorInfo;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -30,9 +32,13 @@ import com.apalya.myplex.data.CardDataRelatedCastItem;
 import com.apalya.myplex.data.CardDataUserReviewsItem;
 import com.apalya.myplex.data.CardDetailBaseData;
 import com.apalya.myplex.data.CardDetailMultiMediaGroup;
+import com.apalya.myplex.data.CardResponseData;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.CardImageLoader;
 import com.apalya.myplex.utils.CircleImageLoader;
+import com.apalya.myplex.utils.ConsumerApi;
+import com.apalya.myplex.utils.FetchCardField;
+import com.apalya.myplex.utils.FetchCardField.FetchComplete;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MessagePost;
 import com.apalya.myplex.utils.MessagePost.MessagePostCallback;
@@ -148,14 +154,14 @@ public class CardDetailViewFactory {
 
 	public static final int  COMMENTSECTION_COMMENTS = 101;
 	public static final int COMMENTSECTION_REVIEW = 102;
-	private void fillCommentSectionData(int type,int numberofItems,LinearLayout layout){
-		if(mData.comments == null){return ;}
-		if(mData.comments.values == null ){return ;}
-		if(mData.comments.values.size() == 0){return ;}
-		layout.removeAllViews();
+	private void fillCommentSectionData(int type,int numberofItems,CardData card){
+		if(card.comments == null){return ;}
+		if(card.comments.values == null ){return ;}
+		if(card.comments.values.size() == 0){return ;}
+		mCommentContentLayout.removeAllViews();
 		int count = 0;
 		if(type == COMMENTSECTION_COMMENTS){
-			for(CardDataCommentsItem commentsItem:mData.comments.values){
+			for(CardDataCommentsItem commentsItem:card.comments.values){
 				count++;
 				if(count > numberofItems && numberofItems != -1){
 					break;
@@ -173,10 +179,10 @@ public class CardDetailViewFactory {
 				commentMessage.setText(commentsItem.comment);
 				commentMessage.setTypeface(FontUtil.Roboto_Regular);
 	//			addSpace(layout, 16);
-				layout.addView(child);
+				mCommentContentLayout.addView(child);
 			}
 		}else if(type == COMMENTSECTION_REVIEW){
-			for(CardDataUserReviewsItem reviewItem:mData.userReviews.values){
+			for(CardDataUserReviewsItem reviewItem:card.userReviews.values){
 				count++;
 				if(count > numberofItems && numberofItems != -1){
 					break;
@@ -194,10 +200,11 @@ public class CardDetailViewFactory {
 				commentMessage.setText(reviewItem.review);
 				commentMessage.setTypeface(FontUtil.Roboto_Regular);
 	//			addSpace(layout, 16);
-				layout.addView(child);
+				mCommentContentLayout.addView(child);
 			}
 		}
 	}
+	private LinearLayout mCommentContentLayout;
 	private View createCommentsView(final int type) {
 		mComments = null;
 //		if(mData.comments == null){return null;}
@@ -207,13 +214,13 @@ public class CardDetailViewFactory {
 		if(mContext.getResources().getBoolean(R.bool.isTablet)){
 			v.setBackgroundResource(0);
 		}
-		final LinearLayout layout = (LinearLayout)v.findViewById(R.id.carddetailcomment_contentlayout);
-		mComments = layout;
-		addSpace(layout, (int)mContext.getResources().getDimension(R.dimen.margin_gap_16));
+		mCommentContentLayout = (LinearLayout)v.findViewById(R.id.carddetailcomment_contentlayout);
+		mComments = mCommentContentLayout;
+		addSpace(mCommentContentLayout, (int)mContext.getResources().getDimension(R.dimen.margin_gap_16));
 		if(type == CARDDETAIL_COMMENTS){
-			fillCommentSectionData(COMMENTSECTION_COMMENTS,-1,layout);
+			fillCommentSectionData(COMMENTSECTION_COMMENTS,-1,mData);
 		}else{
-			fillCommentSectionData(COMMENTSECTION_COMMENTS,10,layout);
+			fillCommentSectionData(COMMENTSECTION_COMMENTS,10,mData);
 		}
 	
 		LinearLayout commentLayout = (LinearLayout)v.findViewById(R.id.carddetailcomment_commentlayout);
@@ -264,9 +271,9 @@ public class CardDetailViewFactory {
 				editBox.setOnClickListener(null);
 				
 				if(type == CARDDETAIL_COMMENTS){
-					fillCommentSectionData(COMMENTSECTION_COMMENTS,-1,layout);
+					fillCommentSectionData(COMMENTSECTION_COMMENTS,-1,mData);
 				}else{
-					fillCommentSectionData(COMMENTSECTION_COMMENTS,10,layout);
+					fillCommentSectionData(COMMENTSECTION_COMMENTS,10,mData);
 				}
 			}
 		});
@@ -284,38 +291,45 @@ public class CardDetailViewFactory {
 				editBox.setHint(R.string.carddetailcommentsection_editreview);
 				editBox.setOnClickListener(mRateListener);
 				if(type == CARDDETAIL_COMMENTS){
-					fillCommentSectionData(COMMENTSECTION_REVIEW,-1,layout);
+					fillCommentSectionData(COMMENTSECTION_REVIEW,-1,mData);
 				}else{
-					fillCommentSectionData(COMMENTSECTION_REVIEW,10,layout);
+					fillCommentSectionData(COMMENTSECTION_REVIEW,10,mData);
 				}
 			}
 		});
 		
 		
-		ImageView image = (ImageView)v.findViewById(R.id.carddetailcomment_expand);
-		if(mContext.getResources().getBoolean(R.bool.isTablet)){
-			image.setVisibility(View.INVISIBLE);
-		}
-		
-		if(type == CARDDETAIL_COMMENTS){
-			image.setImageResource(R.drawable.iconup);
-		}else{
-			image.setImageResource(R.drawable.icondown);
-		}
-		image.setOnClickListener(new OnClickListener() {
+		mCommentRefresh = (ImageView)v.findViewById(R.id.carddetailcomment_expand);
+//		if(type == CARDDETAIL_COMMENTS){
+//			image.setImageResource(R.drawable.iconup);
+//		}else{
+//			image.setImageResource(R.drawable.icondown);
+//		}
+		mCommentRefresh.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				if(mCardExpandListener != null){
-					if(type == CARDDETAIL_COMMENTS){
-						mCardExpandListener.onCommentsCollapsed();
-					}else{
-						mCardExpandListener.onCommentsExpanded();
-					}
-				}				
+				refreshSection(type);
+//				if(mCardExpandListener != null){
+//					if(type == CARDDETAIL_COMMENTS){
+//						mCardExpandListener.onCommentsCollapsed();
+//					}else{
+//						mCardExpandListener.onCommentsExpanded();
+//					}
+//				}				
 			}
 		});
+		refreshSection(COMMENTSECTION_COMMENTS);
 		return v;
+	}
+	private ImageView mCommentRefresh;
+	private void rotateRefresh(){
+		 Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.rotate);
+		 mCommentRefresh.startAnimation(animation);
+	}
+	private void stopRefresh(){
+		 Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.stoprotate);
+		 mCommentRefresh.startAnimation(animation);
 	}
 	private OnClickListener mRateListener = new OnClickListener() {
 		
@@ -329,7 +343,7 @@ public class CardDetailViewFactory {
 				public void sendMessage(boolean status) {
 					if(status){
 						Toast.makeText(mContext, "Review has posted successfully.", Toast.LENGTH_SHORT).show();
-						refreshCommentSection();
+						refreshSection(COMMENTSECTION_REVIEW);
 					}else{
 						Toast.makeText(mContext, "Unable to post your review.", Toast.LENGTH_SHORT).show();
 					}
@@ -338,7 +352,27 @@ public class CardDetailViewFactory {
 			}, mData);
 		}
 	};
-	private void refreshCommentSection() {
+	private void refreshSection(final int type) {
+		rotateRefresh();
+		String FieldName = new  String();
+		if(type == COMMENTSECTION_COMMENTS){
+			FieldName = ConsumerApi.FIELD_COMMENTS;
+		}else{
+			FieldName = ConsumerApi.FIELD_USERREVIEWS;
+		}
+		FetchCardField fetch = new FetchCardField();
+		fetch.Fetch(mData, FieldName, new FetchComplete() {
+			
+			@Override
+			public void response(CardResponseData data) {
+				stopRefresh();
+				if(data == null){return;}
+				if(data.results == null){return;}
+				if(data.results.size() == 0 ){return;}
+				CardData cardData = data.results.get(0);
+				fillCommentSectionData(type,-1,cardData);
+			}
+		});
 		
 	}
 	private void sendMessage(String searchText,int rating,int messageType) {
@@ -349,7 +383,7 @@ public class CardDetailViewFactory {
 			public void sendMessage(boolean status) {
 				if(status){
 					Toast.makeText(mContext, "Comment has posted successfully.", Toast.LENGTH_SHORT).show();
-					refreshCommentSection();
+					refreshSection(COMMENTSECTION_COMMENTS);
 				}else{
 					Toast.makeText(mContext, "Unable to post your comment.", Toast.LENGTH_SHORT).show();
 				}

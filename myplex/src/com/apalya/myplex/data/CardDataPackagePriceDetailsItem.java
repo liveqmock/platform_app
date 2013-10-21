@@ -7,5 +7,6 @@ public class CardDataPackagePriceDetailsItem {
 	public String paymentChannel;
 	public boolean doubleConfirmation;
 	public boolean webBased;
+	public String name;
 	public CardDataPackagePriceDetailsItem(){}
 }

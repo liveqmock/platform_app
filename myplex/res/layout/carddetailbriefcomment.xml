@@ -17,13 +17,7 @@
             android:id="@+id/carddetailcomment_expand"
             android:layout_width="@dimen/size_24"
             android:layout_height="@dimen/size_24"
-            android:src="@drawable/icondown" />
-
-        <ProgressBar
-            android:id="@+id/carddetailcomment_expand_progress"
-            android:layout_width="@dimen/size_24"
-            android:layout_height="@dimen/size_24"
-            android:visibility="invisible" />
+            android:src="@drawable/iconrefresh" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -102,6 +96,7 @@
                 android:layout_width="@dimen/size_24"
                 android:layout_height="@dimen/size_24"
                 android:layout_marginRight="@dimen/margin_gap_6"
+                android:layout_marginLeft="@dimen/margin_gap_6"
                 android:src="@drawable/card_iconheart" />
 
             <TextView

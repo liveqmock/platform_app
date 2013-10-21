@@ -12,6 +12,9 @@ public class ConsumerApi {
 	public static final String CONTENTDETAILS_ACTION = "contentDetail";
 	public static final String COMMENT_TAG= "comment";
 	public static final String RATING_TAG= "rating";
+	public static final String FIELD_COMMENTS = "comments";
+	public static final String FIELD_USERREVIEWS = "userReviews";
+	public static final String FIELD_VIDEOS = "videos";
 	public static final String CONTENT_CONTEXT = "content/v2";
 	public static final String USER_CONTEXT = "user/v2";
 	public static final String SCHEME = "http://";
@@ -22,7 +25,6 @@ public class ConsumerApi {
 	public static final String CLIENTKEY = "clientKey=";
 	public static final String LEVEL = "level=";
 	public static final String FIELDS = "fields=";
-	public static final String VIDEOS = "videos";
 	public static final String STARTLETTER = "startLetter=";
 	public static final String QUALIFIERS = "qualifier=";
 	public static final String STARTINDEX = "startIndex=";
@@ -100,7 +102,7 @@ public class ConsumerApi {
 	public static String getVideosDetail(String contentID){
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH + CONTENTDETAILS_ACTION
 				+ SLASH + contentID + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY  + AMPERSAND
-		        + FIELDS + VIDEOS;
+		        + FIELDS + FIELD_VIDEOS;
 	}
 	public static String getBillingMode(String contentID) {
 		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + BILLING_TAG
