@@ -19,6 +19,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.NetworkImageView;
@@ -87,6 +88,7 @@ public class CardTabletAdapater extends BaseAdapter{
 	}
 	private String mPriceStarts = "Starts from ";
 	private String mRupeeCode  = null;
+	private int cardColor = -1;
 	@Override
 	public View getView(int position, View v, ViewGroup parent) {
 		CardData data = mDataList.get(position);
@@ -99,6 +101,7 @@ public class CardTabletAdapater extends BaseAdapter{
 			dataHolder.mDelete = (TextView)v.findViewById(R.id.card_title_delete);
 			dataHolder.mFavourite = (TextView)v.findViewById(R.id.card_title_fav);
 			dataHolder.mPreview = (CardImageView)v.findViewById(R.id.card_preview_image);
+			dataHolder.mPreviewLayout = (RelativeLayout)v.findViewById(R.id.card_preview_layout);
 			dataHolder.mOverLayPlay = (ImageView)v.findViewById(R.id.card_play);
 			dataHolder.mComments = (TextView)v.findViewById(R.id.card_status_comments);
 			dataHolder.mReviews = (TextView)v.findViewById(R.id.card_status_people);
@@ -107,6 +110,8 @@ public class CardTabletAdapater extends BaseAdapter{
 //			dataHolder.mRentLayout = (LinearLayout)v.findViewById(R.id.card_rent_layout);
 			dataHolder.mRentText = (TextView)v.findViewById(R.id.card_rent_text);
 			dataHolder.mFavProgressBar = (ProgressBar) v.findViewById(R.id.card_title_fav_progress);
+			
+			
 			
 			// fonts
 			
@@ -133,6 +138,11 @@ public class CardTabletAdapater extends BaseAdapter{
 		}else{
 			dataHolder = (CardDataHolder)v.getTag();
 		}
+		Random rnd = new Random();
+		int Low = 100;
+		int High = 196;
+		cardColor = Color.argb(255, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low);
+        dataHolder.mPreviewLayout.setBackgroundColor(cardColor);
 		v.setId(position);
 		dataHolder.mDataObject = data;
 		dataHolder.mPreview.mCardId = position;
@@ -145,14 +155,6 @@ public class CardTabletAdapater extends BaseAdapter{
 			dataHolder.mTitle.setText(data.generalInfo.title);
 		}
 		
-		Random rnd = new Random();
-		int Low = 100;
-		int High = 196;
-		
-//        int color = Color.argb(255, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low); 
-//        dataHolder.mPreview.setBackgroundColor(color);
-//        dataHolder.mPreview.setImageBitmap(null);
-		Log.e("CardView","Erasing "+position+" for "+dataHolder.mTitle.getText());
 		if(data.images != null){
 			for(CardDataImagesItem imageItem:data.images.values){
 				if(imageItem.profile != null && imageItem.profile.equalsIgnoreCase("xxhdpi")){
@@ -171,8 +173,10 @@ public class CardTabletAdapater extends BaseAdapter{
 		dataHolder.mFavourite.setVisibility(View.VISIBLE);
 		if(data.currentUserData != null && data.currentUserData.favorite){
 			dataHolder.mFavourite.setText(R.string.card_filledheart);
+			dataHolder.mFavourite.setTextColor(Color.parseColor("#58b4e5"));
 		}else{
-			dataHolder.mFavourite.setText(R.string.card_heart);
+			dataHolder.mFavourite.setText(R.string.card_filledheart);
+			dataHolder.mFavourite.setTextColor(Color.parseColor("#000000"));
 		}
 		if(data.userReviews != null){
 			dataHolder.mReviewsText.setText(""+data.userReviews.values.size());	
@@ -184,35 +188,7 @@ public class CardTabletAdapater extends BaseAdapter{
 		}else{
 			dataHolder.mCommentsText.setText("0");
 		}
-		float price = 10000f;
-		if(data.packages == null){
-			dataHolder.mRentText.setText("free");
-		}else{
-			for(CardDataPackages packageitem:data.packages){
-				if(packageitem.priceDetails != null){
-					for(CardDataPackagePriceDetailsItem priceDetailItem:packageitem.priceDetails){
-						if(priceDetailItem.price < price){
-							price = priceDetailItem.price;
-						}
-					}
-					if(mRupeeCode == null){
-						mRupeeCode = mContext.getResources().getString(R.string.price_rupeecode); 
-					}
-					dataHolder.mRentText.setText(mPriceStarts + mRupeeCode + " "+price);
-				}else{
-					dataHolder.mRentText.setText("Free");
-				}
-			}	
-		}
-//		int reqsize = (int) mContext.getResources().getDimension(R.dimen.margin_gap_24);
-//		reqsize = 40;
-//		 ShapeDrawable biggerCircle= new ShapeDrawable( new OvalShape());
-//	        biggerCircle.setIntrinsicHeight( reqsize );
-//	        biggerCircle.setIntrinsicWidth( reqsize);
-//	        biggerCircle.setBounds(new Rect(0, 0, reqsize, reqsize));
-//	        biggerCircle.getPaint().setColor(Color.BLUE);
-//
-//	        dataHolder.mOverLayPlay.setBackgroundDrawable(biggerCircle);
+		
 		dataHolder.mDelete.setOnClickListener(mDeleteListener);
 		dataHolder.mDelete.setTag(dataHolder);
 		dataHolder.mOverLayPlay.setOnClickListener(mOpenCardListener);
@@ -223,6 +199,34 @@ public class CardTabletAdapater extends BaseAdapter{
 		dataHolder.mRentText.setTag(dataHolder);
 		dataHolder.mFavourite.setOnClickListener(mFavListener);
 		dataHolder.mFavourite.setTag(dataHolder);
+		
+		float price = 10000f;
+		if(data.packages == null){
+			dataHolder.mRentText.setText("Free");
+			dataHolder.mRentText.setOnClickListener(null);
+		}else{
+			if(data.currentUserData != null && data.currentUserData.purchase != null && data.currentUserData.purchase.size() != 0){
+				dataHolder.mRentText.setText("Watch now");
+				dataHolder.mRentText.setOnClickListener(null);
+			}else{
+				for(CardDataPackages packageitem:data.packages){
+					if(packageitem.priceDetails != null){
+						for(CardDataPackagePriceDetailsItem priceDetailItem:packageitem.priceDetails){
+							if(priceDetailItem.price < price){
+								price = priceDetailItem.price;
+							}
+						}
+						if(mRupeeCode == null){
+							mRupeeCode = mContext.getResources().getString(R.string.price_rupeecode); 
+						}
+						dataHolder.mRentText.setText(mPriceStarts + mRupeeCode + " "+price);
+					}else{
+						dataHolder.mRentText.setText("Free");
+						dataHolder.mRentText.setOnClickListener(null);
+					}
+				}	
+			}
+		}
 		return v;
 	}
 	private CardItemClickListener mDeleteListener = new CardItemClickListener() {

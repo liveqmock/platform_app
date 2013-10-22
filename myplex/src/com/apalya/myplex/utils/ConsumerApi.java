@@ -6,6 +6,7 @@ public class ConsumerApi {
 	public static final String TAG_ACTION = "tags";
 	public static final String CONTENT_TAG = "content";
 	public static final String FAVORITELIST_ACTION = "contentList/favorites";
+	public static final String PURCHASEDLIST_ACTION = "contentList/purchased";
 	public static final String FAVORITE_ACTION  = "favorite";
 	public static final String RECOMMENDATIONS_ACTION = "recommendations";
 	public static final String SIGN_OUT_ACTION = "signOut";
@@ -82,8 +83,15 @@ public class ConsumerApi {
 				+ QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY;
 	}
 	public static String getFavourites(String level,int startIndex) {
-		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + CONTENT_TAG + SLASH
+		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH  
 				+ FAVORITELIST_ACTION + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY
+				+  AMPERSAND + STARTINDEX
+				+ startIndex + AMPERSAND + LEVEL
+				+ level;
+	}
+	public static String getPurchases(String level,int startIndex) {
+		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH 
+				+ PURCHASEDLIST_ACTION + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY
 				+  AMPERSAND + STARTINDEX
 				+ startIndex + AMPERSAND + LEVEL
 				+ level;

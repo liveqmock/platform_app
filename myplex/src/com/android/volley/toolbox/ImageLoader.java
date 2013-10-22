@@ -19,6 +19,7 @@ import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.widget.ImageView;
 
 import com.android.volley.Request;
@@ -193,10 +194,13 @@ public class ImageLoader {
         // Try to look up the request in the cache of remote images.
         Bitmap cachedBitmap = mCache.getBitmap(cacheKey);
         if (cachedBitmap != null) {
+        	Log.d("ImageLoader","found image in cache for the url::"+cacheKey);
             // Return the cached bitmap.
             ImageContainer container = new ImageContainer(cachedBitmap, requestUrl, null, null);
             imageListener.onResponse(container, true);
             return container;
+        }else{
+        	 Log.e("ImageLoader","fetching image form server "+cacheKey);
         }
 
         // The bitmap did not exist in the cache, fetch it!
@@ -214,6 +218,7 @@ public class ImageLoader {
             return imageContainer;
         }
 
+       
         // The request is not already in flight. Send the new request to the network and
         // track it.
         Request<?> newRequest =
@@ -252,6 +257,7 @@ public class ImageLoader {
      */
     private void onGetImageSuccess(String cacheKey, Bitmap response) {
         // cache the image that was fetched.
+    	 Log.v("ImageLoader","saving bitmap in cache::"+cacheKey);
         mCache.putBitmap(cacheKey, response);
 
         // remove the request from the list of in-flight requests.

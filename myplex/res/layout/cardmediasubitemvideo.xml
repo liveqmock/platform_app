@@ -50,8 +50,8 @@
             android:layout_marginTop="@dimen/margin_gap_4"
             android:singleLine="true"
             android:text=""
-            android:textColor="#4b4b4b"
-            android:textSize="@dimen/textsize_16" />
+            android:textColor="#FFFFFF"
+            android:textSize="@dimen/textsize_14" />
     </RelativeLayout>
 
 </RelativeLayout>

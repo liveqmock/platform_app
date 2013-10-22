@@ -253,6 +253,7 @@ public class CardView extends ScrollView {
 		}
 		applyData(localv, index);
 	}
+	private int cardColor = -1;
 	public void applyData(View v, int position) {
 		if (v == null || !(position >= 0 && position < mNumberofItems)) {
 			return;
@@ -283,8 +284,10 @@ public class CardView extends ScrollView {
 			Random rnd = new Random();
 			int Low = 100;
 			int High = 196;
-	        int color = Color.argb(255, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low); 
-	        dataHolder.mPreviewLayout.setBackgroundColor(color);
+			if(cardColor == -1){
+				cardColor = Color.argb(255, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low);
+			}
+	        dataHolder.mPreviewLayout.setBackgroundColor(cardColor);
 			
 			dataHolder.mTitle.setTypeface(FontUtil.Roboto_Medium);
 			dataHolder.mRentText.setTypeface(FontUtil.Roboto_Medium);
@@ -319,7 +322,7 @@ public class CardView extends ScrollView {
 		
 
         dataHolder.mPreview.setImageBitmap(null);
-//		Log.e("CardView","Erasing "+position+" for "+dataHolder.mTitle.getText());
+//		Log.e(TAG,"Erasing "+position+" for "+dataHolder.mTitle.getText());
 		if(data.images != null){
 			for(CardDataImagesItem imageItem:data.images.values){
 				if(imageItem.profile != null && imageItem.profile.equalsIgnoreCase("xxhdpi")){
@@ -376,10 +379,12 @@ public class CardView extends ScrollView {
 		
 		float price = 10000f;
 		if(data.packages == null){
-			dataHolder.mRentText.setText("free");
+			dataHolder.mRentText.setText("Free");
+			dataHolder.mRentText.setOnClickListener(null);
 		}else{
 			if(data.currentUserData != null && data.currentUserData.purchase != null && data.currentUserData.purchase.size() != 0){
 				dataHolder.mRentText.setText("Watch now");
+				dataHolder.mRentText.setOnClickListener(null);
 			}else{
 				for(CardDataPackages packageitem:data.packages){
 					if(packageitem.priceDetails != null){
@@ -394,6 +399,7 @@ public class CardView extends ScrollView {
 						dataHolder.mRentText.setText(mPriceStarts + mRupeeCode + " "+price);
 					}else{
 						dataHolder.mRentText.setText("Free");
+						dataHolder.mRentText.setOnClickListener(null);
 					}
 				}	
 			}
@@ -401,6 +407,7 @@ public class CardView extends ScrollView {
 //		updateDownloadStatus(data);
 	}
 	public void show() {
+//		Log.e(TAG, "updateCardsPosition show =");
 		mCardsLayout.updateCardsPosition(getScrollY());
 	}
 	
@@ -432,7 +439,9 @@ public class CardView extends ScrollView {
 	
 	@Override
     protected void onScrollChanged(int x, int y, int oldX, int oldY) {
+		
 		if(!mMotionConsumedByClick){
+//			Log.e(TAG, "onScrollChanged show =");
 			mCardsLayout.updateCardsPosition(y);
 		}
 	}
@@ -452,7 +461,7 @@ public class CardView extends ScrollView {
 					View view = mCardsLayout.findCardViewAtPoint((int)ev.getRawX(), (int)ev.getRawY());
 					if (view != null) {
 			        	int i = view.getId();
-			        	Log.e("pref","onInterceptTouchEvent actioup");
+			        	Log.e(TAG,"onInterceptTouchEvent actioup");
 //			        	customSmoothScroll(getScrollX(), i * mCardPositions[1]);
 			        	smoothScrollTo(getScrollX(), i * mCardPositions[1]);
 					}
@@ -470,6 +479,7 @@ public class CardView extends ScrollView {
 		}
 	}
 	public void moveTo(int position){
+		Log.e(TAG, "moveTo =");
 		smoothScrollTo(getScrollX(), position * mCardPositions[1]);
 	}
 	private void customSmoothScroll(int dx,int dy){
@@ -500,7 +510,7 @@ public class CardView extends ScrollView {
 	    dx = Math.max(0, Math.min(scrollX + dx, maxX)) - scrollX;
 	    dy = Math.max(0, Math.min(scrollY + dy, maxY)) - scrollY;
  
-	    Log.e("pref","customSmoothScrollBy mScroller "+mScroller.isFinished());
+	    Log.e(TAG,"customSmoothScrollBy mScroller "+mScroller.isFinished());
 	    mScroller.startScroll(scrollX, scrollY, dx, dy, 1500);
 
 //        mScroller.startScroll(getScrollX(), scrollY, 0, dy,500);
@@ -520,7 +530,7 @@ public class CardView extends ScrollView {
 			if (ev.getAction() == MotionEvent.ACTION_MOVE) {
 				mMotionDetected = true;
 			} else if (ev.getAction() == MotionEvent.ACTION_UP) {
-				Log.e("pref","onTouchEvent actioup");
+				Log.e(TAG,"onTouchEvent actioup");
 //				if (mScroller.isFinished()) {
 //					customSmoothScroll(getScrollX(), mCardsLayout.getSnapPosition(getScrollY()));
 					smoothScrollTo(getScrollX(), mCardsLayout.getSnapPosition(getScrollY()));
@@ -737,6 +747,7 @@ class ViewReusePool {
 }
 
 class CardsLayout extends FrameLayout {
+    private static final String TAG = "CardView";
 	static final int TOP_CARDS = 0;
 	static final int TOP_CARD_VISIBLE_PT = 3;
 	
@@ -773,11 +784,11 @@ class CardsLayout extends FrameLayout {
 	void printTitle(View v,int i ){
 		if(v != null){
 			TextView txt = (TextView)v.findViewById(R.id.card_title_name);
-			Log.e("CardView", "title "+txt.getText()+" for the view "+i);
+			Log.e(TAG, "title "+txt.getText()+" for the view "+i);
 		}
 	}
 	void changeCardViewPosition(int i, int pos) {
-//		Log.e("CardView", "changeCardViewPosition i ="+i+" pos ="+getChildCount());
+//		Log.e(TAG, "changeCardViewPosition i ="+i+" pos ="+getChildCount());
 	    View cardView = mCardViewReusePool.findView(i);
 	    if (cardView == null) {
 	        cardView = mCardViewReusePool.reuseView(i);
@@ -792,9 +803,9 @@ class CardsLayout extends FrameLayout {
 	    cardView.layout(0, pos, getWidth(), (int)(pos + mAlterCardView.getCardHeight()));
         bringChildToFront(cardView);
 	}
-	
+	private boolean viewUpdated = false;
 	public void updateCardsPosition(int scrollOffset) {
-//		Log.e("CardView", "updateCardsPosition scrollOffset ="+scrollOffset);
+//		Log.e(TAG, "updateCardsPosition scrollOffset ="+scrollOffset);
 	    scrollOffset = Math.min(getContentHeight(), scrollOffset);
 	    scrollOffset = Math.max(0, scrollOffset);
 	    
@@ -819,6 +830,7 @@ class CardsLayout extends FrameLayout {
 	            break;
 	        }
 	    	changeCardViewPosition(i, scrollOffset + Math.round(y));
+	    	viewUpdated = true;
 	    }
 	    
 	    mCardViewReusePool.finishUpdate();
@@ -855,7 +867,11 @@ class CardsLayout extends FrameLayout {
 	
 	@Override
 	protected void onLayout(boolean changed, int l, int t, int r, int b) {
-		updateCardsPosition(mAlterCardView.getScrollY());
+		if(viewUpdated){
+//			Log.e(TAG, "onLayout show =");
+			updateCardsPosition(mAlterCardView.getScrollY());
+			viewUpdated = false;
+		}
 		if(sendViewReady){
 			mAlterCardView.viewReady();
 			sendViewReady = false;

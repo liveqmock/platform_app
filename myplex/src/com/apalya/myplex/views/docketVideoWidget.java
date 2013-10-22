@@ -137,9 +137,10 @@ public class docketVideoWidget implements PlayerListener{
 	}
 
 	@Override
-	public void onPlayerQualityClick() {
+	public void onFullScreen(boolean value) {
 		// TODO Auto-generated method stub
 		
 	}
+
 
 }

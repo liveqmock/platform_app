@@ -1,6 +1,7 @@
 
 package com.apalya.myplex.utils;
 
+import android.app.ActivityManager;
 import android.content.Context;
 
 import com.android.volley.RequestQueue;
@@ -15,7 +16,7 @@ import com.android.volley.toolbox.Volley;
  * 
  */
 public class MyVolley {
-    private static final int MAX_IMAGE_CACHE_ENTIRES  = 100;
+    private static int MAX_IMAGE_CACHE_ENTIRES  = 100;
     
     private static RequestQueue mRequestQueue;
     private static ImageLoader mImageLoader;
@@ -27,6 +28,10 @@ public class MyVolley {
 
 
     public static void init(Context context) {
+    	
+    	int memClass = ((ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE)).getMemoryClass();
+    	 // Use 1/8th of the available memory for this memory cache.
+    	MAX_IMAGE_CACHE_ENTIRES = 1024 * 1024 * memClass / 8;
         mRequestQueue = Volley.newRequestQueue(context);
         mImageLoader = new ImageLoader(mRequestQueue, new BitmapLruCache(MAX_IMAGE_CACHE_ENTIRES));
     }

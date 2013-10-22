@@ -90,16 +90,9 @@ public class MainActivity extends Activity implements MainBaseOptions {
 
 	NavigationOptionsMenuAdapter mNavigationAdapter;
 	
-
-	public void setLandscape(){
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-	}
 	@Override
-	public void setPotrait(){
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-	}
-	public void setSensor(){
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+	public void setOrientation(int value){
+		setRequestedOrientation(value);
 	}
 	@Override
 	public void hideActionBar(){
@@ -120,7 +113,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		mMenuItemList.add(new NavigationOptionsMenu(myplexapplication.getUserProfileInstance().getName(),
 				R.drawable.menu_profile, myplexapplication.getUserProfileInstance().getProfilePic(),NavigationOptionsMenuAdapter.CARDDETAILS_ACTION,R.layout.navigation_menuitemlarge));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FAVOURITE,R.drawable.iconfav, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu("Purchases",R.drawable.iconpurchases, null, NavigationOptionsMenuAdapter.NOACTION_ACTION,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.PURCHASES,R.drawable.iconpurchases, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.DOWNLOADS,R.drawable.icondnload, null, NavigationOptionsMenuAdapter.NOACTION_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu("Settings",R.drawable.iconsearch, null, NavigationOptionsMenuAdapter.NOACTION_ACTION,R.layout.navigation_menuitemsmall));
 		Session fbSession=Session.getActiveSession();
@@ -487,7 +480,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 			return;
 		}
 		case NavigationOptionsMenuAdapter.CARDDETAILS_ACTION: {
-if(mCurrentFragment!=mCardDetails)
+			if(mCurrentFragment!=mCardDetails)
 			{
 				mCardDetails = new CardDetails();
 				CardData profileData = new CardData();
@@ -533,6 +526,8 @@ if(mCurrentFragment!=mCardDetails)
 				data.searchQuery ="tvshows";
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.DOWNLOADS)){
 				data.requestType = CardExplorerData.REQUEST_DOWNLOADS;
+			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.PURCHASES)){
+				data.requestType = CardExplorerData.REQUEST_PURCHASES;
 			}
 			mCurrentFragment = mCardExplorer;
 			break;
@@ -664,7 +659,7 @@ if(mCurrentFragment!=mCardDetails)
 			mFilterMenuPopupWindow = null;
 		}
 	}
-
+	private Bitmap mOrginalBitmap;
 	private void addBlur(){
 		if(mCurrentFragment == null){return;}
 		if(mCurrentFragment.getView() == null){return;}
@@ -680,14 +675,16 @@ if(mCurrentFragment!=mCardDetails)
 			});
 			fadeAnim.start();
 			mCurrentFragment.getView().setDrawingCacheEnabled(true);
-			Bitmap orginalBitmap = mCurrentFragment.getView().getDrawingCache();
+			mOrginalBitmap = mCurrentFragment.getView().getDrawingCache();
 			Blur blur = new Blur();
 			Drawable bg = new ColorDrawable(Color.parseColor("#00000000"));
 			mPopBlurredLayout.setBackgroundDrawable(bg);
-			blur.fastblur(mContext, orginalBitmap, 12, new BlurResponse() {
+			blur.fastblur(mContext, mOrginalBitmap, 12, new BlurResponse() {
 				
 				@Override
 				public void BlurredBitmap(Bitmap b) {
+					mOrginalBitmap.recycle();
+					mOrginalBitmap  = null;
 					if( b == null || mFilterMenuPopup == null){return;}
 					Drawable d = new BitmapDrawable(b); 
 					mPopBlurredLayout.setBackgroundDrawable(d);
