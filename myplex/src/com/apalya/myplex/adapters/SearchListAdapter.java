@@ -166,7 +166,7 @@ public class SearchListAdapter extends BaseAdapter implements
 
 	@Override
 	public int getItemViewType(int position) {
-		if (mSearchDataList.get(position).isSection()) {
+		if (mSearchDataList !=null && mSearchDataList.size() > 0 && mSearchDataList.get(position).isSection()) {
 			return 1;
 		} else {
 			return 0;
