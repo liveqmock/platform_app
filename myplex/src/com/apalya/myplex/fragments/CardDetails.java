@@ -13,8 +13,10 @@ import android.support.v4.view.PagerAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.TranslateAnimation;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Space;
@@ -35,6 +37,7 @@ import com.apalya.myplex.data.CardExplorerData;
 import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.MyVolley;
+import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.views.CardDetailViewFactory;
 import com.apalya.myplex.views.CardDetailViewFactory.CardDetailViewFactoryListener;
 import com.apalya.myplex.views.CardVideoPlayer;
@@ -60,6 +63,7 @@ public class CardDetails extends BaseFragment implements
 
 	private CustomScrollView mScrollView;
 	private RelativeLayout mBottomActionBar;
+	private ImageView mShareButton;
 	
 	private boolean mDescriptionExpanded = false;
 	private int mDetailType = Profile;
@@ -88,6 +92,7 @@ public class CardDetails extends BaseFragment implements
 		rootView = inflater.inflate(R.layout.carddetails, container, false);
 		mScrollView = (CustomScrollView)rootView.findViewById(R.id.carddetail_scroll_view);
 		mBottomActionBar = (RelativeLayout)rootView.findViewById(R.id.carddetail_bottomactionbar);
+		mShareButton = (ImageView) rootView.findViewById(R.id.carddetail_share);
 		mScrollView.setDirectionListener(this);
 		RelativeLayout videoLayout = (RelativeLayout)rootView.findViewById(R.id.carddetail_videolayout);
 		mPlayer = new CardVideoPlayer(mContext, mCardData);
@@ -103,6 +108,16 @@ public class CardDetails extends BaseFragment implements
 			mMainActivity.updateActionBarTitle();
 		}
 		prepareContent();
+		
+		mShareButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Util.shareData(getContext(), 3, "", mCardData.generalInfo.title);
+			}
+		});
+		
 		return rootView;
 	}
 
