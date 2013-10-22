@@ -82,9 +82,9 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Util {
-	
-	
-	
+
+
+
 	public static int getStatusBarHeight(Context context) {
 		if(context == null){return 48;}
 		int result = 0;
@@ -397,15 +397,16 @@ public class Util {
 		});
 		set.start();
 	}
-	public static void shareData(Context mContext,int aType,String aPath,String aCaption){
+	public static void shareData(Context mContext,int aType,String aPath,String aTitle){
 		Intent sendIntent = new Intent();
 		sendIntent.setAction(Intent.ACTION_SEND);
 		//sendIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
-		sendIntent.putExtra(Intent.EXTRA_TEXT, aCaption);
+		String msg="Watching "+aTitle+" on myplex \n check it out on http://portal.myplex.in/ \n https://play.google.com/store/apps/details?id=tv.myplex.android";
+		sendIntent.putExtra(Intent.EXTRA_TEXT, msg);
 		if(aType==1)
 		{
-			//Uri picUri = Uri.fromFile(new File("/storage/sdcard0/DCIM/Camera/IMG_20131002_161648.jpg"));
 			Uri picUri = Uri.fromFile(new File(aPath));
+			//Uri picUri = Uri.parse(aPath);
 			sendIntent.setData(picUri);
 			sendIntent.setType("image/*");
 			sendIntent.putExtra(Intent.EXTRA_STREAM, picUri);
@@ -484,19 +485,19 @@ public class Util {
 		return inSampleSize;
 	}
 	public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
-	        int reqWidth, int reqHeight) {
+			int reqWidth, int reqHeight) {
 
-	    // First decode with inJustDecodeBounds=true to check dimensions
-	    final BitmapFactory.Options options = new BitmapFactory.Options();
-	    options.inJustDecodeBounds = true;
-	    BitmapFactory.decodeResource(res, resId, options);
+		// First decode with inJustDecodeBounds=true to check dimensions
+		final BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inJustDecodeBounds = true;
+		BitmapFactory.decodeResource(res, resId, options);
 
-	    // Calculate inSampleSize
-	    options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+		// Calculate inSampleSize
+		options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
 
-	    // Decode bitmap with inSampleSize set
-	    options.inJustDecodeBounds = false;
-	    return BitmapFactory.decodeResource(res, resId, options);
+		// Decode bitmap with inSampleSize set
+		options.inJustDecodeBounds = false;
+		return BitmapFactory.decodeResource(res, resId, options);
 	}
 	private static String TAG="GENERATE KEY";
 	private static Context mContext;
@@ -550,7 +551,7 @@ public class Util {
 			public void onResponse(String response) {
 				Log.d(TAG,"Response: "+response);
 				//Analytics.endTimedEvent("NEW-CLIENT-KEY-GENERATION");
-				
+
 				try {	
 					Log.d(TAG, "########################################################");
 					JSONObject jsonResponse= new JSONObject(response);
@@ -575,16 +576,16 @@ public class Util {
 						SharedPrefUtils.writeToSharedPref(mContext,
 								mContext.getString(R.string.devclientkeyexp), jsonResponse.getString("expiresAt"));
 
-						
+
 					}
 					else
 					{
-						
+
 						SharedPrefUtils.writeToSharedPref(mContext,
 								mContext.getString(R.string.devclientkey), "");
 						SharedPrefUtils.writeToSharedPref(mContext,
 								mContext.getString(R.string.devclientkeyexp), "");
-						
+
 						//Analytics.trackEvent("NEW-CLIENT-KEY-GENERATION-SERVER-ERROR");
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
@@ -597,53 +598,59 @@ public class Util {
 		};
 	}
 	public static void serializeData(Context context) {
-	    try {
-	    	String joinedDate;
-	    	joinedDate=myplexapplication.getUserProfileInstance().joinedDate;
-	    	String dir=context.getCacheDir().toString()+"/uprofile.dat";
-	    	 FileOutputStream fStream = new FileOutputStream(context.getCacheDir()+"/uprofile.dat");
-	    	//FileOutputStream fStream = context.openFileOutput("downloaddetails.dat", Context.MODE_PRIVATE) ;
-	        ObjectOutputStream oStream = new ObjectOutputStream(fStream);
+		try {
+			String joinedDate;
+			joinedDate=myplexapplication.getUserProfileInstance().joinedDate;
+			String dir=context.getCacheDir().toString()+"/uprofile.dat";
+			FileOutputStream fStream = new FileOutputStream(context.getCacheDir()+"/uprofile.dat");
+			//FileOutputStream fStream = context.openFileOutput("downloaddetails.dat", Context.MODE_PRIVATE) ;
+			ObjectOutputStream oStream = new ObjectOutputStream(fStream);
+			/*oStream.writeObject(myplexapplication.getUserProfileInstance().getName());
+			oStream.writeObject(myplexapplication.getUserProfileInstance().getProfilePic());*/
+			oStream.writeObject(joinedDate);    
+			List<CardData> cd=myplexapplication.getUserProfileInstance().lastVisitedCardData;
+			List<String> cardIds=new ArrayList<String>();
+			for(CardData data:cd)
+				cardIds.add(data._id);
+			oStream.writeObject(cardIds);
+			oStream.flush();
+			oStream.close();
 
-	        oStream.writeObject(joinedDate);    
-	        List<CardData> cd=myplexapplication.getUserProfileInstance().lastVisitedCardData;
-	        List<String> cardIds=new ArrayList<String>();
-	        for(CardData data:cd)
-	        	cardIds.add(data._id);
-	        oStream.writeObject(cardIds);
-	        oStream.flush();
-	        oStream.close();
-
-	        Log.v("Serialization success", "Success");
-	    } catch (Exception e) {
-	        Log.v("IO Exception", e.getMessage());
-	    }
+			Log.v("Serialization success", "Success");
+		} catch (Exception e) {
+			Log.v("IO Exception", e.getMessage());
+		}
 	}  
 	public static void deserializeData(Context context){
 		File file=new File(context.getCacheDir(), "uprofile.dat");
 
-	    try {
+		try {
 
-	      FileInputStream fint = new FileInputStream(file);
-	      ObjectInputStream ois = new ObjectInputStream(fint);
-	      myplexapplication.getUserProfileInstance().joinedDate =(String) ois.readObject();
-	      //myplexapplication.getUserProfileInstance().lastVisitedCardData=(List<CardData>)  ois.readObject();
-	      List<String> cardIds=new ArrayList<String>();
-	      cardIds=(List<String>) ois.readObject();
-	      ois.close();
-	      for(String id:cardIds)
-	      {
-	    	  CardData cd=new CardData();
-	    	  cd._id=id;
-	    	  myplexapplication.getUserProfileInstance().lastVisitedCardData.add(cd);
-	      }
-	      
-	    }
-	      catch (Exception e) {
-	    	  e.printStackTrace(); 
-	    	  }
+			FileInputStream fint = new FileInputStream(file);
+			ObjectInputStream ois = new ObjectInputStream(fint);
+			/*String name =(String) ois.readObject();
+			myplexapplication.getUserProfileInstance().setName(name);
+			String pic =(String) ois.readObject();
+			myplexapplication.getUserProfileInstance().setProfilePic(pic);*/
+			myplexapplication.getUserProfileInstance().joinedDate =(String) ois.readObject();
+			//myplexapplication.getUserProfileInstance().lastVisitedCardData=(List<CardData>)  ois.readObject();
+			List<String> cardIds=new ArrayList<String>();
+			cardIds=(List<String>) ois.readObject();
+			ois.close();
+			for(String id:cardIds)
+			{
+				CardData cd=new CardData();
+				cd._id=id;
+				myplexapplication.getUserProfileInstance().lastVisitedCardData.add(cd);
+			}
+			LastWatchedCardDetails lastWatchedData=new LastWatchedCardDetails();
+			lastWatchedData.getLastWatchedCardDetails();
 		}
-	
-	
-	
+		catch (Exception e) {
+			e.printStackTrace(); 
+		}
+	}
+
+
+
 }

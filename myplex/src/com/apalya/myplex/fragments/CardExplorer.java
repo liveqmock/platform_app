@@ -12,6 +12,7 @@ import android.app.DownloadManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
@@ -122,6 +123,9 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		Log.d(TAG,"onCreateView");
+		if(isVisible()){
+			mMainActivity.addFilterData(new ArrayList<FilterMenudata>(), mFilterMenuClickListener);
+		}
 		mRootView = inflater.inflate(R.layout.cardbrowsing, container, false);
 		mCardView = (CardView) mRootView.findViewById(R.id.framelayout);
 		mGridView = (GridView)mRootView.findViewById(R.id.tabletview);
@@ -143,7 +147,9 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		mCardView.setActionBarHeight(getActionBar().getHeight());
 		mCardView.setCardActionListener(this);
 //		mMainActivity.setTitle("Home");
-		mMainActivity.setPotrait();
+		if(!mContext.getResources().getBoolean(R.bool.isTablet)){
+			mMainActivity.setOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		}
 		mMainActivity.setSearchBarVisibilty(View.VISIBLE);
 		mMainActivity.enableFilterAction(true);
 		delayedAction();
@@ -214,7 +220,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				cardList.add(card);
 			}
 			if(cardList.size() <= 0){
-				Util.showToast("No Downloads",getContext());
+				//Util.showToast("No Downloads",getContext());
 				return;
 			}
 			mCacheManager.getCardDetails(cardList,IndexHandler.OperationType.IDSEARCH,CardExplorer.this);
@@ -228,6 +234,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			requestUrl = ConsumerApi.getRecommendation(ConsumerApi.LEVELMIN,mData.mStartIndex);
 		}else if(mData.requestType == CardExplorerData.REQUEST_FAVOURITE){
 			requestUrl = ConsumerApi.getFavourites(ConsumerApi.LEVELMIN,mData.mStartIndex);
+		}else if(mData.requestType == CardExplorerData.REQUEST_PURCHASES){
+			requestUrl = ConsumerApi.getPurchases(ConsumerApi.LEVELMIN,mData.mStartIndex);
 		}
 		StringRequest myReg = new StringRequest(requestUrl, deviceMinSuccessListener(), responseErrorListener());
 		myReg.setShouldCache(true);
@@ -240,7 +248,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			@Override
 			public void onResponse(String response) {
 				try {
-//					Log.d(TAG,"server response "+response);
+					Log.d(TAG,"server response "+response);
 					updateText("parsing results");
 					CardResponseData minResultSet  =(CardResponseData) Util.fromJson(response, CardResponseData.class);
 					if(minResultSet.code != 200){
@@ -253,8 +261,10 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 					if(minResultSet.results.size() ==  0){showNoDataMessage();return;}
 					mCacheManager.getCardDetails(minResultSet.results,IndexHandler.OperationType.IDSEARCH,CardExplorer.this);
 				} catch (JsonParseException e) {
+					showNoDataMessage();
 					e.printStackTrace();
 				} catch (IOException e) {
+					showNoDataMessage();
 					e.printStackTrace();
 				}
 			}

@@ -37,6 +37,11 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.AnimationUtils;
+import android.view.animation.BounceInterpolator;
+import android.view.animation.LinearInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -87,7 +92,7 @@ import com.mixpanel.android.mpmetrics.MixpanelAPI;
 
 
 
-public class LoginActivity extends Activity implements OnClickListener, AccountUtils.AuthenticateCallback, GooglePlayServicesClient.ConnectionCallbacks,
+public class LoginActivity extends Activity implements OnClickListener, AccountUtils.AuthenticateCallback,Twitter11.TwitterAuthenticateCallback, GooglePlayServicesClient.ConnectionCallbacks,
 GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedListener {
 
 	private Button mFacebookButton,mGoogleLogin,mTwitterLogin;
@@ -108,7 +113,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 	public static final String EXTRA_FINISH_INTENT
 	= "com.google.android.iosched.extra.FINISH_INTENT";
 
-	
+
 	private static final String TWITTER_CONSUMER_KEY= "0ZHTN70CDo8JdwEKQWBag";
 	private static final String TWITTER_CONSUMER_SECRET= "hX13meHYmTHb07gt78lwKZG97YJgcx1FyOg8MDDhzo";
 
@@ -123,7 +128,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 	private static final int REQUEST_PLAY_SERVICES_ERROR_DIALOG = 103;
 
 	private static final String MIXPANEL_DISTINCT_ID_NAME = "Mixpanel Example $distinctid";
-	
+
 	private Account mChosenAccount;
 	private boolean mCancelAuth = false;
 	private boolean mAuthInProgress = false;
@@ -135,31 +140,33 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 	private MixpanelAPI mMixpanel;
 	private Twitter11 twitter11;
 	private static int scrollWidth;
+	private TranslateAnimation translateAnim;
+	private RelativeLayout backgroundScrollLayout;
 	
-	  /*
-     * In order for your app to receive push notifications, you will need to enable
-     * the Google Cloud Messaging for Android service in your Google APIs console. To do this:
-     *
-     * - Navigate to https://code.google.com/apis/console
-     * - Select "Services" from the menu on the left side of the screen
-     * - Scroll down until you see the row labeled "Google Cloud Messaging for Android"
-     * - Make sure the switch next to the service name says "On"
-     *
-     * To identify this application with your Google API account, you'll also need your sender id from Google.
-     * You can get yours by logging in to the Google APIs Console at https://code.google.com/apis/console
-     * Once you have logged in, your sender id will appear as part of the URL in your browser's address bar.
-     * The URL will look something like this:
-     *
-     *     https://code.google.com/apis/console/b/0/#project:256660625236
-     *                                                       ^^^^^^^^^^^^
-     *
-     * The twelve-digit number after 'project:' is your sender id. Paste it below (where you see "YOUR SENDER ID")
-     *
-     * There are also some changes you will need to make to your AndroidManifest.xml file to
-     * declare the permissions and receiver capabilities you'll need to get your push notifications working.
-     * You can take a look at this application's AndroidManifest.xml file for an example of what is needed.
-     */
-    public static final String ANDROID_PUSH_SENDER_ID = "317019093395";
+	/*
+	 * In order for your app to receive push notifications, you will need to enable
+	 * the Google Cloud Messaging for Android service in your Google APIs console. To do this:
+	 *
+	 * - Navigate to https://code.google.com/apis/console
+	 * - Select "Services" from the menu on the left side of the screen
+	 * - Scroll down until you see the row labeled "Google Cloud Messaging for Android"
+	 * - Make sure the switch next to the service name says "On"
+	 *
+	 * To identify this application with your Google API account, you'll also need your sender id from Google.
+	 * You can get yours by logging in to the Google APIs Console at https://code.google.com/apis/console
+	 * Once you have logged in, your sender id will appear as part of the URL in your browser's address bar.
+	 * The URL will look something like this:
+	 *
+	 *     https://code.google.com/apis/console/b/0/#project:256660625236
+	 *                                                       ^^^^^^^^^^^^
+	 *
+	 * The twelve-digit number after 'project:' is your sender id. Paste it below (where you see "YOUR SENDER ID")
+	 *
+	 * There are also some changes you will need to make to your AndroidManifest.xml file to
+	 * declare the permissions and receiver capabilities you'll need to get your push notifications working.
+	 * You can take a look at this application's AndroidManifest.xml file for an example of what is needed.
+	 */
+	public static final String ANDROID_PUSH_SENDER_ID = "317019093395";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -193,11 +200,11 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		// and identifying the user with that id as early as possible.
 		getActionBar().hide();
 		setContentView(R.layout.loginscreen);
-		
-		
-		
+
+
+
 		SharedPreferences prefs = getSharedPreferences("TWITTERTIME", 0);
-		twitter11= new Twitter11(this, R.string.app_name, prefs, TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET);
+		twitter11= new Twitter11(this,this, R.string.app_name, prefs, TWITTER_CONSUMER_KEY, TWITTER_CONSUMER_SECRET);
 
 		prepareSlideNotifiation();
 
@@ -206,82 +213,108 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		mGoogleLogin = (Button)findViewById(R.id.google);
 		mGoogleLogin.setOnClickListener(this);
 		mGoogleLogin.setTypeface(FontUtil.Roboto_Regular);
-		
+
 		mTwitterLogin = (Button)findViewById(R.id.twitter);
 		mTwitterLogin.setOnClickListener(this);
 		mTwitterLogin.setTypeface(FontUtil.Roboto_Regular);
-		
+
 
 		mFacebookButton = (Button) findViewById(R.id.fb);
 		mFacebookButton.setOnClickListener(this);
 		mFacebookButton.setTypeface(FontUtil.Roboto_Regular);
-		
+
 		ImageView img1= (ImageView)findViewById(R.id.imageView1);
-		ImageView img2= (ImageView)findViewById(R.id.imageView2);
+
+		img1.setImageResource(R.drawable.myplexbgimage);
+
+		/*		TranslateAnimation _translateAnimation = new TranslateAnimation(TranslateAnimation.ABSOLUTE, -1930f, TranslateAnimation.ABSOLUTE, 0f, TranslateAnimation.ABSOLUTE, 0f, TranslateAnimation.ABSOLUTE, 0f);
+		_translateAnimation.setDuration(5*1000);
+		_translateAnimation.setRepeatCount(-1);
+		_translateAnimation.setRepeatMode(Animation.REVERSE);
+		_translateAnimation.setInterpolator(new LinearInterpolator());
+		img1.setAnimation(_translateAnimation); */
+
+		/*ImageView img2= (ImageView)findViewById(R.id.imageView2);
 		ImageView img3= (ImageView)findViewById(R.id.imageView3);
 		ImageView img4= (ImageView)findViewById(R.id.imageView4);
 		ImageView img5= (ImageView)findViewById(R.id.imageView5);
 		ImageView img6= (ImageView)findViewById(R.id.imageView6);
-		
+
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 
 		final int height = dm.heightPixels;
 		final int width = dm.widthPixels;
-		
+
 		img1.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image1, width, height));
 		img2.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image2, width, height));
 		img3.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image3, width, height));
 		img4.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image4, width, height));
 		img5.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image5, width, height));
 		img6.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image6, width, height));
-		
+
 		img1.setScaleType(ScaleType.CENTER_INSIDE);
 		img2.setScaleType(ScaleType.CENTER_INSIDE);
 		img3.setScaleType(ScaleType.CENTER_INSIDE);
 		img4.setScaleType(ScaleType.CENTER_INSIDE);
 		img5.setScaleType(ScaleType.CENTER_INSIDE);
-		img6.setScaleType(ScaleType.CENTER_INSIDE);
-		
-		
-		final HorizontalScrollView parentScrollView= (HorizontalScrollView) findViewById(R.id.parentScrollview);
+		img6.setScaleType(ScaleType.CENTER_INSIDE);*/
+
+		DisplayMetrics dm = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+		final int height = dm.heightPixels;
+		final int width = dm.widthPixels;
+		final HorizontalScrollView parentScrollView= (HorizontalScrollView) findViewById(R.id.scrollView1);
 		parentScrollView.setOnTouchListener(new View.OnTouchListener() {
 
-	           
+
 			@Override
 			public boolean onTouch(View arg0, MotionEvent arg1) {
 				// TODO Auto-generated method stub
 				//parentScrollView.requestDisallowInterceptTouchEvent(false);
 				return true;
 			}
-            });
+		});
 		
 		ViewTreeObserver vto = parentScrollView.getViewTreeObserver();
+		
 		vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
-		    @Override
-		    public void onGlobalLayout() {
-		    	parentScrollView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-		    	scrollWidth=parentScrollView.getChildAt(0).getMeasuredWidth()-getWindowManager().getDefaultDisplay().getWidth();
-		    	//Util.showToast(Integer.toString(scrollWidth),LoginActivity.this);
-		        LinearLayout backgroundScrollLayout= (LinearLayout)findViewById(R.id.llayout);
-		        backgroundScrollLayout.clearAnimation();
-		        TranslateAnimation translateAnim = new TranslateAnimation(-scrollWidth,0, 0, 0);  
-		        translateAnim.setDuration(80000);   
-		        translateAnim.setRepeatCount(8);
-		        translateAnim.setRepeatMode(2);
-		        translateAnim.setFillEnabled(true);
-		        backgroundScrollLayout.startAnimation(translateAnim);
+			@Override
+			public void onGlobalLayout() {
+				parentScrollView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+				scrollWidth=parentScrollView.getChildAt(0).getMeasuredWidth()-getWindowManager().getDefaultDisplay().getWidth();
+				//Util.showToast(Integer.toString(scrollWidth),LoginActivity.this);
+				backgroundScrollLayout= (RelativeLayout)findViewById(R.id.relativeLayout1);
+				backgroundScrollLayout.clearAnimation();
+				
+				translateAnim = new TranslateAnimation(-scrollWidth,0,0,0); 
+				translateAnim.setDuration((scrollWidth/width)*scrollWidth*350);   
+				translateAnim.setRepeatCount(Animation.INFINITE);
+				translateAnim.setInterpolator(new LinearInterpolator());
+				translateAnim.setRepeatMode(2);
+				translateAnim.setFillBefore(true);
+				backgroundScrollLayout.startAnimation(translateAnim);
 
-		    }
+			}
 		});
-        
-	        
-        mLoginText=(TextView)findViewById(R.id.logintext);
-        mLoginText.setTypeface(FontUtil.Roboto_Regular);
-        
-        mLoginText.setOnClickListener(new OnClickListener() {
+
+		/*Animation animTranslation = new TranslateAnimation(Animation.RELATIVE_TO_SELF, -100.0f, Animation.RELATIVE_TO_SELF, 0f,
+				Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f);
+		animTranslation.setDuration(4000);
+		animTranslation.setRepeatMode(2);
+		animTranslation.setRepeatCount(Animation.INFINITE);
+		animTranslation.setInterpolator(new BounceInterpolator());
+		//img1.setAnimation(animTranslation);
+		img1.startAnimation(animTranslation);*/
+
+		mLoginText=(TextView)findViewById(R.id.logintext);
+		mLoginText.setTypeface(FontUtil.Roboto_Regular);
+
+		mLoginText.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				
 				ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(mLoginText, "alpha", 0.5f, 1f);
 				fadeAnim2.setDuration(300);
 				fadeAnim2.start();
@@ -294,11 +327,11 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 			}
 		});
-        
-        mSignupText=(TextView)findViewById(R.id.signuptext);
-        mSignupText.setTypeface(FontUtil.Roboto_Regular);
-        
-        mSignupText.setOnClickListener(new OnClickListener() {
+
+		mSignupText=(TextView)findViewById(R.id.signuptext);
+		mSignupText.setTypeface(FontUtil.Roboto_Regular);
+
+		mSignupText.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(mSignupText, "alpha", 0.5f, 1f);
@@ -314,7 +347,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		mLetMeIn=(TextView)findViewById(R.id.letmeinMsg);
 		mLetMeIn.setTypeface(FontUtil.Roboto_Regular);
 
-		
+
 
 		mLetMeIn.setOnClickListener(new OnClickListener() {
 			@Override
@@ -326,12 +359,12 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				mUserInfo.setName("Guest");
 				finish();
 				Util.launchMainActivity(LoginActivity.this);
-//				Util.launchActivity(MainActivity.class,LoginActivity.this , null);
+				//				Util.launchActivity(MainActivity.class,LoginActivity.this , null);
 
 			}
 		});
 
-	
+
 		Settings.addLoggingBehavior(LoggingBehavior.INCLUDE_ACCESS_TOKENS);
 		Session session = Session.getActiveSession();
 		if (session == null) {
@@ -362,7 +395,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				//showToast("Already Logged In");
 				finish();
 				Util.launchMainActivity(LoginActivity.this);
-//				Util.launchActivity(MainActivity.class,LoginActivity.this , null);
+				//				Util.launchActivity(MainActivity.class,LoginActivity.this , null);
 			}
 
 		}
@@ -373,12 +406,12 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 		if(AccountUtils.isAuthenticated(LoginActivity.this) )
 		{
-        	
-    		mPlusClient.connect();
-        	
+
+			mPlusClient.connect();
+
 		}
-        
-		
+
+
 		//Check if Keyboard is visible or not
 		//mRootLayout = findViewById(R.id.rootlayout);  
 
@@ -386,15 +419,15 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 
 	@Override
-    protected void onDestroy() {
-        super.onDestroy();
+	protected void onDestroy() {
+		super.onDestroy();
 
-        // To preserve battery life, the Mixpanel library will store
-        // events rather than send them immediately. This means it
-        // is important to call flush() to send any unsent events
-        // before your application is taken out of memory.
-        mMixpanel.flush();
-    }
+		// To preserve battery life, the Mixpanel library will store
+		// events rather than send them immediately. This means it
+		// is important to call flush() to send any unsent events
+		// before your application is taken out of memory.
+		mMixpanel.flush();
+	}
 	private void prepareSlideNotifiation() {
 		mSlideNotificationLayout = (RelativeLayout)findViewById(R.id.slidenotificationlayout);
 		mSlideNotificationText = (TextView)findViewById(R.id.slidenotificationtextview);
@@ -409,7 +442,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		});
 	}
 
-	
+
 
 
 	public void showSoftKeyboard(View view) {
@@ -612,50 +645,50 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		super.onResume();
 		Analytics.trackEvent("LOGIN-SCREEN-VIEWED");
 		long nowInHours = hoursSinceEpoch();
-        int hourOfTheDay = hourOfTheDay();
+		int hourOfTheDay = hourOfTheDay();
 
-        // For our simple test app, we're interested tracking
-        // when the user views our application.
+		// For our simple test app, we're interested tracking
+		// when the user views our application.
 
-        // It will be interesting to segment our data by the date that they
-        // first viewed our app. We use a
-        // superProperty (so the value will always be sent with the
-        // remainder of our events) and register it with
-        // registerSuperPropertiesOnce (so no matter how many times
-        // the code below is run, the events will always be sent
-        // with the value of the first ever call for this user.)
-        // all the change we make below are LOCAL. No API requests are made.
-        try {
-            JSONObject properties = new JSONObject();
-            properties.put("first viewed on", nowInHours);
-            properties.put("user domain", "(unknown)"); // default value
-            mMixpanel.registerSuperPropertiesOnce(properties);
-        } catch (JSONException e) {
-            throw new RuntimeException("Could not encode hour first viewed as JSON");
-        }
+		// It will be interesting to segment our data by the date that they
+		// first viewed our app. We use a
+		// superProperty (so the value will always be sent with the
+		// remainder of our events) and register it with
+		// registerSuperPropertiesOnce (so no matter how many times
+		// the code below is run, the events will always be sent
+		// with the value of the first ever call for this user.)
+		// all the change we make below are LOCAL. No API requests are made.
+		try {
+			JSONObject properties = new JSONObject();
+			properties.put("first viewed on", nowInHours);
+			properties.put("user domain", "(unknown)"); // default value
+			mMixpanel.registerSuperPropertiesOnce(properties);
+		} catch (JSONException e) {
+			throw new RuntimeException("Could not encode hour first viewed as JSON");
+		}
 
-        // Now we send an event to Mixpanel. We want to send a new
-        // "App Resumed" event every time we are resumed, and
-        // we want to send a current value of "hour of the day" for every event.
-        // As usual,all of the user's super properties will be appended onto this event.
-        try {
-            JSONObject properties = new JSONObject();
-            properties.put("hour of the day", hourOfTheDay);
-            mMixpanel.track("App Resumed", properties);
-        } catch(JSONException e) {
-            throw new RuntimeException("Could not encode hour of the day in JSON");
-        }
-        
-        CheckUserStatus();
-        
-       if(isAuthTwitter())
-        {
-        	finish();
-        	Util.launchMainActivity(LoginActivity.this);
-//			Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-//			LoginActivity.this.startActivity(intent);
-        }
-   	}
+		// Now we send an event to Mixpanel. We want to send a new
+		// "App Resumed" event every time we are resumed, and
+		// we want to send a current value of "hour of the day" for every event.
+		// As usual,all of the user's super properties will be appended onto this event.
+		try {
+			JSONObject properties = new JSONObject();
+			properties.put("hour of the day", hourOfTheDay);
+			mMixpanel.track("App Resumed", properties);
+		} catch(JSONException e) {
+			throw new RuntimeException("Could not encode hour of the day in JSON");
+		}
+
+		CheckUserStatus();
+
+		if(isAuthTwitter())
+		{
+			finish();
+			Util.launchMainActivity(LoginActivity.this);
+			//			Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+			//			LoginActivity.this.startActivity(intent);
+		}
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {     
@@ -703,7 +736,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			//showToast(tokenExpiry.toString());
 
 			showProgressBar();
-			
+
 			if(mProgressDialog!=null)
 				mProgressDialog.setMessage("Getting details from facebook....");
 
@@ -717,20 +750,20 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 						com.facebook.Response response) {
 					if(user!=null)
 					{
-					fbUserId=user.getId();
-					mUserInfo.setName(user.getName());
-					mUserInfo.setLoginStatus(true);
-					mUserInfo.setProfilePic("https://graph.facebook.com/"+fbUserId+"/picture?width=480&height=320");
-					
-					
-					Log.d(TAG, "Facebook User Id:   "+fbUserId);
-					Map<String, String> params = new HashMap<String, String>();
-					params.put("facebookId", fbUserId);
-					params.put("profile", "work");
-					params.put("authToken", token);
-					params.put("tokenExpiry", tokenExpiry.toGMTString());
-					params.put("clientKey",mDevInfo.getClientKey());
-					facebookLoginRequest(getString(R.string.fbloginpath), params);
+						fbUserId=user.getId();
+						mUserInfo.setName(user.getName());
+						mUserInfo.setLoginStatus(true);
+						mUserInfo.setProfilePic("https://graph.facebook.com/"+fbUserId+"/picture?width=480&height=320");
+
+
+						Log.d(TAG, "Facebook User Id:   "+fbUserId);
+						Map<String, String> params = new HashMap<String, String>();
+						params.put("facebookId", fbUserId);
+						params.put("profile", "work");
+						params.put("authToken", token);
+						params.put("tokenExpiry", tokenExpiry.toGMTString());
+						params.put("clientKey",mDevInfo.getClientKey());
+						facebookLoginRequest(getString(R.string.fbloginpath), params);
 					}
 					else
 					{
@@ -740,15 +773,15 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 							Util.showToast("No Internet Connection...", LoginActivity.this);	
 							finish();
 							Util.launchActivity(MainActivity.class, LoginActivity.this, null);
-							
+
 						}
 						else
 						{
 							Util.showToast(response.getError().getErrorMessage(), LoginActivity.this);
 						}
-						
+
 					}
-				
+
 				}
 			});
 			request.executeAsync();
@@ -764,9 +797,9 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 		Analytics.trackEvent("FACEBOOK-LOGIN-AUTH-REQUEST",true);
 		RequestQueue queue = MyVolley.getRequestQueue();
-		
+
 		if(mProgressDialog!=null)
-			mProgressDialog.setMessage("Logging using facebook....");
+			mProgressDialog.setMessage("Verifying credentials....");
 
 		String url=ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+ConsumerApi.USER_CONTEXT+ConsumerApi.SLASH+contextPath;
 		StringRequest myReq = new StringRequest(Method.POST,
@@ -830,7 +863,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 						//sendNotification(jsonResponse.getString("message"));
 						finish();
 						Util.launchMainActivity(LoginActivity.this);
-//						Util.launchActivity(MainActivity.class,LoginActivity.this , null);
+						//						Util.launchActivity(MainActivity.class,LoginActivity.this , null);
 
 					}
 					else
@@ -849,14 +882,14 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 						}
 						else
 						{
-							
+
 							Log.d(TAG, "code: "+jsonResponse.getString("code"));
 							Log.d(TAG, "message: "+jsonResponse.getString("message"));
-							
+
 							if(Session.getActiveSession()!=null)
 								Session.getActiveSession().close();
 						}
-						
+
 					}
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -903,13 +936,13 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			if(!AccountUtils.isAuthenticated(LoginActivity.this))
 			{
 				Analytics.trackEvent("GOOGLE-LOGIN-SELECTED");
-				
+
 				// Verifies the proper version of Google Play Services exists on the device.
-		        if(PlayServicesUtils.checkGooglePlaySevices(this))
-		        {
-				if(mPlusClient!=null)
-					mPlusClient.connect();
-		        }
+				if(PlayServicesUtils.checkGooglePlaySevices(this))
+				{
+					if(mPlusClient!=null)
+						mPlusClient.connect();
+				}
 			}
 		}
 		else if(view.getId()==R.id.twitter)
@@ -938,7 +971,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 	private void googleLoginRequest(String contextPath,
 			final Map<String, String> bodyParams) {
 		if(mProgressDialog!=null)
-			mProgressDialog.setMessage("Logging using google....");
+			mProgressDialog.setMessage("Verifying credentials....");
 		Analytics.trackEvent("GOOGLE-LOGIN-AUTH-REQUEST",true);
 
 		RequestQueue queue = MyVolley.getRequestQueue();
@@ -982,7 +1015,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				else
 				{
 					Log.d(TAG, error.toString());
-					
+
 				}
 				sendNotification(error.toString());
 				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
@@ -1014,8 +1047,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 						finish();
 						Util.launchMainActivity(LoginActivity.this);
-//						Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-//						LoginActivity.this.startActivity(intent);
+						//						Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+						//						LoginActivity.this.startActivity(intent);
 
 					}
 					else
@@ -1068,7 +1101,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		if(mProgressDialog!=null)
 			mProgressDialog.setMessage("Getting details from google....");
 		mPlusClient.loadPerson(this, "me");
-		
+
 	}
 
 	@Override
@@ -1161,7 +1194,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				}
 			}
 		} else {
-			
+
 			if (requestCode == MESSAGE_SENT ||
 					requestCode == TWITTER_CALLBACK)
 			{
@@ -1179,7 +1212,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 									Toast.makeText(LoginActivity.this, isAuthTwitter()? "Logged In" : "Not Logged In", Toast.LENGTH_SHORT).show();
 								}
 							});
-							
+
 						}else
 							Toast.makeText(this, data.getExtras().getString(Twitter11.COM_REPLY), Toast.LENGTH_SHORT).show();
 						break;
@@ -1194,8 +1227,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				super.onActivityResult(requestCode, resultCode, data);
 				Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);	
 			}
-			
-			
+
+
 		}
 	}
 	private boolean isAuthTwitter(){
@@ -1208,7 +1241,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		if (mPlusClient != null)
 			mPlusClient.disconnect();
 		if(Session.getActiveSession()!=null)
-		Session.getActiveSession().removeCallback(statusCallback);
+			Session.getActiveSession().removeCallback(statusCallback);
 
 		FlurryAgent.onEndSession(this);
 	}
@@ -1223,7 +1256,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				mUserInfo.setName(person.getName().getGivenName());
 				mUserInfo.setProfilePic("https://plus.google.com/s2/photos/profile/"+person.getId()+"?sz=480");
 				tryAuthenticate();
-				
+
 			}
 		} else {
 			Log.e(TAG, "Got " + connectionResult.getErrorCode() + ". Could not load plus profile.");
@@ -1238,7 +1271,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			{
 				Util.showToast("Can't establish a reliable connection to server, error code: "+String.valueOf(connectionResult.getErrorCode()), LoginActivity.this);
 			}
-			
+
 			/*if(!mPlusClient.isConnected())
 				mPlusClient.connect();*/
 		}
@@ -1274,26 +1307,26 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 	///////////////////////////////////////////////////////
 	private int hourOfTheDay() {
-        Calendar calendar = Calendar.getInstance();
-        return calendar.get(Calendar.HOUR_OF_DAY);
-    }
+		Calendar calendar = Calendar.getInstance();
+		return calendar.get(Calendar.HOUR_OF_DAY);
+	}
 
-    private long hoursSinceEpoch() {
-        Date now = new Date();
-        long nowMillis = now.getTime();
-        return nowMillis / 1000 * 60 * 60;
-    }
+	private long hoursSinceEpoch() {
+		Date now = new Date();
+		long nowMillis = now.getTime();
+		return nowMillis / 1000 * 60 * 60;
+	}
 
-    private String domainFromEmailAddress(String email) {
-        String ret = "";
-        int atSymbolIndex = email.indexOf('@');
-        if ((atSymbolIndex > -1) && (email.length() > atSymbolIndex)) {
-            ret = email.substring(atSymbolIndex + 1);
-        }
+	private String domainFromEmailAddress(String email) {
+		String ret = "";
+		int atSymbolIndex = email.indexOf('@');
+		if ((atSymbolIndex > -1) && (email.length() > atSymbolIndex)) {
+			ret = email.substring(atSymbolIndex + 1);
+		}
 
-        return ret;
-    }
-    protected void SetDeviceDetails() {
+		return ret;
+	}
+	protected void SetDeviceDetails() {
 
 		Log.d(TAG, "******************************************************************");
 
@@ -1327,9 +1360,9 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		mDevInfo.setSimState(mTelephonyMgr.getSimState());
 
 		Log.d(TAG, "******************************************************************");
-    }
-private boolean isTokenValid(String clientKeyExp) {
-		
+	}
+	private boolean isTokenValid(String clientKeyExp) {
+
 		//Util.showToast(clientKeyExp);
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
@@ -1356,7 +1389,7 @@ private boolean isTokenValid(String clientKeyExp) {
 
 	private void devRegRequest(String contextPath, final Map<String, String> bodyParams) {
 
-		
+
 		RequestQueue queue = MyVolley.getRequestQueue();
 
 		String url=ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+ConsumerApi.USER_CONTEXT+ConsumerApi.SLASH+contextPath;
@@ -1414,7 +1447,7 @@ private boolean isTokenValid(String clientKeyExp) {
 
 					if(jsonResponse.getString("status").equalsIgnoreCase("SUCCESS"))
 					{
-						
+
 						//Analytics.trackEvent("DEVICE-REGISTRATION-REQUEST-SUCCESS");
 						Log.d(TAG, "status: "+jsonResponse.getString("status"));
 						Log.d(TAG, "expiresAt: "+jsonResponse.getString("expiresAt"));
@@ -1427,13 +1460,13 @@ private boolean isTokenValid(String clientKeyExp) {
 						mDevInfo.setClientDeviceId(jsonResponse.getString("deviceId"));
 						mDevInfo.setClientKeyExp(jsonResponse.getString("expiresAt"));
 						Log.d(TAG, "---------------------------------------------------------");
-						
+
 						long nowinms=System.currentTimeMillis();
 						Date now=new Date(nowinms);
 						mUserInfo.joinedDate=now.toLocaleString();
 						mUserInfo.lastVisitedDate=now.toLocaleString();
 
-//						ConsumerApi.DEBUGCLIENTKEY = jsonResponse.getString("clientKey");
+						//						ConsumerApi.DEBUGCLIENTKEY = jsonResponse.getString("clientKey");
 
 						SharedPrefUtils.writeToSharedPref(LoginActivity.this,
 								getString(R.string.devclientkey), jsonResponse.getString("clientKey"));
@@ -1442,7 +1475,7 @@ private boolean isTokenValid(String clientKeyExp) {
 						SharedPrefUtils.writeToSharedPref(LoginActivity.this,
 								getString(R.string.devclientkeyexp), jsonResponse.getString("expiresAt"));
 
-						
+
 					}
 					else
 					{
@@ -1460,14 +1493,14 @@ private boolean isTokenValid(String clientKeyExp) {
 	private void CheckUserStatus(){
 
 		SetDeviceDetails();
-		
-		
+
+
 		ConsumerApi.DOMAIN=getString(R.string.domain_name);
-		
+
 		String clientKey=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
 				getString(R.string.devclientkey));
 		if(clientKey != null && clientKey.length() >10){
-//			ConsumerApi.DEBUGCLIENTKEY = clientKey;
+			//			ConsumerApi.DEBUGCLIENTKEY = clientKey;
 		}
 		String clientKeyExp=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
 				getString(R.string.devclientkeyexp));
@@ -1476,12 +1509,12 @@ private boolean isTokenValid(String clientKeyExp) {
 		if(clientKey!=null)
 		{
 			mUserInfo.firstVisitStatus=false;
-			
+
 			long nowinms=System.currentTimeMillis();
 			Date now=new Date(nowinms);
 			mUserInfo.lastVisitedDate=now.toLocaleString();
-			Util.deserializeData(LoginActivity.this);
-			
+
+
 			//Analytics.trackEvent("CLIENT-KEY-AVAILABLE");
 			//check if the client key is valid or not, if expired give generate key request
 			if(isTokenValid(clientKeyExp))
@@ -1495,16 +1528,16 @@ private boolean isTokenValid(String clientKeyExp) {
 
 				String username=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
 						getString(R.string.devusername));
-				
-				
+
+
 				//check if user is already logged in, if so take him to main screen or else login screen
 				if(username!=null)
 				{
 					finish();
 					Util.launchMainActivity(LoginActivity.this);
-//					Util.launchActivity(MainActivity.class,LoginActivity.this , null);
+					//					Util.launchActivity(MainActivity.class,LoginActivity.this , null);
 				}
-					
+
 			}
 			else
 			{
@@ -1521,7 +1554,7 @@ private boolean isTokenValid(String clientKeyExp) {
 		}
 		else
 		{
-			
+
 			mUserInfo.firstVisitStatus=true;
 			//Analytics.trackEvent("DEVICE-REGISTRATION-REQUEST",true);
 			Log.d(TAG, "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
@@ -1541,104 +1574,23 @@ private boolean isTokenValid(String clientKeyExp) {
 
 		}		
 	}
-	
-	/*private void genKeyRequest(String contextPath, final Map<String, String> bodyParams) {
-		RequestQueue queue = MyVolley.getRequestQueue();
 
-		String url=ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+ConsumerApi.USER_CONTEXT+ConsumerApi.SLASH+contextPath;
-		StringRequest myReq = new StringRequest(Method.POST,
-				url,
-				genKeyRegSuccessListener(),
-				genKeyRegErrorListener()) {
 
-			protected Map<String, String> getParams() throws com.android.volley.AuthFailureError {
-				Map<String, String> params = new HashMap<String, String>();
-				params=bodyParams;
-				return params;
-			};
-		};
-		Log.d(TAG,"Request sent ");
-		queue.add(myReq);
+	@Override
+	public void onTwitterLogin(String token, String secret) {
+		mUserInfo.setLoginStatus(true);
+
+		String clientKeyExp=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
+				getString(R.string.devclientkeyexp)); 
+
+		Log.d(TAG, "Twitter User Id:   "+mUserInfo.getUserId());
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("twitterId", mUserInfo.getUserId());
+		params.put("profile", "work");
+		params.put("authToken", token);
+		params.put("tokenExpiry",clientKeyExp);
+		params.put("clientKey",mDevInfo.getClientKey());
+		facebookLoginRequest("social/login/Twitter", params);
+
 	}
-
-	protected ErrorListener genKeyRegErrorListener() {
-		return new Response.ErrorListener() {
-			public void onErrorResponse(VolleyError error) {
-				//Analytics.endTimedEvent("NEW-CLIENT-KEY-GENERATION");
-				//Analytics.trackEvent("NEW-CLIENT-KEY-GENERATION-ERROR");
-				Log.d(TAG,"Error: "+error.toString());
-				if(error.toString().indexOf("NoConnectionError")>0)
-				{
-					//Util.showToast(getString(R.string.interneterr),LoginActivity.this);
-					//finish();
-					//Util.launchActivity(MainActivity.class,LoginActivity.this , null);
-
-				}
-				else
-				{
-					//Util.showToast(error.toString(),LoginActivity.this);	
-				}
-
-				Log.d(TAG, "@@@@@@@@@@@@@@@ LOGIN ACTIVITY @@@@@@@@@@@@@@@@@@@@");
-			}
-		};
-	}
-
-
-	protected Listener<String> genKeyRegSuccessListener() {
-		return new Response.Listener<String>() {
-			@Override
-			public void onResponse(String response) {
-				Log.d(TAG,"Response: "+response);
-				//Analytics.endTimedEvent("NEW-CLIENT-KEY-GENERATION");
-				
-				try {	
-					Log.d(TAG, "########################################################");
-					JSONObject jsonResponse= new JSONObject(response);
-
-					if(jsonResponse.getString("status").equalsIgnoreCase("SUCCESS"))
-					{
-						//Analytics.trackEvent("NEW-CLIENT-KEY-GENERATION-Success");
-						Log.d(TAG, "status: "+jsonResponse.getString("status"));
-						Log.d(TAG, "expiresAt: "+jsonResponse.getString("expiresAt"));
-						Log.d(TAG, "code: "+jsonResponse.getString("code"));
-						Log.d(TAG, "message: "+jsonResponse.getString("message"));
-						Log.d(TAG, "clientKey: "+jsonResponse.getString("clientKey"));
-						Log.d(TAG, "########################################################");
-						mDevInfo.setClientKey(jsonResponse.getString("clientKey"));
-						mDevInfo.setClientKeyExp(jsonResponse.getString("expiresAt"));
-						Log.d(TAG, "---------------------------------------------------------");
-
-
-
-						SharedPrefUtils.writeToSharedPref(LoginActivity.this,
-								getString(R.string.devclientkey), jsonResponse.getString("clientKey"));
-						SharedPrefUtils.writeToSharedPref(LoginActivity.this,
-								getString(R.string.devclientkeyexp), jsonResponse.getString("expiresAt"));
-
-						String username=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
-								getString(R.string.devusername));
-						
-						
-						if(username!=null)
-						{
-							finish();
-							Util.launchMainActivity(LoginActivity.this);
-//							Util.launchActivity(MainActivity.class,LoginActivity.this , null);
-						}
-						
-					}
-					else
-					{
-						//Analytics.trackEvent("NEW-CLIENT-KEY-GENERATION-SERVER-ERROR");
-						Log.d(TAG, "code: "+jsonResponse.getString("code"));
-						Log.d(TAG, "message: "+jsonResponse.getString("message"));
-						Util.showToast("Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),LoginActivity.this);
-					}
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}
-		};
-	}*/
 }

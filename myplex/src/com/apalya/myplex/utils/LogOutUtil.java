@@ -17,6 +17,7 @@ import com.apalya.myplex.LoginActivity;
 import com.apalya.myplex.R;
 import com.apalya.myplex.data.myplexapplication;
 import com.facebook.Session;
+import com.flurry.android.monolithic.sdk.impl.mc;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -35,6 +36,8 @@ public class LogOutUtil {
 
 	private static boolean signOutRequest(String aUrlPath,final Map<String, String> bodyParams) {
 		Analytics.trackEvent("SIGN-OUT-REQUEST",true);
+		
+		
 
 		RequestQueue queue = MyVolley.getRequestQueue();
 		StringRequest myReq = new StringRequest(Method.POST,
@@ -154,6 +157,11 @@ public class LogOutUtil {
 						Log.d(TAG, "########################################################");
 						Log.d(TAG, "---------------------------------------------------------");
 
+						myplexapplication.getUserProfileInstance().lastVisitedCardData.clear();
+						myplexapplication.getUserProfileInstance().joinedDate="NA";
+						myplexapplication.getUserProfileInstance().lastVisitedDate="NA";
+						
+						Util.serializeData(logoutContext);
 						
 						//Util.showToast("Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),logoutContext);
 						SharedPrefUtils.writeToSharedPref(logoutContext,

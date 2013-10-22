@@ -4,6 +4,7 @@ package com.apalya.myplex.utils;
 import com.apalya.myplex.LoginActivity;
 import com.apalya.myplex.MainActivity;
 import com.apalya.myplex.TwitterWebView;
+import com.apalya.myplex.data.myplexapplication;
 
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
@@ -43,10 +44,16 @@ public class Twitter11{
 	private static RequestToken requestToken;
 	private SharedPreferences mSharedPreferences;
 	Activity activity;
+	private TwitterAuthenticateCallback mCallback;
 	
-	public Twitter11(Activity act, int appname, SharedPreferences pref, String consumerkey, String consumersecret){
+	public static interface TwitterAuthenticateCallback {
+       public void onTwitterLogin(String token,String secret);
+    }
+	
+	public Twitter11(Activity act,TwitterAuthenticateCallback callback, int appname, SharedPreferences pref, String consumerkey, String consumersecret){
 		//super();
 		this.activity= act;
+		this.mCallback=callback;
 		this.mSharedPreferences= pref;
 		this.TWITTER_CONSUMER_KEY= consumerkey;
 		this.TWITTER_CONSUMER_SECRET= consumersecret;
@@ -107,6 +114,9 @@ public class Twitter11{
 						long userID= accessToken.getUserId();
 						User user= twitter.showUser(userID);
 						String username= user.getName();
+						myplexapplication.getUserProfileInstance().setUserId(String.valueOf(userID));
+						myplexapplication.getUserProfileInstance().setName(user.getScreenName());
+						myplexapplication.getUserProfileInstance().setProfilePic(user.getBiggerProfileImageURL());
 						ed.putString("twitter_name", username);
 						ed.commit();
 						Log.e("UserID: ", "userID: " + userID + "" + username);
@@ -124,11 +134,12 @@ public class Twitter11{
 					progress.dismiss();
 					if(postloginrunnable != null)
 						postloginrunnable.run();
-					
-					
-						activity.finish();
+					String access_token= mSharedPreferences.getString(PREF_KEY_OAUTH_TOKEN, null);
+					String access_token_secret= mSharedPreferences.getString(PREF_KEY_OAUTH_SECRET, null);
+					mCallback.onTwitterLogin(access_token, access_token_secret);
+						/*activity.finish();
 						Intent intent = new Intent(activity, MainActivity.class);
-						activity.startActivity(intent);
+						activity.startActivity(intent);*/
 					
 				}
 				@Override

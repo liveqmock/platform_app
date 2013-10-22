@@ -12,5 +12,5 @@ public interface PlayerListener {
 	
 	public void onCompletion(MediaPlayer mp) ;
 	
-	public void onPlayerQualityClick();
+	public void onFullScreen(boolean value);
 }

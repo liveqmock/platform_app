@@ -94,6 +94,7 @@
     <string name="signin">signIn</string>
     <string name="signuppath">signUp</string>
     <string name="signoutpath">signOut</string>
+    <string name="forgotpassword">forgotPassword</string>
     <string name="fbloginpath">social/login/FB</string>
     <string name="gplusloginpath">social/login/Google</string>
     <string name="getVideoPathUrl">generateKey</string>

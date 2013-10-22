@@ -35,6 +35,7 @@ public class NavigationOptionsMenuAdapter extends BaseAdapter {
 	public final static String RECOMMENDED = "Recommended";
 	public final static String MOVIES = "Movies";
 	public final static String LIVETV = "Live TV";
+	public final static String PURCHASES = "Purchased";
 	public final static String TVSHOWS = "TV Shows";
 	public Context mContext;
 	public NavigationOptionsMenuAdapter(Context context){
@@ -82,7 +83,8 @@ public class NavigationOptionsMenuAdapter extends BaseAdapter {
 			text.setText(menu.mLabel);
 			image.setDefaultImageResId(menu.mDefaultResId);
 			image.setImageUrl(menu.mIconUrl, MyVolley.getImageLoader());
-			if(!myplexapplication.getUserProfileInstance().getName().equalsIgnoreCase("Guest"))
+			String name=myplexapplication.getUserProfileInstance().getName();
+			if(name!=null && !name.equalsIgnoreCase("Guest"))
 				image.setScaleType(ScaleType.CENTER_CROP);
 		} else if (menu.mResourceLayoutId == R.layout.navigation_menuitemsmall) {
 			TextView text = (TextView) v.findViewById(R.id.drawer_list_item_text);

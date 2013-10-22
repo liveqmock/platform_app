@@ -2,6 +2,7 @@ package com.apalya.myplex;
 
 
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,9 +20,12 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnFocusChangeListener;
 import android.view.ViewTreeObserver;
 import android.view.View.OnClickListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -65,6 +69,8 @@ public class SignUpActivity extends Activity{
 	private Handler hidehandler=new Handler();
 	private ProgressDialog mProgressDialog = null;
 	private DeviceDetails mDevInfo;
+	boolean isValidPhoneNumber=false;
+	private static int scrollWidth;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -77,7 +83,7 @@ public class SignUpActivity extends Activity{
 		mDevInfo=myplexapplication.getDevDetailsInstance();
 
 		prepareSlideNotifiation();
-		
+
 		//String login;
 
 		if(getIntent().getExtras()!=null)
@@ -111,23 +117,44 @@ public class SignUpActivity extends Activity{
 					// TODO Auto-generated method stub
 					if(mPassword.getVisibility()==View.VISIBLE)
 					{
-					mPassword.setVisibility(View.GONE);
-					line.setVisibility(View.GONE);
-					mFpwd.setText("sign into myplex");
-					mSubmit.setText("Submit");
+						mPassword.setVisibility(View.GONE);
+						line.setVisibility(View.GONE);
+						mFpwd.setText("Sign into myplex");
+						mSubmit.setText("Submit");
 					}
 					else
 					{
 						mPassword.setVisibility(View.VISIBLE);
 						line.setVisibility(View.VISIBLE);
-						mFpwd.setText("Forgot password?");
-						mSubmit.setText("sign into myplex");	
+						mFpwd.setText("Forgot password,Let's fix it here?");
+						mSubmit.setText("Sign into myplex");	
 					}
 				}
 			});
 
+			mEmail.setOnFocusChangeListener(new OnFocusChangeListener() {
 
-			
+				@Override
+				public void onFocusChange(View v, boolean hasFocus) {
+					// TODO Auto-generated method stub
+					if(!hasFocus)
+					{
+						String text = mEmail.getText().toString();
+						try {
+							long num = Long.parseLong(text);
+							isValidPhoneNumber=true;
+							Log.i("",num+" is a number");
+							if(text.length()==10){
+								isValidPhoneNumber=true;
+								mEmail.setText("+91"+text);
+							}
+						} catch (NumberFormatException e) {
+							Log.i("",text+"is not a number");
+						}
+					}
+				}
+			});
+
 			mSubmit.setOnClickListener(new OnClickListener() {
 
 				@Override
@@ -136,44 +163,64 @@ public class SignUpActivity extends Activity{
 					ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(mSubmit, "alpha", 0.5f, 1f);
 					fadeAnim2.setDuration(800);
 					fadeAnim2.start();
-					
+
 
 					Analytics.trackEvent("USER-LOGIN-SELECTED");
-					if(mEmail.getText().toString().length() > 0 &&  mPassword.getText().toString().length()>0)
+					if(mPassword.getVisibility()!=View.GONE)
 					{
-						if(mEmail.getText().toString().contains("@")&& mEmail.getText().toString().contains("."))
+
+						if(mEmail.getText().toString().length() > 0 &&  mPassword.getText().toString().length()>0)
 						{
-							Map<String, String> params = new HashMap<String, String>();
-							params.put("userid", mEmail.getText().toString());
-							params.put("password", mPassword.getText().toString());
-							params.put("profile", "work");
-							params.put("clientKey",mDevInfo.getClientKey());
-							Log.d(TAG, "clientKey-----------: "+mDevInfo.getClientKey());
-							Analytics.trackEvent("USER-LOGIN-REQUEST",true);
-							showProgressBar();
-							userLoginRequest(getString(R.string.signin), params);
-							//finish();
-							//Util.launchActivity(CardExplorer.class,LoginActivity.this , null);
+							if(mEmail.getText().toString().contains("@")&& mEmail.getText().toString().contains(".") || isValidPhoneNumber)
+							{
+								Map<String, String> params = new HashMap<String, String>();
+								params.put("userid", mEmail.getText().toString());
+								params.put("password", mPassword.getText().toString());
+								params.put("profile", "work");
+								params.put("clientKey",mDevInfo.getClientKey());
+								Log.d(TAG, "clientKey-----------: "+mDevInfo.getClientKey());
+								Analytics.trackEvent("USER-LOGIN-REQUEST",true);
+								showProgressBar();
+								userLoginRequest(getString(R.string.signin), params);
+							}
+							else
+							{
+								mEmail.setError( "Enter Valid Email or phone number!" );
+								sendNotification("Hey, you might have entered wrong mail id!");	
+							}
+
 						}
 						else
 						{
-							mEmail.setError( "Enter Valid Email!" );
-							sendNotification("Hey, you might have entered wrong mail id!");
-
+							if( mEmail.getText().toString().length() == 0 )
+							{
+								mEmail.setError( "Username is required!" );
+							}
+							if( mPassword.getText().toString().length() == 0 )
+							{
+								mPassword.setError( "Password is required!" );
+							}
+							sendNotification("Username and password are required");
 						}
-
 					}
 					else
 					{
-						if( mEmail.getText().toString().length() == 0 )
+						if(mEmail.getText().toString().contains("@")&& mEmail.getText().toString().contains(".") || isValidPhoneNumber)
 						{
-							mEmail.setError( "Username is required!" );
+							Map<String, String> params = new HashMap<String, String>();
+							params.put("email", mEmail.getText().toString());
+							params.put("profile", "work");
+							params.put("clientKey",mDevInfo.getClientKey());
+							Log.d(TAG, "clientKey-----------: "+mDevInfo.getClientKey());
+							Analytics.trackEvent("FORGOT-PASSWORD-REQUEST",true);
+							showProgressBar();
+							forgotPasswordRequest(getString(R.string.forgotpassword), params);
 						}
-						if( mPassword.getText().toString().length() == 0 )
+						else
 						{
-							mPassword.setError( "Password is required!" );
+							mEmail.setError( "Enter Valid Email or phone number!" );
+							sendNotification("Hey, you might have entered wrong mail id!");	
 						}
-						sendNotification("Username and password are required");
 					}
 				}
 			});
@@ -201,6 +248,30 @@ public class SignUpActivity extends Activity{
 			mSubmit = (Button) findViewById(R.id.signsubmit);
 			mSubmit.setTypeface(FontUtil.Roboto_Regular);
 			mSubmit.setText("Create Account");
+
+			mEmail.setOnFocusChangeListener(new OnFocusChangeListener() {
+
+				@Override
+				public void onFocusChange(View v, boolean hasFocus) {
+					// TODO Auto-generated method stub
+					if(!hasFocus)
+					{
+						String text = mEmail.getText().toString();
+						try {
+							long num = Long.parseLong(text);
+							isValidPhoneNumber=true;
+							Log.i("",num+" is a number");
+							if(text.length()==10){
+								isValidPhoneNumber=true;
+								mEmail.setText("+91"+text);
+							}
+						} catch (NumberFormatException e) {
+							Log.i("",text+"is not a number");
+						}
+					}
+				}
+			});
+
 			mSubmit.setOnClickListener(new OnClickListener() {
 
 				@Override
@@ -212,7 +283,7 @@ public class SignUpActivity extends Activity{
 					//hideKeypad();
 					if(mEmail.getText().toString().length()>0 &&mPassword.getText().toString().length()>0) {
 
-						if(mEmail.getText().toString().contains("@") && mEmail.getText().toString().contains("."))
+						if(mEmail.getText().toString().contains("@") && mEmail.getText().toString().contains(".") || isValidPhoneNumber)
 						{
 							Map<String, String> params = new HashMap<String, String>();
 							params.put("email",mEmail.getText().toString());
@@ -232,7 +303,7 @@ public class SignUpActivity extends Activity{
 						{
 
 							{
-								mEmail.setError("Enter Valid Email!");
+								mEmail.setError("Enter Valid Email or Phone number");
 							}
 							sendNotification("Enter Valid details");
 						}
@@ -254,65 +325,104 @@ public class SignUpActivity extends Activity{
 			});
 
 		}
-		
+
 		ImageView img1= (ImageView)findViewById(R.id.imageView1);
-		ImageView img2= (ImageView)findViewById(R.id.imageView2);
+		/*ImageView img2= (ImageView)findViewById(R.id.imageView2);
 		ImageView img3= (ImageView)findViewById(R.id.imageView3);
 		ImageView img4= (ImageView)findViewById(R.id.imageView4);
 		ImageView img5= (ImageView)findViewById(R.id.imageView5);
-		ImageView img6= (ImageView)findViewById(R.id.imageView6);
+		ImageView img6= (ImageView)findViewById(R.id.imageView6);*/
+		
+		img1.setImageResource(R.drawable.myplexbgimage);
 		
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 
 		final int height = dm.heightPixels;
 		final int width = dm.widthPixels;
-		
-		img1.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image1, width, height));
-		img2.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image2, width, height));
-		img3.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image3, width, height));
-		img4.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image4, width, height));
-		img5.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image5, width, height));
-		img6.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image6, width, height));
-		
-		img1.setScaleType(ScaleType.CENTER_INSIDE);
-		img2.setScaleType(ScaleType.CENTER_INSIDE);
-		img3.setScaleType(ScaleType.CENTER_INSIDE);
-		img4.setScaleType(ScaleType.CENTER_INSIDE);
-		img5.setScaleType(ScaleType.CENTER_INSIDE);
-		img6.setScaleType(ScaleType.CENTER_INSIDE);
-		
-		
-		final HorizontalScrollView parentScrollView= (HorizontalScrollView) findViewById(R.id.parentScrollview);
+		final HorizontalScrollView parentScrollView= (HorizontalScrollView) findViewById(R.id.scrollView1);
 		parentScrollView.setOnTouchListener(new View.OnTouchListener() {
 
-	           
+
 			@Override
 			public boolean onTouch(View arg0, MotionEvent arg1) {
 				// TODO Auto-generated method stub
 				//parentScrollView.requestDisallowInterceptTouchEvent(false);
 				return true;
 			}
-            });
+		});
 
 		ViewTreeObserver vto = parentScrollView.getViewTreeObserver();
 		vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
-		    @Override
-		    public void onGlobalLayout() {
-		    	parentScrollView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-		    	int scrollWidth=parentScrollView.getChildAt(0).getMeasuredWidth()-getWindowManager().getDefaultDisplay().getWidth();
-		    	//Util.showToast(Integer.toString(scrollWidth),SignUpActivity.this);
-		        LinearLayout backgroundScrollLayout= (LinearLayout)findViewById(R.id.llayout);
-		        backgroundScrollLayout.clearAnimation();
-		        TranslateAnimation translateAnim = new TranslateAnimation(-scrollWidth,0, 0, 0);  
-		        translateAnim.setDuration(80000);   
-		        translateAnim.setRepeatCount(8);
-		        translateAnim.setRepeatMode(2);
-		        translateAnim.setFillEnabled(true);
-		        backgroundScrollLayout.startAnimation(translateAnim);
+			@Override
+			public void onGlobalLayout() {
+				parentScrollView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+				scrollWidth=parentScrollView.getChildAt(0).getMeasuredWidth()-getWindowManager().getDefaultDisplay().getWidth();
+				//Util.showToast(Integer.toString(scrollWidth),LoginActivity.this);
+				RelativeLayout backgroundScrollLayout= (RelativeLayout)findViewById(R.id.relativeLayout1);
+				backgroundScrollLayout.clearAnimation();
+				TranslateAnimation translateAnim = new TranslateAnimation(-scrollWidth,0,0,0); 
+				translateAnim.setDuration((scrollWidth/width)*scrollWidth*350);   
+				translateAnim.setRepeatCount(Animation.INFINITE);
+				translateAnim.setInterpolator(new LinearInterpolator());
+				translateAnim.setRepeatMode(2);
+				translateAnim.setFillBefore(true);
+				backgroundScrollLayout.startAnimation(translateAnim);
 
-		    }
+			}
 		});
+
+		/*DisplayMetrics dm = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+		final int height = dm.heightPixels;
+		final int width = dm.widthPixels;
+
+		img1.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image1, width, height));
+		img2.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image2, width, height));
+		img3.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image3, width, height));
+		img4.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image4, width, height));
+		img5.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image5, width, height));
+		img6.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image6, width, height));
+
+		img1.setScaleType(ScaleType.CENTER_INSIDE);
+		img2.setScaleType(ScaleType.CENTER_INSIDE);
+		img3.setScaleType(ScaleType.CENTER_INSIDE);
+		img4.setScaleType(ScaleType.CENTER_INSIDE);
+		img5.setScaleType(ScaleType.CENTER_INSIDE);
+		img6.setScaleType(ScaleType.CENTER_INSIDE);
+
+
+		final HorizontalScrollView parentScrollView= (HorizontalScrollView) findViewById(R.id.parentScrollview);
+		parentScrollView.setOnTouchListener(new View.OnTouchListener() {
+
+
+			@Override
+			public boolean onTouch(View arg0, MotionEvent arg1) {
+				// TODO Auto-generated method stub
+				//parentScrollView.requestDisallowInterceptTouchEvent(false);
+				return true;
+			}
+		});
+
+		ViewTreeObserver vto = parentScrollView.getViewTreeObserver();
+		vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+			@Override
+			public void onGlobalLayout() {
+				parentScrollView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+				int scrollWidth=parentScrollView.getChildAt(0).getMeasuredWidth()-getWindowManager().getDefaultDisplay().getWidth();
+				//Util.showToast(Integer.toString(scrollWidth),SignUpActivity.this);
+				LinearLayout backgroundScrollLayout= (LinearLayout)findViewById(R.id.llayout);
+				backgroundScrollLayout.clearAnimation();
+				TranslateAnimation translateAnim = new TranslateAnimation(-scrollWidth,0, 0, 0);  
+				translateAnim.setDuration(80000);   
+				translateAnim.setRepeatCount(8);
+				translateAnim.setRepeatMode(2);
+				translateAnim.setFillEnabled(true);
+				backgroundScrollLayout.startAnimation(translateAnim);
+
+			}
+		});*/
 
 		/*EditText mFullName=(EditText)findViewById(R.id.editFullName);
 		mFullName.setTypeface(FontUtil.Roboto_Regular);*/
@@ -321,7 +431,7 @@ public class SignUpActivity extends Activity{
 	}
 
 
-	
+
 	public void showSoftKeyboard(View view) {
 
 		InputMethodManager imm = (InputMethodManager)
@@ -432,13 +542,16 @@ public class SignUpActivity extends Activity{
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
 						Log.d(TAG, "########################################################");
 						Log.d(TAG, "---------------------------------------------------------");
+
+						myplexapplication.getUserProfileInstance().setName(mEmail.getText().toString());
+
 						SharedPrefUtils.writeToSharedPref(SignUpActivity.this,
 								getString(R.string.devusername), mEmail.getText().toString());
 						SharedPrefUtils.writeToSharedPref(SignUpActivity.this,
 								getString(R.string.devpassword), mPassword.getText().toString());
 						finish();
 						Util.launchMainActivity(SignUpActivity.this);
-//						Util.launchActivity(MainActivity.class,SignUpActivity.this , null);
+						//						Util.launchActivity(MainActivity.class,SignUpActivity.this , null);
 					}
 					else
 					{
@@ -446,6 +559,62 @@ public class SignUpActivity extends Activity{
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
 						sendNotification("Err: "+jsonResponse.getString("code")+" "+jsonResponse.getString("message"));
+					}
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+		};
+	}
+	protected void forgotPasswordRequest(String contextPath, final Map<String, String> bodyParams) {
+		RequestQueue queue = MyVolley.getRequestQueue();
+
+		String url=ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+ConsumerApi.USER_CONTEXT+ConsumerApi.SLASH+contextPath;
+		StringRequest myReq = new StringRequest(Method.POST,
+				url,
+				forgotPasswordSuccessListener(),
+				userLoginErrorListener()) {
+
+			protected Map<String, String> getParams() throws com.android.volley.AuthFailureError {
+				Map<String, String> params = new HashMap<String, String>();
+				params=bodyParams;
+				return params;
+			};
+		};
+
+		Log.d(TAG,"Request sent ");
+		queue.add(myReq);
+
+	}
+	
+
+	protected Listener<String> forgotPasswordSuccessListener() {
+		dismissProgressBar();
+		return new Response.Listener<String>() {
+			@Override
+			public void onResponse(String response) {
+				Analytics.endTimedEvent("USER-LOGIN-REQUEST");
+
+				Log.d(TAG,"Response: "+response);
+				try {	
+					Log.d(TAG, "########################################################");
+					JSONObject jsonResponse= new JSONObject(response);
+
+					if(jsonResponse.getString("status").equalsIgnoreCase("SUCCESS"))
+					{
+						Analytics.trackEvent("USER-LOGIN-REQUEST-SUCCESS");
+						Log.d(TAG, "status: "+jsonResponse.getString("status"));
+						Log.d(TAG, "code: "+jsonResponse.getString("code"));
+						Log.d(TAG, "message: "+jsonResponse.getString("message"));
+						Log.d(TAG, "########################################################");
+						Log.d(TAG, "---------------------------------------------------------");
+					}
+					else
+					{
+						Analytics.trackEvent("USER-LOGIN-REQUEST-SERVER-ERROR");
+						Log.d(TAG, "code: "+jsonResponse.getString("code"));
+						Log.d(TAG, "message: "+jsonResponse.getString("message"));
+						sendNotification("Err: "+jsonResponse.getString("code")+" \nErr Msg: "+jsonResponse.getString("message"));
 					}
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -468,10 +637,10 @@ public class SignUpActivity extends Activity{
 				return params;
 			};
 		};
-		
+
 		Log.d(TAG,"Request sent ");
 		queue.add(myReq);
-		
+
 	}
 	protected ErrorListener userLoginErrorListener() {
 		dismissProgressBar();
@@ -487,7 +656,7 @@ public class SignUpActivity extends Activity{
 					sendNotification(getString(R.string.interneterr));
 					finish();
 					Util.launchMainActivity(SignUpActivity.this);
-//					Util.launchActivity(MainActivity.class,SignUpActivity.this , null);
+					//					Util.launchActivity(MainActivity.class,SignUpActivity.this , null);
 
 				}
 				else
@@ -520,6 +689,9 @@ public class SignUpActivity extends Activity{
 						Log.d(TAG, "########################################################");
 						Log.d(TAG, "---------------------------------------------------------");
 
+						myplexapplication.getUserProfileInstance().setName(mEmail.getText().toString());
+
+
 						SharedPrefUtils.writeToSharedPref(SignUpActivity.this,
 								getString(R.string.devusername), mEmail.getText().toString());
 						SharedPrefUtils.writeToSharedPref(SignUpActivity.this,
@@ -527,7 +699,7 @@ public class SignUpActivity extends Activity{
 
 						finish();
 						Util.launchMainActivity(SignUpActivity.this);
-//						Util.launchActivity(MainActivity.class,SignUpActivity.this , null);
+						//						Util.launchActivity(MainActivity.class,SignUpActivity.this , null);
 					}
 					else
 					{
@@ -542,7 +714,7 @@ public class SignUpActivity extends Activity{
 							Util.genKeyRequest(SignUpActivity.this,getString(R.string.genKeyReqPath),params);
 							sendNotification("Err: "+jsonResponse.getString("code")+" \nErr Msg: "+jsonResponse.getString("message"));
 						}
-						
+
 						Analytics.trackEvent("USER-LOGIN-REQUEST-SERVER-ERROR");
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));

@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.Set;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Color;
 import android.media.MediaPlayer;
@@ -25,6 +26,7 @@ import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.Space;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -55,6 +57,7 @@ import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.utils.MediaUtil.MediaUtilEventListener;
 import com.apalya.myplex.views.CardDetailViewFactory;
+import com.apalya.myplex.views.CardVideoPlayer;
 import com.apalya.myplex.views.CustomDialog;
 import com.apalya.myplex.views.CustomScrollView;
 import com.apalya.myplex.views.FadeInNetworkImageView;
@@ -62,11 +65,12 @@ import com.apalya.myplex.views.JazzyViewPager;
 import com.apalya.myplex.views.OutlineContainer;
 import com.apalya.myplex.views.docketVideoWidget;
 import com.apalya.myplex.views.CardDetailViewFactory.CardDetailViewFactoryListener;
+import com.apalya.myplex.views.CardVideoPlayer.PlayerFullScreen;
 import com.apalya.myplex.views.ItemExpandListener.ItemExpandListenerCallBackListener;
 import com.apalya.myplex.views.JazzyViewPager.TransitionEffect;
 
 public class CardDetailsTabletFrag extends BaseFragment implements
-ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,PlayerListener,ScrollingDirection,CacheManagerCallback {
+ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirection,CacheManagerCallback,PlayerFullScreen {
 	public static final String TAG = "CardDetails";
 	private LayoutInflater mInflater;
 	private CardDetailViewFactory mCardDetailViewFactory;
@@ -75,7 +79,9 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,PlayerListener,
 	private LinearLayout mMediaContentLayout;
 	private LinearLayout mCommentsContentLayout;
 
-	
+	private LinearLayout mRightScrollViewLayout;
+	private ScrollView mBottomScrollView;
+	private CardVideoPlayer mPlayer;
 	private boolean mDescriptionExpanded = false;
 
 	private int mDetailType = Profile;
@@ -98,17 +104,21 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,PlayerListener,
 			mCardData = (CardData) mDataObject;
 		}
 		Log.d(TAG,"content ID ="+mCardData._id);
-		mMainActivity.setPotrait();
+		mMainActivity.setOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 		mInflater = LayoutInflater.from(getContext());
 		rootView = inflater.inflate(R.layout.carddetailstablet, container, false);
-		
+		mRightScrollViewLayout = (LinearLayout)rootView.findViewById(R.id.carddetailtablet_rightscrollviewlayout);
+		mBottomScrollView = (ScrollView)rootView.findViewById(R.id.carddetailtablet_descriptionscroll_view);
 		mDescriptionContentLayout = (LinearLayout)rootView.findViewById(R.id.carddetailtablet_descriptiondetaillayout);
 		mDescriptionContentLayout.removeAllViews();
 		mMediaContentLayout = (LinearLayout)rootView.findViewById(R.id.carddetailtablet_multimedialayout);
 		mMediaContentLayout.removeAllViews();
 		mCommentsContentLayout = (LinearLayout)rootView.findViewById(R.id.carddetailtablet_commentlayout);
 		mCommentsContentLayout.removeAllViews();
-		createVideoPreview();
+		RelativeLayout videoLayout = (RelativeLayout)rootView.findViewById(R.id.carddetailtablet_videolayout);
+		mPlayer = new CardVideoPlayer(mContext, mCardData);
+		mPlayer.setFullScreenListener(this);
+		videoLayout.addView(mPlayer.CreateTabletPlayerView(videoLayout));
 		mCardDetailViewFactory = new CardDetailViewFactory(getContext());
 		mCardDetailViewFactory.setOnCardDetailExpandListener(this);
 		mMainActivity.setSearchBarVisibilty(View.VISIBLE);
@@ -122,234 +132,15 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,PlayerListener,
 	}
 
 	private CardData mCardData;
-	private FadeInNetworkImageView mPreviewImage;
-	private VideoViewExtn mVideoView;
-	private boolean mPlaying = false;
-	private ImageView mPlay;
-	private RelativeLayout mProgressBar;
-	VideoViewPlayer mVideoViewPlayer;
-	private RelativeLayout mVideoViewLayout;
-	private int mPerBuffer = 0;
-	private TextView mBufferPercentageTextView;
-	private View createVideoPreview(){
-		int width , height = 100;
-		width = myplexapplication.getApplicationConfig().screenWidth;
-		width = (myplexapplication.getApplicationConfig().screenWidth/3)*2;
-		int marginleft = (int)getResources().getDimension(R.dimen.margin_gap_12);
-		width -= marginleft*2;
-		height = (width * 9)/16;
-		
-		RelativeLayout videoLayout = (RelativeLayout)rootView.findViewById(R.id.carddetailtablet_videolayout);
-		LinearLayout.LayoutParams layoutparams = new LinearLayout.LayoutParams(width,height);
-		layoutparams.setMargins(marginleft, marginleft, marginleft, marginleft);
-		videoLayout.setLayoutParams(layoutparams);
-		
-		
-		View v = mInflater.inflate(R.layout.cardmediasubitemvideo, null);
-		videoLayout.addView(v);
-		
-		mVideoViewLayout = (RelativeLayout)v;
-		
-		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(width,height);
-		
-		mPreviewImage = (FadeInNetworkImageView) v.findViewById(R.id.cardmediasubitemvideo_imagepreview);
-		mPreviewImage.setLayoutParams(params);
-		mVideoView = (VideoViewExtn)v.findViewById(R.id.cardmediasubitemvideo_videopreview);
-		mVideoView.setLayoutParams(params);
-		mVideoView.resizeVideo(width, height);
-		mPlay = (ImageView) v.findViewById(R.id.cardmediasubitemvideo_play);
-		mBufferPercentageTextView = (TextView)v.findViewById(R.id.carddetaildesc_movename);
-		Random rnd = new Random();
-		int Low = 100;
-		int High = 196;
-		
-        int color = Color.argb(255, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low); 
-        mPreviewImage.setBackgroundColor(color);
-		mProgressBar = (RelativeLayout) v.findViewById(R.id.cardmediasubitemvideo_progressbarLayout);
-		if(mCardData.images != null){
-			for(CardDataImagesItem imageItem:mCardData.images.values){
-				if(imageItem.profile != null && imageItem.profile.equalsIgnoreCase("xxhdpi")){
-					if (imageItem.link == null || imageItem.link.compareTo("Images/NoImage.jpg") == 0) {
-						mPreviewImage.setImageResource(0);
-					} else if (imageItem.link != null){
-						mPreviewImage.setImageUrl(imageItem.link, MyVolley.getImageLoader());
-					}
-					break;
-				}
-			}
-		}
-		Util.showFeedback(mPlay);
-//		v.setOnClickListener(mPlayListener);
-		mPlay.setOnClickListener(mPlayListener);
-		return v;
-	}
-	private OnClickListener mPlayListener = new OnClickListener() {
-
-		@Override
-		public void onClick(View v) {
-			if(mPlaying){
-				if(mVideoViewPlayer != null){
-					mVideoViewPlayer.closeSession();
-				}
-				mProgressBar.setVisibility(View.GONE);
-				showImagePreview();
-				mPlaying = false;
-				return;
-			}
-			mPlaying = true;
-			hideImagePreview();
-			mProgressBar.setVisibility(View.VISIBLE);
-			MediaUtil.setUrlEventListener(new MediaUtilEventListener() {
-				
-				@Override
-				public void urlReceived(boolean aStatus, String url) {
-					if(!aStatus){
-						if(mVideoViewPlayer != null){
-							mVideoViewPlayer.closeSession();
-						}
-						mProgressBar.setVisibility(View.GONE);
-						showImagePreview();
-						mPlaying = false;
-						Toast.makeText(getContext(), "Failed in fetching the url.", Toast.LENGTH_SHORT).show();
-						return;
-					}
-					if(url == null){
-						if(mVideoViewPlayer != null){
-							mVideoViewPlayer.closeSession();
-						}
-						mProgressBar.setVisibility(View.GONE);
-						showImagePreview();
-						mPlaying = false;
-						Toast.makeText(getContext(), "No url to play.", Toast.LENGTH_SHORT).show();
-						return;
-					}
-					Uri uri = Uri.parse("rtsp://59.162.166.216:554/AAJTAK_QVGA.sdp");
-					uri = Uri.parse("rtsp://46.249.213.87:554/playlists/bollywood-action_qcif.hpl.3gp");
-					uri = Uri.parse(url);
-//					Toast.makeText(getContext(), "URL:"+url, Toast.LENGTH_SHORT).show();
-					VideoViewPlayer.StreamType streamType = StreamType.VOD;
-					if(mVideoViewPlayer == null){
-						mVideoViewPlayer = new VideoViewPlayer(mVideoView,mContext, uri, streamType);
-						mVideoViewPlayer.openVideo();
-					}else{
-						mVideoViewPlayer.setUri(uri, streamType);
-					}
-					mVideoViewPlayer.hideMediaController();
-					mVideoView.setOnTouchListener(new OnTouchListener() {
-						
-						@Override
-						public boolean onTouch(View arg0, MotionEvent event) {
-							// TODO Auto-generated method stub
-							if(mPlayStarted){
-								mVideoViewPlayer.onTouchEvent(event);
-							}
-							return false;
-						}
-					});
-					mVideoViewPlayer.setPlayerListener(CardDetailsTabletFrag.this);	
-					
-				}
-			});
-			MediaUtil.getVideoUrl(mCardData._id, "low");
-		}
-	};
-	public void playStarted(){
-		mPlayStarted = true;
-//		mMainActivity.setSensor();
-	}
-	public void playStopped(){
-		mPerBuffer = 0;
-		mPlayStarted = false;
-//		mMainActivity.setPotrait();
-	}
-	public void playInLandscape(){
-		if(mVideoViewPlayer!= null){
-			mVideoViewPlayer.showMediaController();
-		}
-		mVideoView.resizeVideo(myplexapplication.getApplicationConfig().screenHeight,myplexapplication.getApplicationConfig().screenWidth-Util.getStatusBarHeight(getContext()));
-		mVideoView.requestLayout();
-//		mVideoViewLayout.setLayoutParams(new LayoutParams(myplexapplication.getApplicationConfig().screenHeight,myplexapplication.getApplicationConfig().screenWidth-Util.getStatusBarHeight(getContext())));
-//		mVideoViewLayout.requestLayout();
-		mMainActivity.hideActionBar();
-	}
-	public void playInPotrait(){
-		if(mVideoViewPlayer!= null){
-			mVideoViewPlayer.hideMediaController();
-		}
-		int width = myplexapplication.getApplicationConfig().screenWidth;
-		int height = (width * 9)/16; 
-		mVideoView.resizeVideo(width,height);
-		mVideoView.requestLayout();
-//		mVideoViewLayout.setLayoutParams(new LayoutParams(width,height));
-//		mVideoViewLayout.requestLayout();
-		mMainActivity.showActionBar();
-	}
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		if(newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE){
-//			playInLandscape();
+			mPlayer.playInLandscape();
 		}else{
-//			playInPotrait();
+			mPlayer.playInPortrait();
 		}
 		super.onConfigurationChanged(newConfig);
 	}
-	@Override
-	public void onBufferingUpdate(MediaPlayer mp, int perBuffer) {
-		Log.e("player",perBuffer +" loading ");
-		if(this.mPerBuffer <= perBuffer){
-			this.mPerBuffer = perBuffer;
-		}
-		if(mBufferPercentageTextView != null){
-			mBufferPercentageTextView.setText(""+mPerBuffer);
-		}
-		int currentseekposition = mVideoView.getCurrentPosition();
-		if(currentseekposition < 0){
-			currentseekposition = 510;
-		}
-		if(mVideoView.isPlaying() && currentseekposition > 500){
-			mProgressBar.setVisibility(View.GONE);
-			mVideoViewPlayer.deregisteronBufferingUpdate();
-			playStarted();
-		}
-	}
-
-	@Override
-	public boolean onError(MediaPlayer mp, int arg1, int arg2) {
-		mProgressBar.setVisibility(View.GONE);
-		showImagePreview();
-		playStopped();
-		return false;
-	}
-
-	@Override
-	public void onCompletion(MediaPlayer mp) {
-		mProgressBar.setVisibility(View.GONE);
-		showImagePreview();
-		playStopped();
-	}
-
-	@Override
-	public void onPlayerQualityClick() {
-		// TODO Auto-generated method stub
-		
-	}
-	@Override
-	public void onSeekComplete(MediaPlayer mp) {
-		// TODO Auto-generated method stub
-		
-	}
-	private void showImagePreview(){
-		mPreviewImage.setVisibility(View.VISIBLE);
-		mVideoView.setVisibility(View.INVISIBLE);
-		mPlay.setBackgroundResource(R.drawable.cardplayselector);
-		
-	}
-	private void hideImagePreview(){
-		mPreviewImage.setVisibility(View.INVISIBLE);
-		mVideoView.setVisibility(View.VISIBLE);
-		mPlay.setBackgroundResource(R.drawable.cardpauseselector);
-	}
-	@Override
 	public void onResume() {
 		super.onResume();
 	}
@@ -652,5 +443,15 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,PlayerListener,
 	public void scrollDirection(boolean value) {
 		// TODO Auto-generated method stub
 		
+	}
+	@Override
+	public void playerInFullScreen(boolean value) {
+		if(value){
+			mRightScrollViewLayout.setVisibility(View.GONE);
+			mBottomScrollView.setVisibility(View.GONE);
+		}else{
+			mRightScrollViewLayout.setVisibility(View.VISIBLE);
+			mBottomScrollView.setVisibility(View.VISIBLE);			
+		}
 	}
 }

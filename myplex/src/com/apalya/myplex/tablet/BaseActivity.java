@@ -8,6 +8,7 @@ import java.util.TimerTask;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.ActionBar;
@@ -15,6 +16,7 @@ import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -31,10 +33,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
@@ -49,10 +53,16 @@ import com.apalya.myplex.R;
 import com.apalya.myplex.SearchActivity;
 import com.apalya.myplex.adapters.FliterMenuAdapter;
 import com.apalya.myplex.adapters.NavigationOptionsMenuAdapter;
+import com.apalya.myplex.data.CardData;
+import com.apalya.myplex.data.CardDataGenralInfo;
+import com.apalya.myplex.data.CardDataImages;
+import com.apalya.myplex.data.CardDataImagesItem;
+import com.apalya.myplex.data.CardDataSimilarContent;
 import com.apalya.myplex.data.CardExplorerData;
 import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.NavigationOptionsMenu;
 import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.fragments.CardDetails;
 import com.apalya.myplex.fragments.CardDetailsTabletFrag;
 import com.apalya.myplex.fragments.CardExplorer;
 import com.apalya.myplex.menu.FilterMenuProvider;
@@ -78,16 +88,9 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 
 	NavigationOptionsMenuAdapter mNavigationAdapter;
 
-	public void setLandscape() {
-//		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-	}
 	@Override
-	public void setPotrait() {
-//		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-	}
-
-	public void setSensor() {
-//		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+	public void setOrientation(int value){
+		setRequestedOrientation(value);
 	}
 	@Override
 	public void hideActionBar() {
@@ -141,11 +144,13 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 					R.drawable.ic_drawer, R.string.drawer_open,
 					R.string.drawer_close) {
 				public void onDrawerClosed(View view) {
+					showNavigationFullImage(true);
 					mNavigationDrawerOpened = false;
 					invalidateOptionsMenu();
 				}
 
 				public void onDrawerOpened(View drawerView) {
+					showNavigationFullImage(false);
 					mNavigationDrawerOpened = true;
 					invalidateOptionsMenu();
 				}
@@ -160,7 +165,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 	public void fillMenuItem() {
 		 mMenuItemList.add(new NavigationOptionsMenu(myplexapplication.getUserProfileInstance().getName(),R.drawable.menu_profile,myplexapplication.getUserProfileInstance().getProfilePic(),NavigationOptionsMenuAdapter.CARDDETAILS_ACTION,R.layout.navigation_menuitemlarge));
 		 mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FAVOURITE,R.drawable.iconfav,null,NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-		 mMenuItemList.add(new NavigationOptionsMenu("Purchases",R.drawable.iconpurchases, null,NavigationOptionsMenuAdapter.NOACTION_ACTION,R.layout.navigation_menuitemsmall));
+		 mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.PURCHASES,R.drawable.iconpurchases, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		 mMenuItemList.add(new NavigationOptionsMenu("Downloads",R.drawable.icondnload, null,NavigationOptionsMenuAdapter.NOACTION_ACTION,R.layout.navigation_menuitemsmall));
 		 mMenuItemList.add(new NavigationOptionsMenu("Settings",R.drawable.iconsearch, null,NavigationOptionsMenuAdapter.NOACTION_ACTION,R.layout.navigation_menuitemsmall));
 		 mMenuItemList.add(new NavigationOptionsMenu("Invite Friends",R.drawable.iconfriends, null,NavigationOptionsMenuAdapter.NOACTION_ACTION,R.layout.navigation_menuitemsmall));
@@ -200,7 +205,20 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 			showFilterMenuPopup();
 		}
 	};
-
+	private ImageView mNavigationMenu;
+	private void showNavigationFullImage(boolean value){
+		AnimatorSet set = new AnimatorSet();
+		int fromX = 0;
+		int toX = -(mNavigationMenu.getWidth()/2);
+		if(value){
+			fromX = -(mNavigationMenu.getWidth()/2);
+			toX = 0;
+		}
+		set.play(ObjectAnimator.ofFloat(mNavigationMenu, View.TRANSLATION_X, fromX,toX));
+		set.setDuration(200);
+		set.setInterpolator(new DecelerateInterpolator());
+		set.start();
+	}
 	public void prepareCustomActionBar() {
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		getActionBar().setDisplayUseLogoEnabled(false);
@@ -212,12 +230,12 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		if (v == null) {
 			return;
 		}
-		ImageView navigationDrawer = (ImageView) v
-				.findViewById(R.id.customactionbar_drawer);
+		LinearLayout navigationMenuLayout = (LinearLayout)v.findViewById(R.id.customactionbar_drawerLayout);
+		mNavigationMenu = (ImageView) v.findViewById(R.id.customactionbar_drawer);
 		if (mDrawerLayout == null) {
-			navigationDrawer.setVisibility(View.INVISIBLE);
+			mNavigationMenu.setVisibility(View.INVISIBLE);
 		}
-		navigationDrawer.setOnClickListener(new OnClickListener() {
+		navigationMenuLayout.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
@@ -230,7 +248,6 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 				}
 			}
 		});
-		Util.showFeedback(navigationDrawer);
 
 		mCustomActionBarTitleLayout = (RelativeLayout) v
 				.findViewById(R.id.customactionbar_filter);
@@ -413,6 +430,32 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 			Util.showDownloads(this);
 			return;
 		}
+		case NavigationOptionsMenuAdapter.CARDDETAILS_ACTION: {
+			mCardDetails = new CardDetailsTabletFrag();
+			CardData profileData = new CardData();
+			profileData._id="0";
+			CardDataGenralInfo profileInfo=new CardDataGenralInfo();
+			profileInfo.title=myplexapplication.getUserProfileInstance().getName();
+			if(myplexapplication.getUserProfileInstance().joinedDate==null)
+				myplexapplication.getUserProfileInstance().joinedDate=myplexapplication.getUserProfileInstance().lastVisitedDate;
+			profileInfo.briefDescription="Joined myplex on: "+myplexapplication.getUserProfileInstance().joinedDate+" \n Last Visited on: "+myplexapplication.getUserProfileInstance().lastVisitedDate+" ";
+			profileInfo.description="Joined myplex on: "+myplexapplication.getUserProfileInstance().joinedDate+" \n Last Visited on: "+myplexapplication.getUserProfileInstance().lastVisitedDate+" ";
+			CardDataImages pics=new CardDataImages();
+			CardDataImagesItem profilePic=new CardDataImagesItem();
+			profilePic.profile="xxhdpi";
+			profilePic.link=myplexapplication.getUserProfileInstance().getProfilePic();
+			pics.values.add(profilePic);
+			CardDataSimilarContent lastVisited=new CardDataSimilarContent();
+			lastVisited.values=myplexapplication.getUserProfileInstance().lastVisitedCardData;
+			profileData.similarContent=lastVisited;
+			profileData.generalInfo=profileInfo;
+			profileData.images=pics;
+			mCurrentFragment=mCardDetails;
+			mCurrentFragment.mDataObject=profileData;
+			myplexapplication.mSelectedCard = profileData;
+			startActivity(new Intent(this,TabletCardDetails.class));
+			return;
+		}
 		case NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION: {
 			mCardExplorer = (CardExplorer) createFragment(NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION);
 			CardExplorerData data = myplexapplication.getCardExplorerData();
@@ -432,6 +475,8 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 			} else if (label
 					.equalsIgnoreCase(NavigationOptionsMenuAdapter.TVSHOWS)) {
 				data.searchQuery = "tvshows";
+			}else if(label.equalsIgnoreCase(NavigationOptionsMenuAdapter.PURCHASES)){
+				data.requestType = CardExplorerData.REQUEST_PURCHASES;
 			}
 			if(this instanceof TabletCardDetails){
 				myplexapplication.mSelectedOption_Tablet = screenType;

@@ -28,6 +28,8 @@ import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDataCertifiedRatingsItem;
 import com.apalya.myplex.data.CardDataCommentsItem;
 import com.apalya.myplex.data.CardDataImagesItem;
+import com.apalya.myplex.data.CardDataPackagePriceDetailsItem;
+import com.apalya.myplex.data.CardDataPackages;
 import com.apalya.myplex.data.CardDataRelatedCastItem;
 import com.apalya.myplex.data.CardDataUserReviewsItem;
 import com.apalya.myplex.data.CardDetailBaseData;
@@ -408,7 +410,15 @@ public class CardDetailViewFactory {
 		CardData simillarData = mData.similarContent.values.get(0);
 		View child = mInflator.inflate(R.layout.carddetails_fullmultimediaitem, null);
 		TextView groupname = (TextView)child.findViewById(R.id.carddetailmultimedia_groupname);
-		groupname.setText("Similar Content");
+		if(mData._id.equalsIgnoreCase("0"))
+		{
+			groupname.setText("Last Watched Content");
+		}
+		else
+		{
+			groupname.setText("Similar Content");	
+		}
+		
 		groupname.setTypeface(FontUtil.Roboto_Medium);
 		TextView secondaryname = (TextView)child.findViewById(R.id.carddetailmultimedia_secondaryname);
 		secondaryname.setTypeface(FontUtil.Roboto_Medium);
@@ -751,10 +761,41 @@ public class CardDetailViewFactory {
 		}
 		Button packageButton = (Button)v.findViewById(R.id.carddetaildesc_purchasebutton);
 		packageButton.setOnClickListener(packageButtonListener);
+		packageButton.setTypeface(FontUtil.Roboto_Medium);
+		float price = 10000f;
+		if(mData.packages == null){
+			packageButton.setText("Free");
+			packageButton.setOnClickListener(null);
+		}else{
+			if(mData.currentUserData != null && mData.currentUserData.purchase != null && mData.currentUserData.purchase.size() != 0){
+				packageButton.setText("Watch now");
+				packageButton.setOnClickListener(null);
+			}else{
+				for(CardDataPackages packageitem:mData.packages){
+					if(packageitem.priceDetails != null){
+						for(CardDataPackagePriceDetailsItem priceDetailItem:packageitem.priceDetails){
+							if(priceDetailItem.price < price){
+								price = priceDetailItem.price;
+							}
+						}
+						if(mRupeeCode == null){
+							mRupeeCode = mContext.getResources().getString(R.string.price_rupeecode); 
+						}
+						packageButton.setText(mPriceStarts + mRupeeCode + " "+price);
+					}else{
+						packageButton.setText("Free");
+						packageButton.setOnClickListener(null);
+					}
+				}	
+			}
+		}
+		
 //		createPlayInPlaceView(layout);
 		addSpace(layout,(int)mContext.getResources().getDimension(R.dimen.margin_gap_8));
 		return v;
 	}
+	private String mPriceStarts = "Starts from ";
+	private String mRupeeCode  = null;
 	private View createBriefDescriptionView() {
 		mCredits = null;
 		mDetails = null;
@@ -800,9 +841,37 @@ public class CardDetailViewFactory {
 			moviedescription.setText(mData.generalInfo.briefDescription);
 		}
 		moviedescription.setTypeface(FontUtil.Roboto_Regular);
-		
 		Button packageButton = (Button)v.findViewById(R.id.carddetailbriefdescription_purchasebutton);
 		packageButton.setOnClickListener(packageButtonListener);
+		packageButton.setTypeface(FontUtil.Roboto_Medium);
+		float price = 10000f;
+		if(mData.packages == null){
+			packageButton.setText("Free");
+			packageButton.setOnClickListener(null);
+		}else{
+			if(mData.currentUserData != null && mData.currentUserData.purchase != null && mData.currentUserData.purchase.size() != 0){
+				packageButton.setText("Watch now");
+				packageButton.setOnClickListener(null);
+			}else{
+				for(CardDataPackages packageitem:mData.packages){
+					if(packageitem.priceDetails != null){
+						for(CardDataPackagePriceDetailsItem priceDetailItem:packageitem.priceDetails){
+							if(priceDetailItem.price < price){
+								price = priceDetailItem.price;
+							}
+						}
+						if(mRupeeCode == null){
+							mRupeeCode = mContext.getResources().getString(R.string.price_rupeecode); 
+						}
+						packageButton.setText(mPriceStarts + mRupeeCode + " "+price);
+					}else{
+						packageButton.setText("Free");
+						packageButton.setOnClickListener(null);
+					}
+				}	
+			}
+		}
+		
 		
 		
 		ImageView expand = (ImageView)v.findViewById(R.id.carddetailbriefdescription_expand);

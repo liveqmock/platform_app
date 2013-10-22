@@ -221,9 +221,14 @@ public class IndexHandler {
 			qp.setDefaultOperator(QueryParser.Operator.OR);
 			String queryString = "";
 			for (CardData data : cardIds) {
-				queryString += data._id;
-				queryString += " ";
+				if(data != null && data._id !=null)
+				{
+					queryString += data._id;
+					queryString += " ";
+				}
 			}
+			if(queryString.length() == 0)
+				return null;
 			Query query = qp.parse(queryString);
 			
 			Log.i(TAG,"searching for "+queryString +" in index");
@@ -309,6 +314,8 @@ public class IndexHandler {
 			IndexSearcher indexSearcher = null; 
 			try {
 				initIndexReader();
+				if(mIndexReader.numDocs() <= 0)
+					return null;
 				indexSearcher = new IndexSearcher(mIndexReader);
 				QueryParser qp =null;
 				switch (this.mSearchType) {
@@ -327,10 +334,14 @@ public class IndexHandler {
 				
 				String queryString = "";
 				for (CardData card : mCardIds) {
-//					queryString += "\""+string+"\"";
-					queryString += card._id;
-					queryString += " ";
+//					queryString += "\""+string1+"\"";
+					if(card!=null && card._id !=null)
+					{
+						queryString += card._id;
+						queryString += " ";
+					}
 				}
+				
 				Query query = qp.parse(queryString);
 				
 				Log.i(TAG,"searching for "+queryString +" in index");

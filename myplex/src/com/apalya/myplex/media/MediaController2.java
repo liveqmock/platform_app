@@ -64,7 +64,7 @@ public class MediaController2 extends LinearLayout {
     private ImageView         mNextButton;
     private ImageView         mPrevButton;
     private ImageView 			mMuteButton;
-    private ImageView 			mPlayerQuality;
+    private ImageView 			mFullScreenTooggle;
     private MediaPlayer   	  mMediaPlayer = null;
     private boolean   mMuteEnabled = false;
     private VideoViewPlayer mCustomVideoView = null;
@@ -194,8 +194,9 @@ public class MediaController2 extends LinearLayout {
 
         return mRoot;
     }
-
+    private boolean mPlayerFullScreen = false;
     private void initControllerView(View v) {
+    	mPlayerFullScreen = false;
     	if(mContentEnabled){
     		mPauseButton = (ImageView) v.findViewById(R.id.playpause);
     	}
@@ -204,14 +205,15 @@ public class MediaController2 extends LinearLayout {
             mPauseButton.requestFocus();
             mPauseButton.setOnClickListener(mPauseListener);
         }
-        mPlayerQuality = (ImageView) v.findViewById(R.id.playerquality);
-        if(mPlayerQuality != null){
-        	mPlayerQuality.setOnClickListener(new OnClickListener() {
+        mFullScreenTooggle = (ImageView) v.findViewById(R.id.playerfullscreen);
+        if(mFullScreenTooggle != null){
+        	mFullScreenTooggle.setOnClickListener(new OnClickListener() {
 				
 				@Override
 				public void onClick(View v) {
 					if(mPlayerListener != null){
-						mPlayerListener.onPlayerQualityClick();
+						mPlayerFullScreen = !mPlayerFullScreen;
+						mPlayerListener.onFullScreen(mPlayerFullScreen);
 					}
 				}
 			});

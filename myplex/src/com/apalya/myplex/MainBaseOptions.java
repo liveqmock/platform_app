@@ -13,7 +13,7 @@ public interface MainBaseOptions {
 	
 	public void showfilterMenu();
 
-	public void setPotrait();
+	public void setOrientation(int value);
 
 	public void setSearchBarVisibilty(int visible);
 
