@@ -116,14 +116,14 @@ public class CardVideoPlayer implements PlayerListener {
 		}
 		mVideoViewParent.setOnClickListener(mPlayerClickListener);
 		if(mData._id.equalsIgnoreCase("0"))
-		{
-			mVideoViewParent.setOnClickListener(null);
-			mPlayButton.setVisibility(View.GONE);
-			mVideoView.setVisibility(View.INVISIBLE);
-			mProgressBarLayout.setVisibility(View.INVISIBLE);
-			mPreviewImage.setScaleType(ScaleType.CENTER);
-			mPreviewImage.setBackgroundColor(Color.BLACK);
-		}
+		 {
+			 mVideoViewParent.setOnClickListener(null);
+			 mPlayButton.setVisibility(View.GONE);
+			 mVideoView.setVisibility(View.INVISIBLE);
+			 mProgressBarLayout.setVisibility(View.INVISIBLE);
+			 mPreviewImage.setScaleType(ScaleType.CENTER);
+			 mPreviewImage.setBackgroundColor(Color.BLACK);
+		 }
 		return v;
 	}
 
@@ -181,7 +181,7 @@ public class CardVideoPlayer implements PlayerListener {
 						.parse("rtsp://59.162.166.216:554/AAJTAK_QVGA.sdp");
 				uri = Uri
 						.parse("rtsp://46.249.213.87:554/playlists/bollywood-action_qcif.hpl.3gp");
-				uri = Uri.parse(url);
+				 uri = Uri.parse(url);
 				// Toast.makeText(getContext(), "URL:"+url,
 				// Toast.LENGTH_SHORT).show();
 				VideoViewPlayer.StreamType streamType = StreamType.VOD;
@@ -204,17 +204,6 @@ public class CardVideoPlayer implements PlayerListener {
 				mVideoViewPlayer.setPlayerListener(CardVideoPlayer.this);
 			}
 		});
-
-		boolean lastWatchedStatus=false;
-		for(CardData data:myplexapplication.getUserProfileInstance().lastVisitedCardData)
-		{
-			if(data._id.equalsIgnoreCase(mData._id))
-			{
-				lastWatchedStatus=true;
-			}
-		}
-		if(!lastWatchedStatus)
-			myplexapplication.getUserProfileInstance().lastVisitedCardData.add(mData);
 		MediaUtil.getVideoUrl(mData._id, "low");
 	}
 
@@ -225,7 +214,7 @@ public class CardVideoPlayer implements PlayerListener {
 		int marginleft = (int)mContext.getResources().getDimension(R.dimen.margin_gap_12);
 		mWidth -= marginleft*2;
 		mHeight = (mWidth * 9)/16;
-
+		
 		mParentLayout = parentLayout;
 		LinearLayout.LayoutParams layoutparams = new LinearLayout.LayoutParams(mWidth,mHeight);
 		layoutparams.setMargins(marginleft, marginleft, marginleft, marginleft);
@@ -269,16 +258,16 @@ public class CardVideoPlayer implements PlayerListener {
 			}
 		}
 		mVideoViewParent.setOnClickListener(mPlayerClickListener);
-		if(mData._id.equalsIgnoreCase("0"))
-		{
-			mVideoViewParent.setOnClickListener(null);
-			mPlayButton.setVisibility(View.GONE);
-			mVideoView.setVisibility(View.INVISIBLE);
-			mProgressBarLayout.setVisibility(View.INVISIBLE);
-			mPreviewImage.setScaleType(ScaleType.CENTER);
-			mPreviewImage.setBackgroundColor(Color.BLACK);
-		}
-		// mPlay.setOnClickListener(mPlayListener);
+		 if(mData._id.equalsIgnoreCase("0"))
+		 {
+			 mVideoViewParent.setOnClickListener(null);
+			 mPlayButton.setVisibility(View.GONE);
+			 mVideoView.setVisibility(View.INVISIBLE);
+			 mProgressBarLayout.setVisibility(View.INVISIBLE);
+			 mPreviewImage.setScaleType(ScaleType.CENTER);
+			 mPreviewImage.setBackgroundColor(Color.BLACK);
+		 }
+		 	// mPlay.setOnClickListener(mPlayListener);
 		return v;
 	}
 
@@ -336,7 +325,7 @@ public class CardVideoPlayer implements PlayerListener {
 
 	public void playInLandscape() {
 		int statusBarHeight = Util.getStatusBarHeight(mContext);
-
+		
 		int derviedWidth = myplexapplication.getApplicationConfig().screenWidth;
 		int derviedHeight = myplexapplication.getApplicationConfig().screenHeight;
 		if(!mContext.getResources().getBoolean(R.bool.isTablet)){
@@ -364,12 +353,12 @@ public class CardVideoPlayer implements PlayerListener {
 			int marginleft = (int)mContext.getResources().getDimension(R.dimen.margin_gap_12);
 			mWidth -= marginleft*2;
 			mHeight = (mWidth * 9)/16;
-
+			
 			LinearLayout.LayoutParams layoutparams = new LinearLayout.LayoutParams(mWidth,mHeight);
 			layoutparams.setMargins(marginleft, marginleft, marginleft, marginleft);
 			mParentLayout.setLayoutParams(layoutparams);
 		}
-
+		
 		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(mWidth, mHeight);
 		mVideoViewParent.setLayoutParams(params);
 		mVideoView.setLayoutParams(params);
