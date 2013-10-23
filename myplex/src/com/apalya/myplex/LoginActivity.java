@@ -288,16 +288,28 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				backgroundScrollLayout= (RelativeLayout)findViewById(R.id.relativeLayout1);
 				backgroundScrollLayout.clearAnimation();
 				
+				/*ValueAnimator translatex = ObjectAnimator.ofFloat(backgroundScrollLayout,"translationX", -scrollWidth, 0);
+                translatex.setDuration((scrollWidth/width)*scrollWidth*160);
+                translatex.setRepeatCount(Animation.INFINITE);
+                translatex.setRepeatMode(2);
+                translatex.start();*/
+				
 				translateAnim = new TranslateAnimation(-scrollWidth,0,0,0); 
+				translateAnim.setDetachWallpaper(true);
 				translateAnim.setDuration((scrollWidth/width)*scrollWidth*350);   
 				translateAnim.setRepeatCount(Animation.INFINITE);
 				translateAnim.setInterpolator(new LinearInterpolator());
 				translateAnim.setRepeatMode(2);
-				translateAnim.setFillBefore(true);
+				translateAnim.setFillEnabled(true);
+				translateAnim.scaleCurrentDuration(1f);
 				backgroundScrollLayout.startAnimation(translateAnim);
+
+				
 
 			}
 		});
+		
+		
 
 		/*Animation animTranslation = new TranslateAnimation(Animation.RELATIVE_TO_SELF, -100.0f, Animation.RELATIVE_TO_SELF, 0f,
 				Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f);
@@ -410,7 +422,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			mPlusClient.connect();
 
 		}
-
+		CheckUserStatus();
 
 		//Check if Keyboard is visible or not
 		//mRootLayout = findViewById(R.id.rootlayout);  
@@ -679,7 +691,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			throw new RuntimeException("Could not encode hour of the day in JSON");
 		}
 
-		CheckUserStatus();
+		//CheckUserStatus();
 
 		if(isAuthTwitter())
 		{
@@ -1466,7 +1478,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 						mUserInfo.joinedDate=now.toLocaleString();
 						mUserInfo.lastVisitedDate=now.toLocaleString();
 
-						//						ConsumerApi.DEBUGCLIENTKEY = jsonResponse.getString("clientKey");
+						ConsumerApi.DEBUGCLIENTKEY = jsonResponse.getString("clientKey");
 
 						SharedPrefUtils.writeToSharedPref(LoginActivity.this,
 								getString(R.string.devclientkey), jsonResponse.getString("clientKey"));
@@ -1499,8 +1511,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 		String clientKey=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
 				getString(R.string.devclientkey));
-		if(clientKey != null && clientKey.length() >10){
-			//			ConsumerApi.DEBUGCLIENTKEY = clientKey;
+		if(clientKey != null ){
+			ConsumerApi.DEBUGCLIENTKEY = clientKey;
 		}
 		String clientKeyExp=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
 				getString(R.string.devclientkeyexp));
