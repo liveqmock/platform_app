@@ -252,7 +252,8 @@ public class Util {
 			DownloadManager manager = (DownloadManager) mContext.getSystemService(Context.DOWNLOAD_SERVICE);
 
 
-			Uri uri=Uri.parse("http://commonsware.com/misc/test.mp4");
+			//Uri uri=Uri.parse("http://commonsware.com/misc/test.mp4");
+			Uri uri=Uri.parse(aUrl);
 
 			Environment
 			.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
@@ -260,13 +261,12 @@ public class Util {
 
 			lastDownloadId=
 					manager.enqueue(new DownloadManager.Request(uri)
-					.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI |
-							DownloadManager.Request.NETWORK_MOBILE)
+					.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI)
 							.setAllowedOverRoaming(false)
-							.setTitle("Demo")
-							.setDescription("Something useful. No, really.")
+							.setTitle("myplex")
+							.setDescription(aMovieName)
 							.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,
-									"test.mp4"));
+									aMovieName+".wvm"));
 
 			//			//String url = "http://220.226.22.120:9090/aptv3-downloads/appdevclip.wvm";
 			//			String url=aUrl;

@@ -14,6 +14,7 @@ import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.DisplayMetrics;
@@ -71,15 +72,23 @@ public class SignUpActivity extends Activity{
 	private DeviceDetails mDevInfo;
 	boolean isValidPhoneNumber=false;
 	private static int scrollWidth;
+	private TranslateAnimation translateAnim;
+	private RelativeLayout backgroundScrollLayout;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		if(getResources().getBoolean(R.bool.isTablet))
+			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+		else
+			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 		getActionBar().hide();
-
+		
 		setContentView(R.layout.signupscreen);
 
+		
 		mDevInfo=myplexapplication.getDevDetailsInstance();
 
 		prepareSlideNotifiation();
@@ -326,14 +335,14 @@ public class SignUpActivity extends Activity{
 
 		}
 
-		ImageView img1= (ImageView)findViewById(R.id.imageView1);
+		//ImageView img1= (ImageView)findViewById(R.id.imageView1);
 		/*ImageView img2= (ImageView)findViewById(R.id.imageView2);
 		ImageView img3= (ImageView)findViewById(R.id.imageView3);
 		ImageView img4= (ImageView)findViewById(R.id.imageView4);
 		ImageView img5= (ImageView)findViewById(R.id.imageView5);
 		ImageView img6= (ImageView)findViewById(R.id.imageView6);*/
 		
-		img1.setImageResource(R.drawable.myplexbgimage);
+		//img1.setImageResource(R.drawable.myplexbgimage);
 		
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -357,17 +366,46 @@ public class SignUpActivity extends Activity{
 			@Override
 			public void onGlobalLayout() {
 				parentScrollView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-				scrollWidth=parentScrollView.getChildAt(0).getMeasuredWidth()-getWindowManager().getDefaultDisplay().getWidth();
+				
 				//Util.showToast(Integer.toString(scrollWidth),LoginActivity.this);
-				RelativeLayout backgroundScrollLayout= (RelativeLayout)findViewById(R.id.relativeLayout1);
-				backgroundScrollLayout.clearAnimation();
-				TranslateAnimation translateAnim = new TranslateAnimation(-scrollWidth,0,0,0); 
-				translateAnim.setDuration((scrollWidth/width)*scrollWidth*350);   
-				translateAnim.setRepeatCount(Animation.INFINITE);
-				translateAnim.setInterpolator(new LinearInterpolator());
-				translateAnim.setRepeatMode(2);
-				translateAnim.setFillBefore(true);
-				backgroundScrollLayout.startAnimation(translateAnim);
+				if(getResources().getBoolean(R.bool.isTablet))
+				{
+					scrollWidth=parentScrollView.getChildAt(0).getMeasuredWidth()-getWindowManager().getDefaultDisplay().getWidth();
+					//Util.showToast(Integer.toString(scrollWidth),LoginActivity.this);
+					LinearLayout backgroundLayout= (LinearLayout)findViewById(R.id.relativeLayout1);
+					backgroundLayout.clearAnimation();
+
+					translateAnim = new TranslateAnimation(-scrollWidth,0,0,0); 
+					translateAnim.setDetachWallpaper(true);
+
+					translateAnim.setDuration(10000);   
+					translateAnim.setRepeatCount(Animation.INFINITE);
+					translateAnim.setInterpolator(new LinearInterpolator());
+					translateAnim.setRepeatMode(2);
+					//translateAnim.setFillEnabled(true);
+					//translateAnim.setFillBefore(true);
+					translateAnim.scaleCurrentDuration(1f);
+					backgroundLayout.startAnimation(translateAnim);
+				}
+				else
+				{
+					scrollWidth=parentScrollView.getChildAt(0).getMeasuredWidth()-getWindowManager().getDefaultDisplay().getWidth();
+					//Util.showToast(Integer.toString(scrollWidth),LoginActivity.this);
+					backgroundScrollLayout= (RelativeLayout)findViewById(R.id.relativeLayout1);
+					backgroundScrollLayout.clearAnimation();
+
+					translateAnim = new TranslateAnimation(-scrollWidth,0,0,0); 
+					translateAnim.setDetachWallpaper(true);
+
+					translateAnim.setDuration(scrollWidth*100);   
+					translateAnim.setRepeatCount(Animation.INFINITE);
+					translateAnim.setInterpolator(new LinearInterpolator());
+					translateAnim.setRepeatMode(2);
+					translateAnim.setFillEnabled(true);
+					translateAnim.setFillBefore(true);
+					translateAnim.scaleCurrentDuration(1f);
+					backgroundScrollLayout.startAnimation(translateAnim);
+				}
 
 			}
 		});

@@ -24,6 +24,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -74,12 +75,14 @@ import com.apalya.myplex.utils.Twitter11;
 import com.apalya.myplex.utils.Util;
 import com.facebook.FacebookAuthorizationException;
 import com.facebook.FacebookOperationCanceledException;
+import com.facebook.FacebookRequestError;
 import com.facebook.LoggingBehavior;
 import com.facebook.Request;
 import com.facebook.Request.GraphUserCallback;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.Settings;
+import com.facebook.android.Facebook;
 import com.facebook.model.GraphUser;
 import com.flurry.android.FlurryAgent;
 import com.google.android.gms.common.ConnectionResult;
@@ -142,7 +145,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 	private static int scrollWidth;
 	private TranslateAnimation translateAnim;
 	private RelativeLayout backgroundScrollLayout;
-	
+
 	/*
 	 * In order for your app to receive push notifications, you will need to enable
 	 * the Google Cloud Messaging for Android service in your Google APIs console. To do this:
@@ -198,6 +201,12 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		// The data-sets are separate, and may have different unique keys (distinct_id).
 		// We recommend using the same distinct_id value for a given user in both,
 		// and identifying the user with that id as early as possible.
+
+		if(getResources().getBoolean(R.bool.isTablet))
+			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+		else
+			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+
 		getActionBar().hide();
 		setContentView(R.layout.loginscreen);
 
@@ -223,43 +232,6 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		mFacebookButton.setOnClickListener(this);
 		mFacebookButton.setTypeface(FontUtil.Roboto_Regular);
 
-		ImageView img1= (ImageView)findViewById(R.id.imageView1);
-
-		img1.setImageResource(R.drawable.myplexbgimage);
-
-		/*		TranslateAnimation _translateAnimation = new TranslateAnimation(TranslateAnimation.ABSOLUTE, -1930f, TranslateAnimation.ABSOLUTE, 0f, TranslateAnimation.ABSOLUTE, 0f, TranslateAnimation.ABSOLUTE, 0f);
-		_translateAnimation.setDuration(5*1000);
-		_translateAnimation.setRepeatCount(-1);
-		_translateAnimation.setRepeatMode(Animation.REVERSE);
-		_translateAnimation.setInterpolator(new LinearInterpolator());
-		img1.setAnimation(_translateAnimation); */
-
-		/*ImageView img2= (ImageView)findViewById(R.id.imageView2);
-		ImageView img3= (ImageView)findViewById(R.id.imageView3);
-		ImageView img4= (ImageView)findViewById(R.id.imageView4);
-		ImageView img5= (ImageView)findViewById(R.id.imageView5);
-		ImageView img6= (ImageView)findViewById(R.id.imageView6);
-
-		DisplayMetrics dm = new DisplayMetrics();
-		getWindowManager().getDefaultDisplay().getMetrics(dm);
-
-		final int height = dm.heightPixels;
-		final int width = dm.widthPixels;
-
-		img1.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image1, width, height));
-		img2.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image2, width, height));
-		img3.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image3, width, height));
-		img4.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image4, width, height));
-		img5.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image5, width, height));
-		img6.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image6, width, height));
-
-		img1.setScaleType(ScaleType.CENTER_INSIDE);
-		img2.setScaleType(ScaleType.CENTER_INSIDE);
-		img3.setScaleType(ScaleType.CENTER_INSIDE);
-		img4.setScaleType(ScaleType.CENTER_INSIDE);
-		img5.setScaleType(ScaleType.CENTER_INSIDE);
-		img6.setScaleType(ScaleType.CENTER_INSIDE);*/
-
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 
@@ -276,40 +248,59 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				return true;
 			}
 		});
-		
+
 		ViewTreeObserver vto = parentScrollView.getViewTreeObserver();
-		
+
 		vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
 			@Override
 			public void onGlobalLayout() {
 				parentScrollView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-				scrollWidth=parentScrollView.getChildAt(0).getMeasuredWidth()-getWindowManager().getDefaultDisplay().getWidth();
-				//Util.showToast(Integer.toString(scrollWidth),LoginActivity.this);
-				backgroundScrollLayout= (RelativeLayout)findViewById(R.id.relativeLayout1);
-				backgroundScrollLayout.clearAnimation();
-				
-				/*ValueAnimator translatex = ObjectAnimator.ofFloat(backgroundScrollLayout,"translationX", -scrollWidth, 0);
-                translatex.setDuration((scrollWidth/width)*scrollWidth*160);
-                translatex.setRepeatCount(Animation.INFINITE);
-                translatex.setRepeatMode(2);
-                translatex.start();*/
-				
-				translateAnim = new TranslateAnimation(-scrollWidth,0,0,0); 
-				translateAnim.setDetachWallpaper(true);
-				translateAnim.setDuration((scrollWidth/width)*scrollWidth*350);   
-				translateAnim.setRepeatCount(Animation.INFINITE);
-				translateAnim.setInterpolator(new LinearInterpolator());
-				translateAnim.setRepeatMode(2);
-				translateAnim.setFillEnabled(true);
-				translateAnim.scaleCurrentDuration(1f);
-				backgroundScrollLayout.startAnimation(translateAnim);
 
-				
+
+				if(getResources().getBoolean(R.bool.isTablet))
+				{
+					scrollWidth=parentScrollView.getChildAt(0).getMeasuredWidth()-getWindowManager().getDefaultDisplay().getWidth();
+					//Util.showToast(Integer.toString(scrollWidth),LoginActivity.this);
+					LinearLayout backgroundLayout= (LinearLayout)findViewById(R.id.relativeLayout1);
+					backgroundLayout.clearAnimation();
+
+					translateAnim = new TranslateAnimation(-scrollWidth,0,0,0); 
+					translateAnim.setDetachWallpaper(true);
+
+					translateAnim.setDuration(10000);   
+					translateAnim.setRepeatCount(Animation.INFINITE);
+					translateAnim.setInterpolator(new LinearInterpolator());
+					translateAnim.setRepeatMode(2);
+					//translateAnim.setFillEnabled(true);
+					//translateAnim.setFillBefore(true);
+					translateAnim.scaleCurrentDuration(1f);
+					backgroundLayout.startAnimation(translateAnim);
+				}
+				else
+				{
+					scrollWidth=parentScrollView.getChildAt(0).getMeasuredWidth()-getWindowManager().getDefaultDisplay().getWidth();
+					//Util.showToast(Integer.toString(scrollWidth),LoginActivity.this);
+					backgroundScrollLayout= (RelativeLayout)findViewById(R.id.relativeLayout1);
+					backgroundScrollLayout.clearAnimation();
+
+					translateAnim = new TranslateAnimation(-scrollWidth,0,0,0); 
+					translateAnim.setDetachWallpaper(true);
+
+					translateAnim.setDuration(scrollWidth*100);   
+					translateAnim.setRepeatCount(Animation.INFINITE);
+					translateAnim.setInterpolator(new LinearInterpolator());
+					translateAnim.setRepeatMode(2);
+					translateAnim.setFillEnabled(true);
+					translateAnim.setFillBefore(true);
+					translateAnim.scaleCurrentDuration(1f);
+					backgroundScrollLayout.startAnimation(translateAnim);
+				}
+
 
 			}
 		});
-		
-		
+
+
 
 		/*Animation animTranslation = new TranslateAnimation(Animation.RELATIVE_TO_SELF, -100.0f, Animation.RELATIVE_TO_SELF, 0f,
 				Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF, 0.0f);
@@ -326,7 +317,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		mLoginText.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				
+
 				ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(mLoginText, "alpha", 0.5f, 1f);
 				fadeAnim2.setDuration(300);
 				fadeAnim2.start();
@@ -378,6 +369,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 
 		Settings.addLoggingBehavior(LoggingBehavior.INCLUDE_ACCESS_TOKENS);
+		Settings.addLoggingBehavior(LoggingBehavior.REQUESTS);
 		Session session = Session.getActiveSession();
 		if (session == null) {
 			if (savedInstanceState != null) {
@@ -391,7 +383,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				//session.openForRead(new Session.OpenRequest(this).setCallback(statusCallback));
 				if (!session.isOpened() && !session.isClosed()) {
 					session.openForRead(new Session.OpenRequest(this)
-					.setPermissions(Arrays.asList("basic_info","email","read_friendlists","user_about_me","friends_about_me"))
+					.setPermissions(Arrays.asList("basic_info","email","read_friendlists","user_about_me","friends_about_me","user_hometown"))
 					.setCallback(statusCallback));
 				} else {
 					Session.openActiveSession(this, true, statusCallback);
@@ -764,6 +756,9 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					{
 						fbUserId=user.getId();
 						mUserInfo.setName(user.getName());
+						mUserInfo.setUserEmail(user.getProperty("email").toString());
+						//mUserInfo.location=user.getProperty("location").toString();
+						//mUserInfo.setProfileDesc(user.getProperty("hometown").);
 						mUserInfo.setLoginStatus(true);
 						mUserInfo.setProfilePic("https://graph.facebook.com/"+fbUserId+"/picture?width=480&height=320");
 
@@ -1364,13 +1359,15 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 		TelephonyManager mTelephonyMgr;
 		mTelephonyMgr = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-		mDevInfo.setDeviceId(mTelephonyMgr.getDeviceId());
-		mDevInfo.setOperatorName(mTelephonyMgr.getNetworkOperatorName());
-		mDevInfo.setMccMnc(String.valueOf(mTelephonyMgr.getSimOperator()));
-		mDevInfo.setSimSNo(mTelephonyMgr.getSimSerialNumber());
-		mDevInfo.setImsiNo(mTelephonyMgr.getSubscriberId());
-		mDevInfo.setSimState(mTelephonyMgr.getSimState());
-
+		if(mTelephonyMgr!=null)
+		{
+			mDevInfo.setDeviceId(mTelephonyMgr.getDeviceId());
+			mDevInfo.setOperatorName(mTelephonyMgr.getNetworkOperatorName());
+			mDevInfo.setMccMnc(String.valueOf(mTelephonyMgr.getSimOperator()));
+			mDevInfo.setSimSNo(mTelephonyMgr.getSimSerialNumber());
+			mDevInfo.setImsiNo(mTelephonyMgr.getSubscriberId());
+			mDevInfo.setSimState(mTelephonyMgr.getSimState());
+		}
 		Log.d(TAG, "******************************************************************");
 	}
 	private boolean isTokenValid(String clientKeyExp) {
@@ -1571,7 +1568,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			//Analytics.trackEvent("DEVICE-REGISTRATION-REQUEST",true);
 			Log.d(TAG, "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 			Map<String, String> params = new HashMap<String, String>();
-			params.put("serialNo", mDevInfo.getDeviceId());
+			params.put("serialNo", mDevInfo.getDeviceSNo());
 			params.put("os", mDevInfo.getDeviceOs());
 			params.put("osVersion", mDevInfo.getDeviceOsVer());
 			params.put("make",mDevInfo.getDeviceMake());

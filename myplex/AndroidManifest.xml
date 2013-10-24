@@ -26,8 +26,8 @@
         android:hardwareAccelerated="true" >
         <activity
             android:name="com.apalya.myplex.LoginActivity"
-            android:configChanges="orientation"
             android:label="@string/app_name"
+            android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -52,6 +52,7 @@
             android:label="myplex" />
         <activity
             android:name=".SignUpActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustResize" >
         </activity>

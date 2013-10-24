@@ -75,7 +75,7 @@
                 android:layout_marginBottom="@dimen/margin_gap_24"
                 android:layout_marginLeft="@dimen/margin_gap_24"
                 android:layout_marginRight="@dimen/margin_gap_24"
-                android:background="#f1f1f1"
+                android:background="@drawable/background_card"
                 android:orientation="vertical"
                 android:visibility="gone" >
 
@@ -89,7 +89,8 @@
                     android:background="#F1F1F1"
                     android:hint="@string/hinttextemail"
                     android:inputType="textEmailAddress"
-                    android:textSize="@dimen/textsize_14" />
+                    android:textSize="@dimen/textsize_14"
+                    android:textColor="#b5b6c0" />
 
                 <View
                     android:id="@+id/sp"
@@ -114,7 +115,8 @@
                     android:background="#F1F1F1"
                     android:hint="@string/hinttextpwd"
                     android:inputType="textPassword"
-                    android:textSize="@dimen/textsize_14" />
+                    android:textSize="@dimen/textsize_14"
+                    android:textColor="#b5b6c0" />
 
                 <View
                     android:id="@+id/sp1"
@@ -139,7 +141,7 @@
                     android:layout_marginTop="32dp"
                     android:background="@drawable/buttonbackground"
                     android:text="@string/signup"
-                    android:textColor="#343842" />
+                    android:textColor="#464B55" />
 
                 <Space
                     android:id="@+id/buttonbottomspace"
@@ -171,7 +173,7 @@
                 android:layout_marginLeft="@dimen/margin_gap_24"
                 android:layout_marginRight="@dimen/margin_gap_24"
                 android:layout_marginBottom="@dimen/margin_gap_24"
-                android:background="#f1f1f1"
+                android:background="@drawable/background_card"
                 android:orientation="vertical" >
 
                 <EditText
@@ -184,7 +186,8 @@
                     android:background="#F1F1F1"
                     android:hint="@string/hinttextemail"
                     android:inputType="textEmailAddress"
-                    android:textSize="@dimen/textsize_14" />
+                    android:textSize="@dimen/textsize_14"
+                    android:textColor="#b5b6c0" />
 
                 <View
                     android:id="@+id/loginsp"
@@ -209,7 +212,8 @@
                     android:background="#F1F1F1"
                     android:hint="@string/password"
                     android:inputType="textPassword"
-                    android:textSize="@dimen/textsize_14" />
+                    android:textSize="@dimen/textsize_14" 
+                    android:textColor="#b5b6c0"/>
 
                 <View
                     android:id="@+id/loginsp1"
@@ -235,7 +239,7 @@
                     android:background="@drawable/buttonbackground"
                     android:text="@string/signup"
                     android:typeface="sans"
-                    android:textColor="#343842" />
+                    android:textColor="#464B55" />
 
                 <Space
                     android:id="@+id/loginbottomspace"

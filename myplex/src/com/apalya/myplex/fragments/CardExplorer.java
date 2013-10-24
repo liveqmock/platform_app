@@ -375,8 +375,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	@Override
 	public void favouriteAction(final CardData data,int type){
 		FavouriteUtil favUtil = new FavouriteUtil();
-		long id=Util.startDownload("", "", getContext());
-		myplexapplication.getUserProfileInstance().downloadMap.put(data._id, id);
+		//long id=Util.startDownload("", "", getContext());
+		//myplexapplication.getUserProfileInstance().downloadMap.put(data._id, id);
 		favUtil.addFavourite(type, data, new FavouriteCallback() {
 			
 			@Override

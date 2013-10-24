@@ -13,19 +13,19 @@
 
         <ImageView
             android:id="@+id/customactionbar_drawer"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_gravity="center_vertical"
             android:contentDescription="@string/hello_world"
             android:src="@drawable/iconmenu" />
 
-        <ImageView
+       <!--  <ImageView
             android:layout_width="32dp"
             android:layout_height="32dp"
-            android:layout_margin="4dp"
+            android:layout_margin="0dp"
             android:layout_gravity="center_vertical"
             android:contentDescription="@string/hello_world"
-            android:src="@drawable/watermark" />
+            android:src="@drawable/watermark" /> -->
     </LinearLayout>
 
     <RelativeLayout

@@ -15,19 +15,20 @@
             android:visibility="gone" >
         </include>
 
-        <RelativeLayout android:id="@+id/drawerlayout"
+        <RelativeLayout
+            android:id="@+id/drawerlayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@+id/tablayoutchanger" 
-             android:background="@drawable/navigation">
-            
+            android:layout_above="@+id/tablayoutchanger"
+            android:background="@drawable/navigation" >
+
             <TextView
                 android:id="@+id/searchBox"
                 android:layout_width="fill_parent"
                 android:layout_height="48dp"
                 android:drawableRight="@drawable/iconsearchgrey"
-                android:textSize="@dimen/textsize_14"
-                android:gravity="center"/>
+                android:gravity="center"
+                android:textSize="@dimen/textsize_14" />
 
             <ListView
                 android:id="@+id/left_drawer"
@@ -35,7 +36,7 @@
                 android:layout_height="fill_parent"
                 android:layout_below="@id/searchBox"
                 android:layout_gravity="start"
-
+                android:background="#E0E0E0"
                 android:choiceMode="singleChoice"
                 android:divider="@android:color/transparent"
                 android:dividerHeight="0dp"

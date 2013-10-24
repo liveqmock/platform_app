@@ -9,19 +9,39 @@ import java.util.Map;
 
 public class UserProfile implements Serializable{
 	private static final long serialVersionUID = 1L;
-	private static String useremail;
+	private static String useremail="NA";
 	private static String userid;
 	private static String facebookid;
 	private static String googleid;
 	private static String profilepic;
-	private static String profileDesc;
-	private static String name;
+	private static String profileDesc="NA";
+	private static String name="NA";
 	private static boolean loggedInStatus;
 	public String joinedDate;
-	public String lastVisitedDate;
+	public String phonenumber="NA";
+	public String location="NA";
+	public String lastVisitedDate="NA";
 	public boolean firstVisitStatus;
+	private String userProfile;
+	public String likes="NA";
 	public List<CardData> lastVisitedCardData=new ArrayList<CardData>();
 	public Map<String, Long> downloadMap = new HashMap<String, Long>();
+	
+	public String getUserProfile(){
+		
+		
+		
+		userProfile="Name: "+name+"\n\n"+
+					"User Email: "+useremail+"\n\n"+
+				    "Phone: "+phonenumber+"\n\n"+
+					"Location: "+location+"\n\n"+
+				    "About: "+profileDesc+"\n\n"+
+					"Joined on:"+joinedDate+"\n\n"+
+				    "Last Visited: "+lastVisitedDate+"\n\n"+
+				    "Likes: "+likes+"\n\n";
+		return userProfile;
+		
+	}
 	
 	public void setUserEmail(String aUserEmail)
 	{

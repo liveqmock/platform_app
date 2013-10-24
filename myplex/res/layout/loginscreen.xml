@@ -7,7 +7,7 @@
     <HorizontalScrollView 
         android:id="@+id/scrollView1"
         android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
          >
 
         <RelativeLayout
@@ -84,8 +84,8 @@
 
         <LinearLayout
             android:id="@+id/social"
-            android:layout_width="320dp"
-            android:layout_height="48dp"
+            android:layout_width="332dp"
+            android:layout_height="46dp"
             android:layout_above="@id/line"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="12dp"
@@ -96,29 +96,29 @@
 
             <Button
                 android:id="@+id/google"
-                android:layout_width="wrap_content"
-                android:layout_height="48dp"
+                android:layout_width="160dp"
+                android:layout_height="46dp"
                 android:layout_weight="1.0"
                 android:background="@drawable/buttongoogle" />
 
             <Space
                 android:id="@+id/vsp1"
-                android:layout_width="10dp"
+                android:layout_width="12dp"
                 android:layout_height="wrap_content"
                 android:background="#D1D1D1" />
 
             <Button
                 android:id="@+id/twitter"
-                android:layout_width="wrap_content"
-                android:layout_height="48dp"
+                android:layout_width="160dp"
+                android:layout_height="46dp"
                 android:layout_weight="1.0"
                 android:background="@drawable/buttontwitter" />
         </LinearLayout>
 
         <Button
             android:id="@+id/fb"
-            android:layout_width="320dp"
-            android:layout_height="48dp"
+            android:layout_width="332dp"
+            android:layout_height="46dp"
             android:layout_above="@id/social"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="12dp"

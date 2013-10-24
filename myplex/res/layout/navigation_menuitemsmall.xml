@@ -21,6 +21,6 @@
         android:paddingRight="16dp"
         android:text="Settings"
         android:textSize="@dimen/textsize_16"
-        android:textColor="#fff" />
+        android:textColor="#1E2125" />
 
 </LinearLayout>

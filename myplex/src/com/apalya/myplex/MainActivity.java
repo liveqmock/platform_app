@@ -116,13 +116,13 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FAVOURITE,R.drawable.iconfav, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.PURCHASES,R.drawable.iconpurchases, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.DOWNLOADS,R.drawable.icondnload, null, NavigationOptionsMenuAdapter.NOACTION_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu("Settings",R.drawable.iconsearch, null, NavigationOptionsMenuAdapter.NOACTION_ACTION,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu("Settings",R.drawable.iconsettings, null, NavigationOptionsMenuAdapter.NOACTION_ACTION,R.layout.navigation_menuitemsmall));
 		Session fbSession=Session.getActiveSession();
 		if(fbSession!=null && fbSession.isOpened())
 			mMenuItemList.add(new NavigationOptionsMenu("Invite Friends",R.drawable.iconfriends, null, NavigationOptionsMenuAdapter.INVITE_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu("Logout",R.drawable.iconlogout, null, NavigationOptionsMenuAdapter.LOGOUT_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu("ApplicationLogo",R.drawable.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.RECOMMENDED,R.drawable.iconrate, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.RECOMMENDED,R.drawable.iconhome, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.MOVIES,R.drawable.iconmovie, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LIVETV,R.drawable.iconlivetv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.TVSHOWS,R.drawable.icontv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
@@ -211,7 +211,12 @@ public class MainActivity extends Activity implements MainBaseOptions {
 	}
 
 	private void showNavigationFullImage(boolean value){
-		AnimatorSet set = new AnimatorSet();
+		if(value)
+			mNavigationMenu.setImageResource(R.drawable.iconmenu);
+		else
+			mNavigationMenu.setImageResource(R.drawable.iconmenuin);
+		
+		/*AnimatorSet set = new AnimatorSet();
 		int fromX = 0;
 		int toX = -(mNavigationMenu.getWidth()/2);
 		if(value){
@@ -221,7 +226,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		set.play(ObjectAnimator.ofFloat(mNavigationMenu, View.TRANSLATION_X, fromX,toX));
 		set.setDuration(200);
 		set.setInterpolator(new DecelerateInterpolator());
-		set.start();
+		set.start();*/
 	}
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
@@ -492,8 +497,8 @@ public class MainActivity extends Activity implements MainBaseOptions {
 				profileInfo.title=myplexapplication.getUserProfileInstance().getName();
 				if(myplexapplication.getUserProfileInstance().joinedDate==null)
 					myplexapplication.getUserProfileInstance().joinedDate=myplexapplication.getUserProfileInstance().lastVisitedDate;
-				profileInfo.briefDescription="Joined myplex on: "+myplexapplication.getUserProfileInstance().joinedDate+" \n Last Visited on: "+myplexapplication.getUserProfileInstance().lastVisitedDate+" ";
-				profileInfo.description="Joined myplex on: "+myplexapplication.getUserProfileInstance().joinedDate+" \n Last Visited on: "+myplexapplication.getUserProfileInstance().lastVisitedDate+" ";
+				profileInfo.briefDescription=myplexapplication.getUserProfileInstance().getUserProfile();
+				profileInfo.description=myplexapplication.getUserProfileInstance().getUserProfile();
 				CardDataImages pics=new CardDataImages();
 				CardDataImagesItem profilePic=new CardDataImagesItem();
 				profilePic.profile="xxhdpi";
