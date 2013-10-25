@@ -2,6 +2,7 @@ package com.apalya.myplex.media;
 
 
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.drm.DrmErrorEvent;
@@ -25,7 +26,8 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.apalya.myplex.data.ErrorManagerData;
-
+import com.apalya.myplex.utils.WidevineDrm;
+import com.flurry.android.monolithic.sdk.impl.mc;
 public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 		MediaPlayer.OnCompletionListener, OnPreparedListener,
 		OnSeekCompleteListener, OnBufferingUpdateListener {
@@ -59,7 +61,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 	private Context mContext = null;
 	private ErrorManagerData errordata = null; 
 	private ProgressBar mProgressBar = null;
-	private DrmManagerClient drmManager;
+	private WidevineDrm drmManager;
 
 	public static enum StreamType {
 		LIVE, VOD
@@ -110,6 +112,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 			}
 		}
 	};
+	private boolean isPlayStarted=false;
 
 	public VideoViewPlayer(VideoView rootView, Context context, Uri videoUri,
 			StreamType streamType) {
@@ -147,7 +150,12 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 			//DRM CONTENT, GET THE RIGHTS
 			acquireRights();
 		}
-		openVideo();
+		else
+		{
+			openVideo();	
+		}
+			
+		
 		
 	}
 	private void initilizeMediaController() {
@@ -210,11 +218,12 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 
 	}
 	private void displayAlert(String message){
-		/*AlertDialog.Builder builder = new AlertDialog.Builder(myplexapplication.getContext());
+		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 		builder.setMessage(message)
 		.setPositiveButton("OK", null);
 		AlertDialog dialog = builder.create();
-		dialog.show();*/
+		dialog.show();
+		return;
 	}
 	/*private Handler handler = new Handler(){
 		public void
@@ -226,21 +235,64 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 	};*/
 	
 	public void acquireRights(){
-		DrmInfoRequest drmRequest = new DrmInfoRequest(
+		/*DrmInfoRequest drmRequest = new DrmInfoRequest(
 				DrmInfoRequest.TYPE_RIGHTS_ACQUISITION_INFO,"video/wvm");
 		// Setup drm info object
-		drmRequest.put("WVDRMServerKey","https://staging.shibboleth.tv/widevine/cypherpc/cgi-bin/GetEMMs.cgi");
+		drmRequest.put("WVDRMServerKey","http://122.248.233.48/widevine/cypherpc/cgi-bin/GetEMMs.cgi");
 		drmRequest.put("WVAssetURIKey", mUri.toString());
-		drmRequest.put("WVDeviceIDKey", "device1");
-		drmRequest.put("WVPortalKey", "OEM");
+		drmRequest.put("WVDeviceIDKey", "device12345");
+		drmRequest.put("WVPortalKey", "sotalapalya");*/
 		// Request license
-		drmManager.acquireRights(drmRequest); 
+		drmManager.acquireRights(mUri.toString()); 
 	}
 	
 	private void prepareDrmManager(){
 		
+		drmManager = new WidevineDrm(mContext);
+		
+		
+		drmManager.logBuffer.append("Asset Uri: " + mUri.toString() + "\n");
+		drmManager.logBuffer.append("Drm Server: " + WidevineDrm.Settings.DRM_SERVER_URI + "\n");
+		drmManager.logBuffer.append("Device Id: " + WidevineDrm.Settings.DEVICE_ID + "\n");
+		drmManager.logBuffer.append("Portal Name: " + WidevineDrm.Settings.PORTAL_NAME + "\n");
+
+        // Set log update listener
+        WidevineDrm.WidevineDrmLogEventListener drmLogListener =
+            new WidevineDrm.WidevineDrmLogEventListener() {
+
+            public void logUpdated(String msg) {
+                
+            	updateLogs(msg);
+            }
+        };
+		
+        drmManager.setLogListener(drmLogListener);
+        drmManager.registerPortal(WidevineDrm.Settings.PORTAL_NAME);
+        
+		/*if (drmManager.isProvisionedDevice()) {
+            setContentView(R.layout.activity_main);
+        } else {
+            setContentView(R.layout.notprovisioned);
+        }*/
+		
+		
+		
+		/*
+		
 		// Setup the DRM Client
 		drmManager = new DrmManagerClient(mContext); 
+		
+		// Set log update listener
+        WidevineDrm.WidevineDrmLogEventListener drmLogListener =
+            new WidevineDrm.WidevineDrmLogEventListener() {
+
+            public void logUpdated() {
+                
+            	updateLogs();
+            }
+        };
+		
+        drm.setLogListener(drmLogListener);
 		
 		drmManager.setOnEventListener( new DrmManagerClient.OnEventListener() {
 			public void onEvent( DrmManagerClient client, DrmEvent event){
@@ -264,6 +316,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 				case DrmInfoEvent.TYPE_RIGHTS_INSTALLED:
 					// Handle event
 					displayAlert("Rights Installed");
+					//openVideo();
 					break;
 				case DrmInfoEvent.TYPE_RIGHTS_REMOVED:
 					// Handle event
@@ -299,8 +352,23 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 				}
 			}
 		});
-	}
+	*/}
 
+	protected void updateLogs(String msg) {
+		// TODO Auto-generated method stub
+		
+		displayAlert(msg);
+		if(!isPlayStarted)
+		{
+			if(msg.contains("Rights"))
+			{
+				openVideo();
+				isPlayStarted=true;
+				
+			}
+		}
+		
+	}
 	public void openVideo() {
 		Log.d("PlayerScreen", "VideoViewPlayer openVideo Start");
 		// For streams that we expect to be slow to start up, show a

@@ -589,6 +589,7 @@ public class SignUpActivity extends Activity{
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
 						Log.d(TAG, "########################################################");
 						Log.d(TAG, "---------------------------------------------------------");
+						Util.showToast(jsonResponse.getString("message"), SignUpActivity.this);
 					}
 					else
 					{

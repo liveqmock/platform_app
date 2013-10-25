@@ -215,14 +215,15 @@ public class CardVideoPlayer implements PlayerListener {
 						.parse("rtsp://59.162.166.216:554/AAJTAK_QVGA.sdp");
 				uri = Uri
 						.parse("rtsp://46.249.213.87:554/playlists/bollywood-action_qcif.hpl.3gp");
-//				uri = Uri.parse(url);
+				uri = Uri.parse(url);
 				// Toast.makeText(getContext(), "URL:"+url,
 				// Toast.LENGTH_SHORT).show();
 				VideoViewPlayer.StreamType streamType = StreamType.VOD;
 				if (mVideoViewPlayer == null) {
 					mVideoViewPlayer = new VideoViewPlayer(mVideoView,
 							mContext, uri, streamType);
-					mVideoViewPlayer.openVideo();
+					//mVideoViewPlayer.openVideo();
+					mVideoViewPlayer.setUri(uri, streamType);
 				} else {
 					mVideoViewPlayer.setUri(uri, streamType);
 				}
@@ -265,9 +266,9 @@ public class CardVideoPlayer implements PlayerListener {
         
         String qualityType="low";
         
-        if(Util.isWifiEnabled(mContext))
+        /*if(Util.isWifiEnabled(mContext))
             qualityType="high";
-        
+        */
         
         MediaUtil.getVideoUrl(mData._id,qualityType,isESTPackPurchased);
 	}

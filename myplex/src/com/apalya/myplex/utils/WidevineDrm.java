@@ -23,8 +23,8 @@ import android.drm.DrmStore;
 
 public class WidevineDrm {
 
-    interface WidevineDrmLogEventListener extends EventListener {
-        public void logUpdated();
+    public interface WidevineDrmLogEventListener extends EventListener {
+        public void logUpdated(String msg);
     }
 
     private WidevineDrmLogEventListener logEventListener;
@@ -68,7 +68,7 @@ public class WidevineDrm {
             // @Override
             public void onInfo(DrmManagerClient client, DrmInfoEvent event) {
                 if (event.getType() == DrmInfoEvent.TYPE_RIGHTS_INSTALLED) {
-                    logMessage("Rights installed\n");
+                    logMessage("Rightsinstalled");
                 }
             }
         });
@@ -267,7 +267,7 @@ public class WidevineDrm {
         logBuffer.append(message);
 
         if (logEventListener != null) {
-            logEventListener.logUpdated();
+            logEventListener.logUpdated(message);
         }
     }
 }
