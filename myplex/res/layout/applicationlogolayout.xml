@@ -4,6 +4,6 @@
     android:layout_height="wrap_content" >
 
     <View android:layout_width="match_parent" android:layout_margin="2dp"
-        android:layout_height="1dp" android:background="#464A4F" />
+        android:layout_height="1dp" android:background="#B7B9BC" />
 
 </RelativeLayout>

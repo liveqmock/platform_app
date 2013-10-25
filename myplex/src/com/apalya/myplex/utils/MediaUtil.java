@@ -21,10 +21,12 @@ public class MediaUtil {
 		public void urlReceived(boolean aStatus,String url);
 	}
 	public static MediaUtilEventListener urlEventListener;
-	private static String bitrateType;
+	private static String qualityType;
+	private static boolean downloadStatus;
 
-	public static void getVideoUrl(String aContentId,String bitRate){
-		bitrateType=bitRate;
+	public static void getVideoUrl(String aContentId,String bitRate,boolean isESTPackPurchased){
+		qualityType=bitRate;
+		downloadStatus=isESTPackPurchased;
 		String url=ConsumerApi.getVideosDetail(aContentId);
 		getContentUrlReq(url);
 	}
@@ -69,9 +71,19 @@ public class MediaUtil {
 				for(CardData data:minResultSet.results){
 					if(data.videos == null || data.videos.values == null || data.videos.values.size() == 0){sendResponse(false,null);}
 					for(CardDataVideosItem video:data.videos.values){
-						if(video.profile != null && video.profile.equalsIgnoreCase(bitrateType) && video.link != null){
-							sendResponse(true,video.link);
-							return;
+						if(downloadStatus)
+						{
+							if(video.profile != null && video.profile.equalsIgnoreCase(qualityType) && video.link != null && video.type.equalsIgnoreCase("download")){
+								sendResponse(true,video.link);
+								return;
+							}
+						}
+						else
+						{
+							if(video.profile != null && video.profile.equalsIgnoreCase(qualityType) && video.link != null){
+								sendResponse(true,video.link);
+								return;
+							}
 						}
 					}
 				}

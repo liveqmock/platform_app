@@ -126,6 +126,7 @@ public class SignUpActivity extends Activity{
 					// TODO Auto-generated method stub
 					if(mPassword.getVisibility()==View.VISIBLE)
 					{
+						
 						mPassword.setVisibility(View.GONE);
 						line.setVisibility(View.GONE);
 						mFpwd.setText("Sign into myplex");
@@ -173,11 +174,12 @@ public class SignUpActivity extends Activity{
 					fadeAnim2.setDuration(800);
 					fadeAnim2.start();
 
-
-					Analytics.trackEvent("USER-LOGIN-SELECTED");
+					Map<String,String> attribs=new HashMap<String, String>();
+					attribs.put("status", "Selected");
+					Analytics.trackEvent(Analytics.loginSignIn,attribs);
+					
 					if(mPassword.getVisibility()!=View.GONE)
 					{
-
 						if(mEmail.getText().toString().length() > 0 &&  mPassword.getText().toString().length()>0)
 						{
 							if(mEmail.getText().toString().contains("@")&& mEmail.getText().toString().contains(".") || isValidPhoneNumber)
@@ -188,7 +190,6 @@ public class SignUpActivity extends Activity{
 								params.put("profile", "work");
 								params.put("clientKey",mDevInfo.getClientKey());
 								Log.d(TAG, "clientKey-----------: "+mDevInfo.getClientKey());
-								Analytics.trackEvent("USER-LOGIN-REQUEST",true);
 								showProgressBar();
 								userLoginRequest(getString(R.string.signin), params);
 							}
@@ -221,7 +222,6 @@ public class SignUpActivity extends Activity{
 							params.put("profile", "work");
 							params.put("clientKey",mDevInfo.getClientKey());
 							Log.d(TAG, "clientKey-----------: "+mDevInfo.getClientKey());
-							Analytics.trackEvent("FORGOT-PASSWORD-REQUEST",true);
 							showProgressBar();
 							forgotPasswordRequest(getString(R.string.forgotpassword), params);
 						}
@@ -289,6 +289,11 @@ public class SignUpActivity extends Activity{
 					ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(findViewById(v.getId()), "alpha", 0.5f, 1f);
 					fadeAnim2.setDuration(800);
 					fadeAnim2.start();
+					
+					Map<String,String> attribs=new HashMap<String, String>();
+					attribs.put("Status", "Selected");
+					Analytics.trackEvent(Analytics.loginSignUp,attribs);
+					
 					//hideKeypad();
 					if(mEmail.getText().toString().length()>0 &&mPassword.getText().toString().length()>0) {
 
@@ -305,8 +310,6 @@ public class SignUpActivity extends Activity{
 							Log.d(TAG, "clientKey-----------: "+mDevInfo.getClientKey());
 							showProgressBar();
 							RegisterUserReq(getString(R.string.signuppath), params);
-							//finish();
-							//launchActivity(CardExplorer.class,SignUpActivity.this, null);
 						}
 						else
 						{
@@ -335,15 +338,6 @@ public class SignUpActivity extends Activity{
 
 		}
 
-		//ImageView img1= (ImageView)findViewById(R.id.imageView1);
-		/*ImageView img2= (ImageView)findViewById(R.id.imageView2);
-		ImageView img3= (ImageView)findViewById(R.id.imageView3);
-		ImageView img4= (ImageView)findViewById(R.id.imageView4);
-		ImageView img5= (ImageView)findViewById(R.id.imageView5);
-		ImageView img6= (ImageView)findViewById(R.id.imageView6);*/
-		
-		//img1.setImageResource(R.drawable.myplexbgimage);
-		
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 
@@ -378,7 +372,7 @@ public class SignUpActivity extends Activity{
 					translateAnim = new TranslateAnimation(-scrollWidth,0,0,0); 
 					translateAnim.setDetachWallpaper(true);
 
-					translateAnim.setDuration(10000);   
+					translateAnim.setDuration((scrollWidth/2)*100);   
 					translateAnim.setRepeatCount(Animation.INFINITE);
 					translateAnim.setInterpolator(new LinearInterpolator());
 					translateAnim.setRepeatMode(2);
@@ -397,78 +391,19 @@ public class SignUpActivity extends Activity{
 					translateAnim = new TranslateAnimation(-scrollWidth,0,0,0); 
 					translateAnim.setDetachWallpaper(true);
 
-					translateAnim.setDuration(scrollWidth*100);   
+					translateAnim.setDuration(width*100);   
 					translateAnim.setRepeatCount(Animation.INFINITE);
 					translateAnim.setInterpolator(new LinearInterpolator());
 					translateAnim.setRepeatMode(2);
-					translateAnim.setFillEnabled(true);
-					translateAnim.setFillBefore(true);
+					//translateAnim.setFillEnabled(true);
+					//translateAnim.setFillBefore(true);
 					translateAnim.scaleCurrentDuration(1f);
 					backgroundScrollLayout.startAnimation(translateAnim);
 				}
 
 			}
 		});
-
-		/*DisplayMetrics dm = new DisplayMetrics();
-		getWindowManager().getDefaultDisplay().getMetrics(dm);
-
-		final int height = dm.heightPixels;
-		final int width = dm.widthPixels;
-
-		img1.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image1, width, height));
-		img2.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image2, width, height));
-		img3.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image3, width, height));
-		img4.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image4, width, height));
-		img5.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image5, width, height));
-		img6.setImageBitmap(Util.decodeSampledBitmapFromResource(getResources(),R.drawable.image6, width, height));
-
-		img1.setScaleType(ScaleType.CENTER_INSIDE);
-		img2.setScaleType(ScaleType.CENTER_INSIDE);
-		img3.setScaleType(ScaleType.CENTER_INSIDE);
-		img4.setScaleType(ScaleType.CENTER_INSIDE);
-		img5.setScaleType(ScaleType.CENTER_INSIDE);
-		img6.setScaleType(ScaleType.CENTER_INSIDE);
-
-
-		final HorizontalScrollView parentScrollView= (HorizontalScrollView) findViewById(R.id.parentScrollview);
-		parentScrollView.setOnTouchListener(new View.OnTouchListener() {
-
-
-			@Override
-			public boolean onTouch(View arg0, MotionEvent arg1) {
-				// TODO Auto-generated method stub
-				//parentScrollView.requestDisallowInterceptTouchEvent(false);
-				return true;
-			}
-		});
-
-		ViewTreeObserver vto = parentScrollView.getViewTreeObserver();
-		vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
-			@Override
-			public void onGlobalLayout() {
-				parentScrollView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-				int scrollWidth=parentScrollView.getChildAt(0).getMeasuredWidth()-getWindowManager().getDefaultDisplay().getWidth();
-				//Util.showToast(Integer.toString(scrollWidth),SignUpActivity.this);
-				LinearLayout backgroundScrollLayout= (LinearLayout)findViewById(R.id.llayout);
-				backgroundScrollLayout.clearAnimation();
-				TranslateAnimation translateAnim = new TranslateAnimation(-scrollWidth,0, 0, 0);  
-				translateAnim.setDuration(80000);   
-				translateAnim.setRepeatCount(8);
-				translateAnim.setRepeatMode(2);
-				translateAnim.setFillEnabled(true);
-				backgroundScrollLayout.startAnimation(translateAnim);
-
-			}
-		});*/
-
-		/*EditText mFullName=(EditText)findViewById(R.id.editFullName);
-		mFullName.setTypeface(FontUtil.Roboto_Regular);*/
-
-
 	}
-
-
 
 	public void showSoftKeyboard(View view) {
 
@@ -510,7 +445,10 @@ public class SignUpActivity extends Activity{
 	}
 	private void RegisterUserReq(String contextPath, final Map<String,String> bodyParams) {
 
-		Analytics.trackEvent("REGISTRATION-REQUEST",true);
+		Map<String,String> attribs=new HashMap<String, String>();
+		attribs.put("Status", "Request");
+		//Analytics.trackEvent(Analytics.loginSignUp,attribs,true);
+		
 		RequestQueue queue = MyVolley.getRequestQueue();
 
 		String url=ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+ConsumerApi.USER_CONTEXT+ConsumerApi.SLASH+contextPath;
@@ -534,8 +472,11 @@ public class SignUpActivity extends Activity{
 			@Override
 			public void onErrorResponse(VolleyError error) {
 				dismissProgressBar();
-				Analytics.endTimedEvent("REGISTRATION-REQUEST");
-				Analytics.trackEvent("REGISTRATION-REQUEST-ERROR");
+				//Analytics.endTimedEvent(Analytics.loginSignUp);
+				Map<String,String> attribs=new HashMap<String, String>();
+				attribs.put("Status", "Failed");
+				attribs.put("Msg", error.toString());
+				Analytics.trackEvent(Analytics.loginSignUp,attribs);
 				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 				Log.d(TAG,"Error: "+error.toString());
 				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
@@ -546,7 +487,6 @@ public class SignUpActivity extends Activity{
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
-		Analytics.trackEvent("REGISTER-SCREEN-VIEWED");
 	}
 	@Override
 	protected void onStart() {
@@ -565,8 +505,8 @@ public class SignUpActivity extends Activity{
 			@Override
 			public void onResponse(String response) {
 				dismissProgressBar();
-				Analytics.endTimedEvent("REGISTRATION-REQUEST");
-
+				//Analytics.endTimedEvent(Analytics.loginSignUp);
+				
 				Log.d(TAG,"Response: "+response);
 				try {	
 					Log.d(TAG, "########################################################");
@@ -574,7 +514,9 @@ public class SignUpActivity extends Activity{
 
 					if(jsonResponse.getString("status").equalsIgnoreCase("SUCCESS"))
 					{
-						Analytics.trackEvent("REGISTRATION-REQUEST-SUCCESS");
+						Map<String,String> attribs=new HashMap<String, String>();
+						attribs.put("Status", "Success");
+						Analytics.trackEvent(Analytics.loginSignUp,attribs);
 						Log.d(TAG, "status: "+jsonResponse.getString("status"));
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
@@ -593,7 +535,10 @@ public class SignUpActivity extends Activity{
 					}
 					else
 					{
-						Analytics.trackEvent("REGISTRATION-REQUEST-SERVER-ERROR");
+						Map<String,String> attribs=new HashMap<String, String>();
+						attribs.put("Status", "Failed");
+						attribs.put("Msg", jsonResponse.getString("code"));
+						Analytics.trackEvent(Analytics.loginSignUp,attribs);
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
 						sendNotification("Err: "+jsonResponse.getString("code")+" "+jsonResponse.getString("message"));
@@ -631,8 +576,7 @@ public class SignUpActivity extends Activity{
 		return new Response.Listener<String>() {
 			@Override
 			public void onResponse(String response) {
-				Analytics.endTimedEvent("USER-LOGIN-REQUEST");
-
+				
 				Log.d(TAG,"Response: "+response);
 				try {	
 					Log.d(TAG, "########################################################");
@@ -640,7 +584,6 @@ public class SignUpActivity extends Activity{
 
 					if(jsonResponse.getString("status").equalsIgnoreCase("SUCCESS"))
 					{
-						Analytics.trackEvent("USER-LOGIN-REQUEST-SUCCESS");
 						Log.d(TAG, "status: "+jsonResponse.getString("status"));
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
@@ -649,7 +592,6 @@ public class SignUpActivity extends Activity{
 					}
 					else
 					{
-						Analytics.trackEvent("USER-LOGIN-REQUEST-SERVER-ERROR");
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
 						sendNotification("Err: "+jsonResponse.getString("code")+" \nErr Msg: "+jsonResponse.getString("message"));
@@ -663,6 +605,10 @@ public class SignUpActivity extends Activity{
 	protected void userLoginRequest(String contextPath, final Map<String, String> bodyParams) {
 		RequestQueue queue = MyVolley.getRequestQueue();
 
+		Map<String,String> attribs=new HashMap<String, String>();
+		attribs.put("status", "Request");
+		//Analytics.trackEvent(Analytics.loginSignIn,attribs,true);
+		
 		String url=ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+ConsumerApi.USER_CONTEXT+ConsumerApi.SLASH+contextPath;
 		StringRequest myReq = new StringRequest(Method.POST,
 				url,
@@ -685,17 +631,18 @@ public class SignUpActivity extends Activity{
 		return new Response.ErrorListener() {
 			@Override
 			public void onErrorResponse(VolleyError error) {
-				Analytics.endTimedEvent("USER-LOGIN-REQUEST");
-				Analytics.trackEvent("USER-LOGIN-REQUEST-ERROR");
 				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 				Log.d(TAG,"Error: "+error.toString());
+				//Analytics.endTimedEvent(Analytics.loginSignIn);
+				Map<String,String> attribs=new HashMap<String, String>();
+				attribs.put("Status", "Failed");
+				attribs.put("Msg", error.toString());
+				Analytics.trackEvent(Analytics.loginSignIn,attribs);
 				if(error.toString().indexOf("NoConnectionError")>0)
 				{
-					sendNotification(getString(R.string.interneterr));
+					Util.showToast(getString(R.string.interneterr),SignUpActivity.this);
 					finish();
 					Util.launchMainActivity(SignUpActivity.this);
-					//					Util.launchActivity(MainActivity.class,SignUpActivity.this , null);
-
 				}
 				else
 				{
@@ -711,8 +658,7 @@ public class SignUpActivity extends Activity{
 		return new Response.Listener<String>() {
 			@Override
 			public void onResponse(String response) {
-				Analytics.endTimedEvent("USER-LOGIN-REQUEST");
-
+				//Analytics.endTimedEvent(Analytics.loginSignIn);
 				Log.d(TAG,"Response: "+response);
 				try {	
 					Log.d(TAG, "########################################################");
@@ -720,7 +666,11 @@ public class SignUpActivity extends Activity{
 
 					if(jsonResponse.getString("status").equalsIgnoreCase("SUCCESS"))
 					{
-						Analytics.trackEvent("USER-LOGIN-REQUEST-SUCCESS");
+				
+						Map<String,String> attribs=new HashMap<String, String>();
+						attribs.put("Status", "Success");
+						Analytics.trackEvent(Analytics.loginSignIn,attribs);
+						
 						Log.d(TAG, "status: "+jsonResponse.getString("status"));
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
@@ -737,10 +687,14 @@ public class SignUpActivity extends Activity{
 
 						finish();
 						Util.launchMainActivity(SignUpActivity.this);
-						//						Util.launchActivity(MainActivity.class,SignUpActivity.this , null);
 					}
 					else
 					{
+						Map<String,String> attribs=new HashMap<String, String>();
+						attribs.put("Status", "Failed");
+						attribs.put("Msg", jsonResponse.getString("code"));
+						Analytics.trackEvent(Analytics.loginSignIn,attribs);
+						
 						if(jsonResponse.getString("code").equalsIgnoreCase("401"))
 						{
 							String devId=SharedPrefUtils.getFromSharedPreference(SignUpActivity.this,
@@ -753,7 +707,6 @@ public class SignUpActivity extends Activity{
 							sendNotification("Err: "+jsonResponse.getString("code")+" \nErr Msg: "+jsonResponse.getString("message"));
 						}
 
-						Analytics.trackEvent("USER-LOGIN-REQUEST-SERVER-ERROR");
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
 						sendNotification("Err: "+jsonResponse.getString("code")+" \nErr Msg: "+jsonResponse.getString("message"));

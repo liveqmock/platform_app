@@ -35,10 +35,6 @@ public class LogOutUtil {
 	static final String PREF_KEY_OAUTH_SECRET= "oauth_token_secret";
 
 	private static boolean signOutRequest(String aUrlPath,final Map<String, String> bodyParams) {
-		Analytics.trackEvent("SIGN-OUT-REQUEST",true);
-		
-		
-
 		RequestQueue queue = MyVolley.getRequestQueue();
 		StringRequest myReq = new StringRequest(Method.POST,
 				aUrlPath,
@@ -69,7 +65,6 @@ public class LogOutUtil {
 	public static void onClickLogout(Context mContext) {
 
 		//Log.d("BASE ACTIVITY", "@@@@@@@@@@@@@@ LOGOUT ACTIVITY @@@@@@@@@@@@@@@@@@@@@");
-		Analytics.trackEvent("SIGN-OUT-SELECTED");
 		logoutContext=mContext;
 		
 		Session session = Session.getActiveSession();
@@ -83,13 +78,11 @@ public class LogOutUtil {
 
 			if(session.isOpened())
 			{
-				Analytics.trackEvent("FACEBOOK-SIGN-OUT-SELECTED");
 				session.closeAndClearTokenInformation();
 
 			}
 			else if(AccountUtils.isAuthenticated(logoutContext))
 			{
-				Analytics.trackEvent("GOOGLE-SIGN-OUT-SELECTED");
 				AccountUtils.signOut(logoutContext);
 			}
 			
@@ -128,8 +121,6 @@ public class LogOutUtil {
 			@Override
 			public void onErrorResponse(VolleyError error) {
 				dismissProgressBar();
-				Analytics.endTimedEvent("SIGN-OUT-REQUEST");
-				Analytics.trackEvent("SIGN-OUT-REQUEST-ERROR");
 				Log.d(TAG, "@@@@@@@@@@@@@@ BASE ACTIVITY @@@@@@@@@@@@@@@@@@@@@");
 				Log.d(TAG,"Error: "+error.toString());
 				Util.showToast("Code: "+error.toString(),logoutContext);
@@ -141,7 +132,6 @@ public class LogOutUtil {
 		return new Response.Listener<String>() {
 			@Override
 			public void onResponse(String response) {
-				Analytics.endTimedEvent("SIGN-OUT-REQUEST");
 				Log.d(TAG,"Response: "+response);
 				Log.d(TAG, "*****************BASE ACTIVITY************************");
 				dismissProgressBar();
@@ -150,7 +140,6 @@ public class LogOutUtil {
 					jsonResponse = new JSONObject(response);
 					if(jsonResponse.getString("status").equalsIgnoreCase("SUCCESS"))
 					{
-						Analytics.trackEvent("SIGN-OUT-REQUEST-SUCESS");
 						Log.d(TAG, "status: "+jsonResponse.getString("status"));
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
@@ -178,7 +167,6 @@ public class LogOutUtil {
 					}
 					else
 					{
-						Analytics.trackEvent("SIGN-OUT-REQUEST-SERVER-ERROR");
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
 						Util.showToast("Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),logoutContext);

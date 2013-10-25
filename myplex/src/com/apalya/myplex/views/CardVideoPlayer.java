@@ -25,6 +25,7 @@ import com.apalya.myplex.MainBaseOptions;
 import com.apalya.myplex.R;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDataImagesItem;
+import com.apalya.myplex.data.CardDataPurchaseItem;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.media.PlayerListener;
 import com.apalya.myplex.media.VideoViewExtn;
@@ -52,6 +53,7 @@ public class CardVideoPlayer implements PlayerListener {
 	private int mWidth;
 	private int mHeight;
 	private PlayerFullScreen mPlayerFullScreen;
+	boolean isESTPackPurchased=false;
 
 	public void setFullScreenListener(PlayerFullScreen mListener){
 		this.mPlayerFullScreen = mListener;
@@ -177,31 +179,51 @@ public class CardVideoPlayer implements PlayerListener {
 							Toast.LENGTH_SHORT).show();
 					return;
 				}
-				Uri uri = Uri
-						.parse("rtsp://59.162.166.216:554/AAJTAK_QVGA.sdp");
-				uri = Uri
-						.parse("rtsp://46.249.213.87:554/playlists/bollywood-action_qcif.hpl.3gp");
-				uri = Uri.parse(url);
-				// Toast.makeText(getContext(), "URL:"+url,
-				// Toast.LENGTH_SHORT).show();
-				VideoViewPlayer.StreamType streamType = StreamType.VOD;
-				if (mVideoViewPlayer == null) {
-					mVideoViewPlayer = new VideoViewPlayer(mVideoView,
-							mContext, uri, streamType);
-					mVideoViewPlayer.openVideo();
-				} else {
-					mVideoViewPlayer.setUri(uri, streamType);
-				}
-				mVideoViewPlayer.hideMediaController();
-				mVideoView.setOnTouchListener(new OnTouchListener() {
-
-					@Override
-					public boolean onTouch(View arg0, MotionEvent event) {
-						mVideoViewPlayer.onTouchEvent(event);
-						return false;
+				
+				if(isESTPackPurchased)
+				{
+					closePlayer();
+					
+					if(Util.checkDownloadStatus( mData._id, mContext)==0)
+					{
+						long id=Util.startDownload(url, mData.generalInfo.title, mContext);
+						myplexapplication.getUserProfileInstance().downloadMap.put(mData._id, id);
 					}
-				});
-				mVideoViewPlayer.setPlayerListener(CardVideoPlayer.this);
+					else
+					{
+						Util.showToast("Your download is in progress,Please check your status in Downloads section", mContext);
+					}
+					return;
+					
+				}
+				else
+				{
+					Uri uri = Uri
+							.parse("rtsp://59.162.166.216:554/AAJTAK_QVGA.sdp");
+					uri = Uri
+							.parse("rtsp://46.249.213.87:554/playlists/bollywood-action_qcif.hpl.3gp");
+					uri = Uri.parse(url);
+					// Toast.makeText(getContext(), "URL:"+url,
+					// Toast.LENGTH_SHORT).show();
+					VideoViewPlayer.StreamType streamType = StreamType.VOD;
+					if (mVideoViewPlayer == null) {
+						mVideoViewPlayer = new VideoViewPlayer(mVideoView,
+								mContext, uri, streamType);
+						mVideoViewPlayer.openVideo();
+					} else {
+						mVideoViewPlayer.setUri(uri, streamType);
+					}
+					mVideoViewPlayer.hideMediaController();
+					mVideoView.setOnTouchListener(new OnTouchListener() {
+
+						@Override
+						public boolean onTouch(View arg0, MotionEvent event) {
+							mVideoViewPlayer.onTouchEvent(event);
+							return false;
+						}
+					});
+					mVideoViewPlayer.setPlayerListener(CardVideoPlayer.this);
+				}
 			}
 		});
 
@@ -215,7 +237,25 @@ public class CardVideoPlayer implements PlayerListener {
 		}
 		if(!lastWatchedStatus)
 			myplexapplication.getUserProfileInstance().lastVisitedCardData.add(mData);
-		MediaUtil.getVideoUrl(mData._id, "low");
+		
+		
+		if(mData.currentUserData!=null)
+		{	
+			for(CardDataPurchaseItem data:mData.currentUserData.purchase)
+			{
+				if(data.type.equalsIgnoreCase("download") || data.type.equalsIgnoreCase("est")){
+					isESTPackPurchased=true;
+				}
+			}
+		}
+		
+		String qualityType="low";
+		
+		if(Util.isWifiEnabled(mContext))
+			qualityType="high";
+		
+		
+		MediaUtil.getVideoUrl(mData._id,qualityType,isESTPackPurchased);
 	}
 
 	public View CreateTabletPlayerView(View parentLayout) {

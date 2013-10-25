@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +32,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
@@ -36,6 +40,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -248,6 +254,7 @@ public class Util {
 		long lastDownloadId=-1L;
 		if(isDownloadManagerAvailable(mContext))
 		{
+			try{
 			// get download service and enqueue file
 			DownloadManager manager = (DownloadManager) mContext.getSystemService(Context.DOWNLOAD_SERVICE);
 
@@ -267,36 +274,53 @@ public class Util {
 							.setDescription(aMovieName)
 							.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,
 									aMovieName+".wvm"));
-
-			//			//String url = "http://220.226.22.120:9090/aptv3-downloads/appdevclip.wvm";
-			//			String url=aUrl;
-			//			
-			//			/*int val=url.length()-url.lastIndexOf("/");
-			//			String filename="";
-			//			if(val>0)
-			//				filename= url.substring(val, url.length()-1);
-			//			else*/
-			//			String filename= aMovieName+".wvm";
-			//			
-			//			DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-			//			request.setDescription(aMovieName);
-			//			request.setTitle("Myplex Downloads");
-			//			// in order for this if to run, you must use the android 3.2 to compile your app
-			//			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			//			    request.allowScanningByMediaScanner();
-			//			    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-			//			}
-			//			request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
-			//
-			//			// get download service and enqueue file
-			//			DownloadManager manager = (DownloadManager) mContext.getSystemService(Context.DOWNLOAD_SERVICE);
-			//			lastDownloadId=manager.enqueue(request);
+			if(lastDownloadId>0)
+			Util.showToast("Your Download has been started, Please check progress in Downloads Section",mContext);
+			
+			
+			}
+			catch(IllegalArgumentException e)
+			{
+				e.printStackTrace();
+				Util.showToast("Can only download HTTP/HTTPS links, please try again", mContext);
+			}
 		}
 		else
 		{
 			//Download Manager is not available
 		}
 		return lastDownloadId;
+	}
+	public static int checkDownloadStatus(String cardId,Context mContext){
+		
+		
+		Map<String, Long> ids=myplexapplication.getUserProfileInstance().downloadMap;
+		if(ids.get(cardId)==null){
+			return 0;
+		}
+		
+		/*final long dwnlId=ids.get(cardId);
+		
+		final DownloadManager manager = (DownloadManager) mContext.getSystemService(Context.DOWNLOAD_SERVICE);
+
+		new Thread(new Runnable() {
+			
+			@Override
+			public void run() {
+					int dStatus;
+					DownloadManager.Query q = new DownloadManager.Query();
+					q.setFilterById(dwnlId);
+
+					Cursor cursor = manager.query(q);
+					cursor.moveToFirst();
+					dStatus=cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
+					cursor.close();
+					
+			}
+			
+		}).start();*/
+		return 1;
+		
 	}
 	public static void InviteFriends(final Context mContext) {
 
@@ -651,6 +675,53 @@ public class Util {
 		}
 	}
 
-
+	public static String sha1Hash( String toHash )
+	{
+	    String hash = null;
+	    try
+	    {
+	        MessageDigest digest = MessageDigest.getInstance( "SHA-1" );
+	        byte[] bytes = toHash.getBytes("UTF-8");
+	        digest.update(bytes, 0, bytes.length);
+	        bytes = digest.digest();
+	        StringBuilder sb = new StringBuilder();
+	        for( byte b : bytes )
+	        {
+	            sb.append( String.format("%02X", b) );
+	        }
+	        hash = sb.toString();
+	    }
+	    catch( NoSuchAlgorithmException e )
+	    {
+	        e.printStackTrace();
+	    }
+	    catch( UnsupportedEncodingException e )
+	    {
+	        e.printStackTrace();
+	    }
+	    return hash;
+	}
+	public static boolean isUserOnline(Context mContext){
+		ConnectivityManager cm =
+		        (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+		 
+		NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+		boolean isConnected = activeNetwork != null &&
+		                      activeNetwork.isConnectedOrConnecting();
+		
+		return isConnected;
+	}
+	
+	public static boolean isWifiEnabled(Context mContext){
+		
+		ConnectivityManager cm =
+		        (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+		 
+		NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+		
+		
+		boolean isWiFi = activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
+		return isWiFi;
+	}
 
 }
