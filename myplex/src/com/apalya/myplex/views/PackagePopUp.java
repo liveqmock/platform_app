@@ -3,10 +3,18 @@ package com.apalya.myplex.views;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,6 +27,7 @@ import android.widget.PopupWindow;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.Space;
 import android.widget.TextView;
@@ -32,8 +41,10 @@ import com.apalya.myplex.data.CardDataCertifiedRatingsItem;
 import com.apalya.myplex.data.CardDataPackagePriceDetailsItem;
 import com.apalya.myplex.data.CardDataPackages;
 import com.apalya.myplex.data.CardDataPromotionDetailsItem;
+import com.apalya.myplex.utils.Blur;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FontUtil;
+import com.apalya.myplex.utils.Blur.BlurResponse;
 
 public class PackagePopUp {
 	private String TAG  = "PackagePopUp";
@@ -41,15 +52,40 @@ public class PackagePopUp {
 	private List<PopupWindow> mFilterMenuPopupWindowList = new ArrayList<PopupWindow>();
 	private Context mContext;
 	private LayoutInflater mInflater;
-	public PackagePopUp(Context cxt){
-		mContext = cxt;
-		mInflater = LayoutInflater.from(mContext);
+	private View mBackground;
+	private RelativeLayout mPopupBackground;
+	public PackagePopUp(Context cxt,View background){
+		this.mContext = cxt;
+		this.mBackground = background;
+		this.mInflater = LayoutInflater.from(mContext);
 	}
 	private void dismissFilterMenuPopupWindow() {
 		if (mFilterMenuPopupWindow != null) {
 			mFilterMenuPopupWindowList.remove(mFilterMenuPopupWindow);
 			mFilterMenuPopupWindow.dismiss();
 			mFilterMenuPopupWindow = null;
+		}
+	}
+	private Bitmap mOrginalBitmap;
+	private void addBlur(){
+		if(mBackground == null){return;}
+		if(mPopupBackground == null){return;}
+		try {
+			mBackground.setDrawingCacheEnabled(true);
+			mOrginalBitmap = mBackground.getDrawingCache();
+			Blur blur = new Blur();
+			blur.fastblur(mContext, mOrginalBitmap, 12, new BlurResponse() {
+				
+				@Override
+				public void BlurredBitmap(Bitmap b) {
+					mOrginalBitmap.recycle();
+					mOrginalBitmap  = null;
+					Drawable d = new BitmapDrawable(b); 
+					mPopupBackground.setBackgroundDrawable(d);
+				}
+			});
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 	private void showPopup(View v,View anchorView) {
@@ -62,6 +98,7 @@ public class PackagePopUp {
 	}
 	public void showPackDialog(CardData data,View anchorView) {
 		View v = mInflater.inflate(R.layout.purchasepopup,null);
+		mPopupBackground = (RelativeLayout)v.findViewById(R.id.purchasepopup_background);
 		fillPackData(data,v);
 		LinearLayout susblayout = (LinearLayout) v.findViewById(R.id.purchasepopup_packslayout);
 		mPaymentModeHeading = (TextView)v.findViewById(R.id.purchasepopup_selectedpaymentmodeheading);
@@ -70,17 +107,15 @@ public class PackagePopUp {
 		mPaymentModeGroup = (RadioGroup)v.findViewById(R.id.purchasepopup_selectedpaymentmodegroup);
 		mPaymentModeGroup.setVisibility(View.INVISIBLE);
 		
-		
+//		addBlur();
 		addPack(data,susblayout);
 		showPopup(v,anchorView);
 	}
 	private void addPack(CardData data,LinearLayout parentlayout) {
 		if(data.packages == null){return;}
 		for(CardDataPackages packageitem:data.packages){
-			if(packageitem.priceDetails != null){
-				for(CardDataPackagePriceDetailsItem priceDetailItem:packageitem.priceDetails){
-					createPackItem(priceDetailItem,packageitem,parentlayout);
-				}
+			if(packageitem.priceDetails != null && packageitem.priceDetails.size() > 0){
+				createPackItem(packageitem.priceDetails.get(0),packageitem,parentlayout);
 			}
 		}
 	}

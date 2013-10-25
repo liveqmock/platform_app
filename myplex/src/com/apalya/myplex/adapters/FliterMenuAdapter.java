@@ -41,13 +41,13 @@ public class FliterMenuAdapter extends ArrayAdapter<FilterMenudata>
 			v = mInflater.inflate(R.layout.filtermenuitem, null);
 			TextView txt = (TextView) v.findViewById(R.id.filtermenutext);
 			txt.setText(mMenuDataList.get(position).label);
-			txt.setTypeface(FontUtil.Roboto_Medium);
+			txt.setTypeface(FontUtil.Roboto_Light);
 			v.setTag(mMenuDataList.get(position));
 		} else if (getItem(position).type == FilterMenudata.ITEM) {
 			v = mInflater.inflate(R.layout.filtersubmenuitem, null);
 			TextView txt = (TextView) v.findViewById(R.id.filtersubmenutext);
 			txt.setText(mMenuDataList.get(position).label);
-			txt.setTypeface(FontUtil.Roboto_Medium);
+			txt.setTypeface(FontUtil.Roboto_Light);
 			v.setTag(mMenuDataList.get(position));
 		}
 		return v;

@@ -25,6 +25,6 @@
         android:singleLine="true"
         android:text="sadsdaf"
         android:textColor="#ffffff"
-        android:textSize="22sp" />
+        android:textSize="18sp" />
 
 </LinearLayout>

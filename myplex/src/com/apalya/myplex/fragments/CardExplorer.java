@@ -24,7 +24,10 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
+import android.widget.RelativeLayout.LayoutParams;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -44,6 +47,8 @@ import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDataGenre;
 import com.apalya.myplex.data.CardExplorerData;
 import com.apalya.myplex.data.CardResponseData;
+import com.apalya.myplex.data.FetchDownloadData;
+import com.apalya.myplex.data.FetchDownloadData.FetchDownloadDataListener;
 import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.listboxanimation.OnDismissCallback;
@@ -113,6 +118,20 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			}
 		});
 	}
+	private void arangeWaterMark(){
+		ImageView waterMark = (ImageView) mRootView.findViewById(R.id.watermarkicon);
+		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT,RelativeLayout.LayoutParams.WRAP_CONTENT);
+		params.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+		params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+		int remainingSpace  = myplexapplication.getApplicationConfig().screenHeight;
+		remainingSpace -= (int)getResources().getDimension(R.dimen.cardHeight);
+		remainingSpace -= (int)getResources().getDimension(R.dimen.margin_gap_12);
+		remainingSpace -= (int)getResources().getDimension(R.dimen.margin_gap_12);
+		remainingSpace -= (int)getResources().getDimension(R.dimen.cardstatusheight);
+		remainingSpace -= (int)getResources().getDimension(R.dimen.watermarkheight);
+		waterMark.setPadding(0, 0, 0, remainingSpace/2);
+		waterMark.setLayoutParams(params);
+	}
 	@Override
 	public void onStop() {
 	// TODO Auto-generated method stub
@@ -129,6 +148,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		mRootView = inflater.inflate(R.layout.cardbrowsing, container, false);
 		mCardView = (CardView) mRootView.findViewById(R.id.framelayout);
 		mGridView = (GridView)mRootView.findViewById(R.id.tabletview);
+		arangeWaterMark();
 		if(getResources().getBoolean(R.bool.isTablet)){
 			mTabletAdapter = new CardTabletAdapater(getContext());
 			mTabletAdapter.setCardActionListener(this);
@@ -163,11 +183,15 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			@Override
 			public void run() {
 				showProgressBar();
-//				prepareDummyData();
-				if(verifyResume()){
-					fetchMinData();	
+				if(mData.requestType == CardExplorerData.REQUEST_DOWNLOADS){
+					fillDownloadList();
+				}else{
+	//				prepareDummyData();
+					if(verifyResume()){
+						fetchMinData();	
+					}
+					applyData();
 				}
-				applyData();
 			}
 		});
 	}
@@ -198,10 +222,20 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		// TODO Auto-generated method stub
 		super.onPause();
 	}
-
+	public void fillDownloadList(){
+		FetchDownloadData d = new FetchDownloadData(getContext());
+		d.fetchDownload(new FetchDownloadDataListener() {
+			
+			@Override
+			public void completed() {
+			showNoDataMessage();
+				
+			}
+		});
+	}
 	@Override
 	public void loadmore(int value) {
-		if(mData.requestType != CardExplorerData.REQUEST_DOWNLOADS){
+		if(mData.requestType != CardExplorerData.REQUEST_DOWNLOADS && mData.requestType != CardExplorerData.REQUEST_SIMILARCONTENT){
 			mData.mStartIndex = value;
 			fetchMinData();
 		}
@@ -209,23 +243,6 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 
 	private void fetchMinData() {
 		mMainActivity.showActionBarProgressBar();
-		if(mData.requestType == CardExplorerData.REQUEST_SIMILARCONTENT || mData.requestType == CardExplorerData.REQUEST_DOWNLOADS){
-			Map<String, Long> ids=myplexapplication.getUserProfileInstance().downloadMap;
-
-			List<CardData> cardList = new ArrayList<CardData>();
-			for (Map.Entry<String,Long> entry : ids.entrySet()) {
-				CardData card= new CardData();
-				card._id = entry.getKey();
-				card.ESTId = entry.getValue();;
-				cardList.add(card);
-			}
-			if(cardList.size() <= 0){
-				//Util.showToast("No Downloads",getContext());
-				return;
-			}
-			mCacheManager.getCardDetails(cardList,IndexHandler.OperationType.IDSEARCH,CardExplorer.this);
-			return;	
-		}
 		RequestQueue queue = MyVolley.getRequestQueue();
 		String requestUrl = new String();
 		if(mData.requestType == CardExplorerData.REQUEST_SEARCH){
@@ -401,15 +418,15 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		mSelectedCard = data;
 	}
 
-	public void updateDownloadInformation(){
-		if(mData.requestType == CardExplorerData.REQUEST_DOWNLOADS){
-			Map<String, Long> ids=myplexapplication.getUserProfileInstance().downloadMap;
-			for(CardData data:mData.mMasterEntries){
-				data.isESTEnabled = true;
-				data.ESTId = ids.get(data._id);
-			}
-		}
-	}
+//	public void updateDownloadInformation(){
+//		if(mData.requestType == CardExplorerData.REQUEST_DOWNLOADS){
+//			Map<String, Long> ids=myplexapplication.getUserProfileInstance().downloadMap;
+//			for(CardData data:mData.mMasterEntries){
+//				data.isESTEnabled = true;
+//				data.ESTId = ids.get(data._id);
+//			}
+//		}
+//	}
 	@Override
 	public void deletedCard(CardData data) {
 		// TODO Auto-generated method stub
@@ -418,7 +435,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 
 	@Override
 	public void purchase(CardData data) {
-		PackagePopUp popup = new PackagePopUp(getContext());
+		PackagePopUp popup = new PackagePopUp(getContext(),mRootView);
 		popup.showPackDialog(data, getActionBar().getCustomView());
 	}
 
@@ -457,14 +474,14 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				}
 			}
 		}
-		updateDownloadInformation();
+//		updateDownloadInformation();
 		if(mData.mMasterEntries.size() != 0){
 			showNoDataMessage();
 		}
 		applyData();
-		if(mData.requestType == CardExplorerData.REQUEST_DOWNLOADS){
-			showProgress();
-		}
+//		if(mData.requestType == CardExplorerData.REQUEST_DOWNLOADS){
+//			showProgress();
+//		}
 		
 	}
 
@@ -481,7 +498,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			}
 			
 		}
-		updateDownloadInformation();
+//		updateDownloadInformation();
 		showNoDataMessage();
 		applyData();		
 	}
@@ -490,56 +507,56 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	public void OnOnlineError(VolleyError error) {
 		showNoDataMessage();
 	}
-	private void showProgress(){
-		final DownloadManager manager = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
-
-		new Thread(new Runnable() {
-
-			@Override
-			public void run() {
-				boolean downloading = true;
-
-				while (downloading) {
-					try {
-						if(mSelectedCard == null){
-							continue;
-						}
-						DownloadManager.Query q = new DownloadManager.Query();
-						if(q == null){
-							continue;
-						}
-						Log.d(TAG,"Download information for "+mSelectedCard.ESTId);
-						q.setFilterById(mSelectedCard.ESTId);
-						if(mSelectedCard.ESTId == 0){
-							continue;
-						}
-						Cursor cursor = manager.query(q);
-						if(cursor == null){
-							continue;
-						}
-						cursor.moveToFirst();
-						int bytes_downloaded = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
-						int bytes_total = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
-
-						if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
-							downloading = false;
-							mSelectedCard.ESTProgressStatus = CardData.ESTDOWNLOADCOMPLETE;
-							mCardView.updateDownloadStatus(mSelectedCard);
-						}
-						else{
-							final int dl_progress = (bytes_downloaded * 100) / bytes_total;
-							mSelectedCard.ESTStatus = CardData.ESTDOWNLOADINPROGRESS;
-							mSelectedCard.ESTProgressStatus = dl_progress;
-							Log.d(TAG,"Download inform progress  "+dl_progress);
-							mCardView.updateDownloadStatus(mSelectedCard);
-						}
-						cursor.close();
-					} catch (Exception e) {
-						// TODO: handle exception
-					}
-					
-				}
-			}
-		}).start();
-	}
+//	private void showProgress(){
+//		final DownloadManager manager = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
+//
+//		new Thread(new Runnable() {
+//
+//			@Override
+//			public void run() {
+//				boolean downloading = true;
+//
+//				while (downloading) {
+//					try {
+//						if(mSelectedCard == null){
+//							continue;
+//						}
+//						DownloadManager.Query q = new DownloadManager.Query();
+//						if(q == null){
+//							continue;
+//						}
+//						Log.d(TAG,"Download information for "+mSelectedCard.ESTId);
+//						q.setFilterById(mSelectedCard.ESTId);
+//						if(mSelectedCard.ESTId == 0){
+//							continue;
+//						}
+//						Cursor cursor = manager.query(q);
+//						if(cursor == null){
+//							continue;
+//						}
+//						cursor.moveToFirst();
+//						int bytes_downloaded = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+//						int bytes_total = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+//
+//						if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
+//							downloading = false;
+//							mSelectedCard.ESTProgressStatus = CardData.ESTDOWNLOADCOMPLETE;
+//							mCardView.updateDownloadStatus(mSelectedCard);
+//						}
+//						else{
+//							final int dl_progress = (bytes_downloaded * 100) / bytes_total;
+//							mSelectedCard.ESTStatus = CardData.ESTDOWNLOADINPROGRESS;
+//							mSelectedCard.ESTProgressStatus = dl_progress;
+//							Log.d(TAG,"Download inform progress  "+dl_progress);
+//							mCardView.updateDownloadStatus(mSelectedCard);
+//						}
+//						cursor.close();
+//					} catch (Exception e) {
+//						// TODO: handle exception
+//					}
+//					
+//				}
+//			}
+//		}).start();
+//	}
 }

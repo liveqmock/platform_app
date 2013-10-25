@@ -36,6 +36,7 @@ import com.apalya.myplex.utils.CardImageLoader;
 import com.apalya.myplex.utils.FavouriteUtil;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
+import com.apalya.myplex.utils.Util;
 
 public class CardTabletAdapater extends BaseAdapter{
 	private static final String TAG = "CardGoogleLayoutAdapater";
@@ -98,7 +99,9 @@ public class CardTabletAdapater extends BaseAdapter{
 			dataHolder = new CardDataHolder();
 			dataHolder.mTitleLayout = (LinearLayout)v.findViewById(R.id.card_title_layout); 
 			dataHolder.mTitle = (TextView)v.findViewById(R.id.card_title_name);
-			dataHolder.mDelete = (TextView)v.findViewById(R.id.card_title_delete);
+			dataHolder.mDelete = (TextView)v.findViewById(R.id.card_title_deleteText);
+			dataHolder.mDeleteLayout = (LinearLayout)v.findViewById(R.id.card_title_delete);
+			dataHolder.mFavLayout = (RelativeLayout)v.findViewById(R.id.card_title_favlayout);
 			dataHolder.mFavourite = (TextView)v.findViewById(R.id.card_title_fav);
 			dataHolder.mPreview = (CardImageView)v.findViewById(R.id.card_preview_image);
 			dataHolder.mPreviewLayout = (RelativeLayout)v.findViewById(R.id.card_preview_layout);
@@ -107,7 +110,7 @@ public class CardTabletAdapater extends BaseAdapter{
 			dataHolder.mReviews = (TextView)v.findViewById(R.id.card_status_people);
 			dataHolder.mCommentsText = (TextView)v.findViewById(R.id.card_status_comments_text);
 			dataHolder.mReviewsText = (TextView)v.findViewById(R.id.card_status_people_text);
-//			dataHolder.mRentLayout = (LinearLayout)v.findViewById(R.id.card_rent_layout);
+			dataHolder.mRentLayout = (RelativeLayout)v.findViewById(R.id.card_rent_layout);
 			dataHolder.mRentText = (TextView)v.findViewById(R.id.card_rent_text);
 			dataHolder.mFavProgressBar = (ProgressBar) v.findViewById(R.id.card_title_fav_progress);
 			
@@ -130,7 +133,7 @@ public class CardTabletAdapater extends BaseAdapter{
 //			dataHolder.mOverLayPlay.setText(R.string.card_play);
 //			dataHolder.mDelete.setText(R.string.card_delete);
 //			dataHolder.mFavourite.setText(R.string.card_heart);
-			dataHolder.mComments.bringToFront();
+//			dataHolder.mComments.bringToFront();
 //			dataHolder.mReviews.setText(R.string.card_people);
 			
 //			CardData dataHolder.mDataObject = (TextView)v.findViewById(id);
@@ -189,25 +192,28 @@ public class CardTabletAdapater extends BaseAdapter{
 			dataHolder.mCommentsText.setText("0");
 		}
 		
-		dataHolder.mDelete.setOnClickListener(mDeleteListener);
-		dataHolder.mDelete.setTag(dataHolder);
+		dataHolder.mDeleteLayout.setOnClickListener(mDeleteListener);
+		dataHolder.mDeleteLayout.setTag(dataHolder);
+		Util.showFeedback(dataHolder.mDeleteLayout);
 		dataHolder.mOverLayPlay.setOnClickListener(mOpenCardListener);
 		dataHolder.mOverLayPlay.setTag(dataHolder);
 		dataHolder.mPreview.setOnClickListener(mOpenCardListener);
 		dataHolder.mPreview.setTag(dataHolder);
-		dataHolder.mRentText.setOnClickListener(mPurchaseListener);
-		dataHolder.mRentText.setTag(dataHolder);
-		dataHolder.mFavourite.setOnClickListener(mFavListener);
-		dataHolder.mFavourite.setTag(dataHolder);
+		dataHolder.mRentLayout.setOnClickListener(mPurchaseListener);
+		dataHolder.mRentLayout.setTag(dataHolder);
+		
+		dataHolder.mFavLayout.setOnClickListener(mFavListener);
+		dataHolder.mFavLayout.setTag(dataHolder);
+		Util.showFeedback(dataHolder.mFavLayout);
 		
 		float price = 10000f;
 		if(data.packages == null){
-			dataHolder.mRentText.setText("Free");
+			dataHolder.mRentText.setText("            Free           ");
 			dataHolder.mRentText.setOnClickListener(null);
 		}else{
 			if(data.currentUserData != null && data.currentUserData.purchase != null && data.currentUserData.purchase.size() != 0){
-				dataHolder.mRentText.setText("Watch now");
-				dataHolder.mRentText.setOnClickListener(null);
+				dataHolder.mRentText.setText("         Watch now         ");
+				dataHolder.mRentLayout.setOnClickListener(null);
 			}else{
 				for(CardDataPackages packageitem:data.packages){
 					if(packageitem.priceDetails != null){
@@ -221,8 +227,8 @@ public class CardTabletAdapater extends BaseAdapter{
 						}
 						dataHolder.mRentText.setText(mPriceStarts + mRupeeCode + " "+price);
 					}else{
-						dataHolder.mRentText.setText("Free");
-						dataHolder.mRentText.setOnClickListener(null);
+						dataHolder.mRentText.setText("            Free           ");
+						dataHolder.mRentLayout.setOnClickListener(null);
 					}
 				}	
 			}

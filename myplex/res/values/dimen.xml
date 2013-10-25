@@ -5,12 +5,13 @@
     <dimen name="cardstatusheight">34dp</dimen>
     <dimen name="cardmoreinfoheight">38dp</dimen>
     <dimen name="cardplayheight">150dp</dimen>
-    <dimen name="cardvideosize">301dp</dimen> <!-- total of cardtitleheight,cardstatusheight,cardmoreinfoheight,cardplayheight  -->
-    <dimen name="cardHeight">301dp</dimen> <!-- total of cardtitleheight,cardstatusheight,cardmoreinfoheight,cardplayheight  -->
+    <dimen name="cardvideosize">261dp</dimen> <!-- total of cardtitleheight,cardstatusheight,cardmoreinfoheight,cardplayheight  -->
+    <dimen name="cardHeight">261dp</dimen> <!-- total of cardtitleheight,cardstatusheight,cardmoreinfoheight,cardplayheight  -->
     <dimen name="cardmargin">12dp</dimen>
     <dimen name="cardpartialvisibleheight">50dp</dimen>
-    <dimen name="slidemenugap">250dp</dimen>
+    <dimen name="slidemenugap">261dp</dimen>
     <dimen name="slidenotification">32dp</dimen>
+    <dimen name="watermarkheight">216dp</dimen>
     
     
     <!-- margins -->

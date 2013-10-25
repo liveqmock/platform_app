@@ -14,6 +14,8 @@ public interface MainBaseOptions {
 	public void showfilterMenu();
 
 	public void setOrientation(int value);
+	
+	public int getOrientation();
 
 	public void setSearchBarVisibilty(int visible);
 

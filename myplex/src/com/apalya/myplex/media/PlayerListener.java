@@ -1,6 +1,7 @@
 package com.apalya.myplex.media;
 
 import android.media.MediaPlayer;
+import android.widget.ImageView;
 
 public interface PlayerListener {
 

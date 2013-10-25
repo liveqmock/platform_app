@@ -17,6 +17,6 @@
          android:singleLine="true"
          android:text="dsadas"
          android:textColor="#ffffff"
-         android:textSize="20sp" />
+         android:textSize="18sp" />
 
 </LinearLayout>

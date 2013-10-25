@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/carddetails_bg" >
+    android:background="@drawable/carddetails_bg" xmlns:app="http://schemas.android.com/apk/res/com.apalya.myplex">
 
     <RelativeLayout
         android:id="@+id/carddetailbriefdescription_expandlayout"
@@ -30,6 +30,7 @@
         android:id="@+id/carddetailbriefdescriptiontitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingRight="36dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_marginLeft="@dimen/margin_gap_12"
@@ -113,10 +114,9 @@
         android:layout_marginLeft="@dimen/margin_gap_12"
         android:layout_marginTop="12dp"
         android:background="@drawable/carddetailbutton_bg"
-        android:paddingLeft="4dp"
         android:paddingRight="4dp"
         android:textColor="#54b5e9"
-        android:textSize="@dimen/textsize_12" />
+        android:textSize="15sp" />
     
 
     <TextView
@@ -128,7 +128,8 @@
         android:layout_marginLeft="16dp"
         android:layout_marginTop="12dp"
         android:layout_marginRight="36dp"
-        android:lineSpacingExtra="3dp"
+        android:paddingBottom="12dp"
+        android:lineSpacingExtra="4dp"
         android:text=""
         android:textColor="#4b4b4c"
         android:textSize="14sp" />

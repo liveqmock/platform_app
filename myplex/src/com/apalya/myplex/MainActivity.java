@@ -96,6 +96,10 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		setRequestedOrientation(value);
 	}
 	@Override
+	public int getOrientation(){
+		return getRequestedOrientation();
+	}
+	@Override
 	public void hideActionBar(){
 		ActionBar actionBar = getActionBar();
 		if(actionBar != null){
@@ -115,7 +119,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 				R.drawable.menu_profile, myplexapplication.getUserProfileInstance().getProfilePic(),NavigationOptionsMenuAdapter.CARDDETAILS_ACTION,R.layout.navigation_menuitemlarge));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FAVOURITE,R.drawable.iconfav, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.PURCHASES,R.drawable.iconpurchases, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.DOWNLOADS,R.drawable.icondnload, null, NavigationOptionsMenuAdapter.NOACTION_ACTION,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.DOWNLOADS,R.drawable.icondnload, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu("Settings",R.drawable.iconsettings, null, NavigationOptionsMenuAdapter.NOACTION_ACTION,R.layout.navigation_menuitemsmall));
 		Session fbSession=Session.getActiveSession();
 		if(fbSession!=null && fbSession.isOpened())
@@ -211,22 +215,22 @@ public class MainActivity extends Activity implements MainBaseOptions {
 	}
 
 	private void showNavigationFullImage(boolean value){
-		if(value)
-			mNavigationMenu.setImageResource(R.drawable.iconmenu);
-		else
-			mNavigationMenu.setImageResource(R.drawable.iconmenuin);
+//		if(value)
+//			mNavigationMenu.setImageResource(R.drawable.iconmenu);
+//		else
+//			mNavigationMenu.setImageResource(R.drawable.iconmenuin);
 		
-		/*AnimatorSet set = new AnimatorSet();
+		AnimatorSet set = new AnimatorSet();
 		int fromX = 0;
-		int toX = -(mNavigationMenu.getWidth()/2);
+		int toX = -(mNavigationMenu.getWidth()/4);
 		if(value){
-			fromX = -(mNavigationMenu.getWidth()/2);
+			fromX = -(mNavigationMenu.getWidth()/4);
 			toX = 0;
 		}
 		set.play(ObjectAnimator.ofFloat(mNavigationMenu, View.TRANSLATION_X, fromX,toX));
 		set.setDuration(200);
 		set.setInterpolator(new DecelerateInterpolator());
-		set.start();*/
+		set.start();
 	}
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
@@ -302,7 +306,8 @@ public class MainActivity extends Activity implements MainBaseOptions {
 				.findViewById(R.id.customactionbar_filter_button);
 		mTitleTextView = (TextView) v
 				.findViewById(R.id.customactionbar_filter_text);
-		mTitleTextView.setTypeface(FontUtil.Roboto_Medium);
+		mTitleTextView.setTypeface(FontUtil.Roboto_Regular);
+		mTitleTextView.setEnabled(true);
 		mCustomActionBarSearch = (ImageView) v
 				.findViewById(R.id.customactionbar_search_button);
 		mCustomActionBarSearch.setOnClickListener(new OnClickListener() {
@@ -427,6 +432,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 			mFragmentStack.pop();
 			fragment = mFragmentStack.peek();
 			if (fragment != null) {
+				mFragmentStack.pop();
 				bringFragment(fragment);
 				return;
 			}
@@ -643,7 +649,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 
 	private List<FilterMenudata> mMenuDataList = new ArrayList<FilterMenudata>();
 	private View mFilterMenuPopup;
-	private PinnedSectionListView mFilterListView;
+	private ListView mFilterListView;
 	private OnClickListener mFilterDelegate;
 	private PopupWindow mFilterMenuPopupWindow = null;
 	private List<PopupWindow> mFilterMenuPopupWindowList = new ArrayList<PopupWindow>();
@@ -731,7 +737,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		
 		mPopBlurredLayout  = (RelativeLayout)mFilterMenuPopup.findViewById(R.id.fliterMenuBlurredLayout);
 		
-		mFilterListView = (PinnedSectionListView) mFilterMenuPopup.findViewById(R.id.listView1);
+		mFilterListView = (ListView) mFilterMenuPopup.findViewById(R.id.listView1);
 		
 		mMenuDataList = datalist;
 		

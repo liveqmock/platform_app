@@ -29,10 +29,7 @@ public class CardData {
 	public CardDataImages images;
 	public CardDataSimilarContent similarContent;
 	public String _id;
-	public boolean isESTEnabled = false;
-	public int ESTStatus;
-	public int ESTProgressStatus;
-	public long ESTId;
+	public CardDownloadData downloadData;
 	public CardData(){
 		
 	}

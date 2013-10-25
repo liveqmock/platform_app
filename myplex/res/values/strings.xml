@@ -45,7 +45,7 @@
     <string name="carddetailsectionheader_relatedMultimedia">Related Multimedia</string>
     <string name="pricepopupdiscount">off</string>
     <string name="pricepopuprent">Rent</string>
-    <string name="carddetailsectionheader_reviews">Reviews</string>
+    <string name="carddetailsectionheader_reviews">Rate &#38; Review </string>
     <string name="navigationmenu_settings">Settings</string>
     <string name="card_delete">&#x2421;</string>
     <string name="card_heart">&#xE1A2;</string>
@@ -61,6 +61,8 @@
     <string name="ratingheading">Rate this Movie </string>
     <string name="ratingmessageheading">Add a movie review </string>
     <string name="ratingmessagehint">Add a review</string>
+    <string name="commentpopupheading">Add a comment</string>
+    <string name="commentpopuphint">Add a comment</string>
     <string name="feedbackheading">Rate myplex </string>
     <string name="feedbackmessageheading">Please share the experience </string>
     <string name="feedbackmessagehint">Add a feedback</string>

@@ -13,6 +13,7 @@ public class CardDataHolder {
 	public TextView mDelete;
 	public TextView mFavourite;
 	public CardImageView mPreview;
+	public LinearLayout mDeleteLayout;
 	public RelativeLayout mPreviewLayout;
 	public ImageView mOverLayPlay;
 	public TextView mComments;
@@ -20,7 +21,8 @@ public class CardDataHolder {
 	public TextView mCommentsText;
 	public TextView mReviewsText;
 	public TextView mRentText;
-	public LinearLayout mRentLayout;
+	public RelativeLayout mRentLayout;
+	public RelativeLayout mFavLayout;
 	public ProgressBar mFavProgressBar;
 	public ProgressBar mESTDownloadBar;
 	public TextView mESTDownloadStatus;

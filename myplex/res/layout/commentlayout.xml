@@ -12,7 +12,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginLeft="@dimen/margin_gap_24"
         android:layout_marginTop="20dp"
-        android:text="@string/ratingheading"
+        android:text="@string/commentpopupheading"
         android:textColor="#4f4f4f"
         android:textSize="@dimen/textsize_18" />
 
@@ -26,73 +26,12 @@
         android:layout_marginTop="20dp"
         android:background="#dbdbdb" />
 
-    <LinearLayout
-        android:id="@+id/feedback_ratingbar_layout"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/feedback_heading_separator"
-        android:layout_marginLeft="@dimen/margin_gap_24"
-        android:layout_marginRight="@dimen/margin_gap_24"
-        android:layout_marginTop="20dp"
-        android:orientation="horizontal" >
-
-        <TextView
-            android:id="@+id/feedback_ratingtext_low"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/rating_low"
-            android:textColor="#919191"
-            android:textSize="@dimen/textsize_20" />
-
-        <SeekBar
-            android:id="@+id/feedback_ratingbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginLeft="@dimen/margin_gap_2"
-            android:layout_marginRight="@dimen/margin_gap_2"
-            android:layout_weight="1"
-            android:max="5"
-            android:progress="0" />
-
-        <TextView
-            android:id="@+id/feedback_ratingtext_high"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/rating_high"
-            android:textColor="#919191"
-            android:textSize="@dimen/textsize_20" />
-    </LinearLayout>
-
-    <TextView
-        android:id="@+id/feedback_messageheading"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/feedback_ratingbar_layout"
-        android:layout_marginLeft="@dimen/margin_gap_24"
-        android:layout_marginRight="@dimen/margin_gap_24"
-        android:layout_marginTop="40dp"
-        android:text="@string/ratingmessageheading"
-        android:textColor="#4f4f4f"
-        android:textSize="@dimen/textsize_18" />
-
-    <View
-        android:id="@+id/feedback_messageheading_separator"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_below="@+id/feedback_messageheading"
-        android:layout_marginLeft="@dimen/margin_gap_24"
-        android:layout_marginRight="@dimen/margin_gap_24"
-        android:layout_marginTop="20dp"
-        android:background="#dbdbdb" />
 
     <EditText
         android:id="@+id/feedback_messagebox"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:layout_below="@+id/feedback_messageheading_separator"
+        android:layout_below="@+id/feedback_heading_separator"
         android:layout_marginLeft="@dimen/margin_gap_24"
         android:layout_marginRight="@dimen/margin_gap_24"
         android:layout_marginTop="20dp"
@@ -100,7 +39,7 @@
         android:textColor="#4f4f4f"
         android:background="@drawable/feedbackeditbox_bg"
         android:ems="10"
-        android:hint="@string/ratingmessagehint"
+        android:hint="@string/commentpopuphint"
         android:singleLine="false" >
     </EditText>
 

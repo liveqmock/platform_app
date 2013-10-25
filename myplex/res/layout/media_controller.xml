@@ -2,20 +2,36 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/fliterpopuplist_bg"
+    android:background="#E6282A2F"
     android:orientation="horizontal"
     android:visibility="visible" >
 
-    <ImageView
+    <RelativeLayout
         android:id="@+id/playpause"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_gravity="center_vertical"
-        android:layout_margin="6dp"
-        android:contentDescription="@string/hello_world"
-        android:src="@drawable/player_icon_pause" />
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="center_vertical" >
 
-    <ImageView
+        <ImageView
+            android:id="@+id/playpauseimage"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_centerInParent="true"
+            android:contentDescription="@string/hello_world"
+            android:src="@drawable/player_icon_pause" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/playerexpiredtime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginRight="4dp"
+        android:text="12:32"
+        android:textColor="#FFFFFF"
+        android:textSize="12sp" />
+    <!--
+         <ImageView
         android:id="@+id/playerstop"
         android:layout_width="32dp"
         android:layout_height="32dp"
@@ -23,56 +39,62 @@
         android:layout_margin="6dp"
         android:contentDescription="@string/hello_world"
         android:src="@drawable/player_icon_stop" />
+    -->
 
     <RelativeLayout
         android:id="@+id/relativeLayout1"
         android:layout_width="fill_parent"
         android:layout_height="48dp" >
 
-        <ImageView
+        <RelativeLayout
             android:id="@+id/playerfullscreen"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_margin="6dp"
-            android:contentDescription="@string/hello_world"
-            android:src="@drawable/player_icon_quality" />
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentRight="true" >
 
-        <ImageView
+            <ImageView
+                android:id="@+id/playerfullscreenimage"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_centerInParent="true"
+                android:contentDescription="@string/hello_world"
+                android:src="@drawable/player_expand" />
+        </RelativeLayout>
+
+        <RelativeLayout
             android:id="@+id/playervolume"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
             android:layout_centerVertical="true"
-            android:layout_margin="6dp"
-            android:layout_toLeftOf="@+id/playerfullscreen"
-            android:contentDescription="@string/hello_world"
-            android:src="@drawable/player_icon_volume_max" />
+            android:layout_toLeftOf="@+id/playerfullscreen" >
+
+            <ImageView
+                 android:id="@+id/playervolumeimage"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_centerInParent="true"
+                android:contentDescription="@string/hello_world"
+                android:src="@drawable/player_icon_volume_max" />
+        </RelativeLayout>
 
         <SeekBar
             android:id="@+id/mediacontroller_progress"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toLeftOf="@+id/playervolume" />
-
-        <TextView
-            android:id="@+id/playerexpiredtime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/mediacontroller_progress"
-            android:layout_toRightOf="@+id/playerstop"
-            android:text=""
-            android:textSize="7sp" />
+            android:layout_toLeftOf="@+id/playervolume"
+            android:thumb="@drawable/player_icon_seek" />
 
         <TextView
             android:id="@+id/playertotaltime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/mediacontroller_progress"
-            android:layout_alignParentRight="true"
-            android:text=""
-            android:textSize="7sp" />
+            android:layout_alignParentTop="true"
+            android:layout_alignRight="@+id/mediacontroller_progress"
+            android:text="13:32"
+            android:textColor="#FFFFFF"
+            android:textSize="7sp"
+            android:visibility="gone" />
     </RelativeLayout>
 
 </LinearLayout>

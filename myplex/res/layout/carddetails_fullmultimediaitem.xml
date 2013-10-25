@@ -6,13 +6,13 @@
 
     <ImageView
         android:id="@+id/imageView1"
-        android:layout_width="@dimen/size_24"
-        android:layout_height="@dimen/size_24"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_marginLeft="@dimen/margin_gap_4"
         android:contentDescription="@string/hello_world"
-        android:src="@drawable/card_icontimeline" />
+        android:src="@drawable/icontimeline" />
 
     <LinearLayout
         android:layout_width="fill_parent"

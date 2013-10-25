@@ -15,6 +15,7 @@ import com.apalya.myplex.cache.InsertionResult;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardResponseData;
 import com.apalya.myplex.data.myplexapplication;
+import com.google.android.gms.internal.er;
 
 public class FavouriteUtil {
 	public static final String TAG = "FavouriteUtil";
@@ -93,6 +94,9 @@ public class FavouriteUtil {
 			@Override
 			public void onErrorResponse(VolleyError error) {
 				Log.e(TAG, "error response: ");
+				if(error != null && error.networkResponse != null){
+					Log.e(TAG, "$$$  "+error.networkResponse.statusCode);	
+				}
 				if(mListener != null){
 					mListener.response(false);
 				}

@@ -11,8 +11,8 @@
     <padding android:left="6dp" />
 
     <stroke
-        android:width="2dp"
-        android:color="#efefef" />
+        android:width="1dp"
+        android:color="#b4b4b5" />
 
     <gradient
         android:endColor="#ffffff"

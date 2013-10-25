@@ -30,9 +30,10 @@
         android:id="@+id/carddetailfulldescriptiontitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:paddingRight="36dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:layout_marginLeft="@dimen/margin_gap_12"
+        android:layout_marginLeft="@dimen/margin_gap_16"
         android:layout_marginTop="@dimen/margin_gap_12"
         android:orientation="horizontal" >
 
@@ -60,7 +61,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/carddetailfulldescriptiontitle"
-        android:layout_marginLeft="@dimen/margin_gap_12"
+        android:layout_marginLeft="@dimen/margin_gap_16"
         android:layout_marginTop="@dimen/margin_gap_12"
         android:orientation="horizontal" >
 
@@ -110,13 +111,12 @@
         android:layout_width="wrap_content"
         android:layout_height="32dp"
         android:layout_below="@+id/carddetailfulldescriptionsubtitle"
-        android:layout_marginLeft="@dimen/margin_gap_12"
+        android:layout_marginLeft="@dimen/margin_gap_16"
         android:layout_marginTop="12dp"
         android:background="@drawable/carddetailbutton_bg"
-        android:paddingLeft="4dp"
         android:paddingRight="4dp"
         android:textColor="#54b5e9"
-        android:textSize="@dimen/textsize_12" />
+        android:textSize="15sp" />
 
     <View
         android:layout_width="match_parent"
@@ -133,7 +133,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/carddetaildesc_separtor"
-        android:layout_marginLeft="@dimen/margin_gap_12"
+        android:layout_marginLeft="@dimen/margin_gap_16"
         android:layout_marginTop="12dp"
         android:lineSpacingExtra="2dp"
         android:text="@string/carddetailsectionheader_description"
@@ -149,7 +149,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginTop="12dp"
         android:layout_marginRight="36dp"
-        android:lineSpacingExtra="3dp"
+        android:lineSpacingExtra="4dp"
         android:text=""
         android:textColor="#4b4b4c"
         android:textSize="14sp" />

@@ -22,14 +22,15 @@
         android:background="@drawable/fliterpopuplist_bg" >
     </RelativeLayout>
 
-    <com.apalya.myplex.views.PinnedSectionListView
+    <ListView
         android:id="@+id/listView1"
         android:layout_width="200dp"
+        android:layout_marginTop="28dp"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
         android:layout_centerInParent="true"
         android:divider="@drawable/fliterpopuplist_bg"
         android:dividerHeight="0dp" >
-    </com.apalya.myplex.views.PinnedSectionListView>
+    </ListView>
 
 </RelativeLayout>

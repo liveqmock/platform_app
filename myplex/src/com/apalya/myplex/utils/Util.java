@@ -147,6 +147,7 @@ public class Util {
 	public static void prepareDisplayinfo(Activity activity) {
 		try {
 			ConsumerApi.DOMAIN = activity.getString(R.string.domain_name);
+			myplexapplication.getApplicationConfig().downloadCardsPath =  activity.getFilesDir()+"/"+"downloadlist.bin";
 			DisplayMetrics dm = new DisplayMetrics();
 			activity.getWindowManager().getDefaultDisplay().getMetrics(dm);
 			myplexapplication.getApplicationConfig().screenHeight = dm.heightPixels;
@@ -199,7 +200,7 @@ public class Util {
 			public boolean onTouch(View v, MotionEvent event) {
 				switch (event.getAction()) {
 				case MotionEvent.ACTION_DOWN:
-					v.setBackgroundColor(color.searchtags_color);
+					v.setBackgroundColor(Color.parseColor("#54B5E9"));
 					break;
 				case MotionEvent.ACTION_UP:
 					v.setBackgroundColor(Color.TRANSPARENT);
@@ -723,5 +724,5 @@ public class Util {
 		boolean isWiFi = activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
 		return isWiFi;
 	}
-
+	public static void saveObject(Object obj,String path) {		try {			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(path))); 			oos.writeObject(obj); 			oos.flush(); 			oos.close();		} catch (Exception ex) {			Log.v("Util", ex.getMessage());			ex.printStackTrace();		}	}	public static Object loadObject(String path) {		try {			File f = new File(path);			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(f));			Object o = ois.readObject();			return o;		} catch (Exception ex) {			Log.v("Util", ex.getMessage());			ex.printStackTrace();		}		return null;	}
 }

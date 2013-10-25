@@ -33,12 +33,14 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.apalya.myplex.R;
+import com.apalya.myplex.utils.Util;
 
 public class MediaController2 extends LinearLayout {
 
@@ -58,13 +60,16 @@ public class MediaController2 extends LinearLayout {
     private View.OnClickListener mNextListener, mPrevListener;
     StringBuilder               mFormatBuilder;
     Formatter                   mFormatter;
-    private ImageView         mPauseButton;
+    private RelativeLayout         mPauseButton;
+    private ImageView         mPauseButtonImage;
     private ImageView         mFfwdButton;
     private ImageView         mRewButton;
     private ImageView         mNextButton;
     private ImageView         mPrevButton;
-    private ImageView 			mMuteButton;
-    private ImageView 			mFullScreenTooggle;
+    private RelativeLayout 			mMuteButton;
+    private ImageView 			mMuteButtonImage;
+    private RelativeLayout 			mFullScreenTooggle;
+    private ImageView 			mFullScreenTooggleImage;
     private MediaPlayer   	  mMediaPlayer = null;
     private boolean   mMuteEnabled = false;
     private VideoViewPlayer mCustomVideoView = null;
@@ -194,18 +199,31 @@ public class MediaController2 extends LinearLayout {
 
         return mRoot;
     }
+    public void playerInFullScreen(boolean value){
+    	if(mFullScreenTooggleImage== null){return;}
+    	if(value){
+    		mFullScreenTooggleImage.setImageResource(R.drawable.player_collapse);	
+    	}else{
+    		mFullScreenTooggleImage.setImageResource(R.drawable.player_expand);
+    	}
+    	
+    }
     private boolean mPlayerFullScreen = false;
     private void initControllerView(View v) {
     	mPlayerFullScreen = false;
     	if(mContentEnabled){
-    		mPauseButton = (ImageView) v.findViewById(R.id.playpause);
+    		mPauseButton = (RelativeLayout) v.findViewById(R.id.playpause);
+    		mPauseButtonImage = (ImageView)v.findViewById(R.id.playpauseimage);
+    		Util.showFeedback(mPauseButton);
     	}
         if (mPauseButton != null) {
         	mPauseButton.setVisibility(View.VISIBLE);
             mPauseButton.requestFocus();
             mPauseButton.setOnClickListener(mPauseListener);
         }
-        mFullScreenTooggle = (ImageView) v.findViewById(R.id.playerfullscreen);
+        mFullScreenTooggle = (RelativeLayout) v.findViewById(R.id.playerfullscreen);
+        Util.showFeedback(mFullScreenTooggle);
+        mFullScreenTooggleImage = (ImageView) v.findViewById(R.id.playerfullscreenimage);
         if(mFullScreenTooggle != null){
         	mFullScreenTooggle.setOnClickListener(new OnClickListener() {
 				
@@ -214,10 +232,12 @@ public class MediaController2 extends LinearLayout {
 					if(mPlayerListener != null){
 						mPlayerFullScreen = !mPlayerFullScreen;
 						mPlayerListener.onFullScreen(mPlayerFullScreen);
+						playerInFullScreen(mPlayerFullScreen);
 					}
 				}
 			});
         }
+        playerInFullScreen(false);
         ImageView stopButton = (ImageView)v.findViewById(R.id.playerstop);
         if(stopButton != null){
         	stopButton.setOnClickListener(new OnClickListener() {
@@ -233,7 +253,9 @@ public class MediaController2 extends LinearLayout {
 				}
 			});
         }
-        mMuteButton = (ImageView)v.findViewById(R.id.playervolume);
+        mMuteButton = (RelativeLayout)v.findViewById(R.id.playervolume);
+        Util.showFeedback(mMuteButton);
+        mMuteButtonImage = (ImageView)v.findViewById(R.id.playervolumeimage);
         if(mMuteButton != null){
         	mMuteButton.setOnClickListener(new OnClickListener() {
 				
@@ -252,13 +274,13 @@ public class MediaController2 extends LinearLayout {
 						if(!mMuteEnabled){
 							Toast toast = Toast.makeText(mContext, "Muted", Toast.LENGTH_LONG);
 							toast.show();
-							mMuteButton.setImageResource(R.drawable.player_icon_volume_mute);
+							mMuteButtonImage.setImageResource(R.drawable.player_icon_volume_mute);
 							mMediaPlayer.setVolume(0,0);
 							mMuteEnabled = true;
 						}else{
 							Toast toast = Toast.makeText(mContext, "Unmuted", Toast.LENGTH_LONG);
 							toast.show();
-							mMuteButton.setImageResource(R.drawable.player_icon_volume_max);
+							mMuteButtonImage.setImageResource(R.drawable.player_icon_volume_max);
 							mMediaPlayer.setVolume(1,1);
 							mMuteEnabled = false;
 						}
@@ -522,11 +544,11 @@ public class MediaController2 extends LinearLayout {
         }
         
         if (mPlayer.isPlaying()) {
-        	if(mPauseButton != null)
-            mPauseButton.setImageResource(R.drawable.player_icon_pause);            
+        	if(mPauseButtonImage != null)
+        		mPauseButtonImage.setImageResource(R.drawable.player_icon_pause);            
         } else {
-        	if(mPauseButton != null)
-            mPauseButton.setImageResource(R.drawable.player_icon_play);
+        	if(mPauseButtonImage != null)
+        		mPauseButtonImage.setImageResource(R.drawable.player_icon_play);
         }
     }
     

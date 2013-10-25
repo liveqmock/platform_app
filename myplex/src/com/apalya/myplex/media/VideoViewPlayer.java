@@ -730,6 +730,11 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 			mMediaPlayerController.hide();
 		}
 	}
+	public void playerInFullScreen(boolean value){
+		if(mMediaPlayerController != null){
+			mMediaPlayerController.playerInFullScreen(value);
+		}
+	}
 	public void showMediaController(){
 		if(mMediaPlayerController != null){
 			mMediaPlayerController.show();

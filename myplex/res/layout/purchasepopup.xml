@@ -3,10 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/fliterpopuplist_bg"
+    android:background="#E6343433"
     tools:ignore="all" >
 
     <RelativeLayout
+        android:id="@+id/purchasepopup_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
 
@@ -96,7 +97,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical" >
-
+                
             </LinearLayout>
 
             <LinearLayout
@@ -104,6 +105,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginLeft="@dimen/margin_gap_12"
+                android:layout_marginTop="@dimen/margin_gap_16"
                 android:orientation="vertical" >
 
                 <TextView

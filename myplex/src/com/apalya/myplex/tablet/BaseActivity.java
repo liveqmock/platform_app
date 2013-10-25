@@ -94,6 +94,10 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		setRequestedOrientation(value);
 	}
 	@Override
+	public int getOrientation(){
+		return getRequestedOrientation();
+	}
+	@Override
 	public void hideActionBar() {
 		ActionBar actionBar = getActionBar();
 		if (actionBar != null) {

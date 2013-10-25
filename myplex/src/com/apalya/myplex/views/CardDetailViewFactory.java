@@ -18,6 +18,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.Space;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -227,36 +228,54 @@ public class CardDetailViewFactory {
 	
 		LinearLayout commentLayout = (LinearLayout)v.findViewById(R.id.carddetailcomment_commentlayout);
 		LinearLayout reviewLayout = (LinearLayout)v.findViewById(R.id.carddetailcomment_reviewlayout);
-		LinearLayout rateLayout = (LinearLayout)v.findViewById(R.id.carddetailcomment_ratelayout);
-		
-		rateLayout.setOnClickListener(mRateListener);
 		
 		final ImageView commentImage = (ImageView)v.findViewById(R.id.carddetailcomment_commentimage);
 		final TextView commentHeading = (TextView)v.findViewById(R.id.carddetailcomment_commentheading);
+		commentHeading.setTypeface(FontUtil.Roboto_Regular);
 		final ImageView reviewImage = (ImageView)v.findViewById(R.id.carddetailcomment_reviewimage);
 		final TextView reviewHeading = (TextView)v.findViewById(R.id.carddetailcomment_reviewheading);
-		final EditText editBox = (EditText)v.findViewById(R.id.carddetailcomment_edittext);
-		editBox.setTypeface(FontUtil.Roboto_Medium);
-		
-		editBox.setOnEditorActionListener(new OnEditorActionListener() {
-
-			@Override
-			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-				if(actionId == EditorInfo.IME_ACTION_SEND)
-				{
-					String userSearchText = editBox.getText().toString();
-					if(userSearchText.length() <=0)
-						return true;
-					String searchText = editBox.getText().toString();
-					String hintText = (String) editBox.getHint();
-					if(hintText.equalsIgnoreCase(mContext.getResources().getString(R.string.carddetailcommentsection_editcomment))){
-						sendMessage(searchText,0,MessagePost.POST_COMMENT);
-					}
-					return true;
-				}
-				return false;
-			}
+		reviewHeading.setTypeface(FontUtil.Roboto_Regular);
+		final Button editBox = (Button)v.findViewById(R.id.carddetailcomment_edittext);
+		editBox.setTypeface(FontUtil.Roboto_Regular);
+//		Util.showFeedback(editBox);
+		editBox.setOnClickListener(new OnClickListener() {
 			
+			@Override
+			public void onClick(View arg0) {
+				String label = (String) editBox.getText();
+				if(label.equalsIgnoreCase(mContext.getResources().getString(R.string.carddetailcommentsection_editcomment))){
+					CommentDialog dialog = new CommentDialog(mContext);
+					dialog.showDialog(new MessagePostCallback() {
+						
+						@Override
+						public void sendMessage(boolean status) {
+							if(status){
+								Toast.makeText(mContext, "Comment has posted successfully.", Toast.LENGTH_SHORT).show();
+								refreshSection(COMMENTSECTION_COMMENTS);
+							}else{
+								Toast.makeText(mContext, "Unable to post your comment.", Toast.LENGTH_SHORT).show();
+							}
+						}
+						
+					}, mData);
+				}else{
+					RatingDialog dialog = new RatingDialog(mContext);
+					dialog.prepareRating();
+					dialog.showDialog(new MessagePostCallback() {
+						
+						@Override
+						public void sendMessage(boolean status) {
+							if(status){
+								Toast.makeText(mContext, "Review has posted successfully.", Toast.LENGTH_SHORT).show();
+								refreshSection(COMMENTSECTION_REVIEW);
+							}else{
+								Toast.makeText(mContext, "Unable to post your review.", Toast.LENGTH_SHORT).show();
+							}
+						}
+						
+					}, mData);
+				}
+			}
 		});
 		
 		commentImage.setImageResource(R.drawable.card_iconcommentblue);
@@ -269,8 +288,8 @@ public class CardDetailViewFactory {
 				commentHeading.setTextColor(Color.parseColor("#6CBEE9"));
 				reviewImage.setImageResource(R.drawable.card_iconuser);
 				reviewHeading.setTextColor(Color.parseColor("#000000"));
-				editBox.setHint(R.string.carddetailcommentsection_editcomment);
-				editBox.setOnClickListener(null);
+				editBox.setText(R.string.carddetailcommentsection_editcomment);
+//				editBox.setOnClickListener(null);
 				
 				if(type == CARDDETAIL_COMMENTS){
 					fillCommentSectionData(COMMENTSECTION_COMMENTS,-1,mData);
@@ -290,8 +309,8 @@ public class CardDetailViewFactory {
 				commentHeading.setTextColor(Color.parseColor("#000000"));
 				reviewImage.setImageResource(R.drawable.card_iconuserblue);
 				reviewHeading.setTextColor(Color.parseColor("#6CBEE9"));
-				editBox.setHint(R.string.carddetailcommentsection_editreview);
-				editBox.setOnClickListener(mRateListener);
+				editBox.setText(R.string.carddetailcommentsection_editreview);
+//				editBox.setOnClickListener(mRateListener);
 				if(type == CARDDETAIL_COMMENTS){
 					fillCommentSectionData(COMMENTSECTION_REVIEW,-1,mData);
 				}else{
@@ -300,25 +319,15 @@ public class CardDetailViewFactory {
 			}
 		});
 		
-		
+//		
 		mCommentRefresh = (ImageView)v.findViewById(R.id.carddetailcomment_expand);
-//		if(type == CARDDETAIL_COMMENTS){
-//			image.setImageResource(R.drawable.iconup);
-//		}else{
-//			image.setImageResource(R.drawable.icondown);
-//		}
-		mCommentRefresh.setOnClickListener(new OnClickListener() {
+		RelativeLayout commentRefreshlayout = (RelativeLayout)v.findViewById(R.id.carddetailcomment_expandlayout);
+		Util.showFeedback(commentRefreshlayout);
+		commentRefreshlayout.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
 				refreshSection(type);
-//				if(mCardExpandListener != null){
-//					if(type == CARDDETAIL_COMMENTS){
-//						mCardExpandListener.onCommentsCollapsed();
-//					}else{
-//						mCardExpandListener.onCommentsExpanded();
-//					}
-//				}				
 			}
 		});
 		refreshSection(COMMENTSECTION_COMMENTS);
@@ -333,27 +342,6 @@ public class CardDetailViewFactory {
 		 Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.stoprotate);
 		 mCommentRefresh.startAnimation(animation);
 	}
-	private OnClickListener mRateListener = new OnClickListener() {
-		
-		@Override
-		public void onClick(View v) {
-			RatingDialog dialog = new RatingDialog(mContext);
-			dialog.prepareRating();
-			dialog.showDialog(new MessagePostCallback() {
-				
-				@Override
-				public void sendMessage(boolean status) {
-					if(status){
-						Toast.makeText(mContext, "Review has posted successfully.", Toast.LENGTH_SHORT).show();
-						refreshSection(COMMENTSECTION_REVIEW);
-					}else{
-						Toast.makeText(mContext, "Unable to post your review.", Toast.LENGTH_SHORT).show();
-					}
-				}
-				
-			}, mData);
-		}
-	};
 	private void refreshSection(final int type) {
 		rotateRefresh();
 		String FieldName = new  String();
@@ -377,22 +365,6 @@ public class CardDetailViewFactory {
 		});
 		
 	}
-	private void sendMessage(String searchText,int rating,int messageType) {
-		MessagePost post = new MessagePost();
-		post.sendComment(searchText, rating,mData, messageType,new MessagePostCallback() {
-			
-			@Override
-			public void sendMessage(boolean status) {
-				if(status){
-					Toast.makeText(mContext, "Comment has posted successfully.", Toast.LENGTH_SHORT).show();
-					refreshSection(COMMENTSECTION_COMMENTS);
-				}else{
-					Toast.makeText(mContext, "Unable to post your comment.", Toast.LENGTH_SHORT).show();
-				}
-			}
-		});
-	}
-
 
 	private View createExtraMultiMediaView() {
 		// TODO Auto-generated method stub
@@ -875,7 +847,7 @@ public class CardDetailViewFactory {
 		
 		
 		ImageView expand = (ImageView)v.findViewById(R.id.carddetailbriefdescription_expand);
-		v.setOnClickListener(new OnClickListener() {
+		expand.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
@@ -884,14 +856,14 @@ public class CardDetailViewFactory {
 				}				
 			}
 		});
-//		Util.showFeedback(v);
+		Util.showFeedback(expand);
 		return v;
 	}
 	private OnClickListener packageButtonListener = new OnClickListener() {
 		
 		@Override
 		public void onClick(View v) {
-			PackagePopUp popup = new PackagePopUp(mContext);
+			PackagePopUp popup = new PackagePopUp(mContext,null);
 			popup.showPackDialog(mData, ((Activity)mContext).getActionBar().getCustomView());			
 		}
 	};

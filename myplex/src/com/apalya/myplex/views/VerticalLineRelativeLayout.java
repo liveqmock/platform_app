@@ -36,8 +36,8 @@ public class VerticalLineRelativeLayout extends RelativeLayout {
 		// TODO Auto-generated constructor stub
 	}
 	private void createPaint(){
-		paint.setColor(Color.parseColor("#efefef"));
-		paint.setStrokeWidth(4f);
+		paint.setColor(Color.parseColor("#b4b4b5"));
+		paint.setStrokeWidth(2f);
 		paint.setStyle(Paint.Style.FILL);
 	}
 	Rect mRect = new Rect();
@@ -45,7 +45,7 @@ public class VerticalLineRelativeLayout extends RelativeLayout {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		if(mRect.isEmpty()){
-			mStartX = (int)getContext().getResources().getDimension(R.dimen.margin_gap_4);
+			mStartX = getPaddingLeft()+(int)getContext().getResources().getDimension(R.dimen.margin_gap_4);
 			View child = getChildAt(0);
 			child.getGlobalVisibleRect(mRect);
 		}

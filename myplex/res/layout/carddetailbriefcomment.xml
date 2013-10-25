@@ -1,136 +1,105 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content" 
+    android:layout_height="wrap_content"
     android:background="@drawable/carddetails_bg" >
-    
+
+    <LinearLayout
+        android:id="@+id/carddetailcomment_commentlayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="@dimen/margin_gap_12"
+        android:layout_marginTop="@dimen/margin_gap_12" >
+
+        <ImageView
+            android:id="@+id/carddetailcomment_commentimage"
+            android:layout_width="@dimen/size_24"
+            android:layout_height="@dimen/size_24"
+            android:layout_marginRight="@dimen/margin_gap_6"
+            android:contentDescription="@string/hello_world"
+            android:src="@drawable/card_iconcomment" />
+
+        <TextView
+            android:id="@+id/carddetailcomment_commentheading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="@string/carddetailsectionheader_comment"
+            android:textSize="@dimen/textsize_14" />
+    </LinearLayout>
+
     <RelativeLayout
-        android:id="@+id/carddetailcomment_expandlayout"
+        android:id="@+id/carddetailcomment_editlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/carddetailcomment_commentlayout"
+        android:layout_marginLeft="@dimen/margin_gap_12"
+        android:layout_marginRight="@dimen/margin_gap_12"
+        android:layout_marginTop="16dp" >
+
+        <Button
+            android:id="@+id/carddetailcomment_edittext"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/commenttextbg"
+            android:layout_marginRight="42dp"
+            android:textColor="#4b4b4c"
+            android:text="@string/carddetailcommentsection_editcomment"
+            android:textSize="@dimen/textsize_14" >
+        </Button>
+
+       <RelativeLayout
+           android:id="@+id/carddetailcomment_expandlayout"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
+            android:layout_alignParentRight="true" >
+
+            <ImageView
+                android:id="@+id/carddetailcomment_expand"
+                android:layout_width="@dimen/size_24"
+                android:layout_height="@dimen/size_24"
+                android:layout_centerInParent="true"
+                android:contentDescription="@string/hello_world"
+                android:src="@drawable/iconrefresh" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/carddetailcomment_contentlayout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/carddetailcomment_editlayout"
+        android:layout_marginTop="@dimen/margin_gap_12"
+        android:orientation="vertical" >
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/carddetailcomment_reviewlayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:padding="@dimen/margin_gap_12" >
+        android:layout_marginRight="@dimen/margin_gap_12"
+        android:layout_marginTop="@dimen/margin_gap_12" >
 
         <ImageView
-            android:contentDescription="@string/hello_world"
-            android:id="@+id/carddetailcomment_expand"
+            android:id="@+id/carddetailcomment_reviewimage"
             android:layout_width="@dimen/size_24"
             android:layout_height="@dimen/size_24"
-            android:src="@drawable/iconrefresh" />
-    </RelativeLayout>
+            android:layout_marginRight="@dimen/margin_gap_6"
+            android:contentDescription="@string/hello_world"
+            android:src="@drawable/card_iconuser" />
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_toLeftOf="@+id/carddetailcomment_expandlayout" >
-
-        <LinearLayout
-            android:id="@+id/carddetailcomment_commentlayout"
+        <TextView
+            android:id="@+id/carddetailcomment_reviewheading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/margin_gap_12"
-        	android:layout_marginTop="@dimen/margin_gap_12"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true" >
-
-            <ImageView
-                android:contentDescription="@string/hello_world"
-                android:id="@+id/carddetailcomment_commentimage"
-                android:layout_width="@dimen/size_24"
-                android:layout_height="@dimen/size_24" android:layout_marginRight="@dimen/margin_gap_6"
-                android:src="@drawable/card_iconcomment" />
-
-            <TextView
-                android:id="@+id/carddetailcomment_commentheading"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:text="@string/carddetailsectionheader_comment"
-                android:textSize="@dimen/textsize_14" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/carddetailcomment_editlayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_marginTop="16dp"
-            android:layout_marginLeft="@dimen/margin_gap_12"
-            android:layout_below="@+id/carddetailcomment_commentlayout" >
-
-            <EditText
-                android:id="@+id/carddetailcomment_edittext"
-                android:layout_width="match_parent"                                                                   
-                android:layout_height="32dp"
-                android:layout_marginLeft="4dp"
-                android:layout_gravity="center_vertical"
-                android:hint="@string/carddetailcommentsection_editcomment"
-                android:background="@drawable/commenttextbg" android:inputType="text"
-    			android:imeOptions="actionSend"
-                android:textSize="@dimen/textsize_14" >
-            </EditText>
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/carddetailcomment_contentlayout"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/carddetailcomment_editlayout"
-            android:layout_marginLeft="@dimen/margin_gap_16"
-            android:layout_marginTop="@dimen/margin_gap_4"
-            android:layout_marginRight="@dimen/margin_gap_8"
-            android:orientation="vertical" >
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/carddetailcomment_ratelayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:layout_alignTop="@+id/carddetailcomment_commentlayout"
-            android:layout_centerHorizontal="true" >
-
-            <ImageView
-                android:contentDescription="@string/hello_world"
-                android:layout_width="@dimen/size_24"
-                android:layout_height="@dimen/size_24"
-                android:layout_marginRight="@dimen/margin_gap_6"
-                android:layout_marginLeft="@dimen/margin_gap_6"
-                android:src="@drawable/card_iconheart" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:text="@string/carddetailsectionheader_rate"
-                android:textSize="@dimen/textsize_14" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/carddetailcomment_reviewlayout"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/carddetailcomment_editlayout"
-            android:layout_alignRight="@+id/carddetailcomment_contentlayout" >
-
-            <ImageView
-                android:contentDescription="@string/hello_world"
-                 android:id="@+id/carddetailcomment_reviewimage"
-                android:layout_width="@dimen/size_24"
-                android:layout_height="@dimen/size_24"
-                android:layout_marginRight="@dimen/margin_gap_6"
-                android:src="@drawable/card_iconuser" />
-
-            <TextView
-                android:id="@+id/carddetailcomment_reviewheading"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:text="@string/carddetailsectionheader_reviews"
-                android:textSize="@dimen/textsize_14" />
-        </LinearLayout>
-
-    </RelativeLayout>
+            android:layout_gravity="center_vertical"
+            android:text="@string/carddetailsectionheader_reviews"
+            android:textSize="@dimen/textsize_14" />
+    </LinearLayout>
 
 </RelativeLayout>
