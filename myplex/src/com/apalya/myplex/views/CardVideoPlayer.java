@@ -31,6 +31,7 @@ import com.apalya.myplex.MainBaseOptions;
 import com.apalya.myplex.R;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDataImagesItem;
+import com.apalya.myplex.data.CardDataPurchaseItem;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.media.PlayerListener;
 import com.apalya.myplex.media.VideoViewExtn;
@@ -63,6 +64,7 @@ public class CardVideoPlayer implements PlayerListener {
 	private static int PLAYER_STOPPED = 3;
 	private static int PLAYER_BUFFERING = 4;
 	private PlayerFullScreen mPlayerFullScreen;
+	boolean isESTPackPurchased=false;
 
 	public void setFullScreenListener(PlayerFullScreen mListener){
 		this.mPlayerFullScreen = mListener;
@@ -191,6 +193,24 @@ public class CardVideoPlayer implements PlayerListener {
 //							Toast.LENGTH_SHORT).show();
 //					return;
 //				}
+				if(isESTPackPurchased)
+				{
+					closePlayer();
+					
+					if(Util.checkDownloadStatus( mData._id, mContext)==0)
+					{
+						long id=Util.startDownload(url, mData.generalInfo.title, mContext);
+						myplexapplication.getUserProfileInstance().downloadMap.put(mData._id, id);
+					}
+					else
+					{
+						Util.showToast("Your download is in progress,Please check your status in Downloads section", mContext);
+					}
+					return;
+					
+				}
+				else
+				{
 				Uri uri = Uri
 						.parse("rtsp://59.162.166.216:554/AAJTAK_QVGA.sdp");
 				uri = Uri
@@ -217,6 +237,7 @@ public class CardVideoPlayer implements PlayerListener {
 				});
 				mVideoViewPlayer.setPlayerListener(CardVideoPlayer.this);
 			}
+			}
 		});
 
 		boolean lastWatchedStatus=false;
@@ -229,7 +250,26 @@ public class CardVideoPlayer implements PlayerListener {
 		}
 		if(!lastWatchedStatus)
 			myplexapplication.getUserProfileInstance().lastVisitedCardData.add(mData);
-		MediaUtil.getVideoUrl(mData._id, "low");
+
+		
+		if(mData.currentUserData!=null)
+        {    
+            for(CardDataPurchaseItem data:mData.currentUserData.purchase)
+            {
+                if(data.type.equalsIgnoreCase("download") || data.type.equalsIgnoreCase("est")){
+                    isESTPackPurchased=true;
+
+                }
+            }
+        }
+        
+        String qualityType="low";
+        
+        if(Util.isWifiEnabled(mContext))
+            qualityType="high";
+        
+        
+        MediaUtil.getVideoUrl(mData._id,qualityType,isESTPackPurchased);
 	}
 
 	public View CreateTabletPlayerView(View parentLayout) {

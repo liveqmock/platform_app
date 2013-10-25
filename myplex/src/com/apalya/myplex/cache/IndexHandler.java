@@ -315,7 +315,10 @@ public class IndexHandler {
 			try {
 				initIndexReader();
 				if(mIndexReader.numDocs() <= 0)
+				{
+					Log.e(TAG," numDocs is -1");
 					return null;
+				}
 				indexSearcher = new IndexSearcher(mIndexReader);
 				QueryParser qp =null;
 				switch (this.mSearchType) {
@@ -331,6 +334,11 @@ public class IndexHandler {
 					break;
 				}
 				
+				if(mCardIds == null || mCardIds.size() ==0)
+				{
+					Log.e(TAG," search data is null/size is zero");
+					return null;
+				}
 				
 				String queryString = "";
 				for (CardData card : mCardIds) {
@@ -380,6 +388,7 @@ public class IndexHandler {
 		@Override
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
+			Log.e(TAG,"searchComplete callback :" +mSearchResult.size()+" results");
 			mCallback.searchComplete(mSearchResult);
 		}
 	}
