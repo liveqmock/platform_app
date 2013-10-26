@@ -25,7 +25,14 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
+import com.apalya.myplex.cache.CacheManager;
+import com.apalya.myplex.cache.InsertionResult;
+import com.apalya.myplex.data.CardData;
+import com.apalya.myplex.data.CardResponseData;
+import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.ConsumerApi;
+import com.apalya.myplex.utils.FetchCardField;
+import com.apalya.myplex.utils.FetchCardField.FetchComplete;
 
 public class SubscriptionView extends Activity {
 	private static final String TAG="SubscriptionView";
@@ -56,10 +63,39 @@ public class SubscriptionView extends Activity {
 			dofinish(ConsumerApi.SUBSCRIPTIONERROR);
 		}
 	}
-	private void dofinish(int response){
+	private void dofinish(final int response){
+		if(response == ConsumerApi.SUBSCRIPTIONSUCCESS){
+			FetchCardField fetch = new FetchCardField();
+			fetch.Fetch(myplexapplication.getCardExplorerData().cardDataToSubscribe, ConsumerApi.FIELD_CURRENTUSERDATA, new FetchComplete() {
+				
+				@Override
+				public void response(CardResponseData data) {
+					if(data == null){
+						closeSession(response);
+					}
+					if(data.results == null){closeSession(response);}
+					if(data.results.size() == 0){closeSession(response);}
+					CardData subscribedData = myplexapplication.getCardExplorerData().cardDataToSubscribe;
+					subscribedData.currentUserData =  data.results.get(0).currentUserData;
+					List<CardData> dataToSave = new ArrayList<CardData>();
+					dataToSave.add(subscribedData);
+					myplexapplication.getCacheHolder().UpdataDataAsync(dataToSave, new InsertionResult() {
+						
+						@Override
+						public void updateComplete(Boolean updateStatus) {
+							closeSession(response);
+						}
+					});					
+				}
+			});
+		}else{
+			closeSession(response);
+		}
+	}
+	private void closeSession(int response){
 		setResult(response);
 		finish();
-		dismissProgressBar();
+		dismissProgressBar();	
 	}
 	private void setUpWebView(String url){
 		mWebView.setVerticalScrollBarEnabled(false);

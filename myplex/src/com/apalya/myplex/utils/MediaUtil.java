@@ -37,7 +37,7 @@ public class MediaUtil {
 
 		StringRequest myReq = new StringRequest(aVideoUrl, getVideoUrlSuccessListener(), getVideoUrlReqErrorListener());
 
-		myReq.setShouldCache(true);
+		myReq.setShouldCache(false);
 		queue.add(myReq);
 	}
 	private static void sendResponse(boolean status,String url){

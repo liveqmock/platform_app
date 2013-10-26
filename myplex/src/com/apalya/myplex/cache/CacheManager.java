@@ -37,12 +37,10 @@ public class CacheManager {
 			public void searchComplete(HashMap<String, CardData> resultMap) {
 				if(resultMap == null){
 					if(mListener != null){
-						mListener.OnCacheResults(null);
+						mListener.OnCacheResults(null,false);
 					}
 				}else{
-					if(mListener != null){
-						mListener.OnCacheResults(resultMap);
-					}
+					boolean issuedOnlineRequest = false;
 					Set<String> keySet = resultMap.keySet();
 					Log.d(TAG,"Number of result found in cache :"+keySet.size());
 					String missingCardId = new String();
@@ -55,7 +53,11 @@ public class CacheManager {
 						}
 					}
 					if(missingCardId.length() >0){
+						issuedOnlineRequest = true;
 						issueOnlineRequest(missingCardId);
+					}
+					if(mListener != null){
+						mListener.OnCacheResults(resultMap,issuedOnlineRequest);
 					}
 				}
 			}
@@ -67,7 +69,7 @@ public class CacheManager {
 		String url = ConsumerApi.getContentDetail(cardIds, ConsumerApi.LEVELDEVICEMAX);
 		RequestQueue queue = MyVolley.getRequestQueue();
 		StringRequest myReg = new StringRequest(url, onlineRequestSuccessListener(), onlineRequestErrorListener());
-		myReg.setShouldCache(true);
+//		myReg.setShouldCache(true);
 		myReg.setRetryPolicy(new CacheRetry());
 		queue.add(myReg);
 		Log.d(TAG,"issueOnlineRequest :"+url+" timeout "+myReg.getRetryPolicy().getCurrentTimeout());

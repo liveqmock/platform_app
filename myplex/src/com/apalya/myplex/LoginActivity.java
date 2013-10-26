@@ -853,6 +853,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				return params;
 			};
 		};
+		myReq.setShouldCache(false);
 		Log.d(TAG,"Request sent ");
 		queue.add(myReq);
 
@@ -1062,6 +1063,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				return params;
 			};
 		};
+		myReq.setShouldCache(false);
 		Log.d(TAG,"Request sent ");
 		queue.add(myReq);
 
@@ -1479,6 +1481,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				return params;
 			};
 		};
+		myReq.setShouldCache(false);
 		Log.d(TAG,"Request sent ");
 		queue.add(myReq);
 	}
@@ -1681,6 +1684,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				return params;
 			};
 		};
+		myReq.setShouldCache(false);
 		Log.d(TAG,"Request sent ");
 		queue.add(myReq);
 

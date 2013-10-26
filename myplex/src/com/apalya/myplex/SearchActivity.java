@@ -642,7 +642,7 @@ public class SearchActivity extends BaseFragment implements
 	}
 
 	@Override
-	public void OnCacheResults(HashMap<String, CardData> obj) {
+	public void OnCacheResults(HashMap<String, CardData> obj,boolean issuedRequest) {
 		if (obj == null) {
 			return;
 		}

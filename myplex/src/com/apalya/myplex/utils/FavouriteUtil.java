@@ -34,7 +34,7 @@ public class FavouriteUtil {
 		String url = ConsumerApi.getFavourite(data._id);
 		RequestQueue queue = MyVolley.getRequestQueue();
 		StringRequest myReg = new StringRequest(Method.POST,url, onlineRequestSuccessListener(), onlineRequestErrorListener());
-		myReg.setShouldCache(true);
+		myReg.setShouldCache(false);
 		queue.add(myReg);
 		Log.e(TAG, "requestUrl: "+url);
 		

@@ -14,16 +14,17 @@ public class CardExplorerData {
 	public int currentSelectedCard = 0;
 	public  HashMap<String,CardData> mEntries = new HashMap<String,CardData>();
 	public ArrayList<CardData> mMasterEntries = new ArrayList<CardData>();
-	public int mStartIndex = 0;
+	public int mStartIndex = 1;
 	public String searchQuery = new String(); 
 	public int requestType = REQUEST_RECOMMENDATION;
 	public boolean continueWithExisting = false;
-	
+	public CardData cardDataToSubscribe = null;
 	public void reset(){
+		cardDataToSubscribe = null;
 		requestType = REQUEST_SEARCH;
 		searchQuery = new String();
 		currentSelectedCard = 0;
-		mStartIndex = 0;
+		mStartIndex = 1;
 		mEntries = new HashMap<String,CardData>();
 		mMasterEntries = new ArrayList<CardData>();
 		continueWithExisting = false;

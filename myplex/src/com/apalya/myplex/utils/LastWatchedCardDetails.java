@@ -32,7 +32,7 @@ public class LastWatchedCardDetails implements CacheManagerCallback{
 	}
 
 	@Override
-	public void OnCacheResults(HashMap<String, CardData> object) {
+	public void OnCacheResults(HashMap<String, CardData> object,boolean issuedRequest) {
 		 if(object == null){
 		return;
 	}

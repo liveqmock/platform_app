@@ -22,7 +22,6 @@ public class SubscriptionManger {
 		String url = ConsumerApi.getBillingMode(contentId);
 		RequestQueue queue = MyVolley.getRequestQueue();
 		StringRequest myReg = new StringRequest(Method.POST, url, billingModesSuccess(), billingModesError());
-		myReg.setShouldCache(true);
 		queue.add(myReg);
 	}
 

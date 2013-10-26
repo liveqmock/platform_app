@@ -18,6 +18,7 @@
         android:id="@+id/carddetail_scroll_view"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_gap_12"
         android:layout_below="@+id/carddetail_videolayout"
         android:background="#e6e6e6"
         android:scrollbars="none" >
@@ -26,7 +27,9 @@
             android:id="@+id/carddetail_detaillayout"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/margin_gap_12"
+            android:layout_marginBottom="@dimen/margin_gap_12"
+            android:layout_marginLeft="@dimen/margin_gap_12"
+            android:layout_marginRight="@dimen/margin_gap_12"
             android:orientation="vertical" >
         </LinearLayout>
     </com.apalya.myplex.views.CustomScrollView>

@@ -57,7 +57,7 @@ public class FetchDownloadData implements CacheManagerCallback{
 		
 	}
 	@Override
-	public void OnCacheResults(HashMap<String, CardData> obj) {
+	public void OnCacheResults(HashMap<String, CardData> obj,boolean issuedRequest) {
 		Set<String> keySet = obj.keySet();
 		for(String key:keySet){
 			if(mBrowseData.mEntries.get(key) == null){

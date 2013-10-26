@@ -142,6 +142,12 @@ public class CardDetails extends BaseFragment implements
 	@Override
 	public void onResume() {
 		super.onResume();
+		if(myplexapplication.getCardExplorerData().cardDataToSubscribe != null){
+			mCardData = myplexapplication.getCardExplorerData().cardDataToSubscribe;
+		}
+		if(mCardDetailViewFactory != null){
+			mCardDetailViewFactory.UpdateSubscriptionStatus();
+		}
 	}
 	private void prepareContent() {
 		fillData();
@@ -410,7 +416,7 @@ public class CardDetails extends BaseFragment implements
 //		prepareFilterData();
 	}
 	@Override
-	public void OnCacheResults(HashMap<String, CardData> obj) {
+	public void OnCacheResults(HashMap<String, CardData> obj,boolean issuedRequest) {
 		if(obj == null){return;}
 		CardExplorerData dataBundle = myplexapplication.getCardExplorerData();
 		

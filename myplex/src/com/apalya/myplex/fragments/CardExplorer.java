@@ -215,6 +215,9 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	@Override
 	public void onResume() {
 		super.onResume();
+		if(myplexapplication.getCardExplorerData().cardDataToSubscribe != null){
+			mCardView.updateData(myplexapplication.getCardExplorerData().cardDataToSubscribe);
+		}
 		Log.d(TAG,"onResume");
 	}
 	@Override
@@ -228,7 +231,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			
 			@Override
 			public void completed() {
-			showNoDataMessage();
+			showNoDataMessage(false);
 				
 			}
 		});
@@ -236,7 +239,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	@Override
 	public void loadmore(int value) {
 		if(mData.requestType != CardExplorerData.REQUEST_DOWNLOADS && mData.requestType != CardExplorerData.REQUEST_SIMILARCONTENT){
-			mData.mStartIndex = value;
+			mData.mStartIndex++;
 			fetchMinData();
 		}
 	}
@@ -255,7 +258,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			requestUrl = ConsumerApi.getPurchases(ConsumerApi.LEVELMIN,mData.mStartIndex);
 		}
 		StringRequest myReg = new StringRequest(requestUrl, deviceMinSuccessListener(), responseErrorListener());
-		myReg.setShouldCache(true);
+//		myReg.setShouldCache(true);
 		Log.d(TAG,"Min Request:"+requestUrl);
 		queue.add(myReg);
 	}
@@ -265,7 +268,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			@Override
 			public void onResponse(String response) {
 				try {
-					Log.d(TAG,"server response "+response);
+//					Log.d(TAG,"server response "+response);
 					updateText("parsing results");
 					CardResponseData minResultSet  =(CardResponseData) Util.fromJson(response, CardResponseData.class);
 					if(minResultSet.code != 200){
@@ -274,21 +277,23 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 					if(minResultSet.results != null){
 						Log.d(TAG,"Number of Result for the MIN request:"+minResultSet.results.size());
 					}
-					if(minResultSet.results ==  null){showNoDataMessage();return;}
-					if(minResultSet.results.size() ==  0){showNoDataMessage();return;}
+					if(minResultSet.results ==  null){showNoDataMessage(false);return;}
+					if(minResultSet.results.size() ==  0){showNoDataMessage(false);return;}
 					mCacheManager.getCardDetails(minResultSet.results,IndexHandler.OperationType.IDSEARCH,CardExplorer.this);
 				} catch (JsonParseException e) {
-					showNoDataMessage();
+					showNoDataMessage(false);
 					e.printStackTrace();
 				} catch (IOException e) {
-					showNoDataMessage();
+					showNoDataMessage(false);
 					e.printStackTrace();
 				}
 			}
 		};
 	}
-	private void showNoDataMessage(){
-		mMainActivity.hideActionBarProgressBar();
+	private void showNoDataMessage(boolean issuedRequest){
+		if(!issuedRequest){
+			mMainActivity.hideActionBarProgressBar();
+		}
 		dismissProgressBar();
 		if(mData.mMasterEntries.size() == 0){
 			Toast.makeText(getContext(), "No data found,Please try again.", Toast.LENGTH_SHORT).show();
@@ -436,6 +441,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	@Override
 	public void purchase(CardData data) {
 		PackagePopUp popup = new PackagePopUp(getContext(),mRootView);
+		mData.cardDataToSubscribe = data;
 		popup.showPackDialog(data, getActionBar().getCustomView());
 	}
 
@@ -455,9 +461,9 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	}
 
 	@Override
-	public void OnCacheResults(HashMap<String, CardData> object ) {
+	public void OnCacheResults(HashMap<String, CardData> object ,boolean issuedRequest) {
 		if(object == null){
-			showNoDataMessage();
+			showNoDataMessage(issuedRequest);
 			return;
 		}
 		int count = 0;
@@ -476,7 +482,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		}
 //		updateDownloadInformation();
 		if(mData.mMasterEntries.size() != 0){
-			showNoDataMessage();
+			showNoDataMessage(issuedRequest);
 		}
 		applyData();
 //		if(mData.requestType == CardExplorerData.REQUEST_DOWNLOADS){
@@ -499,13 +505,13 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			
 		}
 //		updateDownloadInformation();
-		showNoDataMessage();
+		showNoDataMessage(false);
 		applyData();		
 	}
 
 	@Override
 	public void OnOnlineError(VolleyError error) {
-		showNoDataMessage();
+		showNoDataMessage(false);
 	}
 //	private void showProgress(){
 //		final DownloadManager manager = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);

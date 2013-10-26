@@ -17,6 +17,7 @@ public class ConsumerApi {
 	public static final String RATING_TAG= "rating";
 	public static final String SUBSCRIBE_TAG= "subscribe";
 	public static final String FIELD_COMMENTS = "comments";
+	public static final String FIELD_CURRENTUSERDATA = "currentUserData";
 	public static final String FIELD_USERREVIEWS = "userReviews";
 	public static final String FIELD_VIDEOS = "videos";
 	public static final String PAYMENTCHANNEL = "paymentChannel=";
@@ -34,6 +35,7 @@ public class ConsumerApi {
 	public static final String STARTLETTER = "startLetter=";
 	public static final String QUALIFIERS = "qualifier=";
 	public static final String STARTINDEX = "startIndex=";
+	public static final String COUNT = "count=10";
 	public static final String NUMPERQUALIFIER = "numPerQualifier=";
 	public static final String NUMPERLETTERS = "numPerLetter=";
 	public static final String BILLING_TAG = "billing";
@@ -71,15 +73,15 @@ public class ConsumerApi {
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH
 				+ SEARCH_ACTION + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY
 				+  AMPERSAND + QUERY + queryStr + AMPERSAND + STARTINDEX
-				+ startIndex + AMPERSAND + LEVEL
-				+ level;
+				+ startIndex + AMPERSAND + LEVEL 
+				+ level + AMPERSAND+COUNT;
 	}
 	public static String getRecommendation(String level,int startIndex) {
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH
 				+ RECOMMENDATIONS_ACTION + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY
 				+  AMPERSAND + STARTINDEX
 				+ startIndex + AMPERSAND + LEVEL
-				+ level;
+				+ level + AMPERSAND+COUNT;
 	}
 
 	public static String getCommentPostUrl(String contentID) {
@@ -95,14 +97,14 @@ public class ConsumerApi {
 				+ FAVORITELIST_ACTION + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY
 				+  AMPERSAND + STARTINDEX
 				+ startIndex + AMPERSAND + LEVEL
-				+ level;
+				+ level + AMPERSAND+COUNT;
 	}
 	public static String getPurchases(String level,int startIndex) {
 		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH 
 				+ PURCHASEDLIST_ACTION + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY
 				+  AMPERSAND + STARTINDEX
 				+ startIndex + AMPERSAND + LEVEL
-				+ level;
+				+ level + AMPERSAND+COUNT;
 	}
 	public static String getFavourite(String contentId) {
 		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + CONTENT_TAG +SLASH + contentId +SLASH
@@ -113,12 +115,12 @@ public class ConsumerApi {
 			String level) {
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH + TAG_ACTION
 				+ SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY +  AMPERSAND + STARTLETTER + startLetterstr
-				+ AMPERSAND + LEVEL + level;
+				+ AMPERSAND + LEVEL + level ;
 	}
 	public static String getContentDetail(String contentID,String level){
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH + CONTENTDETAILS_ACTION
 				+ SLASH + contentID + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY  + AMPERSAND
-		        + LEVEL + level;
+		        + LEVEL + level + AMPERSAND+COUNT;
 	}
 	public static String getVideosDetail(String contentID){
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH + CONTENTDETAILS_ACTION

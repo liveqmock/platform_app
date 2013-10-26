@@ -1,5 +1,7 @@
 package com.apalya.myplex.views;
 
+import java.util.Random;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
@@ -17,6 +19,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.Space;
@@ -296,6 +299,7 @@ public class CardDetailViewFactory {
 				}else{
 					fillCommentSectionData(COMMENTSECTION_COMMENTS,10,mData);
 				}
+				refreshSection(type);
 			}
 		});
 		
@@ -316,31 +320,35 @@ public class CardDetailViewFactory {
 				}else{
 					fillCommentSectionData(COMMENTSECTION_REVIEW,10,mData);
 				}
-			}
-		});
-		
-//		
-		mCommentRefresh = (ImageView)v.findViewById(R.id.carddetailcomment_expand);
-		RelativeLayout commentRefreshlayout = (RelativeLayout)v.findViewById(R.id.carddetailcomment_expandlayout);
-		Util.showFeedback(commentRefreshlayout);
-		commentRefreshlayout.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
 				refreshSection(type);
 			}
 		});
+		mCommentSectionProgressBar  = (ProgressBar)v.findViewById(R.id.carddetailcomment_progressBar);
+//		
+//		mCommentRefresh = (ImageView)v.findViewById(R.id.carddetailcomment_expand);
+//		RelativeLayout commentRefreshlayout = (RelativeLayout)v.findViewById(R.id.carddetailcomment_expandlayout);
+//		Util.showFeedback(commentRefreshlayout);
+//		commentRefreshlayout.setOnClickListener(new OnClickListener() {
+//			
+//			@Override
+//			public void onClick(View v) {
+//				refreshSection(type);
+//			}
+//		});
 		refreshSection(COMMENTSECTION_COMMENTS);
 		return v;
 	}
 	private ImageView mCommentRefresh;
+	private ProgressBar mCommentSectionProgressBar;
 	private void rotateRefresh(){
-		 Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.rotate);
-		 mCommentRefresh.startAnimation(animation);
+		mCommentSectionProgressBar.setVisibility(View.VISIBLE);
+//		 Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.rotate);
+//		 mCommentRefresh.startAnimation(animation);
 	}
 	private void stopRefresh(){
-		 Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.stoprotate);
-		 mCommentRefresh.startAnimation(animation);
+		mCommentSectionProgressBar.setVisibility(View.GONE);
+//		 Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.stoprotate);
+//		 mCommentRefresh.startAnimation(animation);
 	}
 	private void refreshSection(final int type) {
 		rotateRefresh();
@@ -396,6 +404,12 @@ public class CardDetailViewFactory {
 		secondaryname.setTypeface(FontUtil.Roboto_Medium);
 //		secondaryname.setText("description for smillar content");
 		ImageView view  = (ImageView)child.findViewById(R.id.carddetailmultimedia_stackview);
+//		Random rnd = new Random();
+//		int Low = 100;
+//		int High = 196;
+//		int cardColor = Color.argb(255, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low);
+//		view.setBackgroundColor(cardColor);
+		
 		view.setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -408,7 +422,7 @@ public class CardDetailViewFactory {
 		String requesturl = null;
 		if(simillarData.images != null){
 			for(CardDataImagesItem imageItem:simillarData.images.values){
-				if(imageItem.type != null && imageItem.type.equalsIgnoreCase("thumbnail")){
+				if(imageItem.type != null && imageItem.type.equalsIgnoreCase("xxhdpi")){
 					if (imageItem.link != null && !(imageItem.link.compareTo("Images/NoImage.jpg") == 0)) {
 						requesturl = imageItem.link;
 					}
@@ -731,39 +745,10 @@ public class CardDetailViewFactory {
 		if(credits != null){
 			layout.addView(createCastCrewView());
 		}
-		Button packageButton = (Button)v.findViewById(R.id.carddetaildesc_purchasebutton);
-		packageButton.setOnClickListener(packageButtonListener);
-		packageButton.setTypeface(FontUtil.Roboto_Medium);
-		float price = 10000f;
-		if(mData.packages == null){
-			packageButton.setText("Free");
-			packageButton.setOnClickListener(null);
-		}else{
-			if(mData.currentUserData != null && mData.currentUserData.purchase != null && mData.currentUserData.purchase.size() != 0){
-				packageButton.setText("Watch now");
-				packageButton.setOnClickListener(null);
-			}else{
-				for(CardDataPackages packageitem:mData.packages){
-					if(packageitem.priceDetails != null){
-						for(CardDataPackagePriceDetailsItem priceDetailItem:packageitem.priceDetails){
-							if(priceDetailItem.price < price){
-								price = priceDetailItem.price;
-							}
-						}
-						if(mRupeeCode == null){
-							mRupeeCode = mContext.getResources().getString(R.string.price_rupeecode); 
-						}
-						packageButton.setText(mPriceStarts + mRupeeCode + " "+price);
-					}else{
-						packageButton.setText("Free");
-						packageButton.setOnClickListener(null);
-					}
-				}	
-			}
-		}
+		mFullDescPackageButton = (Button)v.findViewById(R.id.carddetaildesc_purchasebutton);
 		
 //		createPlayInPlaceView(layout);
-		addSpace(layout,(int)mContext.getResources().getDimension(R.dimen.margin_gap_8));
+		addSpace(layout,(int)mContext.getResources().getDimension(R.dimen.margin_gap_12));
 		return v;
 	}
 	private String mPriceStarts = "Starts from ";
@@ -813,7 +798,30 @@ public class CardDetailViewFactory {
 			moviedescription.setText(mData.generalInfo.briefDescription);
 		}
 		moviedescription.setTypeface(FontUtil.Roboto_Regular);
-		Button packageButton = (Button)v.findViewById(R.id.carddetailbriefdescription_purchasebutton);
+		mBriefDescPackageButton = (Button)v.findViewById(R.id.carddetailbriefdescription_purchasebutton);
+		UpdateSubscriptionStatus();
+		
+		
+		
+		ImageView expand = (ImageView)v.findViewById(R.id.carddetailbriefdescription_expand);
+		expand.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				if(mCardExpandListener != null){
+					mCardExpandListener.onDescriptionExpanded();
+				}				
+			}
+		});
+		Util.showFeedback(expand);
+		return v;
+	}
+	public void UpdateSubscriptionStatus(){
+		UpdatePackageButton(mBriefDescPackageButton);
+		UpdatePackageButton(mFullDescPackageButton);
+	}
+	private void UpdatePackageButton(Button packageButton){
+		if(packageButton == null){return;}
 		packageButton.setOnClickListener(packageButtonListener);
 		packageButton.setTypeface(FontUtil.Roboto_Medium);
 		float price = 10000f;
@@ -843,27 +851,15 @@ public class CardDetailViewFactory {
 				}	
 			}
 		}
-		
-		
-		
-		ImageView expand = (ImageView)v.findViewById(R.id.carddetailbriefdescription_expand);
-		expand.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				if(mCardExpandListener != null){
-					mCardExpandListener.onDescriptionExpanded();
-				}				
-			}
-		});
-		Util.showFeedback(expand);
-		return v;
 	}
+	private Button mBriefDescPackageButton = null;
+	private Button mFullDescPackageButton = null;
 	private OnClickListener packageButtonListener = new OnClickListener() {
 		
 		@Override
 		public void onClick(View v) {
 			PackagePopUp popup = new PackagePopUp(mContext,null);
+			myplexapplication.getCardExplorerData().cardDataToSubscribe =  mData;
 			popup.showPackDialog(mData, ((Activity)mContext).getActionBar().getCustomView());			
 		}
 	};

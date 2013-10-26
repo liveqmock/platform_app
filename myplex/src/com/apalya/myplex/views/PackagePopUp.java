@@ -44,6 +44,7 @@ import com.apalya.myplex.data.CardDataPromotionDetailsItem;
 import com.apalya.myplex.utils.Blur;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FontUtil;
+import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.utils.Blur.BlurResponse;
 
 public class PackagePopUp {
@@ -104,7 +105,7 @@ public class PackagePopUp {
 		mPaymentModeHeading = (TextView)v.findViewById(R.id.purchasepopup_selectedpaymentmodeheading);
 		mPaymentModeHeading.setTypeface(FontUtil.Roboto_Medium);
 		mPaymentModeHeading.setVisibility(View.INVISIBLE);
-		mPaymentModeGroup = (RadioGroup)v.findViewById(R.id.purchasepopup_selectedpaymentmodegroup);
+		mPaymentModeGroup = (LinearLayout)v.findViewById(R.id.purchasepopup_selectedpaymentmodegroup);
 		mPaymentModeGroup.setVisibility(View.INVISIBLE);
 		
 //		addBlur();
@@ -120,7 +121,7 @@ public class PackagePopUp {
 		}
 	}
 	private TextView mPaymentModeHeading;
-	private RadioGroup mPaymentModeGroup;
+	private LinearLayout mPaymentModeGroup;
 	private OnClickListener mPackClickListener = new OnClickListener() {
 		
 		@Override
@@ -141,6 +142,7 @@ public class PackagePopUp {
 					paymentModeText.setTypeface(FontUtil.Roboto_Medium);
 					paymentModeText.setText(priceItem.name);
 					mPaymentModeGroup.addView(paymentModeItem);
+					Util.showFeedback(paymentModeItem);
 					paymentModeItem.setId(count);
 					count++;
 					paymentModeItem.setTag(packageitem);

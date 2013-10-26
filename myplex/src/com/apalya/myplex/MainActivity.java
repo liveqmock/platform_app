@@ -208,7 +208,13 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
 
 		if (savedInstanceState == null) {
-			selectItem(8);
+			Session fbSession=Session.getActiveSession();
+			if(fbSession!=null && fbSession.isOpened()){
+				selectItem(8);
+			}
+			else{
+				selectItem(7);
+			}
 		}
 		
 		Util.deserializeData(MainActivity.this);
@@ -333,7 +339,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 			mCustomActionBarFilterImage.setVisibility(View.VISIBLE);
 		}else{
 			mCustomActionBarTitleLayout.setOnClickListener(null);
-			mCustomActionBarFilterImage.setVisibility(View.INVISIBLE);
+			mCustomActionBarFilterImage.setVisibility(View.GONE);
 		}
 	}
 	@Override

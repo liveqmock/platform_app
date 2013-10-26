@@ -53,8 +53,8 @@
 
         <ImageView
             android:id="@+id/customactionbar_filter_button"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_centerVertical="true"
             android:layout_marginLeft="5dp"
             android:layout_toRightOf="@+id/customactionbar_filter_text"

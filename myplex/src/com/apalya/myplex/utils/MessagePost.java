@@ -15,7 +15,7 @@ import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardResponseData;
 
 public class MessagePost {
-	public static final String TAG = "MessgaePost";
+	public static final String TAG = "MessagePost";
 	public static final int POST_COMMENT = 1;
 	public static final int POST_RATING = 2;
 	public interface MessagePostCallback{
@@ -47,7 +47,8 @@ public class MessagePost {
 		        return params;
 			}
 		};
-		myReg.setShouldCache(true);
+		Log.e(TAG, "request: "+requestURl);
+		myReg.setShouldCache(false);
 		queue.add(myReg);
 	}
 	private void sendCallBack(boolean value){

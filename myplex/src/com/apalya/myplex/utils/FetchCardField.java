@@ -28,6 +28,7 @@ public class FetchCardField {
 		RequestQueue queue = MyVolley.getRequestQueue();
 		
 		StringRequest myReg = new StringRequest(requestURl, successListener(), errorListener());
+		myReg.setShouldCache(false);
 		Log.d(TAG,"Min Request:"+requestURl);
 		queue.add(myReg);
 	}

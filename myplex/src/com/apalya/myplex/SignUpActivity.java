@@ -464,6 +464,7 @@ public class SignUpActivity extends Activity{
 			};
 		};
 		Log.d(TAG,"Request sent ");
+		myReq.setShouldCache(false);
 		queue.add(myReq);
 	}
 
@@ -564,7 +565,7 @@ public class SignUpActivity extends Activity{
 				return params;
 			};
 		};
-
+		myReq.setShouldCache(false);
 		Log.d(TAG,"Request sent ");
 		queue.add(myReq);
 
@@ -622,7 +623,7 @@ public class SignUpActivity extends Activity{
 				return params;
 			};
 		};
-
+		myReq.setShouldCache(false);
 		Log.d(TAG,"Request sent ");
 		queue.add(myReq);
 

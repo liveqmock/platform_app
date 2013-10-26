@@ -96,6 +96,8 @@
         android:layout_marginLeft="@dimen/margin_gap_24"
         android:layout_marginRight="@dimen/margin_gap_24"
         android:layout_marginTop="20dp"
+        android:gravity="top"
+        android:paddingTop="4dp"
         android:textSize="15sp"
         android:textColor="#4f4f4f"
         android:background="@drawable/feedbackeditbox_bg"

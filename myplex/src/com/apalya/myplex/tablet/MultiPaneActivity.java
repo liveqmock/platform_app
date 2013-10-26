@@ -597,7 +597,7 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 	}
 
 	@Override
-	public void OnCacheResults(HashMap<String, CardData> obj) {
+	public void OnCacheResults(HashMap<String, CardData> obj,boolean issuedRequest) {
 
 		if (obj == null) {
 			return;

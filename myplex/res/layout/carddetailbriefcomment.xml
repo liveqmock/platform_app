@@ -44,28 +44,14 @@
             android:id="@+id/carddetailcomment_edittext"
             android:layout_width="match_parent"
             android:layout_height="32dp"
-            android:layout_gravity="center_vertical"
+            android:paddingRight="12dp"
+            android:paddingTop="6dp"
             android:background="@drawable/commenttextbg"
-            android:layout_marginRight="42dp"
-            android:textColor="#4b4b4c"
             android:text="@string/carddetailcommentsection_editcomment"
+            android:gravity="left"
+            android:textColor="#4b4b4c"
             android:textSize="@dimen/textsize_14" >
         </Button>
-
-       <RelativeLayout
-           android:id="@+id/carddetailcomment_expandlayout"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_alignParentRight="true" >
-
-            <ImageView
-                android:id="@+id/carddetailcomment_expand"
-                android:layout_width="@dimen/size_24"
-                android:layout_height="@dimen/size_24"
-                android:layout_centerInParent="true"
-                android:contentDescription="@string/hello_world"
-                android:src="@drawable/iconrefresh" />
-        </RelativeLayout>
     </RelativeLayout>
 
     <LinearLayout
@@ -82,24 +68,35 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_marginRight="@dimen/margin_gap_12"
-        android:layout_marginTop="@dimen/margin_gap_12" >
-
-        <ImageView
-            android:id="@+id/carddetailcomment_reviewimage"
-            android:layout_width="@dimen/size_24"
-            android:layout_height="@dimen/size_24"
-            android:layout_marginRight="@dimen/margin_gap_6"
-            android:contentDescription="@string/hello_world"
-            android:src="@drawable/card_iconuser" />
+        android:layout_marginTop="@dimen/margin_gap_12"
+        android:paddingRight="@dimen/margin_gap_12" >
 
         <TextView
             android:id="@+id/carddetailcomment_reviewheading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
+            android:layout_marginRight="@dimen/margin_gap_6"
             android:text="@string/carddetailsectionheader_reviews"
             android:textSize="@dimen/textsize_14" />
+
+        <ImageView
+            android:id="@+id/carddetailcomment_reviewimage"
+            android:layout_width="@dimen/size_24"
+            android:layout_height="@dimen/size_24"
+            android:contentDescription="@string/hello_world"
+            android:src="@drawable/card_iconuser" />
     </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/carddetailcomment_progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="fill_parent"
+        android:indeterminate="true"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight = "true" 
+        android:layout_toRightOf="@+id/carddetailcomment_commentlayout" />
 
 </RelativeLayout>
