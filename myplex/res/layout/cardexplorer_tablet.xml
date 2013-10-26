@@ -46,18 +46,13 @@
         <RelativeLayout
             android:id="@id/tablayoutchanger"
             android:layout_width="fill_parent"
-            android:layout_height="30dp"
+            
+            android:layout_height="48dp"
             android:layout_alignParentBottom="true"
-            android:background="#555555"
+            android:background="@drawable/pulluptab"
             android:gravity="bottom"
             android:visibility="gone" >
 
-            <Button
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_centerInParent="true"
-                android:background="@drawable/iconexposegrey"
-                android:rotation="180" />
         </RelativeLayout>
     </RelativeLayout>
 

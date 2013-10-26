@@ -300,7 +300,7 @@ public class Util {
 			return 0;
 		}
 		
-		/*final long dwnlId=ids.get(cardId);
+/*		final long dwnlId=ids.get(cardId);
 		
 		final DownloadManager manager = (DownloadManager) mContext.getSystemService(Context.DOWNLOAD_SERVICE);
 
@@ -715,11 +715,12 @@ public class Util {
 	
 	public static boolean isWifiEnabled(Context mContext){
 		
-		ConnectivityManager cm =
-		        (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
-		 
+		ConnectivityManager cm = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+		if(cm == null)
+			return false; 
 		NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-		
+		if(activeNetwork == null)
+			return false;
 		
 		boolean isWiFi = activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
 		return isWiFi;

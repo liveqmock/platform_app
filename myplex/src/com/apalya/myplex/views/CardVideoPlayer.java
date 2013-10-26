@@ -181,18 +181,18 @@ public class CardVideoPlayer implements PlayerListener {
 
 			@Override
 			public void urlReceived(boolean aStatus, String url) {
-//				if (!aStatus) {
-//					closePlayer();
-//					Toast.makeText(mContext, "Failed in fetching the url.",
-//							Toast.LENGTH_SHORT).show();
-//					return;
-//				}
-//				if (url == null) {
-//					closePlayer();
-//					Toast.makeText(mContext, "No url to play.",
-//							Toast.LENGTH_SHORT).show();
-//					return;
-//				}
+				if (!aStatus) {
+					closePlayer();
+					Toast.makeText(mContext, "Failed in fetching the url.",
+							Toast.LENGTH_SHORT).show();
+					return;
+				}
+				if (url == null) {
+					closePlayer();
+					Toast.makeText(mContext, "No url to play.",
+							Toast.LENGTH_SHORT).show();
+					return;
+				}
 				if(isESTPackPurchased)
 				{
 					closePlayer();
@@ -266,9 +266,8 @@ public class CardVideoPlayer implements PlayerListener {
         
         String qualityType="low";
         
-        /*if(Util.isWifiEnabled(mContext))
+        if(Util.isWifiEnabled(mContext))
             qualityType="high";
-        */
         
         MediaUtil.getVideoUrl(mData._id,qualityType,isESTPackPurchased);
 	}

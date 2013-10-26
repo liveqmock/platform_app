@@ -569,7 +569,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 
 	private List<FilterMenudata> mMenuDataList = new ArrayList<FilterMenudata>();
 	private View mFilterMenuPopup;
-	private PinnedSectionListView mFilterListView;
+	private ListView mFilterListView;
 	private OnClickListener mFilterDelegate;
 	private PopupWindow mFilterMenuPopupWindow = null;
 	private List<PopupWindow> mFilterMenuPopupWindowList = new ArrayList<PopupWindow>();
@@ -663,7 +663,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 
 		mFilterMenuPopup = mInflater.inflate(R.layout.filtermenupopup, null);
 		mPopBlurredLayout = (RelativeLayout) mFilterMenuPopup.findViewById(R.id.fliterMenuBlurredLayout);
-		mFilterListView = (PinnedSectionListView) mFilterMenuPopup.findViewById(R.id.listView1);
+		mFilterListView = (ListView) mFilterMenuPopup.findViewById(R.id.listView1);
 
 		mMenuDataList = datalist;
 		FliterMenuAdapter adapter = new FliterMenuAdapter(this,android.R.layout.simple_list_item_1, android.R.id.text1,mMenuDataList);

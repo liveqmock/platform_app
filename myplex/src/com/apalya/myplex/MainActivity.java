@@ -697,7 +697,8 @@ public class MainActivity extends Activity implements MainBaseOptions {
 				
 				@Override
 				public void BlurredBitmap(Bitmap b) {
-					mOrginalBitmap.recycle();
+					if(mOrginalBitmap != null)
+						mOrginalBitmap.recycle();
 					mOrginalBitmap  = null;
 					if( b == null || mFilterMenuPopup == null){return;}
 					Drawable d = new BitmapDrawable(b); 
