@@ -43,6 +43,11 @@ public class ConsumerApi {
 	public static final int SUBSCRIPTIONSUCCESS = 2;
 	public static final int SUBSCRIPTIONREQUEST = 3;
 	
+	public static final String VIDEOQUALTYLOW = "sd";
+	public static final String VIDEOQUALTYMEDIUM = "sd";
+	public static final String VIDEOQUALTYHIGH = "hd";
+	public static final String VIDEOQUALTYVERYHIGH = "hd";
+	
 	// min: returns only content ids.
 	// static: returns static sub-entities.
 	// dynamic: returns dynamic sub-entities.

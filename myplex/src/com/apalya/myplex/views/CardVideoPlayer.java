@@ -39,6 +39,7 @@ import com.apalya.myplex.media.VideoViewPlayer;
 import com.apalya.myplex.media.VideoViewPlayer.StreamType;
 import com.apalya.myplex.utils.MediaUtil;
 import com.apalya.myplex.utils.MediaUtil.MediaUtilEventListener;
+import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
 
@@ -264,10 +265,10 @@ public class CardVideoPlayer implements PlayerListener {
             }
         }
         
-        String qualityType="low";
+        String qualityType = ConsumerApi.VIDEOQUALTYLOW;
         
         if(Util.isWifiEnabled(mContext))
-            qualityType="high";
+            qualityType= ConsumerApi.VIDEOQUALTYHIGH;
         
         MediaUtil.getVideoUrl(mData._id,qualityType,isESTPackPurchased);
 	}

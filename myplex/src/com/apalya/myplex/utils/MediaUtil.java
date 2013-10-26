@@ -87,7 +87,7 @@ public class MediaUtil {
 						}
 					}
 				}
-
+				sendResponse(false,null);
 			}
 		};
 	}

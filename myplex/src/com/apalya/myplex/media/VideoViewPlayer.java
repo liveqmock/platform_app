@@ -45,6 +45,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 	private static final int STATE_RESUME = 7;
 	private static final int STATE_SUSPEND_UNSUPPORTED = 8;
 
+	private static final String TAG = "VideoViewPlayer";
 	private int mCurrentState = STATE_IDLE;
 
 	private VideoView mVideoView;
@@ -218,12 +219,12 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 
 	}
 	private void displayAlert(String message){
-		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+		Log.i(TAG, message);
+/*		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 		builder.setMessage(message)
 		.setPositiveButton("OK", null);
 		AlertDialog dialog = builder.create();
-		dialog.show();
-		return;
+		dialog.show();*/
 	}
 	/*private Handler handler = new Handler(){
 		public void
