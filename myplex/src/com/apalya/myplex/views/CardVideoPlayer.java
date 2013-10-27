@@ -265,12 +265,31 @@ public class CardVideoPlayer implements PlayerListener {
             }
         }
         
-        String qualityType = ConsumerApi.VIDEOQUALTYLOW;
+        String qualityType = new String();
+        String streamingType = new String();
+        
+        streamingType = ConsumerApi.STREAMNORMAL;
+        
+        if(mData.content !=null && mData.content.drmEnabled)
+        {
+        	qualityType = ConsumerApi.VIDEOQUALTYSD;
+        	streamingType = ConsumerApi.STREAMADAPTIVE;
+        }
+        else
+        	qualityType = ConsumerApi.VIDEOQUALTYLOW;
+        	
         
         if(Util.isWifiEnabled(mContext))
-            qualityType= ConsumerApi.VIDEOQUALTYHIGH;
+        {
+        	if(mData.content !=null && mData.content.drmEnabled){
+        		qualityType= ConsumerApi.VIDEOQUALTYHD;
+        		streamingType = ConsumerApi.STREAMADAPTIVE;
+        	}
+        	else
+        		qualityType= ConsumerApi.VIDEOQUALTYHIGH;
+        }
         
-        MediaUtil.getVideoUrl(mData._id,qualityType,isESTPackPurchased);
+        MediaUtil.getVideoUrl(mData._id,qualityType,streamingType,isESTPackPurchased);
 	}
 
 	public View CreateTabletPlayerView(View parentLayout) {

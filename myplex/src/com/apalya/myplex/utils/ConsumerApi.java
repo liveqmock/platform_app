@@ -45,10 +45,20 @@ public class ConsumerApi {
 	public static final int SUBSCRIPTIONSUCCESS = 2;
 	public static final int SUBSCRIPTIONREQUEST = 3;
 	
-	public static final String VIDEOQUALTYLOW = "sd";
-	public static final String VIDEOQUALTYMEDIUM = "sd";
-	public static final String VIDEOQUALTYHIGH = "hd";
-	public static final String VIDEOQUALTYVERYHIGH = "hd";
+	public static final String VIDEOQUALTYLOW = "Low";
+	public static final String VIDEOQUALTYMEDIUM = "Medium";
+	public static final String VIDEOQUALTYHIGH = "High";
+	public static final String VIDEOQUALTYVERYHIGH = "veryhigh";
+	public static final String VIDEOQUALTYSD = "sd";
+	public static final String VIDEOQUALTYHD = "hd";
+	
+	public static final String STREAMINGFORMATHTTP ="http";
+	public static final String STREAMINGFORMATRTSP ="rtsp";
+	public static final String STREAMINGFORMATHLS ="hls";
+	
+	public static final String STREAMADAPTIVE = "adaptive";
+	public static final String STREAMNORMAL = "streaming";
+	public static final String STREAMDOWNLOAD = "download";
 	
 	// min: returns only content ids.
 	// static: returns static sub-entities.

@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -648,9 +649,12 @@ public class Util {
 	}  
 	public static void deserializeData(Context context){
 		File file=new File(context.getCacheDir(), "uprofile.dat");
-
+		if(!file.exists())
+			return;
+		
 		try {
 
+			
 			FileInputStream fint = new FileInputStream(file);
 			ObjectInputStream ois = new ObjectInputStream(fint);
 			/*String name =(String) ois.readObject();
@@ -726,4 +730,33 @@ public class Util {
 		return isWiFi;
 	}
 	public static void saveObject(Object obj,String path) {		try {			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(path))); 			oos.writeObject(obj); 			oos.flush(); 			oos.close();		} catch (Exception ex) {			Log.v("Util", ex.getMessage());			ex.printStackTrace();		}	}	public static Object loadObject(String path) {		try {			File f = new File(path);			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(f));			Object o = ois.readObject();			return o;		} catch (Exception ex) {			Log.v("Util", ex.getMessage());			ex.printStackTrace();		}		return null;	}
+	
+	public static long dirSize(File dir) {
+	    long result = 0;
+
+	    try {
+			Stack<File> dirlist= new Stack<File>();
+			dirlist.clear();
+
+			dirlist.push(dir);
+
+			while(!dirlist.isEmpty())
+			{
+			    File dirCurrent = dirlist.pop();
+
+			    File[] fileList = dirCurrent.listFiles();
+			    for (int i = 0; i < fileList.length; i++) {
+
+			        if(fileList[i].isDirectory())
+			            dirlist.push(fileList[i]);
+			        else
+			            result += fileList[i].length();
+			    }
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	    return result;
+	}
 }

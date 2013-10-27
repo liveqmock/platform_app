@@ -66,7 +66,7 @@ public class IndexHandler {
 
 		mIndexDir = new File(filePath);
 		if(mIndexDir.exists())
-			Log.i(TAG,"file exists");
+			Log.i(TAG,"file exists" + ":: dirSize: "+ Util.dirSize(mIndexDir)+" bytes");
 			else
 				Log.i(TAG,"file not present");
 		try {
@@ -124,6 +124,8 @@ public class IndexHandler {
 	
 	private void updateDatabase(List<CardData> indexableObj)
 	{
+		if(indexableObj ==null || indexableObj.size() <=0)
+			return ;
 		try {
 			Set<String> words = new HashSet(Arrays.asList(StandardAnalyzer.STOP_WORDS_SET));
 			initIndexWriter();
@@ -185,8 +187,22 @@ public class IndexHandler {
 	}
 
 	private void initIndexReader() throws CorruptIndexException, IOException {
+
 		if(mIndexReader == null)
 			mIndexReader = IndexReader.open(mDirectory);
+		else if(!mIndexReader.isCurrent())
+		{
+			IndexReader changedReader = IndexReader.openIfChanged(mIndexReader);
+			if(changedReader != null)
+			{
+				Log.i(TAG,"oldIndexReader"+"numDocs:"+mIndexReader.numDocs() +":: maxDocs:"+mIndexReader.maxDoc());
+				mIndexReader.close(); // close the old Reader.
+				mIndexReader = changedReader;//Assign new reader for further operations.
+				Log.i(TAG,"newIndexReader"+"numDocs:"+mIndexReader.numDocs() +":: maxDocs:"+mIndexReader.maxDoc());
+			}
+			else
+				Log.i(TAG, "changedReader is null");
+		}
 	}
 
 	public HashMap<String, Object> searchInIndex(List<CardData> cardIds,OperationType searchType) {
@@ -239,7 +255,6 @@ public class IndexHandler {
 			int totalHits = topDocs.totalHits;
 			Log.i(TAG,"no. of search result: "+totalHits);
 			HashMap<String, Object> searchResult = new HashMap<String, Object>();
-
 			for (int i = 0; i < totalHits; i++) {
 				Document document = indexSearcher.doc(scoreDoc[i].doc);
                 JSONObject resultObj = new JSONObject(document.get(LUCENE_CONTENT_INFO));
@@ -319,6 +334,7 @@ public class IndexHandler {
 					Log.e(TAG," numDocs is -1");
 					return null;
 				}
+				Log.i(TAG,"numDocs:"+mIndexReader.numDocs() +":: maxDocs:"+mIndexReader.maxDoc());
 				indexSearcher = new IndexSearcher(mIndexReader);
 				QueryParser qp =null;
 				switch (this.mSearchType) {
@@ -336,7 +352,7 @@ public class IndexHandler {
 				
 				if(mCardIds == null || mCardIds.size() ==0)
 				{
-					Log.e(TAG," search data is null/size is zero");
+					Log.e(TAG," mCardIds is null || size is zero");
 					return null;
 				}
 				
@@ -360,7 +376,6 @@ public class IndexHandler {
 				int totalHits = topDocs.totalHits;
 				Log.i(TAG,"no. of search result: "+totalHits);
 				
-
 				for (int i = 0; i < totalHits; i++) {
 					Document document = indexSearcher.doc(scoreDoc[i].doc);
 					CardData data = (CardData) Util.fromJson(document.get(LUCENE_CONTENT_INFO), CardData.class);

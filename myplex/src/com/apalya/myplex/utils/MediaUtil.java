@@ -17,16 +17,20 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 public class MediaUtil {
 
+	private static String TAG ="MediaUtil";
+	
 	public interface MediaUtilEventListener{
 		public void urlReceived(boolean aStatus,String url);
 	}
 	public static MediaUtilEventListener urlEventListener;
-	private static String qualityType;
-	private static boolean downloadStatus;
+	private static String sQualityType;
+	private static boolean sDownloadStatus;
+	private static String sStreamingType;
 
-	public static void getVideoUrl(String aContentId,String bitRate,boolean isESTPackPurchased){
-		qualityType=bitRate;
-		downloadStatus=isESTPackPurchased;
+	public static void getVideoUrl(String aContentId,String bitRate,String streamingType, boolean isESTPackPurchased){
+		sQualityType=bitRate;
+		sDownloadStatus=isESTPackPurchased;
+		sStreamingType = streamingType;
 		String url=ConsumerApi.getVideosDetail(aContentId);
 		getContentUrlReq(url);
 	}
@@ -71,17 +75,25 @@ public class MediaUtil {
 				for(CardData data:minResultSet.results){
 					if(data.videos == null || data.videos.values == null || data.videos.values.size() == 0){sendResponse(false,null);}
 					for(CardDataVideosItem video:data.videos.values){
-						if(downloadStatus)
+						if(sDownloadStatus)
 						{
-							if(video.profile != null && video.profile.equalsIgnoreCase(qualityType) && video.link != null && video.type.equalsIgnoreCase("download")){
+							if(video.profile != null && video.profile.equalsIgnoreCase(sQualityType) && video.link != null && video.type.equalsIgnoreCase(ConsumerApi.STREAMDOWNLOAD)){
 								sendResponse(true,video.link);
 								return;
 							}
 						}
 						else
 						{
-							if(video.profile != null && video.profile.equalsIgnoreCase(qualityType) && video.link != null){
-								sendResponse(true,video.link);
+							if (video.profile != null
+									&& video.profile.equalsIgnoreCase(sQualityType)
+									&& video.link != null
+									&& video.format != null
+									&& (video.format.equalsIgnoreCase(ConsumerApi.STREAMINGFORMATHTTP) ||
+											video.format.equalsIgnoreCase(ConsumerApi.STREAMINGFORMATRTSP))
+									&& video.type !=null
+									&& video.type.equalsIgnoreCase(sStreamingType)) {
+								Log.i(TAG, video.link);
+								sendResponse(true, video.link);
 								return;
 							}
 						}
