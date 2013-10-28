@@ -4,7 +4,9 @@ package com.apalya.myplex;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import android.app.Activity;
@@ -30,9 +32,11 @@ import com.apalya.myplex.cache.InsertionResult;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardResponseData;
 import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FetchCardField;
 import com.apalya.myplex.utils.FetchCardField.FetchComplete;
+import com.flurry.android.FlurryAgent;
 
 public class SubscriptionView extends Activity {
 	private static final String TAG="SubscriptionView";
@@ -63,6 +67,18 @@ public class SubscriptionView extends Activity {
 			dofinish(ConsumerApi.SUBSCRIPTIONERROR);
 		}
 	}
+	@Override
+	protected void onStart() {
+		// TODO Auto-generated method stub
+		super.onStart();
+		FlurryAgent.onStartSession(this, "X6WWX57TJQM54CVZRB3K");
+	}
+	@Override
+	protected void onStop() {
+		// TODO Auto-generated method stub
+		FlurryAgent.onEndSession(this);
+		super.onStop();
+	}
 	private void dofinish(final int response){
 		if(response == ConsumerApi.SUBSCRIPTIONSUCCESS){
 			Toast.makeText(SubscriptionView.this, "Subscription: Success", Toast.LENGTH_SHORT).show();
@@ -78,14 +94,28 @@ public class SubscriptionView extends Activity {
 					if(data.results.size() == 0){closeSession(response);}
 					CardData subscribedData = myplexapplication.getCardExplorerData().cardDataToSubscribe;
 					subscribedData.currentUserData =  data.results.get(0).currentUserData;
+					
+					
+					Map<String,String> params=new HashMap<String, String>();
+					params.put("CardId",subscribedData._id);
+					params.put("CardName", subscribedData.generalInfo.title);
+					params.put("Status", "Purchase Success");
+					Analytics.trackEvent(Analytics.PackagesPurchase,params);
+					
+					
 					List<CardData> dataToSave = new ArrayList<CardData>();
 					dataToSave.add(subscribedData);
 					myplexapplication.getCacheHolder().UpdataDataAsync(dataToSave, new InsertionResult() {
 						
 						@Override
 						public void updateComplete(Boolean updateStatus) {
+							
+							
+							
 							closeSession(response);
 							Toast.makeText(SubscriptionView.this, "Subscription Info updated", Toast.LENGTH_SHORT).show();
+							
+							
 						}
 					});					
 				}

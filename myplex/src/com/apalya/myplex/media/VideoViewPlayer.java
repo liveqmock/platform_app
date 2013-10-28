@@ -2,6 +2,9 @@ package com.apalya.myplex.media;
 
 
 
+import java.util.HashMap;
+import java.util.Map;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -26,6 +29,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.apalya.myplex.data.ErrorManagerData;
+import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.WidevineDrm;
 import com.flurry.android.monolithic.sdk.impl.mc;
 public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
@@ -109,6 +113,11 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 				if (msg != null) {
 					sendMessageDelayed(msg, INTERVAL_BUFFERING_PER_UPDATE);
 				}
+				
+				Map<String,String> params=new HashMap<String, String>();
+				params.put("Buffering", "start");
+				Analytics.trackEvent(Analytics.PlayerBuffering,params);
+				
 				break;
 			}
 		}
@@ -363,6 +372,10 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 		{
 			if(msg.contains("Rights"))
 			{
+				Map<String,String> params=new HashMap<String, String>();
+				params.put("Status", "PlayerRightsAcqusition");
+				Analytics.trackEvent(Analytics.PlayerRightsAcqusition,params);
+				
 				openVideo();
 				isPlayStarted=true;
 				
@@ -421,10 +434,14 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 
 		if (visibility) {
 			mProgressBar.setVisibility(View.VISIBLE);
+			Map<String,String> params=new HashMap<String, String>();
+			params.put("Buffering", "start");
+			Analytics.trackEvent(Analytics.PlayerBuffering,params,true);
 			return;
 		}
 
 		mProgressBar.setVisibility(View.GONE);
+		Analytics.endTimedEvent(Analytics.PlayerBuffering);
 
 	}
 
@@ -730,6 +747,10 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 			if(dismissdialog){
 				showProgressBar(false);
 				mCurrentState = STATE_PREPARED;
+				
+				Map<String,String> params=new HashMap<String, String>();
+				params.put("Buffering", "stop");
+				Analytics.trackEvent(Analytics.PlayerBuffering,params);
 			}
 //			if (perBuffer > 100) {
 //				showProgressBar(false);

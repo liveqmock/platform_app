@@ -8,12 +8,9 @@ import java.util.Map;
 import java.util.Set;
 
 import android.app.AlertDialog;
-import android.app.DownloadManager;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -32,6 +29,7 @@ import android.widget.RelativeLayout.LayoutParams;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.Request.Method;
 import com.android.volley.toolbox.StringRequest;
 import com.apalya.myplex.BaseFragment;
 import com.apalya.myplex.R;
@@ -53,6 +51,7 @@ import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.listboxanimation.OnDismissCallback;
 import com.apalya.myplex.tablet.TabletCardDetails;
+import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FavouriteUtil;
 import com.apalya.myplex.utils.FavouriteUtil.FavouriteCallback;
@@ -73,9 +72,17 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	private View mRootView;
 	private ProgressDialog mProgressDialog = null;
 	public CardData mSelectedCard = null;
+	private String screenName;
 
 	@Override
 	public void open(CardData object) {
+		
+		Map<String,String> params=new HashMap<String, String>();
+		params.put("CardId", object._id);
+		params.put("CardType", object.generalInfo.type);
+		params.put("CardName", object.generalInfo.title);
+		Analytics.trackEvent(Analytics.cardBrowseTouch,params);
+		
 		if(getResources().getBoolean(R.bool.isTablet)){
 			myplexapplication.mSelectedCard = object;
 			startActivity(new Intent(getContext(),TabletCardDetails.class));
@@ -248,17 +255,29 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	private void fetchMinData() {
 		mMainActivity.showActionBarProgressBar();
 		RequestQueue queue = MyVolley.getRequestQueue();
+		int requestMethod = Method.GET;
 		String requestUrl = new String();
 		if(mData.requestType == CardExplorerData.REQUEST_SEARCH){
 			requestUrl = ConsumerApi.getSearch(mData.searchQuery,ConsumerApi.LEVELMIN,mData.mStartIndex);
+			screenName="Search";
 		}else if(mData.requestType == CardExplorerData.REQUEST_RECOMMENDATION){
 			requestUrl = ConsumerApi.getRecommendation(ConsumerApi.LEVELMIN,mData.mStartIndex);
+			screenName="Search";
 		}else if(mData.requestType == CardExplorerData.REQUEST_FAVOURITE){
+			screenName="Favourite";
 			requestUrl = ConsumerApi.getFavourites(ConsumerApi.LEVELMIN,mData.mStartIndex);
 		}else if(mData.requestType == CardExplorerData.REQUEST_PURCHASES){
+			screenName="Purchases";
 			requestUrl = ConsumerApi.getPurchases(ConsumerApi.LEVELMIN,mData.mStartIndex);
+			requestMethod = Method.POST;
 		}
-		StringRequest myReg = new StringRequest(requestUrl, deviceMinSuccessListener(), responseErrorListener());
+		
+		Map<String,String> attrib=new HashMap<String, String>();
+		attrib.put("Category", screenName);
+		attrib.put("Duration", "");
+		Analytics.trackEvent(Analytics.cardBrowseDuration,attrib,true);
+		
+		StringRequest myReg = new StringRequest(requestMethod, requestUrl, deviceMinSuccessListener(), responseErrorListener());
 //		myReg.setShouldCache(true);
 		Log.d(TAG,"Min Request:"+requestUrl);
 		queue.add(myReg);
@@ -268,6 +287,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		return new Response.Listener<String>() {
 			@Override
 			public void onResponse(String response) {
+				Analytics.endTimedEvent(Analytics.cardBrowseDuration);
 				try {
 //					Log.d(TAG,"server response "+response);
 					updateText("parsing results");
@@ -329,6 +349,12 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			if (v.getTag() instanceof FilterMenudata) {
 				String label = ((FilterMenudata) v.getTag()).label;
 				if (label != null && label.equalsIgnoreCase("All")) {
+					
+					Map<String,String> params=new HashMap<String, String>();
+					params.put("FilterType", label);
+					params.put("NumOfCards", String.valueOf(mData.mMasterEntries.size()));
+					Analytics.trackEvent(Analytics.cardBrowseFilter,params);
+					
 					sort(mData.mMasterEntries);
 					return;
 				}
@@ -347,6 +373,10 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 						localData.add(data);
 					}
 				}
+				Map<String,String> params=new HashMap<String, String>();
+				params.put("FilterType", label);
+				params.put("NumOfCards", String.valueOf(localData.size()));
+				Analytics.trackEvent(Analytics.cardBrowseFilter,params);
 				sort(localData);
 			}
 		}
@@ -387,7 +417,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		return new Response.ErrorListener() {
 			@Override
 			public void onErrorResponse(VolleyError error) {
-				
+				Analytics.endTimedEvent(Analytics.cardBrowseDuration);
+				//Analytics.endTimedEvent(Analytics.cardBrowseScreen);
 				Log.d(TAG,"Error from server "+error.networkResponse);
 				showErrorDialog();
 				mMainActivity.hideActionBarProgressBar();
@@ -398,17 +429,28 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	@Override
 	public void favouriteAction(final CardData data,int type){
 		FavouriteUtil favUtil = new FavouriteUtil();
+		
 		//long id=Util.startDownload("", "", getContext());
 		//myplexapplication.getUserProfileInstance().downloadMap.put(data._id, id);
 		favUtil.addFavourite(type, data, new FavouriteCallback() {
 			
 			@Override
 			public void response(boolean value) {
+				String status="";
 				if(value){
+					status="Not Favourite";
 //					Toast.makeText(getContext(), "Chan", Toast.LENGTH_SHORT).show();
 				}else{
+					status="Favourite";
 //					Toast.makeText(getContext(), "Add as Favourite", Toast.LENGTH_SHORT).show();
 				}
+				
+				Map<String,String> params=new HashMap<String, String>();
+				params.put("Status", status);
+				params.put("CardId", data._id);
+				params.put("CardType", data.generalInfo.type);
+				params.put("CardName", data.generalInfo.title);
+				Analytics.trackEvent(Analytics.cardBrowseFavorite,params);
 				if(getResources().getBoolean(R.bool.isTablet)){
 					mTabletAdapter.notifyDataSetChanged();
 				}else{
@@ -420,6 +462,13 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 
 	@Override
 	public void selectedCard(CardData data,int index) {
+		
+		Map<String,String> params=new HashMap<String, String>();
+		params.put("CardId", data._id);
+		params.put("CardType", data.generalInfo.type);
+		params.put("CardName", data.generalInfo.title);
+		Analytics.trackEvent(Analytics.cardBrowseSelect,params);
+		
 		mData.currentSelectedCard = index;
 		mSelectedCard = data;
 	}
@@ -436,7 +485,11 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	@Override
 	public void deletedCard(CardData data) {
 		// TODO Auto-generated method stub
-
+		Map<String,String> params=new HashMap<String, String>();
+		params.put("CardId", data._id);
+		params.put("CardType", data.generalInfo.type);
+		params.put("CardName", data.generalInfo.title);
+		Analytics.trackEvent(Analytics.cardBrowseCancel,params);
 	}
 
 	@Override
@@ -444,6 +497,11 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		PackagePopUp popup = new PackagePopUp(getContext(),mRootView);
 		mData.cardDataToSubscribe = data;
 		popup.showPackDialog(data, getActionBar().getCustomView());
+		Map<String,String> params=new HashMap<String, String>();
+		params.put("CardId", data._id);
+		params.put("CardType", data.generalInfo.type);
+		params.put("CardName", data.generalInfo.title);
+		Analytics.trackEvent(Analytics.cardBrowsePurchase,params);
 	}
 
 	@Override
@@ -454,10 +512,19 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 
 	@Override
 	public void viewReady() {
+		
+		
+		
 		if(getResources().getBoolean(R.bool.isTablet)){
 			
 		}else{
 			mCardView.moveTo(mData.currentSelectedCard);
+			
+			Map<String,String> params=new HashMap<String, String>();
+			params.put("CardId", mData.mMasterEntries.get(mData.currentSelectedCard)._id);
+			params.put("CardType", mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo.type);
+			params.put("CardName", mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo.title);
+			Analytics.trackEvent(Analytics.cardBrowseSwipe,params);
 		}
 	}
 
@@ -486,6 +553,46 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			showNoDataMessage(issuedRequest);
 		}
 		applyData();
+		
+		if(mData.mStartIndex==10)
+		{
+			Map<String,String> params=new HashMap<String, String>();
+			params.put("Category", screenName);
+			params.put("NumOfCards", String.valueOf(mData.mMasterEntries.size()));
+			params.put("CacheResults", "true");
+			params.put("PreviousScreen", "None");
+			if(Util.isWifiEnabled(mContext))
+			{
+				params.put("Network", "Wifi");	
+			}
+			else
+			{
+				params.put("Network", "Mobile");
+			}
+			
+			Analytics.trackEvent(Analytics.cardBrowseScreen,params);
+		}
+		else
+		{
+			Map<String,String> params=new HashMap<String, String>();
+			params.put("Category", screenName);
+			params.put("NumCardsAvailable", String.valueOf(mCardView.getDataList().size()));
+			params.put("NumCardsFetched", String.valueOf(mData.mMasterEntries.size()));
+			params.put("CacheResults", "true");
+			params.put("PreviousScreen", "None");
+			if(Util.isWifiEnabled(mContext))
+			{
+				params.put("Network", "Wifi");	
+			}
+			else
+			{
+				params.put("Network", "Mobile");
+			}
+			
+			Analytics.trackEvent(Analytics.cardBrowseScreen,params);
+		}
+		
+		
 //		if(mData.requestType == CardExplorerData.REQUEST_DOWNLOADS){
 //			showProgress();
 //		}
@@ -505,6 +612,23 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			}
 			
 		}
+		
+		Map<String,String> params=new HashMap<String, String>();
+			params.put("Category", screenName);
+			params.put("NumOfCards", String.valueOf(dataList.size()));
+			params.put("CacheResults", "false");
+			params.put("PreviousScreen", "None");
+			if(Util.isWifiEnabled(mContext))
+			{
+				params.put("Network", "Wifi");	
+			}
+			else
+			{
+				params.put("Network", "Mobile");
+			}
+			
+			Analytics.trackEvent(Analytics.cardBrowseScreen,params);
+		
 //		updateDownloadInformation();
 		showNoDataMessage(false);
 		applyData();		

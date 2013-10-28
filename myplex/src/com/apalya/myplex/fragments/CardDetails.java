@@ -3,6 +3,7 @@ package com.apalya.myplex.fragments;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import android.animation.LayoutTransition;
@@ -37,6 +38,7 @@ import com.apalya.myplex.data.CardDetailMultiMediaGroup;
 import com.apalya.myplex.data.CardExplorerData;
 import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.FavouriteUtil;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
@@ -154,10 +156,24 @@ public class CardDetails extends BaseFragment implements
 			
 			@Override
 			public void onClick(View v) {
+				
+				Map<String,String> params=new HashMap<String, String>();
+				params.put("CardId", mCardData._id);
+				params.put("CardType", mCardData.generalInfo.type);
+				params.put("CardName", mCardData.generalInfo.title);
+				params.put("Action", "Submit");
+				Analytics.trackEvent(Analytics.cardDetailsShare,params);
+				
 				// TODO Auto-generated method stub
 				Util.shareData(getContext(), 3, "", mCardData.generalInfo.title);
 			}
 		});
+		
+		Map<String,String> params=new HashMap<String, String>();
+		params.put("CardId", mCardData._id);
+		params.put("CardType", mCardData.generalInfo.type);
+		params.put("CardName", mCardData.generalInfo.title);
+		Analytics.trackEvent(Analytics.cardDetailsScreen,params);
 		
 		return rootView;
 	}
@@ -242,6 +258,14 @@ public class CardDetails extends BaseFragment implements
 			return;
 		}
 		if (v.getTag() instanceof CardDetailMediaListData) {
+			
+			Map<String,String> params=new HashMap<String, String>();
+			params.put("CardId", mCardData._id);
+			params.put("CardType", mCardData.generalInfo.type);
+			params.put("CardName", mCardData.generalInfo.title);
+			params.put("Status", "Expand");
+			Analytics.trackEvent(Analytics.cardDetailsMultimedia,params);
+			
 			CardDetailMediaListData mainData = (CardDetailMediaListData) v
 					.getTag();
 			mMediaList = mainData.mList;
@@ -421,10 +445,17 @@ public class CardDetails extends BaseFragment implements
 	}
 	@Override
 	public void onDescriptionExpanded() {
+		
 		mDescriptionExpanded = true;
 		mDescriptionContentLayout.removeAllViews();
 		View v  = mCardDetailViewFactory.CreateView(mCardData,CardDetailViewFactory.CARDDETAIL_FULL_DESCRIPTION);
 		if(v != null){
+			Map<String,String> params=new HashMap<String, String>();
+			params.put("CardId", mCardData._id);
+			params.put("CardType", mCardData.generalInfo.type);
+			params.put("CardName", mCardData.generalInfo.title);
+			params.put("Status", "Expand");
+			Analytics.trackEvent(Analytics.cardDetailsDescription,params);
 			mDescriptionContentLayout.addView(v);
 		}
 //		prepareFilterData();
@@ -435,6 +466,12 @@ public class CardDetails extends BaseFragment implements
 		mCommentsContentLayout.removeAllViews();
 		View v  = mCardDetailViewFactory.CreateView(mCardData,CardDetailViewFactory.CARDDETAIL_COMMENTS);
 		if(v != null){
+			Map<String,String> params=new HashMap<String, String>();
+			params.put("CardId", mCardData._id);
+			params.put("CardType", mCardData.generalInfo.type);
+			params.put("CardName", mCardData.generalInfo.title);
+			params.put("Status", "Expand");
+			Analytics.trackEvent(Analytics.cardDetailsComment,params);
 			addSpace();
 			mCommentsContentLayout.addView(v);	
 		}		
@@ -446,6 +483,12 @@ public class CardDetails extends BaseFragment implements
 		if(v != null){
 			addSpace();
 			mCommentsContentLayout.addView(v);	
+			Map<String,String> params=new HashMap<String, String>();
+			params.put("CardId", mCardData._id);
+			params.put("CardType", mCardData.generalInfo.type);
+			params.put("CardName", mCardData.generalInfo.title);
+			params.put("Status", "Contract");
+			Analytics.trackEvent(Analytics.cardDetailsComment,params);
 		}			
 	}
 	@Override
@@ -455,6 +498,12 @@ public class CardDetails extends BaseFragment implements
 		View v  = mCardDetailViewFactory.CreateView(mCardData,CardDetailViewFactory.CARDDETAIL_BRIEF_DESCRIPTION);
 		if(v != null){
 			mDescriptionContentLayout.addView(v);
+			Map<String,String> params=new HashMap<String, String>();
+			params.put("CardId", mCardData._id);
+			params.put("CardType", mCardData.generalInfo.type);
+			params.put("CardName", mCardData.generalInfo.title);
+			params.put("Status", "Contract");
+			Analytics.trackEvent(Analytics.cardDetailsDescription,params);
 		}		
 //		prepareFilterData();
 	}
@@ -504,5 +553,7 @@ public class CardDetails extends BaseFragment implements
 		data.requestType = CardExplorerData.REQUEST_SIMILARCONTENT;
 		data.mMasterEntries =  (ArrayList<CardData>) mCardData.similarContent.values;
 		mMainActivity.bringFragment(fragment);
+		
+		
 	}
 }

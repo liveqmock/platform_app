@@ -1,5 +1,7 @@
 package com.apalya.myplex.views;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -39,6 +41,7 @@ import com.apalya.myplex.media.VideoViewPlayer;
 import com.apalya.myplex.media.VideoViewPlayer.StreamType;
 import com.apalya.myplex.utils.MediaUtil;
 import com.apalya.myplex.utils.MediaUtil.MediaUtilEventListener;
+import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
@@ -147,6 +150,13 @@ public class CardVideoPlayer implements PlayerListener {
 
 		@Override
 		public void onClick(View v) {
+			
+			Map<String,String> params=new HashMap<String, String>();
+			params.put("CardId", mData._id);
+			params.put("CardType", mData.generalInfo.type);
+			params.put("CardName", mData.generalInfo.title);
+			Analytics.trackEvent(Analytics.PlayerPlaySelect,params);
+			
 			FetchUrl();
 			mVideoViewParent.setOnClickListener(null);
 			// TODO Auto-generated method stub
@@ -171,6 +181,13 @@ public class CardVideoPlayer implements PlayerListener {
 		if(!mContext.getResources().getBoolean(R.bool.isTablet)){
 			((MainBaseOptions) mContext).setOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		}
+		
+		Map<String,String> params=new HashMap<String, String>();
+		params.put("CardId", mData._id);
+		params.put("CardType", mData.generalInfo.type);
+		params.put("CardName", mData.generalInfo.title);
+		Analytics.trackEvent(Analytics.PlayerPlayComplete,params);
+		
 	}
 
 	public void FetchUrl() {

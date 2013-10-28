@@ -1,7 +1,9 @@
 package com.apalya.myplex.views;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -42,11 +44,13 @@ import com.apalya.myplex.data.CardDataCertifiedRatingsItem;
 import com.apalya.myplex.data.CardDataPackagePriceDetailsItem;
 import com.apalya.myplex.data.CardDataPackages;
 import com.apalya.myplex.data.CardDataPromotionDetailsItem;
+import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.Blur;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.utils.Blur.BlurResponse;
+import com.flurry.android.FlurryAgent;
 
 public class PackagePopUp {
 	private String TAG  = "PackagePopUp";
@@ -61,6 +65,8 @@ public class PackagePopUp {
 		this.mBackground = background;
 		this.mInflater = LayoutInflater.from(mContext);
 	}
+	
+	
 	private void dismissFilterMenuPopupWindow() {
 		if (mFilterMenuPopupWindow != null) {
 			mFilterMenuPopupWindowList.remove(mFilterMenuPopupWindow);
@@ -169,6 +175,14 @@ public class PackagePopUp {
 									Bundle b = new Bundle();
 									b.putString("url", requestUrl);
 									i.putExtras(b);
+									FlurryAgent.onStartSession(mContext, "X6WWX57TJQM54CVZRB3K");
+									Map<String,String> params=new HashMap<String, String>();
+									params.put("PackageId",packageitem.packageId);
+									params.put("PackageName", packageitem.packageName);
+									params.put("PaymentChannel", priceItem.paymentChannel);
+									params.put("Action", "Purchase");
+									Analytics.trackEvent(Analytics.PackagesPurchase,params);
+									FlurryAgent.onEndSession(mContext);
 									((Activity) mContext).startActivityForResult(i, ConsumerApi.SUBSCRIPTIONREQUEST);
 									dismissFilterMenuPopupWindow();
 								}

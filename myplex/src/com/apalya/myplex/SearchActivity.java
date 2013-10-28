@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -55,6 +56,7 @@ import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.SearchData;
 import com.apalya.myplex.data.SearchData.ButtonData;
 import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
@@ -158,6 +160,11 @@ public class SearchActivity extends BaseFragment implements
 //		mMainActivity.setTitle("Search");
 
 		loadSearchTags();
+		
+		Map<String,String> params=new HashMap<String, String>();
+		params.put("status", "Shown");
+		Analytics.trackEvent(Analytics.SearchScreenShown,params);
+		
 
 		return rootView;
 	}
@@ -186,6 +193,10 @@ public class SearchActivity extends BaseFragment implements
 			}
 			searchQuery = data.getButtonName();
 			searchString.add(temp);
+			
+			Map<String,String> params=new HashMap<String, String>();
+			params.put("tagsSelected", searchQuery);
+			Analytics.trackEvent(Analytics.SearchQuery,params);
 		}
 		mSearchQuery = searchQuery;
 		mCacheManager.getCardDetails(searchString, IndexHandler.OperationType.DONTSEARCHDB, SearchActivity.this);
@@ -196,11 +207,20 @@ public class SearchActivity extends BaseFragment implements
 	private void UpdateSearchTags(ButtonData tagData, Boolean addorremove) {
 		if (mSearchbleTags == null)
 			return;
+		Map<String,String> params=new HashMap<String, String>();
 		if (addorremove)
+		{
 			mSearchbleTags.add(tagData);
+			
+			params.put("tagAdded", tagData.getButtonName());
+			
+		}
 		else
+		{
+			params.put("tagRemoved", tagData.getButtonName());
 			mSearchbleTags.remove(tagData);
-		
+		}
+		Analytics.trackEvent(Analytics.SearchQuery,params);
 		if (mSearchbleTags.size() == 0)
 			mMainActivity.setSearchBarVisibilty(View.INVISIBLE);
 		else
@@ -210,6 +230,9 @@ public class SearchActivity extends BaseFragment implements
 	private void ClearSearchTags() {
 		if (mSearchbleTags != null)
 			mSearchbleTags.clear();
+		Map<String,String> params=new HashMap<String, String>();
+		params.put("tagCleared", "true");
+		Analytics.trackEvent(Analytics.SearchQuery,params);
 	}
 
 	public List<ButtonData> GetSearchTags() {
@@ -231,12 +254,18 @@ public class SearchActivity extends BaseFragment implements
 
 		Log.d("tagresponse", myReq.getUrl());
 		queue.add(myReq);
+		
+		Map<String,String> params=new HashMap<String, String>();
+		params.put("Duration", "");
+		Analytics.trackEvent(Analytics.SearchScreenShown,params,true);
+		
 	}
 
 	private Response.Listener<JSONObject> createMyReqSuccessListener() {
 		return new Response.Listener<JSONObject>() {
 			@Override
 			public void onResponse(JSONObject response) {
+				Analytics.endTimedEvent(Analytics.SearchScreenShown);
 				ParseJonsResponse(response);
 				mMainActivity.hideActionBarProgressBar();
 				dismissProgressBar();
@@ -435,6 +464,7 @@ public class SearchActivity extends BaseFragment implements
 		return new Response.ErrorListener() {
 			@Override
 			public void onErrorResponse(VolleyError error) {
+				Analytics.endTimedEvent(Analytics.SearchScreenShown);
 				TextView empty = (TextView) rootView.findViewById(R.id.empty);
 				empty.setTypeface(FontUtil.Roboto_Light);
 				empty.setVisibility(View.VISIBLE);

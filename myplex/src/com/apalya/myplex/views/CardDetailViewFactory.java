@@ -1,5 +1,8 @@
 package com.apalya.myplex.views;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import android.animation.LayoutTransition;
 import android.app.Activity;
 import android.content.Context;
@@ -31,6 +34,7 @@ import com.apalya.myplex.data.CardDataUserReviewsItem;
 import com.apalya.myplex.data.CardDetailMultiMediaGroup;
 import com.apalya.myplex.data.CardResponseData;
 import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.CircleImageLoader;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FetchCardField;
@@ -175,6 +179,10 @@ public class CardDetailViewFactory {
 				commentMessage.setTypeface(FontUtil.Roboto_Regular);
 	//			addSpace(layout, 16);
 				mCommentContentLayout.addView(child);
+				
+				Map<String,String> params=new HashMap<String, String>();
+				params.put("Action", "Submit");
+				Analytics.trackEvent(Analytics.cardDetailsComment,params);
 			}
 		}else if(type == COMMENTSECTION_REVIEW){
 			for(CardDataUserReviewsItem reviewItem:card.userReviews.values){
@@ -196,6 +204,10 @@ public class CardDetailViewFactory {
 				commentMessage.setTypeface(FontUtil.Roboto_Regular);
 	//			addSpace(layout, 16);
 				mCommentContentLayout.addView(child);
+				
+				Map<String,String> params=new HashMap<String, String>();
+				params.put("Action", "Submit");
+				Analytics.trackEvent(Analytics.cardDetailsReview,params);
 			}
 		}
 	}

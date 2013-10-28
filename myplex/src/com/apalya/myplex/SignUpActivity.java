@@ -446,8 +446,8 @@ public class SignUpActivity extends Activity{
 	private void RegisterUserReq(String contextPath, final Map<String,String> bodyParams) {
 
 		Map<String,String> attribs=new HashMap<String, String>();
-		attribs.put("Status", "Request");
-		//Analytics.trackEvent(Analytics.loginSignUp,attribs,true);
+		attribs.put("Duration", "");
+		Analytics.trackEvent(Analytics.loginSignUp,attribs,true);
 		
 		RequestQueue queue = MyVolley.getRequestQueue();
 
@@ -473,7 +473,7 @@ public class SignUpActivity extends Activity{
 			@Override
 			public void onErrorResponse(VolleyError error) {
 				dismissProgressBar();
-				//Analytics.endTimedEvent(Analytics.loginSignUp);
+				Analytics.endTimedEvent(Analytics.loginSignUp);
 				Map<String,String> attribs=new HashMap<String, String>();
 				attribs.put("Status", "Failed");
 				attribs.put("Msg", error.toString());
@@ -506,7 +506,7 @@ public class SignUpActivity extends Activity{
 			@Override
 			public void onResponse(String response) {
 				dismissProgressBar();
-				//Analytics.endTimedEvent(Analytics.loginSignUp);
+				Analytics.endTimedEvent(Analytics.loginSignUp);
 				
 				Log.d(TAG,"Response: "+response);
 				try {	
@@ -608,8 +608,8 @@ public class SignUpActivity extends Activity{
 		RequestQueue queue = MyVolley.getRequestQueue();
 
 		Map<String,String> attribs=new HashMap<String, String>();
-		attribs.put("status", "Request");
-		//Analytics.trackEvent(Analytics.loginSignIn,attribs,true);
+		attribs.put("Duration", "");
+		Analytics.trackEvent(Analytics.loginSignIn,attribs,true);
 		
 		String url=ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+ConsumerApi.USER_CONTEXT+ConsumerApi.SLASH+contextPath;
 		StringRequest myReq = new StringRequest(Method.POST,
@@ -635,7 +635,7 @@ public class SignUpActivity extends Activity{
 			public void onErrorResponse(VolleyError error) {
 				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 				Log.d(TAG,"Error: "+error.toString());
-				//Analytics.endTimedEvent(Analytics.loginSignIn);
+				Analytics.endTimedEvent(Analytics.loginSignIn);
 				Map<String,String> attribs=new HashMap<String, String>();
 				attribs.put("Status", "Failed");
 				attribs.put("Msg", error.toString());
@@ -660,7 +660,7 @@ public class SignUpActivity extends Activity{
 		return new Response.Listener<String>() {
 			@Override
 			public void onResponse(String response) {
-				//Analytics.endTimedEvent(Analytics.loginSignIn);
+				Analytics.endTimedEvent(Analytics.loginSignIn);
 				Log.d(TAG,"Response: "+response);
 				try {	
 					Log.d(TAG, "########################################################");

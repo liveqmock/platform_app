@@ -20,6 +20,7 @@ public class Analytics {
 	public static String loginSignUp="Login-SignUp";
 	public static String loginGuest="Login-Guest";
 	public static String cardBrowseScreen="Card-Browse-Screen-Shown";
+	public static String cardBrowseDuration="Card-Browse-Duration";
 	public static String cardBrowseMore="Card-Browse-More";
 	public static String cardBrowseFilter="Card-Browse-Filter";
 	public static String cardBrowseSwipe="Card-Browse-Swipe";
@@ -27,6 +28,7 @@ public class Analytics {
 	public static String cardBrowseFavorite="Card-Browse-Favorite";
 	public static String cardBrowseCancel="Card-Browse-Cancel";
 	public static String cardBrowseSelect="Card-Browse-Select";
+	public static String cardBrowsePurchase="Card-Browse-Purchase";
 	public static String cardDetailsScreen="Card-Details-Screen-Shown";
 	public static String cardDetailsDescription="Card-Details-Screen-Description";
 	public static String cardDetailsMultimedia="Card-Details-Screen-Multimedia";
@@ -71,10 +73,10 @@ public class Analytics {
 		mMixPanel.track(aEventName,getJSON(params));
 	}
 
-	/*public static void trackEvent(String aEventName,Map<String, String> params, boolean aStatus) {
+	public static void trackEvent(String aEventName,Map<String, String> params, boolean aStatus) {
 		// TODO Auto-generated method stub
 		FlurryAgent.logEvent(aEventName,params,aStatus);
-	}*/
+	}
 	private static JSONObject getJSON(Map<String, String> params){
 		JSONObject data= new JSONObject();
 		Set<String> keySet = params.keySet();
@@ -96,8 +98,8 @@ public class Analytics {
 		return data;
 	}
 
-	/*public static void endTimedEvent(String aEventName) {
+	public static void endTimedEvent(String aEventName) {
 		// TODO Auto-generated method stub
 		FlurryAgent.endTimedEvent(aEventName);
-	}*/
+	}
 }

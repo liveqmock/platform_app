@@ -8,10 +8,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
-import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -43,16 +41,12 @@ import android.view.View.OnClickListener;
 import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.animation.Animation;
-import android.view.animation.Animation.AnimationListener;
-import android.view.animation.AnimationUtils;
-import android.view.animation.BounceInterpolator;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
-import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -80,14 +74,12 @@ import com.apalya.myplex.utils.Util;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookAuthorizationException;
 import com.facebook.FacebookOperationCanceledException;
-import com.facebook.FacebookRequestError;
 import com.facebook.LoggingBehavior;
 import com.facebook.Request;
 import com.facebook.Request.GraphUserCallback;
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.Settings;
-import com.facebook.android.Facebook;
 import com.facebook.model.GraphUser;
 import com.flurry.android.FlurryAgent;
 import com.google.android.gms.common.ConnectionResult;
@@ -304,9 +296,6 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				fadeAnim2.setDuration(300);
 				fadeAnim2.start();
 				
-				Map<String,String> params=new HashMap<String, String>();
-				params.put("status", "Selected");
-				Analytics.trackEvent(Analytics.loginScreen,params);
 				
 				if(mDevInfo.getClientKey()!=null)
 				{
@@ -334,10 +323,6 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				fadeAnim2.setDuration(300);
 				fadeAnim2.start();
 				
-				Map<String,String> params=new HashMap<String, String>();
-				params.put("status", "Selected");
-				Analytics.trackEvent(Analytics.loginSignIn,params);
-				
 				if(mDevInfo.getClientKey()!=null)
 				{
 					finish();
@@ -362,15 +347,12 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				fadeAnim2.setDuration(300);
 				fadeAnim2.start();
 				
-				Map<String,String> params=new HashMap<String, String>();
-				params.put("status", "Selected");
-				Analytics.trackEvent(Analytics.loginGuest,params);
 				
 				if(mDevInfo.getClientKey()!=null)
 				{
 					Map<String,String> param1=new HashMap<String, String>();
 					param1.put("status", "Success");
-					Analytics.trackEvent(Analytics.loginGuest,params);
+					Analytics.trackEvent(Analytics.loginGuest,param1);
 					mUserInfo.setName("Guest");
 					finish();
 					Util.launchMainActivity(LoginActivity.this);
@@ -379,7 +361,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				{
 					Map<String,String> param2=new HashMap<String, String>();
 					param2.put("status", "Failure");
-					Analytics.trackEvent(Analytics.loginGuest,params);
+					Analytics.trackEvent(Analytics.loginGuest,param2);
 					Util.showToast("Your device registration has been failed, Please check your internet connectivity and reopen the app",  LoginActivity.this);
 				}
 				
@@ -418,7 +400,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			if(session.isOpened())
 			{
 				Map<String,String> params=new HashMap<String, String>();
-				params.put("status", "Selected");
+				params.put("status", "Success");
 				Analytics.trackEvent(Analytics.loginFacebook,params);
 				
 				finish();
@@ -753,9 +735,9 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 	private void onSessionStateChange(Session session, SessionState state, Exception exception) {
 		if (exception instanceof FacebookOperationCanceledException || exception instanceof FacebookAuthorizationException) {
 
-			//Analytics.endTimedEvent(Analytics.loginFacebook);
+			Analytics.endTimedEvent(Analytics.loginFacebook);
 			Map<String,String> attribs=new HashMap<String, String>();
-			attribs.put("Status", "Failed");
+			attribs.put("Status", "Cancel");
 			attribs.put("Msg", "User Cancelled");
 			Analytics.trackEvent(Analytics.loginFacebook,attribs);
 			Log.d(TAG,getString(R.string.userCancelled));
@@ -816,8 +798,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 						{
 							dismissProgressBar();
 							Util.showToast("No Internet Connection...", LoginActivity.this);	
-							finish();
-							Util.launchActivity(MainActivity.class, LoginActivity.this, null);
+							//finish();
+							//Util.launchActivity(MainActivity.class, LoginActivity.this, null);
 
 						}
 						else
@@ -867,9 +849,9 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			@Override
 			public void onErrorResponse(VolleyError error) {
 				dismissProgressBar();
-				//Analytics.endTimedEvent(Analytics.loginFacebook);
+				Analytics.endTimedEvent(Analytics.loginFacebook);
 				Map<String,String> params=new HashMap<String, String>();
-				params.put("Status", "Failed");
+				params.put("Status", "Failure");
 				params.put("Msg", error.toString());
 				Analytics.trackEvent(Analytics.loginFacebook,params);
 				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
@@ -892,7 +874,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			@Override
 			public void onResponse(String response) {
 				Log.d(TAG,"Response: "+response);
-				//Analytics.endTimedEvent(Analytics.loginFacebook);
+				Analytics.endTimedEvent(Analytics.loginFacebook);
 				
 				try {	
 					dismissProgressBar();
@@ -915,7 +897,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					else
 					{
 						Map<String,String> attribs=new HashMap<String, String>();
-						attribs.put("Status", "Failed");
+						attribs.put("Status", "Failure");
 						attribs.put("Msg", jsonResponse.getString("code"));
 						Analytics.trackEvent(Analytics.loginFacebook,attribs);
 						if(jsonResponse.getString("code").equalsIgnoreCase("401"))
@@ -949,9 +931,6 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 	private void onClickLogin() {
 
 		
-		Map<String,String> params=new HashMap<String, String>();
-		params.put("Status", "Selected");
-		//Analytics.trackEvent(Analytics.loginFacebook,params,true);
 		
 		Session session = Session.getActiveSession();
 		if (!session.isOpened() && !session.isClosed()) {
@@ -976,6 +955,10 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			if(mDevInfo.getClientKey()!=null)
 			{
 				
+				Map<String,String> param1=new HashMap<String, String>();
+				param1.put("Duration", "");
+				Analytics.trackEvent(Analytics.loginFacebook,param1,true);
+				
 				if(Session.getActiveSession().isOpened())
 				{
 					//onClickLogout();
@@ -995,10 +978,6 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		}
 		else if (view.getId() == R.id.google ) {
 
-			Map<String,String> params=new HashMap<String, String>();
-			params.put("Status", "Selected");
-			//Analytics.trackEvent(Analytics.loginGoogle,params,true);
-			
 			if(!AccountUtils.isAuthenticated(LoginActivity.this))
 			{
 				if(mDevInfo.getClientKey()!=null)
@@ -1007,7 +986,12 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					if(PlayServicesUtils.checkGooglePlaySevices(this))
 					{
 						if(mPlusClient!=null)
+						{
+							Map<String,String> param1=new HashMap<String, String>();
+							param1.put("Duration", "");
+							Analytics.trackEvent(Analytics.loginGoogle,param1,true);
 							mPlusClient.connect();
+						}
 					}
 				}
 				else
@@ -1018,12 +1002,12 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		}
 		else if(view.getId()==R.id.twitter)
 		{
-			Map<String,String> params=new HashMap<String, String>();
-			params.put("Status", "Selected");
-			//Analytics.trackEvent(Analytics.loginTwitter,params,true);
 			if(mDevInfo.getClientKey()!=null)
 			{
 				if (!isAuthTwitter()){
+					Map<String,String> param1=new HashMap<String, String>();
+					param1.put("Duration", "");
+					Analytics.trackEvent(Analytics.loginTwitter,param1,true);
 					twitter11.login();
 				}
 			}
@@ -1105,7 +1089,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			@Override
 			public void onResponse(String response) {
 				dismissProgressBar();
-				//Analytics.endTimedEvent(Analytics.loginGoogle);
+				Analytics.endTimedEvent(Analytics.loginGoogle);
 				
 				Log.d(TAG,"Response: "+response);
 				try {	
@@ -1130,7 +1114,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					else
 					{
 						Map<String,String> attribs=new HashMap<String, String>();
-						attribs.put("Status", "Failed");
+						attribs.put("Status", "Failure");
 						attribs.put("Msg", jsonResponse.getString("code"));
 						Analytics.trackEvent(Analytics.loginGoogle,attribs);
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
@@ -1180,9 +1164,9 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 	@Override
 	public void onConnectionFailed(ConnectionResult connectionResult) {
-		//Analytics.endTimedEvent(Analytics.loginGoogle);
+		Analytics.endTimedEvent(Analytics.loginGoogle);
 		Map<String,String> attribs=new HashMap<String, String>();
-		attribs.put("Status", "Failed");
+		attribs.put("Status", "Failure");
 		attribs.put("Msg", connectionResult.toString());
 		Analytics.trackEvent(Analytics.loginGoogle,attribs);
 		
@@ -1292,9 +1276,9 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 						break;
 					}
 				}else if(resultCode == Activity.RESULT_CANCELED){
-					//Analytics.endTimedEvent(Analytics.loginTwitter);
+					Analytics.endTimedEvent(Analytics.loginTwitter);
 					Map<String,String> params=new HashMap<String, String>();
-					params.put("Status", "Cancelled");
+					params.put("Status", "Cancel");
 					Analytics.trackEvent(Analytics.loginTwitter,params);
 					if(requestCode==TWITTER_CALLBACK)
 						Toast.makeText(LoginActivity.this, isAuthTwitter()? "Logged In" : "Request Cancelled", Toast.LENGTH_SHORT).show();
@@ -1314,7 +1298,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 	}
 	@Override
 	public void onStop() {
-		super.onStop();
+		
 		if (mAuthInProgress) mCancelAuth = true;
 		if (mPlusClient != null)
 			mPlusClient.disconnect();
@@ -1322,6 +1306,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			Session.getActiveSession().removeCallback(statusCallback);
 
 		FlurryAgent.onEndSession(this);
+		
+		super.onStop();
 	}
 
 	@Override
@@ -1339,15 +1325,15 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		} else {
 			Log.e(TAG, "Got " + connectionResult.getErrorCode() + ". Could not load plus profile.");
 			dismissProgressBar();
-			if(connectionResult.getErrorCode()==7)
+			/*if(connectionResult.getErrorCode()==7)
 			{
 				Util.showToast("No Internet Connection...", LoginActivity.this);
-				finish();
-				Util.launchActivity(MainActivity.class, LoginActivity.this, null);
+				//finish();
+				//Util.launchActivity(MainActivity.class, LoginActivity.this, null);
 			}
-			else
+			else*/
 			{
-				Util.showToast("Can't establish a reliable connection to server, error code: "+String.valueOf(connectionResult.getErrorCode()), LoginActivity.this);
+				Util.showToast(String.valueOf(connectionResult.getErrorCode())+": Connection to google plus server failed.", LoginActivity.this);
 			}
 
 			/*if(!mPlusClient.isConnected())
@@ -1527,7 +1513,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			public void onResponse(String response) {
 				Log.d(TAG,"Response: "+response);
 				dismissProgressBar();
-				//Analytics.endTimedEvent("DEVICE-REGISTRATION-REQUEST");
+				
 				try {	
 					Log.d(TAG, "########################################################");
 					JSONObject jsonResponse= new JSONObject(response);
@@ -1652,7 +1638,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 			showProgressBar();
 
-			Util.showToast(mDevInfo.getDeviceSNo(),this);
+			//Util.showToast(mDevInfo.getDeviceSNo(),this);
 
 			devRegRequest(getString(R.string.devRegPath),params);
 
@@ -1708,9 +1694,9 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			@Override
 			public void onErrorResponse(VolleyError error) {
 				dismissProgressBar();
-				//Analytics.endTimedEvent(Analytics.loginTwitter);
+				Analytics.endTimedEvent(Analytics.loginTwitter);
 				Map<String,String> params=new HashMap<String, String>();
-				params.put("Status", "Failed");
+				params.put("Status", "Failure");
 				params.put("Msg", error.toString());
 				Analytics.trackEvent(Analytics.loginTwitter,params);
 				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
@@ -1733,7 +1719,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			@Override
 			public void onResponse(String response) {
 				Log.d(TAG,"Response: "+response);
-				//Analytics.endTimedEvent(Analytics.loginTwitter);
+				Analytics.endTimedEvent(Analytics.loginTwitter);
 				
 				try {	
 					dismissProgressBar();
@@ -1758,7 +1744,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					else
 					{
 						Map<String,String> attribs=new HashMap<String, String>();
-						attribs.put("Status", "Failed");
+						attribs.put("Status", "Failure");
 						attribs.put("Msg", jsonResponse.getString("code"));
 						Analytics.trackEvent(Analytics.loginTwitter,attribs);
 						if(jsonResponse.getString("code").equalsIgnoreCase("401"))

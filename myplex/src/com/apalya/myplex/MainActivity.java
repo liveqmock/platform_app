@@ -83,6 +83,7 @@ import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.views.PinnedSectionListView;
 import com.apalya.myplex.views.RatingDialog;
 import com.facebook.Session;
+import com.flurry.android.FlurryAgent;
 
 public class MainActivity extends Activity implements MainBaseOptions {
 	private DrawerLayout mDrawerLayout;
@@ -98,6 +99,22 @@ public class MainActivity extends Activity implements MainBaseOptions {
 	private Stack<BaseFragment> mFragmentStack = new Stack<BaseFragment>();
 
 	NavigationOptionsMenuAdapter mNavigationAdapter;
+	
+	@Override
+	protected void onStart() {
+		// TODO Auto-generated method stub
+		super.onStart();
+		FlurryAgent.onStartSession(this, "X6WWX57TJQM54CVZRB3K");
+	}
+	
+	@Override
+	protected void onStop() {
+		// TODO Auto-generated method stub
+		
+		FlurryAgent.onEndSession(this);
+		
+		super.onStop();
+	}
 	
 	@Override
 	public void setOrientation(int value){
@@ -137,7 +154,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.RECOMMENDED,R.drawable.iconhome, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.MOVIES,R.drawable.iconmovie, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LIVETV,R.drawable.iconlivetv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.TVSHOWS,R.drawable.icontv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+//		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.TVSHOWS,R.drawable.icontv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		mNavigationAdapter.setMenuList(mMenuItemList);
 	}
 
@@ -394,6 +411,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 			profileData._id="0";
 			RatingDialog dialog = new RatingDialog(mContext);
 			dialog.prepareRating();
+			myplexapplication.getUserProfileInstance().firstVisitStatus=false;
 			dialog.showDialog(new MessagePostCallback() {
 				
 				@Override
