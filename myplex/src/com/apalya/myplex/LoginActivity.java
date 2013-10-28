@@ -2,12 +2,16 @@ package com.apalya.myplex;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
+import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -1441,12 +1445,22 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 		//Util.showToast(clientKeyExp);
 
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+		List<SimpleDateFormat> knownPatterns = new ArrayList<SimpleDateFormat>();
+		knownPatterns.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"));
+		knownPatterns.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZZ"));
+		knownPatterns.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZZ"));
+		knownPatterns.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm.ss'Z'"));
+		knownPatterns.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"));
+		knownPatterns.add(new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss"));
+		
 		Date convertedDate = new Date();
-		try {
-			convertedDate = dateFormat.parse(clientKeyExp);
-		} catch (ParseException e) {
-			e.printStackTrace();
+		for (SimpleDateFormat pattern : knownPatterns) {
+		    try {
+		    	convertedDate = pattern.parse(clientKeyExp);
+		    	break;
+		    } catch (ParseException pe) {
+		    	pe.printStackTrace();
+		    }
 		}
 		Date currentDate = new Date();
 		if(convertedDate.compareTo(currentDate)>0)

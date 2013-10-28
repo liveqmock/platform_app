@@ -185,8 +185,7 @@ public class SearchActivity extends BaseFragment implements
 			searchString.add(temp);
 		}
 		mSearchQuery = searchQuery;
-		mCacheManager.getCardDetails(searchString,
-				IndexHandler.OperationType.FTSEARCH, SearchActivity.this);
+		mCacheManager.getCardDetails(searchString, IndexHandler.OperationType.DONTSEARCHDB, SearchActivity.this);
 
 	}
 
@@ -401,6 +400,8 @@ public class SearchActivity extends BaseFragment implements
 			JSONArray tagArray = letters.getJSONArray("values");
 
 			for (int tagcount = 0; tagcount < tagArray.length(); tagcount++) {
+				if(tagcount > 20)
+					break;
 				JSONObject tag = tagArray.getJSONObject(tagcount);
 				String id = tag.getString("_id");
 				String name = tag.getString("name");

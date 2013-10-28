@@ -50,7 +50,7 @@ public class IndexHandler {
 	public static final String LUCENE_CONTENT_EXPIRY = "expiresAt";
 	public static final String LUCENE_CONTENT_INFO = "cardInfo";
 	
-	public enum OperationType{IDSEARCH,FTSEARCH,UPDATEDB,SEARCHDB}
+	public enum OperationType{IDSEARCH,FTSEARCH,UPDATEDB,SEARCHDB,DONTSEARCHDB}
 
 
 	File mIndexDir = null;

@@ -17,14 +17,15 @@ public class ConsumerApi {
 	public static final String RATING_TAG= "rating";
 	public static final String SUBSCRIBE_TAG= "subscribe";
 	public static final String FIELD_COMMENTS = "comments";
-	public static final String FIELD_CURRENTUSERDATA = "currentUserData";
+	public static final String FIELD_CURRENTUSERDATA_OLD = "currentUserData";
+	public static final String FIELD_CURRENTUSERDATA = "user/currentData";
 	public static final String FIELD_USERREVIEWS = "userReviews";
 	public static final String FIELD_VIDEOS = "videos";
 	public static final String PAYMENTCHANNEL = "paymentChannel=";
 	public static final String PACKAGEID = "packageId=";
 	public static final String CONTENT_CONTEXT = "content/v2";
 	public static final String USER_CONTEXT = "user/v2";
-	public static final String SCHEME = "http://";
+	public static final String SCHEME = "https://";
 	public static final String SLASH = "/";
 	public static final String QUESTION_MARK = "?";
 	public static final String AMPERSAND = "&";

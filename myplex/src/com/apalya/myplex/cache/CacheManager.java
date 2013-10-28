@@ -31,6 +31,21 @@ public class CacheManager {
 	}
 	public void getCardDetails(final List<CardData> Ids,IndexHandler.OperationType operationType,CacheManagerCallback listener){
 		this.mListener = listener;
+		if(operationType == IndexHandler.OperationType.DONTSEARCHDB)
+		{
+			String cardIds = new String();
+			for (CardData cardData : Ids) {
+				if(cardIds.length() > 0){
+					cardIds += ",";
+				}
+				cardIds += cardData._id;
+			}
+			if(mListener != null){
+				mListener.OnCacheResults(new HashMap<String, CardData>(),true);
+			}
+			issueOnlineRequest(cardIds);
+			return;
+		}
 		myplexapplication.getCacheHolder().GetData(Ids,operationType, new SearchResult() {
 			
 			@Override
