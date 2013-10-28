@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.LayoutTransition;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
@@ -68,14 +69,18 @@ public class PackagePopUp {
 		}
 	}
 	private Bitmap mOrginalBitmap;
+	private Blur mBlurEngine;
 	private void addBlur(){
 		if(mBackground == null){return;}
 		if(mPopupBackground == null){return;}
 		try {
 			mBackground.setDrawingCacheEnabled(true);
 			mOrginalBitmap = mBackground.getDrawingCache();
-			Blur blur = new Blur();
-			blur.fastblur(mContext, mOrginalBitmap, 12, new BlurResponse() {
+			if(mBlurEngine != null){
+				mBlurEngine.abort();
+			}
+			mBlurEngine = new Blur();
+			mBlurEngine.fastblur(mContext, mOrginalBitmap, 12, new BlurResponse() {
 				
 				@Override
 				public void BlurredBitmap(Bitmap b) {
@@ -83,6 +88,7 @@ public class PackagePopUp {
 					mOrginalBitmap  = null;
 					Drawable d = new BitmapDrawable(b); 
 					mPopupBackground.setBackgroundDrawable(d);
+					mBackground.setDrawingCacheEnabled(false);
 				}
 			});
 		} catch (Exception e) {
@@ -99,7 +105,7 @@ public class PackagePopUp {
 	}
 	public void showPackDialog(CardData data,View anchorView) {
 		View v = mInflater.inflate(R.layout.purchasepopup,null);
-		mPopupBackground = (RelativeLayout)v.findViewById(R.id.purchasepopup_background);
+		mPopupBackground = (RelativeLayout)v;
 		fillPackData(data,v);
 		LinearLayout susblayout = (LinearLayout) v.findViewById(R.id.purchasepopup_packslayout);
 		mPaymentModeHeading = (TextView)v.findViewById(R.id.purchasepopup_selectedpaymentmodeheading);
@@ -107,8 +113,10 @@ public class PackagePopUp {
 		mPaymentModeHeading.setVisibility(View.INVISIBLE);
 		mPaymentModeGroup = (LinearLayout)v.findViewById(R.id.purchasepopup_selectedpaymentmodegroup);
 		mPaymentModeGroup.setVisibility(View.INVISIBLE);
-		
-//		addBlur();
+		LayoutTransition transition = new LayoutTransition();
+		transition.setStartDelay(LayoutTransition.CHANGE_APPEARING, 0);
+		mPaymentModeGroup.setLayoutTransition(transition);
+		addBlur();
 		addPack(data,susblayout);
 		showPopup(v,anchorView);
 	}

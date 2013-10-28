@@ -72,7 +72,7 @@
             android:layout_gravity="center_vertical"
             android:layout_marginRight="@dimen/margin_gap_8"
             android:singleLine="true"
-            android:text=""
+            android:text="PG"
             android:textColor="#4b4b4c"
             android:textSize="@dimen/textsize_12" />
 
@@ -125,7 +125,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/carddetailbriefdescription_purchasebutton"
-        android:layout_marginLeft="16dp"
+        android:layout_marginLeft="12dp"
         android:layout_marginTop="12dp"
         android:layout_marginRight="36dp"
         android:paddingBottom="12dp"

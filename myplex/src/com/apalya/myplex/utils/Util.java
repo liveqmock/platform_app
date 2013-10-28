@@ -203,10 +203,28 @@ public class Util {
 				case MotionEvent.ACTION_DOWN:
 					v.setBackgroundColor(Color.parseColor("#54B5E9"));
 					break;
-				case MotionEvent.ACTION_UP:
+				default:
 					v.setBackgroundColor(Color.TRANSPARENT);
 					break;
+				}
+				return false;
+			}
+		});
+	}
+	public static void showFeedbackOnSame(View v) {
+		if (v == null) {
+			return;
+		}
+		v.setOnTouchListener(new OnTouchListener() {
+
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				switch (event.getAction()) {
+				case MotionEvent.ACTION_DOWN:
+					v.setBackgroundColor(color.searchtags_color);
+					break;
 				default:
+					v.setBackgroundColor(Color.TRANSPARENT);
 					break;
 				}
 				return false;

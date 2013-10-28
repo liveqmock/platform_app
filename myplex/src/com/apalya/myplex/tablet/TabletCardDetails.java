@@ -9,6 +9,7 @@ import com.apalya.myplex.fragments.CardExplorer;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
@@ -35,6 +36,7 @@ public class TabletCardDetails extends BaseActivity{
 	}
 	@Override
 	public void onBackPressed() {
+		startActivity(new Intent(TabletCardDetails.this,MultiPaneActivity.class));
 		finish();
 	}
 	@Override

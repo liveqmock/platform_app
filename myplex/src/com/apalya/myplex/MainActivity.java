@@ -14,6 +14,8 @@ import android.animation.ValueAnimator;
 import android.animation.Animator.AnimatorListener;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.ActivityManager.MemoryInfo;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
@@ -26,6 +28,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -36,6 +40,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -44,6 +50,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.PopupWindow.OnDismissListener;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
@@ -291,6 +298,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 			return;
 		}
 		LinearLayout navigationMenuLayout = (LinearLayout)v.findViewById(R.id.customactionbar_drawerLayout);
+		Util.showFeedbackOnSame(navigationMenuLayout);
 		mNavigationMenu = (ImageView) v.findViewById(R.id.customactionbar_drawer);
 		navigationMenuLayout.setOnClickListener(new OnClickListener() {
 
@@ -308,7 +316,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		mCustomActionBarTitleLayout = (RelativeLayout) v
 				.findViewById(R.id.customactionbar_filter);
 		mCustomActionBarTitleLayout.setOnClickListener(mOnFilterClickListener);
-		Util.showFeedback(mCustomActionBarTitleLayout);
+		Util.showFeedbackOnSame(mCustomActionBarTitleLayout);
 		mCustomActionBarFilterImage = (ImageView) v
 				.findViewById(R.id.customactionbar_filter_button);
 		mTitleTextView = (TextView) v
@@ -329,9 +337,17 @@ public class MainActivity extends Activity implements MainBaseOptions {
 				}
 			}
 		});
-		Util.showFeedback(mCustomActionBarSearch);
+		Util.showFeedbackOnSame(mCustomActionBarSearch);
 		mCustomActionBarProgressBar = (ProgressBar) v
 				.findViewById(R.id.customactionbar_progressBar);
+	}
+	private void rotateUp(){
+		 Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.rotateup);
+		 mCustomActionBarFilterImage.startAnimation(animation);
+	}
+	private void rotateDown(){
+		 Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.rotatedown);
+		 mCustomActionBarFilterImage.startAnimation(animation);
 	}
 	@Override
 	public void enableFilterAction(boolean value){
@@ -692,26 +708,30 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		}
 	}
 	private Bitmap mOrginalBitmap;
+	private Blur mBlurEngine;
 	private void addBlur(){
 		if(mCurrentFragment == null){return;}
 		if(mCurrentFragment.getView() == null){return;}
 		if(mFilterMenuPopup == null){return;}
 		try {
 //			mFilterListView.setVisibility(View.INVISIBLE);
-			ValueAnimator fadeAnim = ObjectAnimator.ofFloat(mFilterListView, "alpha", 0f,1f);
-			fadeAnim.setDuration(1200);
-			fadeAnim.addListener(new AnimatorListenerAdapter() {
-				public void onAnimationEnd(Animator animation) {
-//					mFilterListView.setVisibility(View.VISIBLE);
-				}
-			});
-			fadeAnim.start();
+//			ValueAnimator fadeAnim = ObjectAnimator.ofFloat(mFilterListView, "alpha", 0f,1f);
+//			fadeAnim.setDuration(1200);
+//			fadeAnim.addListener(new AnimatorListenerAdapter() {
+//				public void onAnimationEnd(Animator animation) {
+////					mFilterListView.setVisibility(View.VISIBLE);
+//				}
+//			});
+//			fadeAnim.start();
 			mCurrentFragment.getView().setDrawingCacheEnabled(true);
 			mOrginalBitmap = mCurrentFragment.getView().getDrawingCache();
-			Blur blur = new Blur();
+			if(mBlurEngine != null){
+				mBlurEngine.abort();
+			}
+			mBlurEngine = new Blur();
 			Drawable bg = new ColorDrawable(Color.parseColor("#00000000"));
 			mPopBlurredLayout.setBackgroundDrawable(bg);
-			blur.fastblur(mContext, mOrginalBitmap, 12, new BlurResponse() {
+			mBlurEngine.fastblur(mContext, mOrginalBitmap, 12, new BlurResponse() {
 				
 				@Override
 				public void BlurredBitmap(Bitmap b) {
@@ -738,11 +758,25 @@ public class MainActivity extends Activity implements MainBaseOptions {
 	}
 	private void showFilterMenuPopup() {
 		dismissFilterMenuPopupWindow();
-		addBlur();
+		Handler h = new Handler(Looper.getMainLooper());
+		h.post(new Runnable() {
+			public void run() {
+				addBlur();
+			}
+		});
 		mFilterMenuPopupWindow = new PopupWindow(mFilterMenuPopup,
 				LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, true);
 		mFilterMenuPopupWindowList.add(mFilterMenuPopupWindow);
 		mFilterMenuPopupWindow.setOutsideTouchable(true);
+		rotateUp();
+		mFilterMenuPopupWindow.setOnDismissListener(new OnDismissListener() {
+			
+			@Override
+			public void onDismiss() {
+				// TODO Auto-generated method stub
+				rotateDown();
+			}
+		});
 		mFilterMenuPopupWindow.setBackgroundDrawable(new BitmapDrawable());
 		mFilterMenuPopupWindow.showAsDropDown(mCustomActionBarTitleLayout);
 	}

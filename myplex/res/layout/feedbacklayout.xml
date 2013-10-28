@@ -104,6 +104,7 @@
         android:ems="10"
         android:hint="@string/ratingmessagehint"
         android:singleLine="false" >
+        <requestFocus />
     </EditText>
 
     <RelativeLayout
