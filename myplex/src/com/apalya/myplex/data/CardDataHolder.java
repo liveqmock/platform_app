@@ -13,7 +13,7 @@ public class CardDataHolder {
 	public TextView mDelete;
 	public TextView mFavourite;
 	public CardImageView mPreview;
-	public LinearLayout mDeleteLayout;
+	public RelativeLayout mDeleteLayout;
 	public RelativeLayout mPreviewLayout;
 	public ImageView mOverLayPlay;
 	public TextView mComments;

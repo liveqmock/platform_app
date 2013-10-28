@@ -79,6 +79,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		if(getResources().getBoolean(R.bool.isTablet)){
 			myplexapplication.mSelectedCard = object;
 			startActivity(new Intent(getContext(),TabletCardDetails.class));
+			getActivity().finish();
 		}else{
 			BaseFragment fragment = mMainActivity.createFragment(NavigationOptionsMenuAdapter.CARDDETAILS_ACTION);
 			fragment.setDataObject(object);

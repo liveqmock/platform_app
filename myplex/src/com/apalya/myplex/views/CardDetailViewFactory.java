@@ -1,22 +1,15 @@
 package com.apalya.myplex.views;
 
-import java.util.Random;
-
+import android.animation.LayoutTransition;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.view.inputmethod.EditorInfo;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -25,7 +18,6 @@ import android.widget.RelativeLayout;
 import android.widget.Space;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.TextView.OnEditorActionListener;
 
 import com.apalya.myplex.R;
 import com.apalya.myplex.data.CardData;
@@ -36,17 +28,14 @@ import com.apalya.myplex.data.CardDataPackagePriceDetailsItem;
 import com.apalya.myplex.data.CardDataPackages;
 import com.apalya.myplex.data.CardDataRelatedCastItem;
 import com.apalya.myplex.data.CardDataUserReviewsItem;
-import com.apalya.myplex.data.CardDetailBaseData;
 import com.apalya.myplex.data.CardDetailMultiMediaGroup;
 import com.apalya.myplex.data.CardResponseData;
 import com.apalya.myplex.data.myplexapplication;
-import com.apalya.myplex.utils.CardImageLoader;
 import com.apalya.myplex.utils.CircleImageLoader;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FetchCardField;
 import com.apalya.myplex.utils.FetchCardField.FetchComplete;
 import com.apalya.myplex.utils.FontUtil;
-import com.apalya.myplex.utils.MessagePost;
 import com.apalya.myplex.utils.MessagePost.MessagePostCallback;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
@@ -221,6 +210,9 @@ public class CardDetailViewFactory {
 			v.setBackgroundResource(0);
 		}
 		mCommentContentLayout = (LinearLayout)v.findViewById(R.id.carddetailcomment_contentlayout);
+		LayoutTransition transition = new LayoutTransition();
+		transition.setStartDelay(LayoutTransition.CHANGE_APPEARING, 0);
+		mCommentContentLayout.setLayoutTransition(transition);
 		mComments = mCommentContentLayout;
 		addSpace(mCommentContentLayout, (int)mContext.getResources().getDimension(R.dimen.margin_gap_16));
 		if(type == CARDDETAIL_COMMENTS){
@@ -350,6 +342,7 @@ public class CardDetailViewFactory {
 //		 Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.stoprotate);
 //		 mCommentRefresh.startAnimation(animation);
 	}
+	
 	private void refreshSection(final int type) {
 		rotateRefresh();
 		String FieldName = new  String();
@@ -612,6 +605,7 @@ public class CardDetailViewFactory {
 			LinearLayout.LayoutParams leftparams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT);
 			leftparams.gravity = Gravity.RIGHT;
 			leftText.setLayoutParams(leftparams);
+			leftText.setSingleLine();
 			leftText.setTextSize(12);
 			leftText.setTextColor(Color.parseColor("#4b4b4c"));
 			
@@ -628,6 +622,7 @@ public class CardDetailViewFactory {
 			leftText.setOnClickListener(mCastandCrewClickListener);
 //			leftText.setPaintFlags(leftText.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 			rightText.setText(LeftString);
+			rightText.setSingleLine();
 			rightText.setTypeface(FontUtil.Roboto_Regular);
 //			rightText.setPaintFlags(rightText.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
 			leftLayout.addView(leftText);
@@ -720,7 +715,7 @@ public class CardDetailViewFactory {
 		}
 		moviedescription.setTypeface(FontUtil.Roboto_Regular);
 		
-		ImageView expand = (ImageView)v.findViewById(R.id.carddetailfulldescription_expand);
+		RelativeLayout expand = (RelativeLayout)v.findViewById(R.id.carddetailfulldescription_expandlayout);
 		if(mContext.getResources().getBoolean(R.bool.isTablet)){
 			expand.setVisibility(View.INVISIBLE);
 		}
@@ -746,7 +741,7 @@ public class CardDetailViewFactory {
 			layout.addView(createCastCrewView());
 		}
 		mFullDescPackageButton = (Button)v.findViewById(R.id.carddetaildesc_purchasebutton);
-		
+		UpdateSubscriptionStatus();
 //		createPlayInPlaceView(layout);
 		addSpace(layout,(int)mContext.getResources().getDimension(R.dimen.margin_gap_12));
 		return v;
@@ -803,7 +798,7 @@ public class CardDetailViewFactory {
 		
 		
 		
-		ImageView expand = (ImageView)v.findViewById(R.id.carddetailbriefdescription_expand);
+		RelativeLayout expand = (RelativeLayout)v.findViewById(R.id.carddetailbriefdescription_expandlayout);
 		expand.setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -823,6 +818,7 @@ public class CardDetailViewFactory {
 	private void UpdatePackageButton(Button packageButton){
 		if(packageButton == null){return;}
 		packageButton.setOnClickListener(packageButtonListener);
+		Util.showFeedbackOnSame(packageButton);
 		packageButton.setTypeface(FontUtil.Roboto_Medium);
 		float price = 10000f;
 		if(mData.packages == null){
@@ -854,11 +850,15 @@ public class CardDetailViewFactory {
 	}
 	private Button mBriefDescPackageButton = null;
 	private Button mFullDescPackageButton = null;
+	private View mParentView = null;
+	public void setParent(View parent){
+		this.mParentView =  parent;
+	}
 	private OnClickListener packageButtonListener = new OnClickListener() {
 		
 		@Override
 		public void onClick(View v) {
-			PackagePopUp popup = new PackagePopUp(mContext,null);
+			PackagePopUp popup = new PackagePopUp(mContext,mParentView);
 			myplexapplication.getCardExplorerData().cardDataToSubscribe =  mData;
 			popup.showPackDialog(mData, ((Activity)mContext).getActionBar().getCustomView());			
 		}

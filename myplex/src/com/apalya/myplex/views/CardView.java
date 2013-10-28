@@ -275,7 +275,7 @@ public class CardView extends ScrollView {
 			dataHolder.mDelete = (TextView)v.findViewById(R.id.card_title_deleteText);
 			dataHolder.mFavourite = (TextView)v.findViewById(R.id.card_title_fav);
 			dataHolder.mFavLayout = (RelativeLayout)v.findViewById(R.id.card_title_favlayout);
-			dataHolder.mDeleteLayout = (LinearLayout)v.findViewById(R.id.card_title_delete);
+			dataHolder.mDeleteLayout = (RelativeLayout)v.findViewById(R.id.card_title_delete);
 			dataHolder.mPreview = (CardImageView)v.findViewById(R.id.card_preview_image);
 			dataHolder.mPreviewLayout = (RelativeLayout)v.findViewById(R.id.card_preview_layout);
 			dataHolder.mOverLayPlay = (ImageView)v.findViewById(R.id.card_play);
@@ -288,7 +288,7 @@ public class CardView extends ScrollView {
 			dataHolder.mFavProgressBar = (ProgressBar) v.findViewById(R.id.card_title_fav_progress);
 //			dataHolder.mESTDownloadBar = (ProgressBar) v.findViewById(R.id.card_eststatus);
 //			dataHolder.mESTDownloadStatus = (TextView) v.findViewById(R.id.card_eststatus_text);
-			
+			dataHolder.mFavProgressBar.getIndeterminateDrawable().setColorFilter(0xFF54B5E9, android.graphics.PorterDuff.Mode.MULTIPLY);
 			// fonts
 			Random rnd = new Random();
 			int Low = 100;

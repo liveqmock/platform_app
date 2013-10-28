@@ -91,10 +91,8 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		LayoutInflater inflator = LayoutInflater.from(this);
-		View v = inflator.inflate(R.layout.cardexplorer_tablet, null);
-		setContentView(v);
-		setParentView(v);
+		setContentView(R.layout.cardexplorer_tablet);
+		setParentView(findViewById(R.id.parentlayout));
 		super.onCreate(savedInstanceState);
 		mLeftNavigationListView = (ListView) findViewById(R.id.left_drawer);
 		prepareNavigationMenuList(mLeftNavigationListView);

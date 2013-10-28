@@ -121,6 +121,7 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		videoLayout.addView(mPlayer.CreateTabletPlayerView(videoLayout));
 		mCardDetailViewFactory = new CardDetailViewFactory(getContext());
 		mCardDetailViewFactory.setOnCardDetailExpandListener(this);
+		mCardDetailViewFactory.setParent(rootView);
 		mMainActivity.setSearchBarVisibilty(View.VISIBLE);
 //		prepareContent();
 		if(mCardData.generalInfo != null){

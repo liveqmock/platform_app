@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import android.animation.LayoutTransition;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Build;
@@ -36,8 +37,10 @@ import com.apalya.myplex.data.CardDetailMultiMediaGroup;
 import com.apalya.myplex.data.CardExplorerData;
 import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.utils.FavouriteUtil;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
+import com.apalya.myplex.utils.FavouriteUtil.FavouriteCallback;
 import com.apalya.myplex.views.CardDetailViewFactory;
 import com.apalya.myplex.views.CardDetailViewFactory.CardDetailViewFactoryListener;
 import com.apalya.myplex.views.CardVideoPlayer;
@@ -64,6 +67,7 @@ public class CardDetails extends BaseFragment implements
 	private CustomScrollView mScrollView;
 	private RelativeLayout mBottomActionBar;
 	private ImageView mShareButton;
+	private ImageView mFavButton;
 	
 	private boolean mDescriptionExpanded = false;
 	private int mDetailType = Profile;
@@ -93,12 +97,20 @@ public class CardDetails extends BaseFragment implements
 		mScrollView = (CustomScrollView)rootView.findViewById(R.id.carddetail_scroll_view);
 		mBottomActionBar = (RelativeLayout)rootView.findViewById(R.id.carddetail_bottomactionbar);
 		mShareButton = (ImageView) rootView.findViewById(R.id.carddetail_share);
+		mFavButton = (ImageView) rootView.findViewById(R.id.carddetail_fav);
+		if(mCardData.currentUserData != null && mCardData.currentUserData.favorite){
+			mFavButton.setImageResource(R.drawable.card_iconheartblue);			
+		}else{
+			mFavButton.setImageResource(R.drawable.card_iconheart);
+		}
+
 		mScrollView.setDirectionListener(this);
 		RelativeLayout videoLayout = (RelativeLayout)rootView.findViewById(R.id.carddetail_videolayout);
 		mPlayer = new CardVideoPlayer(mContext, mCardData);
 		videoLayout.addView(mPlayer.CreatePlayerView(videoLayout));
 		mParentContentLayout = (LinearLayout) rootView.findViewById(R.id.carddetail_detaillayout);
 		mCardDetailViewFactory = new CardDetailViewFactory(getContext());
+		mCardDetailViewFactory.setParent(rootView);
 		mCardDetailViewFactory.setOnCardDetailExpandListener(this);
 		mMainActivity.setSearchBarVisibilty(View.VISIBLE);
 		mMainActivity.enableFilterAction(false);
@@ -108,7 +120,36 @@ public class CardDetails extends BaseFragment implements
 			mMainActivity.updateActionBarTitle();
 		}
 		prepareContent();
-		
+		mFavButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				mMainActivity.showActionBarProgressBar();
+				int type = FavouriteUtil.FAVOURITEUTIL_ADD;
+				if(mCardData.currentUserData != null && mCardData.currentUserData.favorite){
+					type = FavouriteUtil.FAVOURITEUTIL_REMOVE;
+				}
+				FavouriteUtil favUtil = new FavouriteUtil();
+				favUtil.addFavourite(type, mCardData, new FavouriteCallback() {
+					
+					@Override
+					public void response(boolean value) {
+						mMainActivity.hideActionBarProgressBar();
+						if(value){
+//							Toast.makeText(getContext(), "Chan", Toast.LENGTH_SHORT).show();
+						}else{
+//							Toast.makeText(getContext(), "Add as Favourite", Toast.LENGTH_SHORT).show();
+						}
+						if(mCardData.currentUserData != null && mCardData.currentUserData.favorite){
+							mFavButton.setImageResource(R.drawable.card_iconheartblue);			
+						}else{
+							mFavButton.setImageResource(R.drawable.card_iconheart);
+						}
+					}
+				});
+				
+			}
+		});
 		mShareButton.setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -154,10 +195,10 @@ public class CardDetails extends BaseFragment implements
 	}
 
 	private void addSpace(){
-		Space gap = new Space(getContext());
-		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,(int)getContext().getResources().getDimension(R.dimen.margin_gap_8));
-		gap.setLayoutParams(params);
-		mParentContentLayout.addView(gap);
+//		Space gap = new Space(getContext());
+//		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,(int)getContext().getResources().getDimension(R.dimen.margin_gap_12));
+//		gap.setLayoutParams(params);
+//		mParentContentLayout.addView(gap);
 	}
 	private void fillData() {
 		mDescriptionExpanded = false;
@@ -168,11 +209,13 @@ public class CardDetails extends BaseFragment implements
 		
 		mMediaContentLayout = new LinearLayout(getContext());
 		LinearLayout.LayoutParams mediaParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+		mediaParams.topMargin = (int)getContext().getResources().getDimension(R.dimen.margin_gap_12);
 		mMediaContentLayout.setLayoutParams(mediaParams);
 		mParentContentLayout.addView(mMediaContentLayout);
 		
 		mCommentsContentLayout = new LinearLayout(getContext());
 		LinearLayout.LayoutParams commentParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+		commentParams.topMargin = (int)getContext().getResources().getDimension(R.dimen.margin_gap_12);
 		mCommentsContentLayout.setLayoutParams(commentParams);
 		mParentContentLayout.addView(mCommentsContentLayout);
 		

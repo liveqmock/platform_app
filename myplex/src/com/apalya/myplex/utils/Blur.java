@@ -3,13 +3,8 @@ package com.apalya.myplex.utils;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.os.Build.VERSION;
 import android.os.Handler;
 import android.os.Looper;
-import android.renderscript.Allocation;
-import android.renderscript.Element;
-import android.renderscript.RenderScript;
-//import android.renderscript.ScriptIntrinsicBlur;
 import android.util.Log;
 
 public class Blur {
@@ -17,8 +12,10 @@ public class Blur {
 	public interface BlurResponse{
 		public void BlurredBitmap(Bitmap b);
 	}
+
 	private static final String TAG = "Blur";
 
+	private boolean mAbort = false;
 	private void sendBlurredBitmap(final BlurResponse listener,final Bitmap bm){
 		if(listener == null || bm == null){
 			return;
@@ -38,7 +35,7 @@ public class Blur {
 		Thread t = new Thread() {
 			public void run() {
 				try {
-
+					mAbort = false;
 //					if (VERSION.SDK_INT > 16) {
 //						Bitmap bitmap = sentBitmap.copy(sentBitmap.getConfig(), true);
 //
@@ -82,6 +79,7 @@ public class Blur {
 					//
 					// Stack Blur Algorithm by Mario Klingemann <mario@quasimondo.com>
 
+					System.gc();
 					Bitmap bitmap = sentBitmap.copy(sentBitmap.getConfig(), true);
 
 					if (radius < 1) {
@@ -95,6 +93,7 @@ public class Blur {
 					Log.e("pix", w + " " + h + " " + pix.length);
 					bitmap.getPixels(pix, 0, w, 0, 0, w, h);
 
+					if(mAbort){return;}
 					int wm = w - 1;
 					int hm = h - 1;
 					int wh = w * h;
@@ -125,8 +124,10 @@ public class Blur {
 					int rinsum, ginsum, binsum;
 
 					for (y = 0; y < h; y++) {
+						if(mAbort){return;}
 						rinsum = ginsum = binsum = routsum = goutsum = boutsum = rsum = gsum = bsum = 0;
 						for (i = -radius; i <= radius; i++) {
+							if(mAbort){return;}
 							p = pix[yi + Math.min(wm, Math.max(i, 0))];
 							sir = stack[i + radius];
 							sir[0] = (p & 0xff0000) >> 16;
@@ -149,6 +150,7 @@ public class Blur {
 						stackpointer = radius;
 
 						for (x = 0; x < w; x++) {
+							if(mAbort){return;}
 
 							r[yi] = dv[rsum];
 							g[yi] = dv[gsum];
@@ -198,6 +200,7 @@ public class Blur {
 						yw += w;
 					}
 					for (x = 0; x < w; x++) {
+						if(mAbort){return;}
 						rinsum = ginsum = binsum = routsum = goutsum = boutsum = rsum = gsum = bsum = 0;
 						yp = -radius * w;
 						for (i = -radius; i <= radius; i++) {
@@ -232,6 +235,7 @@ public class Blur {
 						yi = x;
 						stackpointer = radius;
 						for (y = 0; y < h; y++) {
+							if(mAbort){return;}
 							// Preserve alpha channel: ( 0xff000000 & pix[yi] )
 							pix[yi] = (0xff000000 & pix[yi]) | (dv[rsum] << 16) | (dv[gsum] << 8) | dv[bsum];
 
@@ -277,7 +281,7 @@ public class Blur {
 							yi += w;
 						}
 					}
-
+					if(mAbort){return;}
 					Log.e("pix", w + " " + h + " " + pix.length);
 					bitmap.setPixels(pix, 0, w, 0, 0, w, h);
 //					return (bitmap);
@@ -290,6 +294,10 @@ public class Blur {
 		t.start();
 		
 		
+	}
+
+	public void abort() {
+		mAbort = true;
 	}
 
 }

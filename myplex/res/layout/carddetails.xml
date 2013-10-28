@@ -30,6 +30,7 @@
             android:layout_marginBottom="@dimen/margin_gap_12"
             android:layout_marginLeft="@dimen/margin_gap_12"
             android:layout_marginRight="@dimen/margin_gap_12"
+            android:animateLayoutChanges="true"
             android:orientation="vertical" >
         </LinearLayout>
     </com.apalya.myplex.views.CustomScrollView>
@@ -58,7 +59,7 @@
 
                 <ImageView
                     android:contentDescription="@string/hello_world"
-                    android:id="@+id/card_info_rent"
+                    android:id="@+id/carddetail_fav"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_gravity="center_vertical"

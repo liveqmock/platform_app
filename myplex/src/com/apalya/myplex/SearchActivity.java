@@ -86,6 +86,9 @@ public class SearchActivity extends BaseFragment implements
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		if(isVisible()){
+			mMainActivity.addFilterData(new ArrayList<FilterMenudata>(), mFilterMenuClickListener);
+		}
 		rootView = inflater.inflate(R.layout.searchlayout, container, false);
 		mSearchInput = (EditText) rootView.findViewById(R.id.inputSearch);
 		mSearchInput.setTypeface(FontUtil.Roboto_Regular);

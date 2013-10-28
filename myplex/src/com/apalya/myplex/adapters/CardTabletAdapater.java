@@ -100,7 +100,7 @@ public class CardTabletAdapater extends BaseAdapter{
 			dataHolder.mTitleLayout = (LinearLayout)v.findViewById(R.id.card_title_layout); 
 			dataHolder.mTitle = (TextView)v.findViewById(R.id.card_title_name);
 			dataHolder.mDelete = (TextView)v.findViewById(R.id.card_title_deleteText);
-			dataHolder.mDeleteLayout = (LinearLayout)v.findViewById(R.id.card_title_delete);
+			dataHolder.mDeleteLayout = (RelativeLayout)v.findViewById(R.id.card_title_delete);
 			dataHolder.mFavLayout = (RelativeLayout)v.findViewById(R.id.card_title_favlayout);
 			dataHolder.mFavourite = (TextView)v.findViewById(R.id.card_title_fav);
 			dataHolder.mPreview = (CardImageView)v.findViewById(R.id.card_preview_image);
@@ -114,7 +114,7 @@ public class CardTabletAdapater extends BaseAdapter{
 			dataHolder.mRentText = (TextView)v.findViewById(R.id.card_rent_text);
 			dataHolder.mFavProgressBar = (ProgressBar) v.findViewById(R.id.card_title_fav_progress);
 			
-			
+			dataHolder.mFavProgressBar.getIndeterminateDrawable().setColorFilter(0xFF54B5E9, android.graphics.PorterDuff.Mode.MULTIPLY);
 			
 			// fonts
 			
