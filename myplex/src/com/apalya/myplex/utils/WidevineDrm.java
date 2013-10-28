@@ -20,6 +20,7 @@ import android.drm.DrmInfoEvent;
 import android.drm.DrmInfoRequest;
 import android.drm.DrmManagerClient;
 import android.drm.DrmStore;
+import android.widget.Toast;
 
 public class WidevineDrm {
 
@@ -57,11 +58,11 @@ public class WidevineDrm {
 
     private DrmManagerClient mDrmManager;
 
-    // private Context mContext;
+     private Context mContext;
 
     public WidevineDrm(Context context) {
 
-        // mContext = context;
+         mContext = context;
         mDrmManager = new DrmManagerClient(context);
 
         mDrmManager.setOnInfoListener(new DrmManagerClient.OnInfoListener() {
@@ -141,7 +142,11 @@ public class WidevineDrm {
                 Settings.WIDEVINE_MIME_TYPE);
         request.put("WVPortalKey", portal);
         DrmInfo response = mDrmManager.acquireDrmInfo(request);
-
+        if(response == null)
+        {
+        	Toast.makeText(mContext, "acquireDrmInfo failed. DRM cannot be supported", Toast.LENGTH_SHORT).show();
+        	return;
+        }
         String drmInfoRequestStatusKey = (String)response.get("WVDrmInfoRequestStatusKey");
         if (null != drmInfoRequestStatusKey && !drmInfoRequestStatusKey.equals("")) {
             mWVDrmInfoRequestStatusKey = Long.parseLong(drmInfoRequestStatusKey);

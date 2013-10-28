@@ -63,6 +63,7 @@ import com.apalya.myplex.data.NavigationOptionsMenu;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.fragments.CardDetails;
 import com.apalya.myplex.fragments.CardExplorer;
+import com.apalya.myplex.fragments.SetttingsFragment;
 import com.apalya.myplex.menu.FilterMenuProvider;
 import com.apalya.myplex.utils.Blur;
 import com.apalya.myplex.utils.Blur.BlurResponse;
@@ -120,7 +121,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FAVOURITE,R.drawable.iconfav, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.PURCHASES,R.drawable.iconpurchases, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.DOWNLOADS,R.drawable.icondnload, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu("Settings",R.drawable.iconsettings, null, NavigationOptionsMenuAdapter.NOACTION_ACTION,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu("Settings",R.drawable.iconsettings, null, NavigationOptionsMenuAdapter.SETTINGS_ACTION,R.layout.navigation_menuitemsmall));
 		Session fbSession=Session.getActiveSession();
 		if(fbSession!=null && fbSession.isOpened())
 			mMenuItemList.add(new NavigationOptionsMenu("Invite Friends",R.drawable.iconfriends, null, NavigationOptionsMenuAdapter.INVITE_ACTION,R.layout.navigation_menuitemsmall));
@@ -464,6 +465,10 @@ public class MainActivity extends Activity implements MainBaseOptions {
 			mSearchActivity = new SearchActivity();
 			fragment = mSearchActivity;
 			break;
+		case NavigationOptionsMenuAdapter.SETTINGS_ACTION:
+			mSettingsScreen = new SetttingsFragment();
+			fragment = mSettingsScreen;
+			break;
 		default:
 			mCardDetails = new CardDetails();
 			fragment = mCardDetails;
@@ -484,6 +489,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 	private CardExplorer mCardExplorer;
 	private CardDetails mCardDetails;
 	private SearchActivity mSearchActivity;
+	private SetttingsFragment mSettingsScreen;
 	private void selectItem(int position) {
 		NavigationOptionsMenu menu = mMenuItemList.get(position);
 		
@@ -550,6 +556,12 @@ public class MainActivity extends Activity implements MainBaseOptions {
 				data.requestType = CardExplorerData.REQUEST_PURCHASES;
 			}
 			mCurrentFragment = mCardExplorer;
+			break;
+		}
+		case NavigationOptionsMenuAdapter.SETTINGS_ACTION:
+		{
+			mSettingsScreen = (SetttingsFragment) createFragment(NavigationOptionsMenuAdapter.SETTINGS_ACTION);
+			mCurrentFragment = mSettingsScreen;
 			break;
 		}
 		default: {

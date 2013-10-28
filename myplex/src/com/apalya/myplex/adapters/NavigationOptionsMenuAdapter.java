@@ -30,6 +30,7 @@ public class NavigationOptionsMenuAdapter extends BaseAdapter {
 	public final static int NOFOCUS_ACTION = 5;
 	public final static int INVITE_ACTION = 6;
 	public final static int DOWNLOAD_ACTION = 7;
+	public final static int SETTINGS_ACTION = 90;
 	public final static String DOWNLOADS = "Downloads";
 	public final static String FAVOURITE = "Favourite";
 	public final static String RECOMMENDED = "Recommended";

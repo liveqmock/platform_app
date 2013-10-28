@@ -65,6 +65,7 @@ public class SubscriptionView extends Activity {
 	}
 	private void dofinish(final int response){
 		if(response == ConsumerApi.SUBSCRIPTIONSUCCESS){
+			Toast.makeText(SubscriptionView.this, "Subscription: Success", Toast.LENGTH_SHORT).show();
 			FetchCardField fetch = new FetchCardField();
 			fetch.Fetch(myplexapplication.getCardExplorerData().cardDataToSubscribe, ConsumerApi.FIELD_CURRENTUSERDATA, new FetchComplete() {
 				
@@ -84,11 +85,13 @@ public class SubscriptionView extends Activity {
 						@Override
 						public void updateComplete(Boolean updateStatus) {
 							closeSession(response);
+							Toast.makeText(SubscriptionView.this, "Subscription Info updated", Toast.LENGTH_SHORT).show();
 						}
 					});					
 				}
 			});
 		}else{
+			Toast.makeText(SubscriptionView.this, "Subscription: Cancelled", Toast.LENGTH_SHORT).show();
 			closeSession(response);
 		}
 	}
@@ -142,18 +145,16 @@ public class SubscriptionView extends Activity {
 						}
 					}
 					if(status.equalsIgnoreCase("FAILURE")){
+						Toast.makeText(SubscriptionView.this, "Subscription: "+ status, Toast.LENGTH_SHORT).show();
 						dofinish(ConsumerApi.SUBSCRIPTIONERROR);
 					}else{
 						dofinish(ConsumerApi.SUBSCRIPTIONSUCCESS);
 					}
-					Toast.makeText(SubscriptionView.this, message, Toast.LENGTH_SHORT).show();
+					
 				} catch (MalformedURLException e) {
-					// TODO Auto-generated catch block
+					dofinish(ConsumerApi.SUBSCRIPTIONERROR);
 					e.printStackTrace();
 				}
-				
-
-				dofinish(ConsumerApi.SUBSCRIPTIONSUCCESS);
 				return true;
 			}
 			view.loadUrl(url);
@@ -239,6 +240,12 @@ public class SubscriptionView extends Activity {
 			return true;
 		};
 	}
+	
+	@Override
+	public void onBackPressed() {
+		super.onBackPressed();
+	}
+	
 	public void showProgressBar(){
 		if(mProgressDialog != null){
 			mProgressDialog.dismiss();
