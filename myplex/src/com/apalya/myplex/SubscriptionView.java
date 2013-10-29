@@ -36,6 +36,7 @@ import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FetchCardField;
 import com.apalya.myplex.utils.FetchCardField.FetchComplete;
+import com.apalya.myplex.utils.Util;
 import com.flurry.android.FlurryAgent;
 
 public class SubscriptionView extends Activity {

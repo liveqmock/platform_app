@@ -65,6 +65,7 @@ import com.apalya.myplex.data.SearchData.ButtonData;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
+import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.views.PinnedSectionListView;
 
 public class MultiPaneActivity extends BaseActivity implements OpenCallBackListener, CacheManagerCallback{

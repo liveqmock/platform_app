@@ -18,7 +18,7 @@ public class ConsumerApi {
 	public static final String SUBSCRIBE_TAG= "subscribe";
 	public static final String FIELD_COMMENTS = "comments";
 	public static final String FIELD_CURRENTUSERDATA_OLD = "currentUserData";
-	public static final String FIELD_CURRENTUSERDATA = "user/currentData";
+	public static final String FIELD_CURRENTUSERDATA = "user/currentdata";
 	public static final String FIELD_USERREVIEWS = "userReviews";
 	public static final String FIELD_VIDEOS = "videos";
 	public static final String PAYMENTCHANNEL = "paymentChannel=";

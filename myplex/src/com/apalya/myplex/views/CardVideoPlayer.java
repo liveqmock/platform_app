@@ -304,13 +304,12 @@ public class CardVideoPlayer implements PlayerListener {
         if(Util.isWifiEnabled(mContext))
         {
         	if(mData.content !=null && mData.content.drmEnabled){
-        		qualityType= ConsumerApi.VIDEOQUALTYHD;
+        		qualityType= ConsumerApi.VIDEOQUALTYSD;
         		streamingType = ConsumerApi.STREAMADAPTIVE;
         	}
         	else
         		qualityType= ConsumerApi.VIDEOQUALTYHIGH;
         }
-        
         MediaUtil.getVideoUrl(mData._id,qualityType,streamingType,isESTPackPurchased);
 	}
 
