@@ -99,6 +99,9 @@ public class RatingDialog {
 					@Override
 					public void sendMessage(boolean status) {
 						dialog.dismiss();
+						if(mListener != null){
+							mListener.sendMessage(status);
+						}
 					}
 				});
 				

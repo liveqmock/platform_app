@@ -274,6 +274,9 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			screenName="Purchases";
 			requestUrl = ConsumerApi.getPurchases(ConsumerApi.LEVELMIN,mData.mStartIndex);
 			requestMethod = Method.POST;
+		}else if(mData.requestType == CardExplorerData.REQUEST_BROWSE){
+			screenName="Browse" + mData.searchQuery;
+			requestUrl = ConsumerApi.getBrowse(mData.searchQuery,ConsumerApi.LEVELMIN, mData.mStartIndex);
 		}
 		
 		Map<String,String> attrib=new HashMap<String, String>();

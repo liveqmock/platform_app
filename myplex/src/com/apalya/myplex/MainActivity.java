@@ -621,10 +621,13 @@ public class MainActivity extends Activity implements MainBaseOptions {
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.RECOMMENDED)){
 				data.requestType = CardExplorerData.REQUEST_RECOMMENDATION;
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.MOVIES)){
+				data.requestType = CardExplorerData.REQUEST_BROWSE;
 				data.searchQuery ="movie";
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.LIVETV)){
+				data.requestType = CardExplorerData.REQUEST_BROWSE;
 				data.searchQuery ="live";
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.TVSHOWS)){
+				data.requestType = CardExplorerData.REQUEST_BROWSE;
 				data.searchQuery ="tvshows";
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.DOWNLOADS)){
 				data.requestType = CardExplorerData.REQUEST_DOWNLOADS;

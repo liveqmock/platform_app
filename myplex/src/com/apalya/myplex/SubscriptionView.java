@@ -89,11 +89,10 @@ public class SubscriptionView extends Activity {
 				
 				@Override
 				public void response(CardResponseData data) {
-					if(data == null){
+					if (data == null || data.results == null || data.results.size() == 0) {
 						closeSession(response);
+						return;
 					}
-					if(data.results == null){closeSession(response);}
-					if(data.results.size() == 0){closeSession(response);}
 					CardData subscribedData = myplexapplication.getCardExplorerData().cardDataToSubscribe;
 					subscribedData.currentUserData =  data.results.get(0).currentUserData;
 					

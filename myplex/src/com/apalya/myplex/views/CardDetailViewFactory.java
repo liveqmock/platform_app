@@ -154,12 +154,13 @@ public class CardDetailViewFactory {
 	public static final int  COMMENTSECTION_COMMENTS = 101;
 	public static final int COMMENTSECTION_REVIEW = 102;
 	private void fillCommentSectionData(int type,int numberofItems,CardData card){
-		if(card.comments == null){return ;}
-		if(card.comments.values == null ){return ;}
-		if(card.comments.values.size() == 0){return ;}
+		
 		mCommentContentLayout.removeAllViews();
 		int count = 0;
 		if(type == COMMENTSECTION_COMMENTS){
+			if(card.comments == null){return ;}
+			if(card.comments.values == null ){return ;}
+			if(card.comments.values.size() == 0){return ;}
 			for(CardDataCommentsItem commentsItem:card.comments.values){
 				count++;
 				if(count > numberofItems && numberofItems != -1){
@@ -185,6 +186,9 @@ public class CardDetailViewFactory {
 				Analytics.trackEvent(Analytics.cardDetailsComment,params);
 			}
 		}else if(type == COMMENTSECTION_REVIEW){
+			if(card.userReviews == null){return ;}
+			if(card.userReviews.values == null ){return ;}
+			if(card.userReviews.values.size() == 0){return ;}
 			for(CardDataUserReviewsItem reviewItem:card.userReviews.values){
 				count++;
 				if(count > numberofItems && numberofItems != -1){

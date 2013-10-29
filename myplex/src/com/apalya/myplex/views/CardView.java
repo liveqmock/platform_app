@@ -397,7 +397,7 @@ public class CardView extends ScrollView {
 		}else{
 			if(data.currentUserData != null && data.currentUserData.purchase != null && data.currentUserData.purchase.size() != 0){
 				dataHolder.mRentText.setText("         Watch now         ");
-				dataHolder.mRentText.setOnClickListener(null);
+				dataHolder.mRentLayout.setOnClickListener(null);
 			}else{
 				for(CardDataPackages packageitem:data.packages){
 					if(packageitem.priceDetails != null){

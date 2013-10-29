@@ -10,6 +10,7 @@ public class CardExplorerData {
 	public static final int REQUEST_SIMILARCONTENT = 4;
 	public static final int REQUEST_DOWNLOADS = 5;
 	public static final int REQUEST_PURCHASES = 6;
+	public static final int REQUEST_BROWSE = 7;
 	public String requestUrl = new String();
 	public int currentSelectedCard = 0;
 	public  HashMap<String,CardData> mEntries = new HashMap<String,CardData>();

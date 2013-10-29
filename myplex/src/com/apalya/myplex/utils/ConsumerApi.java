@@ -5,6 +5,7 @@ import com.apalya.myplex.data.myplexapplication;
 public class ConsumerApi {
 	public static String DOMAIN = "api-beta.myplex.in";
 	public static final String SEARCH_ACTION = "search";
+	public static final String CONTENTLIST = "contentList";
 	public static final String TAG_ACTION = "tags";
 	public static final String CONTENT_TAG = "content";
 	public static final String FAVORITELIST_ACTION = "contentList/favorites";
@@ -19,7 +20,7 @@ public class ConsumerApi {
 	public static final String FIELD_COMMENTS = "comments";
 	public static final String FIELD_CURRENTUSERDATA_OLD = "currentUserData";
 	public static final String FIELD_CURRENTUSERDATA = "user/currentdata";
-	public static final String FIELD_USERREVIEWS = "userReviews";
+	public static final String FIELD_USERREVIEWS = "reviews/user";
 	public static final String FIELD_VIDEOS = "videos";
 	public static final String PAYMENTCHANNEL = "paymentChannel=";
 	public static final String PACKAGEID = "packageId=";
@@ -30,6 +31,7 @@ public class ConsumerApi {
 	public static final String QUESTION_MARK = "?";
 	public static final String AMPERSAND = "&";
 	public static final String QUERY = "query=";
+	public static final String BROWSETYPE = "type=";
 	public static final String CLIENTKEY = "clientKey=";
 	public static final String LEVEL = "level=";
 	public static final String FIELDS = "fields=";
@@ -87,6 +89,15 @@ public class ConsumerApi {
 				+ startIndex + AMPERSAND + LEVEL 
 				+ level + AMPERSAND+COUNT;
 	}
+	
+	public static String getBrowse(String type, String level,int startIndex) {
+		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH
+				+ CONTENTLIST + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY
+				+  AMPERSAND + BROWSETYPE + type + AMPERSAND + STARTINDEX
+				+ startIndex + AMPERSAND + LEVEL 
+				+ level + AMPERSAND+COUNT;
+	}
+	
 	public static String getRecommendation(String level,int startIndex) {
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH
 				+ RECOMMENDATIONS_ACTION + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY

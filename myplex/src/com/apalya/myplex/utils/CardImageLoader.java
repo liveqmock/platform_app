@@ -38,8 +38,8 @@ public class CardImageLoader {
 			
 			@Override
 			public void onResponse(ImageContainer response, boolean isImmediate) {
-				if(response == null){ mView.setImageResource(R.drawable.placeholder); return;}
-				if(response.getBitmap() == null){ mView.setImageResource(R.drawable.placeholder); return;}
+				if(response == null){ /*mView.setImageResource(R.drawable.placeholder);*/ return;}
+				if(response.getBitmap() == null){ /*mView.setImageResource(R.drawable.placeholder);*/ return;}
 				if(requestUrl.equalsIgnoreCase(mView.mImageUrl)&& mCardId == mView.mCardId){
 					TransitionDrawable td = new TransitionDrawable(new Drawable[]{
 			                new ColorDrawable(android.R.color.transparent),

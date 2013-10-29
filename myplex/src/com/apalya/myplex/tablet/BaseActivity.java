@@ -495,12 +495,15 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 				data.requestType = CardExplorerData.REQUEST_RECOMMENDATION;
 			} else if (label
 					.equalsIgnoreCase(NavigationOptionsMenuAdapter.MOVIES)) {
+				data.requestType = CardExplorerData.REQUEST_BROWSE;
 				data.searchQuery = "movie";
 			} else if (label
 					.equalsIgnoreCase(NavigationOptionsMenuAdapter.LIVETV)) {
+				data.requestType = CardExplorerData.REQUEST_BROWSE;
 				data.searchQuery = "live";
 			} else if (label
 					.equalsIgnoreCase(NavigationOptionsMenuAdapter.TVSHOWS)) {
+				data.requestType = CardExplorerData.REQUEST_BROWSE;
 				data.searchQuery = "tvshows";
 			}else if(label.equalsIgnoreCase(NavigationOptionsMenuAdapter.PURCHASES)){
 				data.requestType = CardExplorerData.REQUEST_PURCHASES;
