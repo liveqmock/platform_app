@@ -123,7 +123,8 @@ public class LogOutUtil {
 				dismissProgressBar();
 				Log.d(TAG, "@@@@@@@@@@@@@@ BASE ACTIVITY @@@@@@@@@@@@@@@@@@@@@");
 				Log.d(TAG,"Error: "+error.toString());
-				Util.showToast("Code: "+error.toString(),logoutContext);
+				Util.showToast(logoutContext,"Code: "+error.toString(),Util.TOAST_TYPE_ERROR);
+//				Util.showToast("Code: "+error.toString(),logoutContext);
 				Log.d(TAG, "@@@@@@@@@@@@@@@ BASE ACTIVITY @@@@@@@@@@@@@@@@@@@@");
 			}
 		};
@@ -169,7 +170,8 @@ public class LogOutUtil {
 					{
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
-						Util.showToast("Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),logoutContext);
+						Util.showToast(logoutContext,"Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),Util.TOAST_TYPE_ERROR);
+//						Util.showToast("Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),logoutContext);
 					}
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block

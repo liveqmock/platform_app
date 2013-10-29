@@ -50,11 +50,13 @@ import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
@@ -90,7 +92,29 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class Util {
 
-
+	public final static int TOAST_TYPE_INFO = 1;
+	public final static int TOAST_TYPE_ERROR = 2;
+	public static void showToast(Context context,String msg,int type){
+		if(context == null){return;}
+		try {
+			Toast toast = new Toast(context);
+			LayoutInflater inflate = LayoutInflater.from(context);
+			View v = inflate.inflate(R.layout.toastlayout, null);
+			TextView header = (TextView)v.findViewById(R.id.toast_type);
+			header.setTypeface(FontUtil.ss_symbolicons_line);
+			TextView message = (TextView)v.findViewById(R.id.toast_text);
+			message.setTypeface(FontUtil.Roboto_Medium);
+			if(type == TOAST_TYPE_ERROR){
+				header.setText(R.string.toast_warning);
+			}
+			message.setText(msg);
+			toast.setView(v);
+			toast.setDuration(Toast.LENGTH_SHORT);
+			toast.show();
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
 
 	public static int getStatusBarHeight(Context context) {
 		if(context == null){return 48;}
@@ -633,7 +657,9 @@ public class Util {
 						//Analytics.trackEvent("NEW-CLIENT-KEY-GENERATION-SERVER-ERROR");
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
-						Util.showToast("Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),mContext);
+						
+						Util.showToast(mContext,"Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),Util.TOAST_TYPE_ERROR);
+//						Util.showToast("Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),mContext);
 					}
 				} catch (JSONException e) {
 					e.printStackTrace();

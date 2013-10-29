@@ -434,7 +434,9 @@ public class CardView extends ScrollView {
 					mCardActionListener.loadmore(mNumberofItems);
 					mLoadMoreLastCalledNumberofItems = mNumberofItems;
 				}
-				mCardActionListener.selectedCard(mDataList.get(currentSelectedIndex),currentSelectedIndex);
+				if(mDataList.size() > currentSelectedIndex){
+					mCardActionListener.selectedCard(mDataList.get(currentSelectedIndex),currentSelectedIndex);
+				}
 			}
 		}
 	}

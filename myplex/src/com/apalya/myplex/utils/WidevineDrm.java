@@ -144,7 +144,8 @@ public class WidevineDrm {
         DrmInfo response = mDrmManager.acquireDrmInfo(request);
         if(response == null)
         {
-        	Toast.makeText(mContext, "acquireDrmInfo failed. DRM cannot be supported", Toast.LENGTH_SHORT).show();
+        	Util.showToast(mContext,"acquireDrmInfo failed. DRM cannot be supported",Util.TOAST_TYPE_ERROR);
+//        	Toast.makeText(mContext, "acquireDrmInfo failed. DRM cannot be supported", Toast.LENGTH_SHORT).show();
         	return;
         }
         String drmInfoRequestStatusKey = (String)response.get("WVDrmInfoRequestStatusKey");

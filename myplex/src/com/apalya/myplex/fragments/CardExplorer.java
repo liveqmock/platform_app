@@ -150,6 +150,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		Log.d(TAG,"onCreateView");
+		System.gc();
 		if(isVisible()){
 			mMainActivity.addFilterData(new ArrayList<FilterMenudata>(), mFilterMenuClickListener);
 		}
@@ -253,6 +254,9 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	}
 
 	private void fetchMinData() {
+		if(mData.requestType == CardExplorerData.REQUEST_SIMILARCONTENT){
+			return;
+		}
 		mMainActivity.showActionBarProgressBar();
 		RequestQueue queue = MyVolley.getRequestQueue();
 		int requestMethod = Method.GET;
@@ -293,7 +297,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 					updateText("parsing results");
 					CardResponseData minResultSet  =(CardResponseData) Util.fromJson(response, CardResponseData.class);
 					if(minResultSet.code != 200){
-						Toast.makeText(getContext(), minResultSet.message, Toast.LENGTH_SHORT).show();
+						Util.showToast(getContext(), minResultSet.message,Util.TOAST_TYPE_ERROR);
+//						Toast.makeText(getContext(), minResultSet.message, Toast.LENGTH_SHORT).show();
 					}
 					if(minResultSet.results != null){
 						Log.d(TAG,"Number of Result for the MIN request:"+minResultSet.results.size());
@@ -317,7 +322,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		}
 		dismissProgressBar();
 		if(mData.mMasterEntries.size() == 0){
-			Toast.makeText(getContext(), "No data found,Please try again.", Toast.LENGTH_SHORT).show();
+			Util.showToast(getContext(),"No data found,Please try again.",Util.TOAST_TYPE_INFO);
+//			Toast.makeText(getContext(), "No data found,Please try again.", Toast.LENGTH_SHORT).show();
 		}
 	}
 	private void prepareFilterData() {
@@ -391,7 +397,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	}
 
 	private void applyData() {
-		if(mData.mMasterEntries.size() == 0){
+		if(mData.mMasterEntries == null || mData.mMasterEntries.size() == 0){
 			return;
 		}
 		updateText("preparing ui");

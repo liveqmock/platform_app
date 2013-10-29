@@ -98,6 +98,9 @@ public class CardDetails extends BaseFragment implements
 		rootView = inflater.inflate(R.layout.carddetails, container, false);
 		mScrollView = (CustomScrollView)rootView.findViewById(R.id.carddetail_scroll_view);
 		mBottomActionBar = (RelativeLayout)rootView.findViewById(R.id.carddetail_bottomactionbar);
+		if(mCardData._id == null || mCardData._id.equalsIgnoreCase("0")){
+			mBottomActionBar.setVisibility(View.INVISIBLE);
+		}
 		mShareButton = (ImageView) rootView.findViewById(R.id.carddetail_share);
 		mFavButton = (ImageView) rootView.findViewById(R.id.carddetail_fav);
 		if(mCardData.currentUserData != null && mCardData.currentUserData.favorite){
@@ -221,31 +224,34 @@ public class CardDetails extends BaseFragment implements
 		mDescriptionContentLayout  = new LinearLayout(getContext());
 		LinearLayout.LayoutParams descParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
 		mDescriptionContentLayout.setLayoutParams(descParams);
-		mParentContentLayout.addView(mDescriptionContentLayout);
+		
 		
 		mMediaContentLayout = new LinearLayout(getContext());
 		LinearLayout.LayoutParams mediaParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
 		mediaParams.topMargin = (int)getContext().getResources().getDimension(R.dimen.margin_gap_12);
 		mMediaContentLayout.setLayoutParams(mediaParams);
-		mParentContentLayout.addView(mMediaContentLayout);
+		
 		
 		mCommentsContentLayout = new LinearLayout(getContext());
 		LinearLayout.LayoutParams commentParams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
 		commentParams.topMargin = (int)getContext().getResources().getDimension(R.dimen.margin_gap_12);
 		mCommentsContentLayout.setLayoutParams(commentParams);
-		mParentContentLayout.addView(mCommentsContentLayout);
+		
 		
 		View v  = mCardDetailViewFactory.CreateView(mCardData,CardDetailViewFactory.CARDDETAIL_BRIEF_DESCRIPTION);
 		if(v != null){
+			mParentContentLayout.addView(mDescriptionContentLayout);
 			mDescriptionContentLayout.addView(v);
 		}
 		v  = mCardDetailViewFactory.CreateView(mCardData,CardDetailViewFactory.CARDDETAIL_BREIF_RELATED_MULTIMEDIA);
 		if(v != null){
+			mParentContentLayout.addView(mMediaContentLayout);
 			addSpace();
 			mMediaContentLayout.addView(v);
 		}
 		v  = mCardDetailViewFactory.CreateView(mCardData,CardDetailViewFactory.CARDDETAIL_BRIEF_COMMENTS);
 		if(v != null){
+			mParentContentLayout.addView(mCommentsContentLayout);
 			addSpace();
 			mCommentsContentLayout.addView(v);	
 		}

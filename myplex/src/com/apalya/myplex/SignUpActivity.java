@@ -590,7 +590,8 @@ public class SignUpActivity extends Activity{
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
 						Log.d(TAG, "########################################################");
 						Log.d(TAG, "---------------------------------------------------------");
-						Util.showToast(jsonResponse.getString("message"), SignUpActivity.this);
+						Util.showToast(SignUpActivity.this, jsonResponse.getString("message"),Util.TOAST_TYPE_INFO);
+//						Util.showToast(jsonResponse.getString("message"), SignUpActivity.this);
 					}
 					else
 					{
@@ -642,7 +643,8 @@ public class SignUpActivity extends Activity{
 				Analytics.trackEvent(Analytics.loginSignIn,attribs);
 				if(error.toString().indexOf("NoConnectionError")>0)
 				{
-					Util.showToast(getString(R.string.interneterr),SignUpActivity.this);
+					Util.showToast(SignUpActivity.this, getString(R.string.interneterr),Util.TOAST_TYPE_INFO);
+//					Util.showToast(getString(R.string.interneterr),SignUpActivity.this);
 					finish();
 					Util.launchMainActivity(SignUpActivity.this);
 				}

@@ -307,7 +307,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				}
 				else
 				{
-					Util.showToast("Your device registration has been failed, Please check your internet connectivity and reopen the app",  LoginActivity.this);
+					Util.showToast(LoginActivity.this, "Your device registration has been failed, Please check your internet connectivity and reopen the application.",Util.TOAST_TYPE_ERROR);
+//					Util.showToast("Your device registration has been failed, Please check your internet connectivity and reopen the app",  LoginActivity.this);
 				}
 
 			}
@@ -330,7 +331,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				}
 				else
 				{
-					Util.showToast("Your device registration has been failed, Please check your internet connectivity and reopen the app",  LoginActivity.this);
+					Util.showToast(LoginActivity.this, "Your device registration has been failed, Please check your internet connectivity and reopen the application.",Util.TOAST_TYPE_ERROR);
+//					Util.showToast("Your device registration has been failed, Please check your internet connectivity and reopen the app",  LoginActivity.this);
 				}
 				
 				
@@ -362,7 +364,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					Map<String,String> param2=new HashMap<String, String>();
 					param2.put("status", "Failure");
 					Analytics.trackEvent(Analytics.loginGuest,param2);
-					Util.showToast("Your device registration has been failed, Please check your internet connectivity and reopen the app",  LoginActivity.this);
+					Util.showToast(LoginActivity.this, "Your device registration has been failed, Please check your internet connectivity and reopen the application.",Util.TOAST_TYPE_ERROR);
+//					Util.showToast("Your device registration has been failed, Please check your internet connectivity and reopen the app",  LoginActivity.this);
 				}
 				
 				
@@ -575,7 +578,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 	private boolean mShowExitToast = true;
 	private boolean closeApplication(){
 		if(mShowExitToast){
-			Toast.makeText(this, "Press back again to close the application.", Toast.LENGTH_LONG).show();
+			Util.showToast(LoginActivity.this, "Press back again to close the application.",Util.TOAST_TYPE_ERROR);
+//			Toast.makeText(this, "Press back again to close the application.", Toast.LENGTH_LONG).show();
 			mShowExitToast = false;
 			Timer timer = new Timer();
 			timer.schedule(new TimerTask() {
@@ -797,14 +801,16 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 						if(response.getError().getErrorCode()==-1)
 						{
 							dismissProgressBar();
-							Util.showToast("No Internet Connection...", LoginActivity.this);	
+							Util.showToast(LoginActivity.this, "No internet connection.",Util.TOAST_TYPE_ERROR);
+//							Util.showToast("No Internet Connection...", LoginActivity.this);	
 							//finish();
 							//Util.launchActivity(MainActivity.class, LoginActivity.this, null);
 
 						}
 						else
 						{
-							Util.showToast(response.getError().getErrorMessage(), LoginActivity.this);
+							Util.showToast(LoginActivity.this, response.getError().getErrorMessage(),Util.TOAST_TYPE_ERROR);
+//							Util.showToast(response.getError().getErrorMessage(), LoginActivity.this);
 						}
 
 					}
@@ -971,7 +977,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			}
 			else
 			{
-				Util.showToast("Your device registration has been failed, Please check your internet connectivity and reopen the app",  LoginActivity.this);
+				Util.showToast(LoginActivity.this, "Your device registration has been failed, Please check your internet connectivity and reopen the application.",Util.TOAST_TYPE_ERROR);
+//				Util.showToast("Your device registration has been failed, Please check your internet connectivity and reopen the app",  LoginActivity.this);
 			}
 
 
@@ -996,7 +1003,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				}
 				else
 				{
-					Util.showToast("Your device registration has been failed, Please check your internet connectivity and reopen the app",  LoginActivity.this);
+					Util.showToast(LoginActivity.this, "Your device registration has been failed, Please check your internet connectivity and reopen the application.",Util.TOAST_TYPE_ERROR);
+//					Util.showToast("Your device registration has been failed, Please check your internet connectivity and reopen the app",  LoginActivity.this);
 				}
 			}
 		}
@@ -1013,7 +1021,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			}
 			else
 			{
-				Util.showToast("Your device registration has been failed, Please check your internet connectivity and reopen the app",  LoginActivity.this);
+				Util.showToast(LoginActivity.this, "Your device registration has been failed, Please check your internet connectivity and reopen the application.",Util.TOAST_TYPE_ERROR);
+//				Util.showToast("Your device registration has been failed, Please check your internet connectivity and reopen the app",  LoginActivity.this);
 			}
 		}
 	}
@@ -1260,19 +1269,23 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					switch(requestCode){
 					case MESSAGE_SENT:
 						final String smsg= data.getExtras().getString(Twitter11.COM_REPLY);
-						Toast.makeText(this, smsg, Toast.LENGTH_SHORT).show();
+						Util.showToast(this, smsg,Util.TOAST_TYPE_ERROR);
+//						Toast.makeText(this, smsg, Toast.LENGTH_SHORT).show();
 						break;
 					case TWITTER_CALLBACK:
 						if(data.getData() != null){	
 							twitter11.logincallback(data, new Runnable(){
 								public void run(){
 									Log.i(TAG, "after ActivityResult ");
-									Toast.makeText(LoginActivity.this, isAuthTwitter()? "Logged In" : "Not Logged In", Toast.LENGTH_SHORT).show();
+									Util.showToast(LoginActivity.this, isAuthTwitter()? "Logged In" : "Not Logged In",Util.TOAST_TYPE_ERROR);
+//									Toast.makeText(LoginActivity.this, isAuthTwitter()? "Logged In" : "Not Logged In", Toast.LENGTH_SHORT).show();
 								}
 							});
 
-						}else
-							Toast.makeText(this, data.getExtras().getString(Twitter11.COM_REPLY), Toast.LENGTH_SHORT).show();
+						}else{
+							Util.showToast(this, data.getExtras().getString(Twitter11.COM_REPLY),Util.TOAST_TYPE_ERROR);
+//							Toast.makeText(this, data.getExtras().getString(Twitter11.COM_REPLY), Toast.LENGTH_SHORT).show();
+						}
 						break;
 					}
 				}else if(resultCode == Activity.RESULT_CANCELED){
@@ -1280,8 +1293,10 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					Map<String,String> params=new HashMap<String, String>();
 					params.put("Status", "Cancel");
 					Analytics.trackEvent(Analytics.loginTwitter,params);
-					if(requestCode==TWITTER_CALLBACK)
-						Toast.makeText(LoginActivity.this, isAuthTwitter()? "Logged In" : "Request Cancelled", Toast.LENGTH_SHORT).show();
+					if(requestCode==TWITTER_CALLBACK){
+						Util.showToast(this, isAuthTwitter()? "Logged In" : "Request Cancelled",Util.TOAST_TYPE_ERROR);
+//						Toast.makeText(LoginActivity.this, isAuthTwitter()? "Logged In" : "Request Cancelled", Toast.LENGTH_SHORT).show();
+					}
 				}	
 			}
 			else
@@ -1333,7 +1348,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			}
 			else*/
 			{
-				Util.showToast(String.valueOf(connectionResult.getErrorCode())+": Connection to google plus server failed.", LoginActivity.this);
+				Util.showToast(LoginActivity.this, String.valueOf(connectionResult.getErrorCode())+": Connection to google plus server failed.",Util.TOAST_TYPE_ERROR);
 			}
 
 			/*if(!mPlusClient.isConnected())
@@ -1494,11 +1509,13 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				Log.d(TAG,"Error: "+error.toString());
 				if(error.toString().indexOf("NoConnectionError")>0)
 				{
-					Util.showToast(getString(R.string.interneterr),LoginActivity.this);
+					Util.showToast(LoginActivity.this, getString(R.string.interneterr),Util.TOAST_TYPE_ERROR);
+//					Util.showToast(getString(R.string.interneterr),LoginActivity.this);
 				}
 				else
 				{
-					Util.showToast(error.toString(),LoginActivity.this);	
+					Util.showToast(LoginActivity.this, error.toString(),Util.TOAST_TYPE_ERROR);
+//					Util.showToast(error.toString(),LoginActivity.this);	
 				}
 
 				Log.d(TAG, "@@@@@@@@@@@@@@@ BASE ACTIVITY @@@@@@@@@@@@@@@@@@@@");
@@ -1553,7 +1570,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					{
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
-						Util.showToast("Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),LoginActivity.this);
+						Util.showToast(LoginActivity.this, "Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),Util.TOAST_TYPE_ERROR);
+//						Util.showToast("Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),LoginActivity.this);
 					}
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -1605,7 +1623,6 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				{
 					finish();
 					Util.launchMainActivity(LoginActivity.this);
-					//					Util.launchActivity(MainActivity.class,LoginActivity.this , null);
 				}
 
 			}

@@ -29,6 +29,9 @@ public class CacheManager {
 	public void autoSaved(boolean value){
 		this.mAutoSave = value;
 	}
+	public void deRegistration(){
+		mListener = null;
+	}
 	public void getCardDetails(final List<CardData> Ids,IndexHandler.OperationType operationType,CacheManagerCallback listener){
 		this.mListener = listener;
 		if(operationType == IndexHandler.OperationType.DONTSEARCHDB)

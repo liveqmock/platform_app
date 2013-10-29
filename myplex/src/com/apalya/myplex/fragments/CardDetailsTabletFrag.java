@@ -51,6 +51,8 @@ import com.apalya.myplex.media.PlayerListener;
 import com.apalya.myplex.media.VideoViewExtn;
 import com.apalya.myplex.media.VideoViewPlayer;
 import com.apalya.myplex.media.VideoViewPlayer.StreamType;
+import com.apalya.myplex.tablet.MultiPaneActivity;
+import com.apalya.myplex.tablet.TabletCardDetails;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MediaUtil;
 import com.apalya.myplex.utils.MyVolley;
@@ -439,11 +441,11 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 	}
 	@Override
 	public void onSimilarContentAction() {
-		BaseFragment fragment = mMainActivity.createFragment(NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION);
 		CardExplorerData data = myplexapplication.getCardExplorerData();
 		data.reset();
 		data.requestType = CardExplorerData.REQUEST_SIMILARCONTENT;
 		data.mMasterEntries =  (ArrayList<CardData>) mCardData.similarContent.values;
+		getActivity().startActivity(new Intent(getActivity(),MultiPaneActivity.class));
 		getActivity().finish();
 	}
 	@Override

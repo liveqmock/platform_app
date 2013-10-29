@@ -81,7 +81,8 @@ public class SubscriptionView extends Activity {
 	}
 	private void dofinish(final int response){
 		if(response == ConsumerApi.SUBSCRIPTIONSUCCESS){
-			Toast.makeText(SubscriptionView.this, "Subscription: Success", Toast.LENGTH_SHORT).show();
+			Util.showToast(SubscriptionView.this, "Subscription: Success",Util.TOAST_TYPE_INFO);
+//			Toast.makeText(SubscriptionView.this, "Subscription: Success", Toast.LENGTH_SHORT).show();
 			FetchCardField fetch = new FetchCardField();
 			fetch.Fetch(myplexapplication.getCardExplorerData().cardDataToSubscribe, ConsumerApi.FIELD_CURRENTUSERDATA, new FetchComplete() {
 				
@@ -113,15 +114,15 @@ public class SubscriptionView extends Activity {
 							
 							
 							closeSession(response);
-							Toast.makeText(SubscriptionView.this, "Subscription Info updated", Toast.LENGTH_SHORT).show();
-							
-							
+							Util.showToast(SubscriptionView.this, "Subscription Info updated",Util.TOAST_TYPE_INFO);
+//							Toast.makeText(SubscriptionView.this, "Subscription Info updated", Toast.LENGTH_SHORT).show();
 						}
 					});					
 				}
 			});
 		}else{
-			Toast.makeText(SubscriptionView.this, "Subscription: Cancelled", Toast.LENGTH_SHORT).show();
+			Util.showToast(SubscriptionView.this, "Subscription: Cancelled",Util.TOAST_TYPE_ERROR);
+//			Toast.makeText(SubscriptionView.this, "Subscription: Cancelled", Toast.LENGTH_SHORT).show();
 			closeSession(response);
 		}
 	}
@@ -175,7 +176,8 @@ public class SubscriptionView extends Activity {
 						}
 					}
 					if(status.equalsIgnoreCase("FAILURE")){
-						Toast.makeText(SubscriptionView.this, "Subscription: "+ status, Toast.LENGTH_SHORT).show();
+						Util.showToast(SubscriptionView.this, "Subscription: "+ status,Util.TOAST_TYPE_ERROR);
+//						Toast.makeText(SubscriptionView.this, "Subscription: "+ status, Toast.LENGTH_SHORT).show();
 						dofinish(ConsumerApi.SUBSCRIPTIONERROR);
 					}else{
 						dofinish(ConsumerApi.SUBSCRIPTIONSUCCESS);

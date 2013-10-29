@@ -41,6 +41,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
 import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.AdapterView;
@@ -360,10 +361,50 @@ public class MainActivity extends Activity implements MainBaseOptions {
 	}
 	private void rotateUp(){
 		 Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.rotateup);
+		 animation.setAnimationListener(new AnimationListener() {
+			
+			@Override
+			public void onAnimationStart(Animation animation) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				// TODO Auto-generated method stub
+				mCustomActionBarFilterImage.setImageResource(R.drawable.iconhide);
+			}
+		});
 		 mCustomActionBarFilterImage.startAnimation(animation);
 	}
 	private void rotateDown(){
 		 Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.rotatedown);
+		 animation.setAnimationListener(new AnimationListener() {
+				
+				@Override
+				public void onAnimationStart(Animation animation) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void onAnimationRepeat(Animation animation) {
+					// TODO Auto-generated method stub
+					
+				}
+				
+				@Override
+				public void onAnimationEnd(Animation animation) {
+					// TODO Auto-generated method stub
+					mCustomActionBarFilterImage.setImageResource(R.drawable.iconexpose);
+				}
+			});
 		 mCustomActionBarFilterImage.startAnimation(animation);
 	}
 	@Override
@@ -417,10 +458,10 @@ public class MainActivity extends Activity implements MainBaseOptions {
 				@Override
 				public void sendMessage(boolean status) {
 					if(status){
-						Toast.makeText(mContext, "Review has posted successfully.", Toast.LENGTH_SHORT).show();
+						Util.showToast(mContext, "Review has posted successfully.",Util.TOAST_TYPE_INFO);
 						
 					}else{
-						Toast.makeText(mContext, "Unable to post your review.", Toast.LENGTH_SHORT).show();
+						Util.showToast(mContext, "Unable to post your review.",Util.TOAST_TYPE_ERROR);
 					}
 					exitApp();
 				}
@@ -432,8 +473,9 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		else
 		{
 			if (mShowExitToast) {
-				Toast.makeText(this, "Press back again to close the application.",
-						Toast.LENGTH_LONG).show();
+				Util.showToast(this, "Press back again to close the application.",Util.TOAST_TYPE_INFO);
+//				Toast.makeText(this, "Press back again to close the application.",
+//						Toast.LENGTH_LONG).show();
 				mShowExitToast = false;
 				Timer timer = new Timer();
 				timer.schedule(new TimerTask() {

@@ -272,14 +272,16 @@ public class MediaController2 extends LinearLayout {
 //						audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,set_volume, 0);
 						
 						if(!mMuteEnabled){
-							Toast toast = Toast.makeText(mContext, "Muted", Toast.LENGTH_LONG);
-							toast.show();
+//							Toast toast = Toast.makeText(mContext, "Muted", Toast.LENGTH_LONG);
+//							toast.show();
+							Util.showToast(mContext,"Muted",Util.TOAST_TYPE_INFO);
 							mMuteButtonImage.setImageResource(R.drawable.player_icon_volume_mute);
 							mMediaPlayer.setVolume(0,0);
 							mMuteEnabled = true;
 						}else{
-							Toast toast = Toast.makeText(mContext, "Unmuted", Toast.LENGTH_LONG);
-							toast.show();
+//							Toast toast = Toast.makeText(mContext, "Unmuted", Toast.LENGTH_LONG);
+//							toast.show();
+							Util.showToast(mContext,"Unmuted",Util.TOAST_TYPE_INFO);
 							mMuteButtonImage.setImageResource(R.drawable.player_icon_volume_max);
 							mMediaPlayer.setVolume(1,1);
 							mMuteEnabled = false;

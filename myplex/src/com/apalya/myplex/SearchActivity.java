@@ -176,7 +176,8 @@ public class SearchActivity extends BaseFragment implements
 
 		if (mSearchbleTags == null || mSearchbleTags.size() <= 0)
 		{
-			Toast.makeText(mContext,  "Select search tags or enter text for search ",  Toast.LENGTH_LONG).show();
+			Util.showToast(mContext, "Select search tags or enter text for search ",Util.TOAST_TYPE_INFO);
+//			Toast.makeText(mContext,  "Select search tags or enter text for search ",  Toast.LENGTH_LONG).show();
 			return;
 		}
 		mMainActivity.showActionBarProgressBar();
@@ -432,8 +433,6 @@ public class SearchActivity extends BaseFragment implements
 			JSONArray tagArray = letters.getJSONArray("values");
 
 			for (int tagcount = 0; tagcount < tagArray.length(); tagcount++) {
-				if(tagcount > 20)
-					break;
 				JSONObject tag = tagArray.getJSONObject(tagcount);
 				String id = tag.getString("_id");
 				String name = tag.getString("name");

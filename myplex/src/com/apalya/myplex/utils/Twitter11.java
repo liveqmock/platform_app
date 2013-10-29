@@ -129,8 +129,10 @@ public class Twitter11{
 				}
 				@Override
 				protected void onPostExecute(String result){
-					if(errmsg!=null)
-						Toast.makeText(activity, "Twitter Login Error: "+errmsg, Toast.LENGTH_SHORT).show();
+					if(errmsg!=null){
+//						Toast.makeText(activity, "Twitter Login Error: "+errmsg, Toast.LENGTH_SHORT).show();
+						Util.showToast(activity,"Twitter Login Error: "+errmsg,Util.TOAST_TYPE_ERROR);
+					}
 					progress.dismiss();
 					if(postloginrunnable != null)
 						postloginrunnable.run();
@@ -187,8 +189,10 @@ public class Twitter11{
 		@Override
 		protected void onPostExecute(String result){
 			progress.dismiss();
-			if(errmsg!=null)
-				Toast.makeText(activity, "Twitter Login Error: "+errmsg, Toast.LENGTH_SHORT).show();
+			if(errmsg!=null){
+//				Toast.makeText(activity, "Twitter Login Error: "+errmsg, Toast.LENGTH_SHORT).show();
+				Util.showToast(activity,"Twitter Login Error: "+errmsg,Util.TOAST_TYPE_ERROR);
+			}
 		}
 		@Override
 		protected void onCancelled(String result){

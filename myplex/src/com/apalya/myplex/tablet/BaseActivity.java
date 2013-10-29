@@ -340,8 +340,9 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 
 	private boolean closeApplication() {
 		if (mShowExitToast) {
-			Toast.makeText(this, "Press back again to close the application.",
-					Toast.LENGTH_LONG).show();
+//			Toast.makeText(this, "Press back again to close the application.",
+//					Toast.LENGTH_LONG).show();
+			Util.showToast(this,"Press back again to close the application.",Util.TOAST_TYPE_INFO);
 			mShowExitToast = false;
 			Timer timer = new Timer();
 			timer.schedule(new TimerTask() {

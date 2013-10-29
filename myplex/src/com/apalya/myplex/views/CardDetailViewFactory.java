@@ -257,10 +257,12 @@ public class CardDetailViewFactory {
 						@Override
 						public void sendMessage(boolean status) {
 							if(status){
-								Toast.makeText(mContext, "Comment has posted successfully.", Toast.LENGTH_SHORT).show();
+								Util.showToast(mContext, "Comment has posted successfully.",Util.TOAST_TYPE_INFO);
+//								Toast.makeText(mContext, "Comment has posted successfully.", Toast.LENGTH_SHORT).show();
 								refreshSection(COMMENTSECTION_COMMENTS);
 							}else{
-								Toast.makeText(mContext, "Unable to post your comment.", Toast.LENGTH_SHORT).show();
+								Util.showToast(mContext, "Unable to post your comment.",Util.TOAST_TYPE_ERROR);
+//								Toast.makeText(mContext, "Unable to post your comment.", Toast.LENGTH_SHORT).show();
 							}
 						}
 						
@@ -273,10 +275,12 @@ public class CardDetailViewFactory {
 						@Override
 						public void sendMessage(boolean status) {
 							if(status){
-								Toast.makeText(mContext, "Review has posted successfully.", Toast.LENGTH_SHORT).show();
+								Util.showToast(mContext, "Review has posted successfully.",Util.TOAST_TYPE_INFO);
+//								Toast.makeText(mContext, "Review has posted successfully.", Toast.LENGTH_SHORT).show();
 								refreshSection(COMMENTSECTION_REVIEW);
 							}else{
-								Toast.makeText(mContext, "Unable to post your review.", Toast.LENGTH_SHORT).show();
+								Util.showToast(mContext, "Unable to post your review.",Util.TOAST_TYPE_ERROR);
+//								Toast.makeText(mContext, "Unable to post your review.", Toast.LENGTH_SHORT).show();
 							}
 						}
 						
@@ -415,7 +419,7 @@ public class CardDetailViewFactory {
 //		int cardColor = Color.argb(255, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low);
 //		view.setBackgroundColor(cardColor);
 		
-		view.setOnClickListener(new OnClickListener() {
+		child.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View arg0) {
@@ -427,7 +431,7 @@ public class CardDetailViewFactory {
 		String requesturl = null;
 		if(simillarData.images != null){
 			for(CardDataImagesItem imageItem:simillarData.images.values){
-				if(imageItem.type != null && imageItem.type.equalsIgnoreCase("xxhdpi")){
+				if(imageItem.profile != null && imageItem.profile.equalsIgnoreCase("xxhdpi")){
 					if (imageItem.link != null && !(imageItem.link.compareTo("Images/NoImage.jpg") == 0)) {
 						requesturl = imageItem.link;
 					}

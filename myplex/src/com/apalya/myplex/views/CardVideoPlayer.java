@@ -124,6 +124,8 @@ public class CardVideoPlayer implements PlayerListener {
 							|| imageItem.link.compareTo("Images/NoImage.jpg") == 0) {
 						mPreviewImage.setImageResource(0);
 					} else if (imageItem.link != null) {
+						mPreviewImage.setDefaultImageResId(R.drawable.placeholder);
+						mPreviewImage.setErrorImageResId(R.drawable.placeholder);
 						mPreviewImage.setImageUrl(imageItem.link,
 								MyVolley.getImageLoader());
 					}
@@ -201,14 +203,16 @@ public class CardVideoPlayer implements PlayerListener {
 			public void urlReceived(boolean aStatus, String url) {
 				if (!aStatus) {
 					closePlayer();
-					Toast.makeText(mContext, "Failed in fetching the url.",
-							Toast.LENGTH_SHORT).show();
+					Util.showToast(mContext, "Failed in fetching the url.",Util.TOAST_TYPE_ERROR);
+//					Toast.makeText(mContext, "Failed in fetching the url.",
+//							Toast.LENGTH_SHORT).show();
 					return;
 				}
 				if (url == null) {
 					closePlayer();
-					Toast.makeText(mContext, "No url to play.",
-							Toast.LENGTH_SHORT).show();
+					Util.showToast(mContext, "No url to play.",Util.TOAST_TYPE_ERROR);
+//					Toast.makeText(mContext, "No url to play.",
+//							Toast.LENGTH_SHORT).show();
 					return;
 				}
 				if(isESTPackPurchased)
@@ -222,17 +226,18 @@ public class CardVideoPlayer implements PlayerListener {
 					}
 					else
 					{
-						Util.showToast("Your download is in progress,Please check your status in Downloads section", mContext);
+						Util.showToast(mContext, "Your download is in progress,Please check your status in Downloads section.",Util.TOAST_TYPE_ERROR);
+//						Util.showToast("Your download is in progress,Please check your status in Downloads section", mContext);
 					}
 					return;
 					
 				}
 				else
 				{
-				Uri uri = Uri
-						.parse("rtsp://59.162.166.216:554/AAJTAK_QVGA.sdp");
-				uri = Uri
-						.parse("rtsp://46.249.213.87:554/playlists/bollywood-action_qcif.hpl.3gp");
+				Uri uri ;
+//				uri = Uri.parse("rtsp://46.249.213.87:554/playlists/bollywood-action_qcif.hpl.3gp");
+//				uri = Uri.parse("http://59.162.166.211:8080/player/3G_H264_320x240_600kbps.3gp");
+//				uri = Uri.parse("http://122.248.233.48/wvm/100_ff_5.wvm");
 				uri = Uri.parse(url);
 				// Toast.makeText(getContext(), "URL:"+url,
 				// Toast.LENGTH_SHORT).show();

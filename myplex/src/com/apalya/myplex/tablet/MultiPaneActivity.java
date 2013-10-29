@@ -122,7 +122,8 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 
 		if (mSearchbleTags == null || mSearchbleTags.size() <= 0)
 		{
-			Toast.makeText(mContext,  "Select search tags or enter text for search ",  Toast.LENGTH_LONG).show();
+//			Toast.makeText(mContext,  "Select search tags or enter text for search ",  Toast.LENGTH_LONG).show();
+			Util.showToast(mContext,"Select search tags or enter text for search.",Util.TOAST_TYPE_INFO);
 			return;
 		}
 //		mMainActivity.showActionBarProgressBar();
@@ -313,7 +314,8 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 			JSONObject tags = response.getJSONObject("tags");
 			if(tags ==null || tags.length()==0)
 			{
-				Toast.makeText(mContext,  "No data for tags",  Toast.LENGTH_LONG).show();
+				Util.showToast(mContext,"No data for tags.",Util.TOAST_TYPE_ERROR);
+//				Toast.makeText(mContext,  "No data for tags",  Toast.LENGTH_LONG).show();
 				return;
 			}
 			JSONObject qualifiers = null;
@@ -371,8 +373,9 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 			mAdapter.notifyDataSetChanged();
 //			preapareFilterData();
 		} catch (JSONException e) {
+			if(e == null){return;}
 			Log.e("response Exception", e.getMessage());
-				Toast.makeText(mContext,  e.getMessage(),  Toast.LENGTH_LONG).show();
+			Util.showToast(mContext,"e.getMessage(",Util.TOAST_TYPE_ERROR);
 //				dismissProgressBar();
 		}
 	}

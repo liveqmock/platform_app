@@ -10,6 +10,7 @@ import android.util.Log;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader.ImageContainer;
 import com.android.volley.toolbox.ImageLoader.ImageListener;
+import com.apalya.myplex.R;
 import com.apalya.myplex.data.CardImageView;
 import com.apalya.myplex.views.CardView;
 
@@ -37,8 +38,8 @@ public class CardImageLoader {
 			
 			@Override
 			public void onResponse(ImageContainer response, boolean isImmediate) {
-				if(response == null){return;}
-				if(response.getBitmap() == null){return;}
+				if(response == null){ mView.setImageResource(R.drawable.placeholder); return;}
+				if(response.getBitmap() == null){ mView.setImageResource(R.drawable.placeholder); return;}
 				if(requestUrl.equalsIgnoreCase(mView.mImageUrl)&& mCardId == mView.mCardId){
 					TransitionDrawable td = new TransitionDrawable(new Drawable[]{
 			                new ColorDrawable(android.R.color.transparent),
