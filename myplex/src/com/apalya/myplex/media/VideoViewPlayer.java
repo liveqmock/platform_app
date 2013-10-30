@@ -13,6 +13,8 @@ import android.drm.DrmEvent;
 import android.drm.DrmInfoEvent;
 import android.drm.DrmInfoRequest;
 import android.drm.DrmManagerClient;
+import android.drm.DrmRights;
+import android.drm.DrmStore;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.media.MediaPlayer.OnPreparedListener;
@@ -30,6 +32,7 @@ import android.widget.RelativeLayout;
 
 import com.apalya.myplex.data.ErrorManagerData;
 import com.apalya.myplex.utils.Analytics;
+import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.utils.WidevineDrm;
 import com.flurry.android.monolithic.sdk.impl.mc;
 public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
@@ -253,7 +256,10 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 		drmRequest.put("WVDeviceIDKey", "device12345");
 		drmRequest.put("WVPortalKey", "sotalapalya");*/
 		// Request license
-		drmManager.acquireRights(mUri.toString()); 
+		int rightStatus= drmManager.checkRightsStatus(mUri.toString());
+		if(rightStatus!=DrmStore.RightsStatus.RIGHTS_VALID)
+			drmManager.acquireRights(mUri.toString()); 
+		openVideo();
 	}
 	
 	private void prepareDrmManager(){
@@ -270,9 +276,9 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
         WidevineDrm.WidevineDrmLogEventListener drmLogListener =
             new WidevineDrm.WidevineDrmLogEventListener() {
 
-            public void logUpdated(String msg) {
+            public void logUpdated(int status,int value) {
                 
-            	updateLogs(msg);
+            	updateLogs(status,value);
             }
         };
 		
@@ -364,21 +370,50 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 		});
 	*/}
 
-	protected void updateLogs(String msg) {
+	protected void updateLogs(int status,int value) {
 		// TODO Auto-generated method stub
 		
-		displayAlert(msg);
+		//displayAlert(String.msg);
 		if(!isPlayStarted)
 		{
-			if(msg.contains("Rights"))
+			if(status==0 && value== DrmInfoEvent.TYPE_RIGHTS_INSTALLED)
 			{
 				Map<String,String> params=new HashMap<String, String>();
 				params.put("Status", "PlayerRightsAcqusition");
 				Analytics.trackEvent(Analytics.PlayerRightsAcqusition,params);
-				
-				openVideo();
+				//Util.showToast(mContext,"RIGHTS INSTALLED",Util.TOAST_TYPE_INFO);
+				//openVideo();
 				isPlayStarted=true;
 				
+			}
+			if(status==1 ){
+				String errMsg = "Error while playing";
+				switch (value) {
+				case DrmErrorEvent.TYPE_NO_INTERNET_CONNECTION:
+					errMsg="No Internet Connection";
+					break;
+				case DrmErrorEvent.TYPE_NOT_SUPPORTED:
+					errMsg="Device Not Supported";
+					break;
+				case DrmErrorEvent.TYPE_OUT_OF_MEMORY:
+					errMsg="Out of Memory";
+					break;
+				case DrmErrorEvent.TYPE_PROCESS_DRM_INFO_FAILED:
+					errMsg="Process DRM Info failed";
+					break;
+				case DrmErrorEvent.TYPE_REMOVE_ALL_RIGHTS_FAILED:
+					errMsg="Remove All Rights failed";
+					break;
+				case DrmErrorEvent.TYPE_RIGHTS_NOT_INSTALLED:
+					errMsg="Rights not installed";
+					break;
+				case DrmErrorEvent.TYPE_RIGHTS_RENEWAL_NOT_ALLOWED:
+					errMsg="Rights renewal not allowed";
+					break;
+				}
+				Util.showToast(mContext,errMsg,Util.TOAST_TYPE_INFO);
+				
+				return;
 			}
 		}
 		

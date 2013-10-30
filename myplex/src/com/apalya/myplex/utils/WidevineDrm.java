@@ -24,256 +24,273 @@ import android.widget.Toast;
 
 public class WidevineDrm {
 
-    public interface WidevineDrmLogEventListener extends EventListener {
-        public void logUpdated(String msg);
-    }
+	public interface WidevineDrmLogEventListener extends EventListener {
+		public void logUpdated(int typeConnectionStatus, int typeRightsInstalled);
+	}
 
-    private WidevineDrmLogEventListener logEventListener;
-    private final static long DEVICE_IS_PROVISIONED = 0;
-    private final static long DEVICE_IS_NOT_PROVISIONED = 1;
-    private final static long DEVICE_IS_PROVISIONED_SD_ONLY = 2;
-    private long mWVDrmInfoRequestStatusKey = DEVICE_IS_PROVISIONED;
+	private WidevineDrmLogEventListener logEventListener;
+	private final static long DEVICE_IS_PROVISIONED = 0;
+	private final static long DEVICE_IS_NOT_PROVISIONED = 1;
+	private final static long DEVICE_IS_PROVISIONED_SD_ONLY = 2;
+	private long mWVDrmInfoRequestStatusKey = DEVICE_IS_PROVISIONED;
 
-    public StringBuffer logBuffer = new StringBuffer();
+	public StringBuffer logBuffer = new StringBuffer();
 
-    /**
-     * Drm Manager Configuration Methods
-     */
+	/**
+	 * Drm Manager Configuration Methods
+	 */
 
-    public static class Settings {
-        public static String WIDEVINE_MIME_TYPE = "video/wvm";
-        //public static String DRM_SERVER_URI = "https://staging.shibboleth.tv/widevine/cypherpc/cgi-bin/GetEMMs.cgi";
-        public static String DRM_SERVER_URI = "http://122.248.233.48/widevine/cypherpc/cgi-bin/GetEMMs.cgi";
-        public static String DEVICE_ID = "device12345"; // use a unique device ID
-        public static String PORTAL_NAME = "sotalapalya";
+	public static class Settings {
+		public static String WIDEVINE_MIME_TYPE = "video/wvm";
+		//public static String DRM_SERVER_URI = "https://staging.shibboleth.tv/widevine/cypherpc/cgi-bin/GetEMMs.cgi";
+		public static String DRM_SERVER_URI = "http://122.248.233.48/widevine/cypherpc/cgi-bin/GetEMMs.cgi";
+		public static String DEVICE_ID = "device12345"; // use a unique device ID
+		public static String PORTAL_NAME = "sotalapalya";
 
-        // test with a sizeable block of user data...
-        public static String USER_DATA = "01234567890123456789012345678901234567890123456789"
-            + "01234567890123456789012345678901234567890123456789"
-            + "01234567890123456789012345678901234567890123456789"
-            + "01234567890123456789012345678901234567890123456789"
-            + "01234567890123456789012345678901234567890123456789"
-            + "01234567890123456789012345678901234567890123456789";
-    };
+		// test with a sizeable block of user data...
+		public static String USER_DATA = "01234567890123456789012345678901234567890123456789"
+				+ "01234567890123456789012345678901234567890123456789"
+				+ "01234567890123456789012345678901234567890123456789"
+				+ "01234567890123456789012345678901234567890123456789"
+				+ "01234567890123456789012345678901234567890123456789"
+				+ "01234567890123456789012345678901234567890123456789";
+	};
 
-    private DrmManagerClient mDrmManager;
+	private DrmManagerClient mDrmManager;
 
-     private Context mContext;
+	private Context mContext;
 
-    public WidevineDrm(Context context) {
+	public WidevineDrm(Context context) {
 
-         mContext = context;
-        mDrmManager = new DrmManagerClient(context);
+		mContext = context;
+		mDrmManager = new DrmManagerClient(context);
 
-        mDrmManager.setOnInfoListener(new DrmManagerClient.OnInfoListener() {
-            // @Override
-            public void onInfo(DrmManagerClient client, DrmInfoEvent event) {
-                if (event.getType() == DrmInfoEvent.TYPE_RIGHTS_INSTALLED) {
-                    logMessage("Rightsinstalled");
-                }
-            }
-        });
+		mDrmManager.setOnInfoListener(new DrmManagerClient.OnInfoListener() {
+			// @Override
+			public void onInfo(DrmManagerClient client, DrmInfoEvent event) {
+				if (event.getType() == DrmInfoEvent.TYPE_RIGHTS_INSTALLED) {
+					logMessage("Rights Installed");
+					logMessage(0,DrmInfoEvent.TYPE_RIGHTS_INSTALLED);
+				}
+			}
 
-        mDrmManager.setOnEventListener(new DrmManagerClient.OnEventListener() {
 
-            public void onEvent(DrmManagerClient client, DrmEvent event) {
-                switch (event.getType()) {
-                case DrmEvent.TYPE_DRM_INFO_PROCESSED:
-                    logMessage("Info Processed\n");
-                    break;
-                case DrmEvent.TYPE_ALL_RIGHTS_REMOVED:
-                    logMessage("All rights removed\n");
-                    break;
-                }
-            }
-        });
+		});
 
-        mDrmManager.setOnErrorListener(new DrmManagerClient.OnErrorListener() {
-            public void onError(DrmManagerClient client, DrmErrorEvent event) {
-                switch (event.getType()) {
-                case DrmErrorEvent.TYPE_NO_INTERNET_CONNECTION:
-                    logMessage("No Internet Connection\n");
-                    break;
-                case DrmErrorEvent.TYPE_NOT_SUPPORTED:
-                    logMessage("Not Supported\n");
-                    break;
-                case DrmErrorEvent.TYPE_OUT_OF_MEMORY:
-                    logMessage("Out of Memory\n");
-                    break;
-                case DrmErrorEvent.TYPE_PROCESS_DRM_INFO_FAILED:
-                    logMessage("Process DRM Info failed\n");
-                    break;
-                case DrmErrorEvent.TYPE_REMOVE_ALL_RIGHTS_FAILED:
-                    logMessage("Remove All Rights failed\n");
-                    break;
-                case DrmErrorEvent.TYPE_RIGHTS_NOT_INSTALLED:
-                    logMessage("Rights not installed\n");
-                    break;
-                case DrmErrorEvent.TYPE_RIGHTS_RENEWAL_NOT_ALLOWED:
-                    logMessage("Rights renewal not allowed\n");
-                    break;
-                }
+		/*mDrmManager.setOnEventListener(new DrmManagerClient.OnEventListener() {
 
-            }
-        });
-    }
+			public void onEvent(DrmManagerClient client, DrmEvent event) {
+				switch (event.getType()) {
+				case DrmEvent.TYPE_DRM_INFO_PROCESSED:
+					logMessage("Info Processed\n");
+					break;
+				case DrmEvent.TYPE_ALL_RIGHTS_REMOVED:
+					logMessage("All rights removed\n");
+					break;
+				}
+			}
+		});*/
 
-    public DrmInfoRequest getDrmInfoRequest(String assetUri) {
-        DrmInfoRequest rightsAcquisitionInfo;
-        rightsAcquisitionInfo = new DrmInfoRequest(DrmInfoRequest.TYPE_RIGHTS_ACQUISITION_INFO,
-                Settings.WIDEVINE_MIME_TYPE);
+		mDrmManager.setOnErrorListener(new DrmManagerClient.OnErrorListener() {
+			public void onError(DrmManagerClient client, DrmErrorEvent event) {
+				switch (event.getType()) {
+				case DrmErrorEvent.TYPE_NO_INTERNET_CONNECTION:
+					logMessage("No Internet Connection\n");
+					logMessage(1,DrmErrorEvent.TYPE_NO_INTERNET_CONNECTION);
+					break;
+				case DrmErrorEvent.TYPE_NOT_SUPPORTED:
+					logMessage("Not Supported\n");
+					logMessage(1,DrmErrorEvent.TYPE_NO_INTERNET_CONNECTION);
+					break;
+				case DrmErrorEvent.TYPE_OUT_OF_MEMORY:
+					logMessage("Out of Memory\n");
+					logMessage(1,DrmErrorEvent.TYPE_NO_INTERNET_CONNECTION);
+					break;
+				case DrmErrorEvent.TYPE_PROCESS_DRM_INFO_FAILED:
+					logMessage("Process DRM Info failed\n");
+					logMessage(1,DrmErrorEvent.TYPE_NO_INTERNET_CONNECTION);
+					break;
+				case DrmErrorEvent.TYPE_REMOVE_ALL_RIGHTS_FAILED:
+					logMessage("Remove All Rights failed\n");
+					logMessage(1,DrmErrorEvent.TYPE_NO_INTERNET_CONNECTION);
+					break;
+				case DrmErrorEvent.TYPE_RIGHTS_NOT_INSTALLED:
+					logMessage("Rights not installed\n");
+					logMessage(1,DrmErrorEvent.TYPE_NO_INTERNET_CONNECTION);
+					break;
+				case DrmErrorEvent.TYPE_RIGHTS_RENEWAL_NOT_ALLOWED:
+					logMessage("Rights renewal not allowed\n");
+					logMessage(1,DrmErrorEvent.TYPE_NO_INTERNET_CONNECTION);
+					break;
+				}
 
-        rightsAcquisitionInfo.put("WVDRMServerKey", Settings.DRM_SERVER_URI);
-        rightsAcquisitionInfo.put("WVAssetURIKey", assetUri);
-        rightsAcquisitionInfo.put("WVDeviceIDKey", Settings.DEVICE_ID);
-        rightsAcquisitionInfo.put("WVPortalKey", Settings.PORTAL_NAME);
-        rightsAcquisitionInfo.put("WVCAUserDataKey", Settings.USER_DATA);
-        return rightsAcquisitionInfo;
-    }
+			}
+		});
+	}
 
-    public boolean isProvisionedDevice() {
-        return ((mWVDrmInfoRequestStatusKey == DEVICE_IS_PROVISIONED) ||
-                (mWVDrmInfoRequestStatusKey == DEVICE_IS_PROVISIONED_SD_ONLY));
-    }
+	public DrmInfoRequest getDrmInfoRequest(String assetUri) {
+		DrmInfoRequest rightsAcquisitionInfo;
+		rightsAcquisitionInfo = new DrmInfoRequest(DrmInfoRequest.TYPE_RIGHTS_ACQUISITION_INFO,
+				Settings.WIDEVINE_MIME_TYPE);
 
-    public void registerPortal(String portal) {
+		rightsAcquisitionInfo.put("WVDRMServerKey", Settings.DRM_SERVER_URI);
+		rightsAcquisitionInfo.put("WVAssetURIKey", assetUri);
+		rightsAcquisitionInfo.put("WVDeviceIDKey", Settings.DEVICE_ID);
+		rightsAcquisitionInfo.put("WVPortalKey", Settings.PORTAL_NAME);
+		rightsAcquisitionInfo.put("WVCAUserDataKey", Settings.USER_DATA);
+		return rightsAcquisitionInfo;
+	}
 
-        DrmInfoRequest request = new DrmInfoRequest(DrmInfoRequest.TYPE_REGISTRATION_INFO,
-                Settings.WIDEVINE_MIME_TYPE);
-        request.put("WVPortalKey", portal);
-        DrmInfo response = mDrmManager.acquireDrmInfo(request);
-        if(response == null)
-        {
-        	Util.showToast(mContext,"acquireDrmInfo failed. DRM cannot be supported",Util.TOAST_TYPE_ERROR);
-//        	Toast.makeText(mContext, "acquireDrmInfo failed. DRM cannot be supported", Toast.LENGTH_SHORT).show();
-        	return;
-        }
-        String drmInfoRequestStatusKey = (String)response.get("WVDrmInfoRequestStatusKey");
-        if (null != drmInfoRequestStatusKey && !drmInfoRequestStatusKey.equals("")) {
-            mWVDrmInfoRequestStatusKey = Long.parseLong(drmInfoRequestStatusKey);
-        }
-    }
+	public boolean isProvisionedDevice() {
+		return ((mWVDrmInfoRequestStatusKey == DEVICE_IS_PROVISIONED) ||
+				(mWVDrmInfoRequestStatusKey == DEVICE_IS_PROVISIONED_SD_ONLY));
+	}
 
-    public int acquireRights(String assetUri) {
+	public void registerPortal(String portal) {
 
-        int rights = mDrmManager.acquireRights(getDrmInfoRequest(assetUri));
-        logMessage("acquireRights = " + rights + "\n");
+		DrmInfoRequest request = new DrmInfoRequest(DrmInfoRequest.TYPE_REGISTRATION_INFO,
+				Settings.WIDEVINE_MIME_TYPE);
+		request.put("WVPortalKey", portal);
+		DrmInfo response = mDrmManager.acquireDrmInfo(request);
+		if(response == null)
+		{
+			Util.showToast(mContext,"acquireDrmInfo failed. DRM cannot be supported",Util.TOAST_TYPE_ERROR);
+			//        	Toast.makeText(mContext, "acquireDrmInfo failed. DRM cannot be supported", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		String drmInfoRequestStatusKey = (String)response.get("WVDrmInfoRequestStatusKey");
+		if (null != drmInfoRequestStatusKey && !drmInfoRequestStatusKey.equals("")) {
+			mWVDrmInfoRequestStatusKey = Long.parseLong(drmInfoRequestStatusKey);
+		}
+	}
 
-        return rights;
-    }
+	public int acquireRights(String assetUri) {
 
-    public int checkRightsStatus(String assetUri) {
+		int rights = mDrmManager.acquireRights(getDrmInfoRequest(assetUri));
+		logMessage("acquireRights = " + rights + "\n");
 
-        // Need to use acquireDrmInfo prior to calling checkRightsStatus
-        mDrmManager.acquireDrmInfo(getDrmInfoRequest(assetUri));
-        int status = mDrmManager.checkRightsStatus(assetUri);
-        logMessage("checkRightsStatus  = " + status + "\n");
+		return rights;
+	}
 
-        return status;
-    }
+	public int checkRightsStatus(String assetUri) {
 
-    public void getConstraints(String assetUri) {
+		// Need to use acquireDrmInfo prior to calling checkRightsStatus
+		mDrmManager.acquireDrmInfo(getDrmInfoRequest(assetUri));
+		int status = mDrmManager.checkRightsStatus(assetUri);
+		logMessage("checkRightsStatus  = " + status + "\n");
 
-        ContentValues values = mDrmManager.getConstraints(assetUri, DrmStore.Action.PLAY);
-        logContentValues(values, "No Contraints");
-    }
+		return status;
+	}
 
-    public void showRights(String assetUri) {
-        logMessage("showRights\n");
+	public void getConstraints(String assetUri) {
 
-        // Need to use acquireDrmInfo prior to calling getConstraints
-        mDrmManager.acquireDrmInfo(getDrmInfoRequest(assetUri));
-        ContentValues values = mDrmManager.getConstraints(assetUri, DrmStore.Action.PLAY);
-        logContentValues(values, "No Rights");
-       
+		ContentValues values = mDrmManager.getConstraints(assetUri, DrmStore.Action.PLAY);
+		logContentValues(values, "No Contraints");
+	}
 
-    }
+	public void showRights(String assetUri) {
+		logMessage("showRights\n");
 
-    private void logContentValues(ContentValues values, String defaultMessage) {
-        if (values != null) {
+		// Need to use acquireDrmInfo prior to calling getConstraints
+		mDrmManager.acquireDrmInfo(getDrmInfoRequest(assetUri));
+		ContentValues values = mDrmManager.getConstraints(assetUri, DrmStore.Action.PLAY);
+		logContentValues(values, "No Rights");
 
-            Set<String> keys = values.keySet();
-            for (String key : keys) {
-                if (key.toLowerCase().contains("time")) {
-                    logMessage(key + " = " + SecondsToDHMS(values.getAsLong(key)) + "\n");
-                } else if (key.toLowerCase().contains("licensetype")) {
-                    logMessage(key + " = " + licenseType(values.getAsInteger(key)) + "\n");
-                } else if (key.toLowerCase().contains("licensedresolution")) {
-                    logMessage(key + " = " + licenseResolution(values.getAsInteger(key)) + "\n");
-                } else {
-                    logMessage(key + " = " + values.get(key) + "\n");
-                }
-            }
-        } else {
-            logMessage(defaultMessage + "\n");
-        }
-    }
 
-    private static final long seconds_per_minute = 60;
-    private static final long seconds_per_hour = 60 * seconds_per_minute;
-    private static final long seconds_per_day = 24 * seconds_per_hour;
+	}
 
-    private String SecondsToDHMS(long seconds) {
-        int days = (int) (seconds / seconds_per_day);
-        seconds -= days * seconds_per_day;
-        int hours = (int) (seconds / seconds_per_hour);
-        seconds -= hours * seconds_per_hour;
-        int minutes = (int) (seconds / seconds_per_minute);
-        seconds -= minutes * seconds_per_minute;
-        return Integer.toString(days) + "d " + Integer.toString(hours) + "h "
-                                        + Integer.toString(minutes) + "m " + Long.toString(seconds)
-                                        + "s";
-    }
+	private void logContentValues(ContentValues values, String defaultMessage) {
+		if (values != null) {
 
-    private String licenseType(int code) {
-        switch (code) {
-        case 1:
-            return "Streaming";
-        case 2:
-            return "Offline";
-        case 3:
-            return "Both";
-        default:
-            return "Unknown";
-        }
-    }
+			Set<String> keys = values.keySet();
+			for (String key : keys) {
+				if (key.toLowerCase().contains("time")) {
+					logMessage(key + " = " + SecondsToDHMS(values.getAsLong(key)) + "\n");
+				} else if (key.toLowerCase().contains("licensetype")) {
+					logMessage(key + " = " + licenseType(values.getAsInteger(key)) + "\n");
+				} else if (key.toLowerCase().contains("licensedresolution")) {
+					logMessage(key + " = " + licenseResolution(values.getAsInteger(key)) + "\n");
+				} else {
+					logMessage(key + " = " + values.get(key) + "\n");
+				}
+			}
+		} else {
+			logMessage(defaultMessage + "\n");
+		}
+	}
 
-    private String licenseResolution(int code) {
-        switch (code) {
-        case 1:
-            return "SD only";
-        case 2:
-            return "HD or SD content";
-        default:
-            return "Unknown";
-        }
-    }
+	private static final long seconds_per_minute = 60;
+	private static final long seconds_per_hour = 60 * seconds_per_minute;
+	private static final long seconds_per_day = 24 * seconds_per_hour;
 
-    public int removeRights(String assetUri) {
+	private String SecondsToDHMS(long seconds) {
+		int days = (int) (seconds / seconds_per_day);
+		seconds -= days * seconds_per_day;
+		int hours = (int) (seconds / seconds_per_hour);
+		seconds -= hours * seconds_per_hour;
+		int minutes = (int) (seconds / seconds_per_minute);
+		seconds -= minutes * seconds_per_minute;
+		return Integer.toString(days) + "d " + Integer.toString(hours) + "h "
+		+ Integer.toString(minutes) + "m " + Long.toString(seconds)
+		+ "s";
+	}
 
-        // Need to use acquireDrmInfo prior to calling removeRights
-        mDrmManager.acquireDrmInfo(getDrmInfoRequest(assetUri));
-        int removeStatus = mDrmManager.removeRights(assetUri);
-        logMessage("removeRights = " + removeStatus + "\n");
+	private String licenseType(int code) {
+		switch (code) {
+		case 1:
+			return "Streaming";
+		case 2:
+			return "Offline";
+		case 3:
+			return "Both";
+		default:
+			return "Unknown";
+		}
+	}
 
-        return removeStatus;
-    }
+	private String licenseResolution(int code) {
+		switch (code) {
+		case 1:
+			return "SD only";
+		case 2:
+			return "HD or SD content";
+		default:
+			return "Unknown";
+		}
+	}
 
-    public int removeAllRights() {
-        int removeAllStatus = mDrmManager.removeAllRights();
-        logMessage("removeAllRights = " + removeAllStatus + "\n");
-        return removeAllStatus;
-    }
+	public int removeRights(String assetUri) {
 
-    public void setLogListener(WidevineDrmLogEventListener logEventListener) {
-        this.logEventListener = logEventListener;
-    }
+		// Need to use acquireDrmInfo prior to calling removeRights
+		mDrmManager.acquireDrmInfo(getDrmInfoRequest(assetUri));
+		int removeStatus = mDrmManager.removeRights(assetUri);
+		logMessage("removeRights = " + removeStatus + "\n");
 
-    private void logMessage(String message) {
-        logBuffer.append(message);
+		return removeStatus;
+	}
 
-        if (logEventListener != null) {
+	public int removeAllRights() {
+		int removeAllStatus = mDrmManager.removeAllRights();
+		logMessage("removeAllRights = " + removeAllStatus + "\n");
+		return removeAllStatus;
+	}
+
+	public void setLogListener(WidevineDrmLogEventListener logEventListener) {
+		this.logEventListener = logEventListener;
+	}
+
+	private void logMessage( int typeConnectionStatus,int typeRightsInstalled) {
+		// TODO Auto-generated method stub
+		if (logEventListener != null) {
+			logEventListener.logUpdated(typeConnectionStatus,typeRightsInstalled);
+			logEventListener=null;
+		}
+	}
+	private void logMessage(String message) {
+		//logBuffer.append(message);
+
+		/* if (logEventListener != null) {
             logEventListener.logUpdated(message);
-        }
-    }
+        }*/
+	}
 }

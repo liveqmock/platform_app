@@ -204,7 +204,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		else
 			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-		getActionBar().hide();
+		if(getActionBar()!=null)
+			getActionBar().hide();
 		setContentView(R.layout.loginscreen);
 
 		SharedPreferences prefs = getSharedPreferences("TWITTERTIME", 0);
@@ -393,6 +394,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					.setPermissions(Arrays.asList("basic_info","email","read_friendlists","user_about_me","friends_about_me","user_hometown"))
 					.setCallback(statusCallback));
 				} else {
+					Util.showToast("Facebook Opening Session", this);
 					Session.openActiveSession(this, true, statusCallback);
 				}
 			}
