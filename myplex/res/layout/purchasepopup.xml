@@ -29,7 +29,8 @@
 
             <RatingBar
                 android:id="@+id/purchasepopup_setRating"
-                style="?android:attr/ratingBarStyleSmall"
+                style="@style/movieRatingBar"
+                android:rating="3.5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignLeft="@+id/purchasepopup_contentname"
@@ -103,31 +104,6 @@
                     android:orientation="vertical" >
                 </LinearLayout>
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginLeft="@dimen/margin_gap_12"
-                    android:layout_marginTop="@dimen/margin_gap_16"
-                    android:orientation="vertical"
-                    android:paddingBottom="@dimen/margin_gap_16" >
-
-                    <TextView
-                        android:id="@+id/purchasepopup_selectedpaymentmodeheading"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="@dimen/margin_gap_6"
-                        android:text="Mode of Payment"
-                        android:textColor="#ffffff"
-                        android:textSize="@dimen/textsize_14" />
-
-                    <LinearLayout
-                        android:id="@+id/purchasepopup_selectedpaymentmodegroup"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical" >
-                    </LinearLayout>
-                </LinearLayout>
             </LinearLayout>
 
             <TextView

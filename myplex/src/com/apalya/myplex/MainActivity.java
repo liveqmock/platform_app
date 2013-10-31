@@ -207,6 +207,8 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		getActionBar().setIcon(new ColorDrawable(Color.TRANSPARENT));
 
 
+		CardExplorerData mExplorerData  = myplexapplication.getCardExplorerData();
+		mExplorerData =  (CardExplorerData)Util.loadObject(myplexapplication.getApplicationConfig().lastViewedCardsPath);
 		prepareCustomActionBar();
 
 		// ActionBarDrawerToggle ties together the the proper interactions
@@ -443,7 +445,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 
 	private boolean closeApplication() {
 		Util.serializeData(MainActivity.this);
-		
+		Util.saveObject(myplexapplication.getCardExplorerData(), myplexapplication.getApplicationConfig().lastViewedCardsPath);
 		
 		if(myplexapplication.getUserProfileInstance().firstVisitStatus)
 		{
@@ -503,9 +505,11 @@ public class MainActivity extends Activity implements MainBaseOptions {
 	@Override
 	public void onBackPressed() {
 		try {
+			showActionBar();
 			setSearchBarVisibilty(View.VISIBLE);
 			BaseFragment fragment = mFragmentStack.peek();
 			if (fragment instanceof CardExplorer) {
+				
 				if (closeApplication()) {
 					mFragmentStack.pop();
 				}

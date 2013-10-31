@@ -1,10 +1,15 @@
 package com.apalya.myplex.data;
 
+import java.io.Serializable;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CardDataPackages {
+public class CardDataPackages implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2077770756068004273L;
 	public List<CardDataPackagePriceDetailsItem> priceDetails;
 	public String contentType;
 	public boolean couponFlag;

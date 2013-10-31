@@ -404,7 +404,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			return;
 		}
 		updateText("preparing ui");
-		if(getResources().getBoolean(R.bool.isTablet)){
+		if(getResources() != null && getResources().getBoolean(R.bool.isTablet)){
 			mTabletAdapter.setData(mData.mMasterEntries);
 		}else{
 			mCardView.addData(mData.mMasterEntries);
@@ -417,9 +417,10 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	}
 
 	private void showErrorDialog() {
-		AlertDialog.Builder b = new AlertDialog.Builder(getContext());
-		b.setMessage("No Response from server");
-		b.show();
+		Util.showToast(getContext(), "No Response from server", Util.TOAST_TYPE_INFO);
+//		AlertDialog.Builder b = new AlertDialog.Builder(getContext());
+//		b.setMessage("No Response from server");
+//		b.show();
 	}
 
 	private Response.ErrorListener responseErrorListener() {
@@ -429,7 +430,9 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				Analytics.endTimedEvent(Analytics.cardBrowseDuration);
 				//Analytics.endTimedEvent(Analytics.cardBrowseScreen);
 				Log.d(TAG,"Error from server "+error.networkResponse);
-				showErrorDialog();
+				if(mData.mMasterEntries == null || mData.mMasterEntries.size() == 0){
+					showErrorDialog();
+				}
 				mMainActivity.hideActionBarProgressBar();
 				dismissProgressBar();
 			}

@@ -114,14 +114,6 @@ public class PackagePopUp {
 		mPopupBackground = (RelativeLayout)v;
 		fillPackData(data,v);
 		LinearLayout susblayout = (LinearLayout) v.findViewById(R.id.purchasepopup_packslayout);
-		mPaymentModeHeading = (TextView)v.findViewById(R.id.purchasepopup_selectedpaymentmodeheading);
-		mPaymentModeHeading.setTypeface(FontUtil.Roboto_Medium);
-		mPaymentModeHeading.setVisibility(View.INVISIBLE);
-		mPaymentModeGroup = (LinearLayout)v.findViewById(R.id.purchasepopup_selectedpaymentmodegroup);
-		mPaymentModeGroup.setVisibility(View.INVISIBLE);
-		LayoutTransition transition = new LayoutTransition();
-		transition.setStartDelay(LayoutTransition.CHANGE_APPEARING, 0);
-		mPaymentModeGroup.setLayoutTransition(transition);
 		addBlur();
 		addPack(data,susblayout);
 		showPopup(v,anchorView);
@@ -134,28 +126,47 @@ public class PackagePopUp {
 			}
 		}
 	}
-	private TextView mPaymentModeHeading;
-	private LinearLayout mPaymentModeGroup;
+	private LinearLayout mLastPaymentModeLayout;
 	private OnClickListener mPackClickListener = new OnClickListener() {
 		
 		@Override
 		public void onClick(View v) {
-			if(v.getTag() instanceof CardDataPackages){
+			if(v.getTag() instanceof LinearLayout){
+				if(mLastPaymentModeLayout != null){
+					mLastPaymentModeLayout.removeAllViews();
+				}
+				LinearLayout subLayout = (LinearLayout)v.getTag();if(subLayout == null){return;}
+				
+				mLastPaymentModeLayout = new LinearLayout(mContext);
+				LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+				params.leftMargin = ((int)mContext.getResources().getDimension(R.dimen.margin_gap_12));
+				mLastPaymentModeLayout.setLayoutParams(params);
+				mLastPaymentModeLayout.setOrientation(LinearLayout.VERTICAL);
+				
+				LayoutTransition transition = new LayoutTransition();
+				transition.setStartDelay(LayoutTransition.CHANGE_APPEARING, 0);
+				mLastPaymentModeLayout.setLayoutTransition(transition);
+				
+				
+				subLayout.addView(mLastPaymentModeLayout);
+				
 				deSelectViews();
 				v.setAlpha(1.0f);
-				CardDataPackages packageitem = (CardDataPackages)v.getTag();
+				CardDataPackages packageitem = (CardDataPackages)subLayout.getTag();
 				if(packageitem == null){return;}
 				if(packageitem.priceDetails == null){return;}
-				mPaymentModeHeading.setVisibility(View.VISIBLE);
-				mPaymentModeGroup.setVisibility(View.VISIBLE);
-				mPaymentModeGroup.removeAllViews();
 				int count = 0;
 				for(CardDataPackagePriceDetailsItem priceItem:packageitem.priceDetails){
+					if(count == 0){
+						TextView heading = (TextView)mInflater.inflate(R.layout.pricepopmodeheading,null);
+						heading.setTypeface(FontUtil.Roboto_Medium);
+						mLastPaymentModeLayout.addView(heading);
+					}
 					View paymentModeItem = mInflater.inflate(R.layout.paymentmodeitemlayout,null);
 					TextView paymentModeText = (TextView)paymentModeItem.findViewById(R.id.paymentmodetext);
 					paymentModeText.setTypeface(FontUtil.Roboto_Medium);
 					paymentModeText.setText(priceItem.name);
-					mPaymentModeGroup.addView(paymentModeItem);
+					mLastPaymentModeLayout.addView(paymentModeItem);
 					Util.showFeedback(paymentModeItem);
 					paymentModeItem.setId(count);
 					count++;
@@ -202,6 +213,16 @@ public class PackagePopUp {
 	}
 	List<View> mPackViewList = new ArrayList<View>();
 	private void createPackItem(CardDataPackagePriceDetailsItem priceDetailItem,CardDataPackages packageitem,LinearLayout parentLayout){
+		
+		LinearLayout packLayout = new LinearLayout(mContext);
+		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+		packLayout.setLayoutParams(params);
+		packLayout.setOrientation(LinearLayout.HORIZONTAL);
+		packLayout.setTag(packageitem);
+		LayoutTransition transition = new LayoutTransition();
+		transition.setStartDelay(LayoutTransition.CHANGE_APPEARING, 0);
+		packLayout.setLayoutTransition(transition);
+		
 		View v = mInflater.inflate(R.layout.purchasepackitem, null);
 		LinearLayout promotionalLayout = (LinearLayout)v.findViewById(R.id.purchasepackItem1_offer);
 		if(packageitem.promotionDetails == null ){ promotionalLayout.setVisibility(View.INVISIBLE);}
@@ -233,10 +254,11 @@ public class PackagePopUp {
 		type.setTypeface(FontUtil.Roboto_Medium);
 		type.setText(packageitem.commercialModel);
 		addSpace(parentLayout, (int)mContext.getResources().getDimension(R.dimen.margin_gap_16));
-		v.setTag(packageitem);
+		v.setTag(packLayout);
 		v.setOnClickListener(mPackClickListener);
 		mPackViewList.add(v);
-		parentLayout.addView(v);
+		packLayout.addView(v);
+		parentLayout.addView(packLayout);
 	}
 	private void addSpace(ViewGroup v,int space){
 		Space gap = new Space(mContext);

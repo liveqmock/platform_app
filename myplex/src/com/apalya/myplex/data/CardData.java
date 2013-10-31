@@ -1,11 +1,16 @@
 package com.apalya.myplex.data;
 
+import java.io.Serializable;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CardData {
+public class CardData implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3114232287673074578L;
 	public static final String TAG = "CardData";
 	public static final int ESTDOWNLOADINPROGRESS = 1;
 	public static final int ESTDOWNLOADCOMPLETE = 2;

@@ -510,6 +510,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 			}
 			if(this instanceof TabletCardDetails){
 				myplexapplication.mSelectedOption_Tablet = screenType;
+				startActivity(new Intent(this,MultiPaneActivity.class));
 				finish();
 				return;
 			}

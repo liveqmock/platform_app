@@ -1,9 +1,14 @@
 package com.apalya.myplex.data;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class CardExplorerData {
+public class CardExplorerData implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7373512867616315000L;
 	public static final int REQUEST_RECOMMENDATION = 1;
 	public static final int REQUEST_SEARCH = 2;
 	public static final int REQUEST_FAVOURITE = 3;

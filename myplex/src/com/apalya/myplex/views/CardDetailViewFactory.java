@@ -115,7 +115,6 @@ public class CardDetailViewFactory {
 	public static final int CARDDETAIL_EXTRA_RELATED_MULTIMEDIA = 10;
 	public static final int CARDDETAIL_COMMENTS = 11;
 	public static final int CARDDETAIL_BRIEF_COMMENTS = 12;
-
 	public View CreateView(CardData data, int type) {
 		mData = data;
 		switch (type) {
@@ -142,9 +141,9 @@ public class CardDetailViewFactory {
 		case CARDDETAIL_EXTRA_RELATED_MULTIMEDIA:
 			return createExtraMultiMediaView();
 		case CARDDETAIL_COMMENTS:
-			return createCommentsView(CARDDETAIL_COMMENTS);
+			return createCommentsView();
 		case CARDDETAIL_BRIEF_COMMENTS:
-			return createCommentsView(CARDDETAIL_BRIEF_COMMENTS);
+			return createCommentsView();
 		default:
 			break;
 		}
@@ -153,19 +152,14 @@ public class CardDetailViewFactory {
 
 	public static final int  COMMENTSECTION_COMMENTS = 101;
 	public static final int COMMENTSECTION_REVIEW = 102;
-	private void fillCommentSectionData(int type,int numberofItems,CardData card){
+	private void fillCommentSectionData(int type,CardData card){
 		
 		mCommentContentLayout.removeAllViews();
-		int count = 0;
 		if(type == COMMENTSECTION_COMMENTS){
 			if(card.comments == null){return ;}
 			if(card.comments.values == null ){return ;}
 			if(card.comments.values.size() == 0){return ;}
 			for(CardDataCommentsItem commentsItem:card.comments.values){
-				count++;
-				if(count > numberofItems && numberofItems != -1){
-					break;
-				}
 				View child = mInflator.inflate(R.layout.carddetailcomment_data, null);
 	//			VerticalLineRelativeLayout timelinelayout = (VerticalLineRelativeLayout)child.findViewById(R.id.timeLineLayout);
 	//			timelinelayout.setWillNotDrawEnabled(false);
@@ -190,10 +184,6 @@ public class CardDetailViewFactory {
 			if(card.userReviews.values == null ){return ;}
 			if(card.userReviews.values.size() == 0){return ;}
 			for(CardDataUserReviewsItem reviewItem:card.userReviews.values){
-				count++;
-				if(count > numberofItems && numberofItems != -1){
-					break;
-				}
 				View child = mInflator.inflate(R.layout.carddetailcomment_data, null);
 	//			VerticalLineRelativeLayout timelinelayout = (VerticalLineRelativeLayout)child.findViewById(R.id.timeLineLayout);
 	//			timelinelayout.setWillNotDrawEnabled(false);
@@ -216,7 +206,7 @@ public class CardDetailViewFactory {
 		}
 	}
 	private LinearLayout mCommentContentLayout;
-	private View createCommentsView(final int type) {
+	private View createCommentsView() {
 		mComments = null;
 //		if(mData.comments == null){return null;}
 //		if(mData.comments.values == null ){return null;}
@@ -231,11 +221,7 @@ public class CardDetailViewFactory {
 		mCommentContentLayout.setLayoutTransition(transition);
 		mComments = mCommentContentLayout;
 		addSpace(mCommentContentLayout, (int)mContext.getResources().getDimension(R.dimen.margin_gap_16));
-		if(type == CARDDETAIL_COMMENTS){
-			fillCommentSectionData(COMMENTSECTION_COMMENTS,-1,mData);
-		}else{
-			fillCommentSectionData(COMMENTSECTION_COMMENTS,10,mData);
-		}
+		fillCommentSectionData(COMMENTSECTION_COMMENTS,mData);
 	
 		LinearLayout commentLayout = (LinearLayout)v.findViewById(R.id.carddetailcomment_commentlayout);
 		LinearLayout reviewLayout = (LinearLayout)v.findViewById(R.id.carddetailcomment_reviewlayout);
@@ -305,13 +291,8 @@ public class CardDetailViewFactory {
 				reviewHeading.setTextColor(Color.parseColor("#000000"));
 				editBox.setText(R.string.carddetailcommentsection_editcomment);
 //				editBox.setOnClickListener(null);
-				
-				if(type == CARDDETAIL_COMMENTS){
-					fillCommentSectionData(COMMENTSECTION_COMMENTS,-1,mData);
-				}else{
-					fillCommentSectionData(COMMENTSECTION_COMMENTS,10,mData);
-				}
-				refreshSection(type);
+//				fillCommentSectionData(COMMENTSECTION_COMMENTS,mData);
+				refreshSection(COMMENTSECTION_COMMENTS);
 			}
 		});
 		
@@ -327,12 +308,8 @@ public class CardDetailViewFactory {
 				reviewHeading.setTextColor(Color.parseColor("#6CBEE9"));
 				editBox.setText(R.string.carddetailcommentsection_editreview);
 //				editBox.setOnClickListener(mRateListener);
-				if(type == CARDDETAIL_COMMENTS){
-					fillCommentSectionData(COMMENTSECTION_REVIEW,-1,mData);
-				}else{
-					fillCommentSectionData(COMMENTSECTION_REVIEW,10,mData);
-				}
-				refreshSection(type);
+//				fillCommentSectionData(COMMENTSECTION_REVIEW,mData);
+				refreshSection(COMMENTSECTION_REVIEW);
 			}
 		});
 		mCommentSectionProgressBar  = (ProgressBar)v.findViewById(R.id.carddetailcomment_progressBar);
@@ -381,7 +358,7 @@ public class CardDetailViewFactory {
 				if(data.results == null){return;}
 				if(data.results.size() == 0 ){return;}
 				CardData cardData = data.results.get(0);
-				fillCommentSectionData(type,-1,cardData);
+				fillCommentSectionData(type,cardData);
 			}
 		});
 		

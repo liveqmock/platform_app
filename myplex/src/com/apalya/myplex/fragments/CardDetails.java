@@ -417,7 +417,7 @@ public class CardDetails extends BaseFragment implements
 			translationY = (rawY - mMinRawY) + mQuickReturnHeight;
 
 
-			System.out.println(translationY);
+//			System.out.println(translationY);
 			if (translationY < 0) {
 				translationY = 0;
 				mMinRawY = rawY + mQuickReturnHeight;

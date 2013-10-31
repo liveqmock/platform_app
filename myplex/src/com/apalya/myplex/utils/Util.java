@@ -173,6 +173,8 @@ public class Util {
 		try {
 			ConsumerApi.DOMAIN = activity.getString(R.string.domain_name);
 			myplexapplication.getApplicationConfig().downloadCardsPath =  activity.getFilesDir()+"/"+"downloadlist.bin";
+			myplexapplication.getApplicationConfig().msisdnPath =  activity.getFilesDir()+"/"+"msisdn.bin";
+			myplexapplication.getApplicationConfig().lastViewedCardsPath = activity.getFilesDir()+"/"+"lastviewed.bin";
 			DisplayMetrics dm = new DisplayMetrics();
 			activity.getWindowManager().getDefaultDisplay().getMetrics(dm);
 			myplexapplication.getApplicationConfig().screenHeight = dm.heightPixels;

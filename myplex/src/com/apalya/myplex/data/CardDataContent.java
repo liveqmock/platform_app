@@ -1,10 +1,15 @@
 package com.apalya.myplex.data;
 
+import java.io.Serializable;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class CardDataContent {
+public class CardDataContent implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -6870595256947750470L;
 	public String categoryName;
 	public String drmType;
 	public String releaseDate;

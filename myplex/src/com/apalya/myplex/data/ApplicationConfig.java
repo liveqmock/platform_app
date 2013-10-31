@@ -13,6 +13,7 @@ public class ApplicationConfig {
 	public int screenHeight;
 	public String type = MDPI;
 	public String downloadCardsPath;
-	
+	public String msisdnPath;
+	public String lastViewedCardsPath;
 	public String indexFilePath = null;
 }

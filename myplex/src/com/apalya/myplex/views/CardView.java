@@ -270,14 +270,14 @@ public class CardView extends ScrollView {
 		CardDataHolder dataHolder = (CardDataHolder)v.getTag();
 		if(dataHolder == null){
 			dataHolder = new CardDataHolder();
-			dataHolder.mTitleLayout = (LinearLayout)v.findViewById(R.id.card_title_layout); 
+			dataHolder.mTitleLayout = (RelativeLayout)v.findViewById(R.id.card_title_layout); 
 			dataHolder.mTitle = (TextView)v.findViewById(R.id.card_title_name);
 			dataHolder.mDelete = (TextView)v.findViewById(R.id.card_title_deleteText);
 			dataHolder.mFavourite = (TextView)v.findViewById(R.id.card_title_fav);
 			dataHolder.mFavLayout = (RelativeLayout)v.findViewById(R.id.card_title_favlayout);
 			dataHolder.mDeleteLayout = (RelativeLayout)v.findViewById(R.id.card_title_delete);
 			dataHolder.mPreview = (CardImageView)v.findViewById(R.id.card_preview_image);
-			dataHolder.mPreviewLayout = (RelativeLayout)v.findViewById(R.id.card_preview_layout);
+//			dataHolder.mPreviewLayout = (RelativeLayout)v.findViewById(R.id.card_preview_layout);
 			dataHolder.mOverLayPlay = (ImageView)v.findViewById(R.id.card_play);
 			dataHolder.mComments = (TextView)v.findViewById(R.id.card_status_comments);
 			dataHolder.mReviews = (TextView)v.findViewById(R.id.card_status_people);
@@ -296,7 +296,7 @@ public class CardView extends ScrollView {
 			if(cardColor == -1){
 				cardColor = Color.argb(255, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low);
 			}
-	        dataHolder.mPreviewLayout.setBackgroundColor(cardColor);
+	        dataHolder.mPreview.setBackgroundColor(cardColor);
 			
 			dataHolder.mTitle.setTypeface(FontUtil.Roboto_Medium);
 			dataHolder.mRentText.setTypeface(FontUtil.Roboto_Medium);
@@ -392,11 +392,11 @@ public class CardView extends ScrollView {
 		//17 chars
 		float price = 10000f;
 		if(data.packages == null){
-			dataHolder.mRentText.setText("            Free           ");
+			dataHolder.mRentText.setText("Free");
 			dataHolder.mRentLayout.setOnClickListener(null);
 		}else{
 			if(data.currentUserData != null && data.currentUserData.purchase != null && data.currentUserData.purchase.size() != 0){
-				dataHolder.mRentText.setText("         Watch now         ");
+				dataHolder.mRentText.setText("Watch now");
 				dataHolder.mRentLayout.setOnClickListener(null);
 			}else{
 				for(CardDataPackages packageitem:data.packages){
@@ -411,7 +411,7 @@ public class CardView extends ScrollView {
 						}
 						dataHolder.mRentText.setText(mPriceStarts + mRupeeCode + " "+price);
 					}else{
-						dataHolder.mRentText.setText("            Free           ");
+						dataHolder.mRentText.setText("Free");
 						dataHolder.mRentLayout.setOnClickListener(null);
 					}
 				}	
@@ -772,7 +772,7 @@ class ViewReusePool {
 	}
 }
 
-class CardsLayout extends FrameLayout {
+class CardsLayout extends RelativeLayout {
     private static final String TAG = "CardView";
 	static final int TOP_CARDS = 0;
 	static final int TOP_CARD_VISIBLE_PT = 3;

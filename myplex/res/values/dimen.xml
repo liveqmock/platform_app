@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="actionbarheight">48dp</dimen>
+    
     <dimen name="cardtitleheight">38dp</dimen>
     <dimen name="cardstatusheight">34dp</dimen>
     <dimen name="cardmoreinfoheight">38dp</dimen>
     <dimen name="cardplayheight">150dp</dimen>
-    <dimen name="cardvideosize">261dp</dimen> <!-- total of cardtitleheight,cardstatusheight,cardmoreinfoheight,cardplayheight  -->
-    <dimen name="cardHeight">261dp</dimen> <!-- total of cardtitleheight,cardstatusheight,cardmoreinfoheight,cardplayheight  -->
+    <dimen name="cardtitleandplayheight">188dp</dimen>
+    <dimen name="cardtitleplayandstatusheight">222dp</dimen>
+    <dimen name="cardimageheight">220dp</dimen>
+    
+    <dimen name="cardvideosize">260dp</dimen> <!-- total of cardtitleheight,cardstatusheight,cardmoreinfoheight,cardplayheight  -->
+    <dimen name="cardHeight">260dp</dimen> <!-- total of cardtitleheight,cardstatusheight,cardmoreinfoheight,cardplayheight  -->
+    
     <dimen name="cardmargin">12dp</dimen>
     <dimen name="cardpartialvisibleheight">50dp</dimen>
     <dimen name="slidemenugap">261dp</dimen>

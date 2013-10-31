@@ -97,14 +97,14 @@ public class CardTabletAdapater extends BaseAdapter{
 		if(v == null){
 			v = mInflater.inflate(R.layout.card, null);
 			dataHolder = new CardDataHolder();
-			dataHolder.mTitleLayout = (LinearLayout)v.findViewById(R.id.card_title_layout); 
+			dataHolder.mTitleLayout = (RelativeLayout)v.findViewById(R.id.card_title_layout); 
 			dataHolder.mTitle = (TextView)v.findViewById(R.id.card_title_name);
 			dataHolder.mDelete = (TextView)v.findViewById(R.id.card_title_deleteText);
 			dataHolder.mDeleteLayout = (RelativeLayout)v.findViewById(R.id.card_title_delete);
 			dataHolder.mFavLayout = (RelativeLayout)v.findViewById(R.id.card_title_favlayout);
 			dataHolder.mFavourite = (TextView)v.findViewById(R.id.card_title_fav);
 			dataHolder.mPreview = (CardImageView)v.findViewById(R.id.card_preview_image);
-			dataHolder.mPreviewLayout = (RelativeLayout)v.findViewById(R.id.card_preview_layout);
+//			dataHolder.mPreviewLayout = (RelativeLayout)v.findViewById(R.id.card_preview_layout);
 			dataHolder.mOverLayPlay = (ImageView)v.findViewById(R.id.card_play);
 			dataHolder.mComments = (TextView)v.findViewById(R.id.card_status_comments);
 			dataHolder.mReviews = (TextView)v.findViewById(R.id.card_status_people);
@@ -145,7 +145,7 @@ public class CardTabletAdapater extends BaseAdapter{
 		int Low = 100;
 		int High = 196;
 		cardColor = Color.argb(255, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low);
-        dataHolder.mPreviewLayout.setBackgroundColor(cardColor);
+        dataHolder.mPreview.setBackgroundColor(cardColor);
 		v.setId(position);
 		dataHolder.mDataObject = data;
 		dataHolder.mPreview.mCardId = position;
@@ -208,11 +208,11 @@ public class CardTabletAdapater extends BaseAdapter{
 		
 		float price = 10000f;
 		if(data.packages == null){
-			dataHolder.mRentText.setText("            Free           ");
+			dataHolder.mRentText.setText("Free");
 			dataHolder.mRentText.setOnClickListener(null);
 		}else{
 			if(data.currentUserData != null && data.currentUserData.purchase != null && data.currentUserData.purchase.size() != 0){
-				dataHolder.mRentText.setText("         Watch now         ");
+				dataHolder.mRentText.setText("Watch now");
 				dataHolder.mRentLayout.setOnClickListener(null);
 			}else{
 				for(CardDataPackages packageitem:data.packages){
@@ -227,7 +227,7 @@ public class CardTabletAdapater extends BaseAdapter{
 						}
 						dataHolder.mRentText.setText(mPriceStarts + mRupeeCode + " "+price);
 					}else{
-						dataHolder.mRentText.setText("            Free           ");
+						dataHolder.mRentText.setText("Free");
 						dataHolder.mRentLayout.setOnClickListener(null);
 					}
 				}	

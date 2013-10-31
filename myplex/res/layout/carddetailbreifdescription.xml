@@ -48,8 +48,9 @@
 
         <RatingBar
             android:id="@+id/carddetailbriefdescription_setRating"
-            style="?android:attr/ratingBarStyleSmall"
+            style="@style/movieRatingBar"
             android:layout_width="wrap_content"
+            android:rating="3.5"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:paddingTop="@dimen/margin_gap_2" />

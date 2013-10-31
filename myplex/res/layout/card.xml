@@ -1,40 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="@dimen/cardHeight"
     android:background="@drawable/card_background"
     android:orientation="vertical" >
 
-    <LinearLayout
+    <RelativeLayout
+        android:id="@+id/card_title_delete"
+        android:layout_width="38dp"
+        android:layout_height="@dimen/cardtitleheight"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:gravity="center" >
+
+        <TextView
+            android:id="@+id/card_title_deleteText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/card_delete"
+            android:textColor="#343433"
+            android:textSize="16sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/card_title_favlayout"
+        android:layout_width="38dp"
+        android:layout_height="@dimen/cardtitleheight"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true" >
+
+        <TextView
+            android:id="@+id/card_title_fav"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center_vertical"
+            android:text="@string/card_filledheart"
+            android:textColor="#343433"
+            android:textSize="16sp" />
+
+        <ProgressBar
+            android:id="@+id/card_title_fav_progress"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignLeft="@+id/card_title_fav"
+            android:layout_alignTop="@+id/card_title_fav"
+            android:gravity="center_vertical" />
+    </RelativeLayout>
+
+    <RelativeLayout
         android:id="@+id/card_title_layout"
         android:layout_width="fill_parent"
         android:layout_height="@dimen/cardtitleheight"
+        android:layout_toLeftOf="@+id/card_title_favlayout"
+        android:layout_toRightOf="@+id/card_title_delete"
         android:orientation="horizontal" >
-
-        <RelativeLayout
-            android:id="@+id/card_title_delete"
-            android:layout_width="38dp"
-            android:layout_height="@dimen/cardtitleheight"
-            android:layout_gravity="center_vertical"
-            android:gravity="center" >
-
-            <TextView
-                android:id="@+id/card_title_deleteText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:text="@string/card_delete"
-                android:textColor="#343433"
-                android:textSize="16sp" />
-        </RelativeLayout>
 
         <TextView
             android:id="@+id/card_title_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="2.88"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
             android:ellipsize="marquee"
             android:focusable="true"
             android:focusableInTouchMode="true"
@@ -43,66 +70,63 @@
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:singleLine="true"
+            android:text="dsadsad"
             android:textColor="#343433"
             android:textSize="16sp" />
+    </RelativeLayout>
 
-        <RelativeLayout
-            android:id="@+id/card_title_favlayout"
-            android:layout_width="38dp"
-            android:layout_height="@dimen/cardtitleheight"
-            android:layout_gravity="center_vertical"
-            android:gravity="center"
-             >
+    <com.apalya.myplex.data.CardImageView
+        android:id="@+id/card_preview_image"
+        android:layout_width="fill_parent"
+        android:background="#000000"
+        android:layout_height="@dimen/cardimageheight"
+        android:layout_marginTop="@dimen/cardtitleheight"
+        android:scaleType="centerCrop" />
 
-            <TextView
-                android:id="@+id/card_title_fav"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:gravity="center_vertical"
-                android:textColor="#343433"
-                android:text="@string/card_filledheart"
-                android:textSize="16sp" />
-
-            <ProgressBar
-                android:id="@+id/card_title_fav_progress"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_alignLeft="@+id/card_title_fav"
-                android:layout_alignTop="@+id/card_title_fav"
-                android:gravity="center_vertical" />
-
-        </RelativeLayout>
-    </LinearLayout>
+<!--     <View
+        android:id="@+id/card_rent_separator"
+        android:layout_width="fill_parent"
+        android:layout_height="1dp"
+        android:layout_above="@+id/card_rent_layout"
+        android:background="#D8D8D7" />
+-->
+    <ImageView
+        android:id="@+id/card_play"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_alignRight="@+id/card_preview_image"
+        android:layout_alignTop="@+id/card_preview_image"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/cardinfoselector"
+        android:gravity="center" />
 
     <RelativeLayout
-        android:id="@+id/card_preview_layout"
+        android:id="@+id/card_rent_layout"
         android:layout_width="fill_parent"
-        android:layout_height="@dimen/cardplayheight"
-        android:background="#000000" >
+        android:layout_height="@dimen/cardmoreinfoheight"
+         android:layout_marginTop="@dimen/cardtitleplayandstatusheight"
+         android:layout_alignParentTop="true"
+        android:background="@drawable/card_priceblock_bg" >
 
-        <com.apalya.myplex.data.CardImageView
-            android:id="@+id/card_preview_image"
+        <TextView
+            android:id="@+id/card_rent_text"
             android:layout_width="fill_parent"
-            android:layout_height="@dimen/cardplayheight"
-            android:scaleType="fitXY" />
-
-        <ImageView
-            android:id="@+id/card_play"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginRight="14dp"
-            android:layout_marginTop="14dp"
-            android:background="@drawable/cardinfoselector"
-            android:gravity="center" />
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:singleLine="true"
+            android:text="fee"
+            android:textColor="#6b6b6b"
+            android:textSize="14sp" />
     </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/card_status_layout"
         android:layout_width="fill_parent"
-        android:layout_height="@dimen/cardstatusheight" >
+        android:layout_height="@dimen/cardstatusheight"
+        android:layout_marginTop="@dimen/cardtitleandplayheight"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/card_statusblock_bg" >
 
         <TextView
             android:id="@+id/card_status_comments"
@@ -112,7 +136,7 @@
             android:layout_centerVertical="true"
             android:layout_marginLeft="14dp"
             android:text="@string/card_comment"
-            android:textColor="#58b4e5"
+            android:textColor="#000000"
             android:textSize="16sp" />
 
         <TextView
@@ -124,7 +148,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="14dp"
             android:text="@string/card_people"
-            android:textColor="#58b4e5"
+            android:textColor="#000000"
             android:textSize="16sp" />
 
         <TextView
@@ -135,7 +159,7 @@
             android:layout_toLeftOf="@+id/card_status_people"
             android:gravity="center_vertical"
             android:singleLine="true"
-            android:textColor="#58b4e5"
+            android:textColor="#000000"
             android:textSize="14sp" />
 
         <TextView
@@ -147,30 +171,8 @@
             android:layout_toRightOf="@+id/card_status_comments"
             android:gravity="center_vertical"
             android:singleLine="true"
-            android:textColor="#58b4e5"
+            android:textColor="#000000"
             android:textSize="14sp" />
     </RelativeLayout>
 
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="1dp"
-        android:background="#D8D8D7" />
-
-    <RelativeLayout
-        android:id="@+id/card_rent_layout"
-        android:layout_width="fill_parent"
-        android:layout_height="@dimen/cardmoreinfoheight"
-        android:background="@drawable/card_priceblock_bg" >
-
-        <TextView
-            android:id="@+id/card_rent_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:singleLine="true"
-            android:text="fee"
-            android:textColor="#6b6b6b"
-            android:textSize="14sp" />
-    </RelativeLayout>
-
-</LinearLayout>
+</RelativeLayout>

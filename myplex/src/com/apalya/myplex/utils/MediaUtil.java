@@ -43,6 +43,7 @@ public class MediaUtil {
 
 		myReq.setShouldCache(false);
 		queue.add(myReq);
+		Log.d(TAG, aVideoUrl);
 	}
 	private static void sendResponse(boolean status,String url){
 		if (urlEventListener != null) {
@@ -53,7 +54,7 @@ public class MediaUtil {
 		return new Response.Listener<String>() {
 			@Override
 			public void onResponse(String response) {
-				Log.d("VIDEO URLS", response);
+				Log.d(TAG, response);
 				CardResponseData minResultSet = null;
 				try {
 					//Analytics.endTimedEvent("RECOMMENDATIONS-REQUEST");
