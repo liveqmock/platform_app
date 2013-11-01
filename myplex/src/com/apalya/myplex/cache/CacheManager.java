@@ -44,9 +44,9 @@ public class CacheManager {
 				cardIds += cardData._id;
 			}
 			if(mListener != null){
-				mListener.OnCacheResults(new HashMap<String, CardData>(),true);
+				mListener.OnCacheResults(new HashMap<String, CardData>(),false);
 			}
-			issueOnlineRequest(cardIds);
+			//issueOnlineRequest(cardIds);
 			return;
 		}
 		myplexapplication.getCacheHolder().GetData(Ids,operationType, new SearchResult() {

@@ -138,7 +138,13 @@ public class IndexHandler {
 					stopWrods.clear();
 					collectJsonKeys(temp, stopWrods);
 					words.addAll(stopWrods);
-					mIndexWriter.addDocument(createCardDoc(indexObject), new StandardAnalyzer(LuceneVersion, words));
+					Document doc = createCardDoc(indexObject);
+					if(doc != null)
+					{
+						mIndexWriter.addDocument(doc, new StandardAnalyzer(LuceneVersion, words));
+						doc = null;
+						temp = null;
+					}
 				}
 			}
 			Log.i(TAG, "Indexing " +indexableObj.size() +"documents " +"Complete");
@@ -163,24 +169,21 @@ public class IndexHandler {
 	}
 
 	private Document createCardDoc(CardData indexableObj) {
-		Document document = new Document();
-		document.add(new Field(LUCENE_CONTENT_ID, indexableObj._id, Field.Store.YES, Field.Index.NOT_ANALYZED,
-				Field.TermVector.NO));
-		// We want to store the expire data, but we don't want to index it
-		// because it is useless searching through these
-		document.add(new Field(LUCENE_CONTENT_EXPIRY, indexableObj._expiresAt, Field.Store.YES, Field.Index.NO,
-				Field.TermVector.NO));
+		Document document = null;
 		try {
-			document.add(new Field(LUCENE_CONTENT_INFO, Util.toJson(indexableObj, false), Field.Store.YES, Field.Index.ANALYZED,
-					Field.TermVector.NO));
+			document =  new Document();
+			document.add(new Field(LUCENE_CONTENT_ID, indexableObj._id, Field.Store.YES, Field.Index.NOT_ANALYZED, Field.TermVector.NO));
+			// We want to store the expire data, but we don't want to index it because it is useless searching through these
+			document.add(new Field(LUCENE_CONTENT_EXPIRY, indexableObj._expiresAt, Field.Store.YES, Field.Index.NO, Field.TermVector.NO));
+			document.add(new Field(LUCENE_CONTENT_INFO, Util.toJson(indexableObj, false), Field.Store.YES, Field.Index.ANALYZED, Field.TermVector.NO));
 		} catch (JsonMappingException e) {
-			// TODO Auto-generated catch block
+			document = null;
 			e.printStackTrace();
 		} catch (JsonGenerationException e) {
-			// TODO Auto-generated catch block
+			document = null;
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			document = null;
 			e.printStackTrace();
 		}
 		return document;

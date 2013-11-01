@@ -663,7 +663,7 @@ public class SearchActivity extends BaseFragment implements
 	}
 
 	public void dismissProgressBar() {
-		if (mProgressDialog != null) {
+		if (mProgressDialog != null && mProgressDialog.isShowing()) {
 			mProgressDialog.dismiss();
 		}
 	}
