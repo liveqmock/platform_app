@@ -666,6 +666,9 @@ public class CardDetailViewFactory {
 		}
 	};
 	private View createStudioDescriptionView() {
+		if(mData.generalInfo == null || mData.generalInfo.studioDescription == null || mData.generalInfo.studioDescription.length() == 0){
+			return null;
+		}
 		View v = mInflator.inflate(R.layout.carddetailstudiodesc, null);
 		TextView title = (TextView)v.findViewById(R.id.carddetaildesc_studiotitle);
 		title.setText("Studio Description");
@@ -678,6 +681,9 @@ public class CardDetailViewFactory {
 	}
 
 	private View createMyplexDescriptionView() {
+		if(mData.generalInfo == null || mData.generalInfo.myplexDescription == null || mData.generalInfo.myplexDescription.length() == 0){
+			return null;
+		}
 		View v = mInflator.inflate(R.layout.carddetailstudiodesc, null);
 		TextView title = (TextView)v.findViewById(R.id.carddetaildesc_studiotitle);
 		title.setText("Myplex Description");
@@ -747,11 +753,18 @@ public class CardDetailViewFactory {
 		});
 		Util.showFeedback(expand);
 		LinearLayout layout = (LinearLayout)v.findViewById(R.id.carddetaildesc_contentlayout);
-		if(mData.generalInfo != null && mData.generalInfo.myplexDescription != null && mData.generalInfo.myplexDescription.length() >0){
-			layout.addView(createMyplexDescriptionView());
+		View myplexDescView = createMyplexDescriptionView(); 
+		View studioDescView = createStudioDescriptionView();
+		if(myplexDescView != null  && studioDescView != null){
+			layout.addView(myplexDescView);	
 		}
-		if(mData.generalInfo != null && mData.generalInfo.studioDescription != null && mData.generalInfo.studioDescription.length() >0){
-			layout.addView(createStudioDescriptionView());
+		else{
+			if(myplexDescView != null){
+				layout.addView(myplexDescView);	
+			}
+			if(studioDescView != null){
+				layout.addView(studioDescView);	
+			}
 		}
 		View credits = createCastCrewView();
 		if(credits != null){

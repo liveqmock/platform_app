@@ -234,7 +234,7 @@ public class CardVideoPlayer implements PlayerListener {
 					
 					if(Util.checkDownloadStatus( mData._id, mContext)==0)
 					{
-						long id=Util.startDownload(url, mData.generalInfo.title, mContext);
+						long id=Util.startDownload(url, mData, mContext);
 						myplexapplication.getUserProfileInstance().downloadMap.put(mData._id, id);
 					}
 					else
