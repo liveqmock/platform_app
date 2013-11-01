@@ -11,6 +11,7 @@ public class myplexapplication extends Application {
 	public static ApplicationConfig mDisplayInfo; 
 	public static CardExplorerData mCardExplorerData;
 	public static CardData mSelectedCard;
+	public static ApplicationSettings mApplicationSettings;
 	private static UserProfile mUserProfile;
 	private static DeviceDetails mDeviceDetails;
 	private static CacheHolder mCache ;
@@ -69,6 +70,12 @@ public class myplexapplication extends Application {
 			mDisplayInfo = new ApplicationConfig();
 		}
 		return mDisplayInfo;
+	}
+	public static ApplicationSettings getApplicationSettings(){
+		if(mApplicationSettings == null){
+			mApplicationSettings = new ApplicationSettings();
+		}
+		return mApplicationSettings;
 	}
 	public static MixpanelAPI getMixPanel(){		return mixPanel;	}	/*public static Context getContext(){		return mContext;	}*/	public static UserProfile getUserProfileInstance(){		if(mUserProfile==null)			mUserProfile=new UserProfile();		return mUserProfile;	}	public static DeviceDetails getDevDetailsInstance(){		if(mDeviceDetails==null)			mDeviceDetails=new DeviceDetails();		return mDeviceDetails;	}
 	public static CardExplorerData getCardExplorerData(){

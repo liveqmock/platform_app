@@ -11,6 +11,8 @@ public interface PlayerListener {
 	
 	public boolean onError(MediaPlayer mp, int arg1, int arg2) ;
 	
+	public boolean onInfo(MediaPlayer mp, int arg1, int arg2) ;
+	
 	public void onCompletion(MediaPlayer mp) ;
 	
 	public void onFullScreen(boolean value);

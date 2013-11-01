@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"  android:background="@drawable/button_bg"
+    android:layout_height="wrap_content" >
+
+    <Switch
+        android:id="@+id/settingitem_togglebutton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:padding="@dimen/layoutleftpadding"
+        android:text="Switch"
+        android:textColor="@android:color/black"
+        android:textSize="@dimen/textsize_18" />
+
+</RelativeLayout>

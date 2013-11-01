@@ -73,13 +73,14 @@ public class SetttingsFragment extends BaseFragment {
 	}
 
 	private void PreapreSettingsData() {
-		mSettingsList.add(new SettingsData(SettingsData.SECTION, "App Settings", 0));
-		mSettingsList.add(new SettingsData(SettingsData.ITEM, "Download only on Wifi", 0));
-		mSettingsList.add(new SettingsData(SettingsData.SECTION, "Myplex 2.0", 0));
-		mSettingsList.add(new SettingsData(SettingsData.ITEM, FEEDBACK, 0));
-		mSettingsList.add(new SettingsData(SettingsData.ITEM, TANDC, 0));
-		mSettingsList.add(new SettingsData(SettingsData.ITEM, PRIVACYPOLIY, 0));
-		mSettingsList.add(new SettingsData(SettingsData.ITEM, HELP, 0));
+		mSettingsList.add(new SettingsData(SettingsData.SECTION, "App Settings", 0,SettingsData.VIEWTYPE_NORMAL));
+		mSettingsList.add(new SettingsData(SettingsData.ITEM, "Download only on Wifi", 0,SettingsData.VIEWTYPE_TOGGLEBUTTON));
+		mSettingsList.add(new SettingsData(SettingsData.ITEM, "Show player logs", 0,SettingsData.VIEWTYPE_TOGGLEBUTTON));
+		mSettingsList.add(new SettingsData(SettingsData.SECTION, "Myplex 2.0", 0,SettingsData.VIEWTYPE_NORMAL));
+		mSettingsList.add(new SettingsData(SettingsData.ITEM, FEEDBACK, 0,SettingsData.VIEWTYPE_NORMAL));
+		mSettingsList.add(new SettingsData(SettingsData.ITEM, TANDC, 0,SettingsData.VIEWTYPE_NORMAL));
+		mSettingsList.add(new SettingsData(SettingsData.ITEM, PRIVACYPOLIY, 0,SettingsData.VIEWTYPE_NORMAL));
+		mSettingsList.add(new SettingsData(SettingsData.ITEM, HELP, 0,SettingsData.VIEWTYPE_NORMAL));
 
 		mListAdapter = new SettingsAdapter(getContext(),
 				android.R.layout.simple_list_item_1, android.R.id.text1,

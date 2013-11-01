@@ -10,26 +10,19 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Color;
-import android.media.MediaPlayer;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
 import android.view.animation.TranslateAnimation;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.Space;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.VolleyError;
 import com.apalya.myplex.BaseFragment;
@@ -41,35 +34,27 @@ import com.apalya.myplex.cache.CacheManager;
 import com.apalya.myplex.cache.IndexHandler;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDataImagesItem;
+import com.apalya.myplex.data.CardDataRelatedCastItem;
 import com.apalya.myplex.data.CardDetailMediaData;
 import com.apalya.myplex.data.CardDetailMediaListData;
 import com.apalya.myplex.data.CardDetailMultiMediaGroup;
 import com.apalya.myplex.data.CardExplorerData;
 import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.myplexapplication;
-import com.apalya.myplex.media.PlayerListener;
-import com.apalya.myplex.media.VideoViewExtn;
-import com.apalya.myplex.media.VideoViewPlayer;
-import com.apalya.myplex.media.VideoViewPlayer.StreamType;
 import com.apalya.myplex.tablet.MultiPaneActivity;
-import com.apalya.myplex.tablet.TabletCardDetails;
 import com.apalya.myplex.utils.FontUtil;
-import com.apalya.myplex.utils.MediaUtil;
 import com.apalya.myplex.utils.MyVolley;
-import com.apalya.myplex.utils.Util;
-import com.apalya.myplex.utils.MediaUtil.MediaUtilEventListener;
 import com.apalya.myplex.views.CardDetailViewFactory;
+import com.apalya.myplex.views.CardDetailViewFactory.CardDetailViewFactoryListener;
 import com.apalya.myplex.views.CardVideoPlayer;
+import com.apalya.myplex.views.CardVideoPlayer.PlayerFullScreen;
 import com.apalya.myplex.views.CustomDialog;
-import com.apalya.myplex.views.CustomScrollView;
 import com.apalya.myplex.views.FadeInNetworkImageView;
+import com.apalya.myplex.views.ItemExpandListener.ItemExpandListenerCallBackListener;
 import com.apalya.myplex.views.JazzyViewPager;
+import com.apalya.myplex.views.JazzyViewPager.TransitionEffect;
 import com.apalya.myplex.views.OutlineContainer;
 import com.apalya.myplex.views.docketVideoWidget;
-import com.apalya.myplex.views.CardDetailViewFactory.CardDetailViewFactoryListener;
-import com.apalya.myplex.views.CardVideoPlayer.PlayerFullScreen;
-import com.apalya.myplex.views.ItemExpandListener.ItemExpandListenerCallBackListener;
-import com.apalya.myplex.views.JazzyViewPager.TransitionEffect;
 
 public class CardDetailsTabletFrag extends BaseFragment implements
 ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirection,CacheManagerCallback,PlayerFullScreen {
@@ -203,34 +188,109 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 	}
 
 	private List<CardDetailMediaData> mMediaList = null;
+	private List<CardDataRelatedCastItem> mRelatedCastList = null;
 	private JazzyViewPager mJazzy;
 	private CustomDialog mAlbumDialog;
 	private String mSearchQuery;
-
+	private int popupType = MainAdapter.PAGE_CASTVIEW;
 	private void setupJazziness(TransitionEffect effect) {
 		mJazzy = (JazzyViewPager) mAlbumDialog.findViewById(R.id.jazzy_pager);
-		int width , height = 100;
-		width = myplexapplication.getApplicationConfig().screenWidth - 2*((int)mContext.getResources().getDimension(R.dimen.margin_gap_8));
-		height = (width * 9)/16; 
+		int width = RelativeLayout.LayoutParams.MATCH_PARENT;
+		int height = RelativeLayout.LayoutParams.MATCH_PARENT;
+		if(popupType == MainAdapter.PAGE_MEDIAVIEW){
+			width = myplexapplication.getApplicationConfig().screenWidth - 2*((int)mContext.getResources().getDimension(R.dimen.margin_gap_8));
+			height = (width * 9)/16; 
+
+		}else{
+			height = (int)(mContext.getResources().getDimension(R.dimen.detailcastheight));
+		}
 		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(width,height);
 		mJazzy.setLayoutParams(params);
 		
 		mJazzy.setTransitionEffect(effect);
-		mJazzy.setAdapter(new MainAdapter());
-		// mJazzy.setPageMargin(30);
+		MainAdapter adapter = new MainAdapter(popupType);
+		mJazzy.setAdapter(adapter);
+		 mJazzy.setPageMargin(30);
 	}
 
 	private class MainAdapter extends PagerAdapter {
+		public static final int PAGE_CASTVIEW = 0;
+		public static final int PAGE_MEDIAVIEW = 1;
+		private int type = PAGE_CASTVIEW;
+		public MainAdapter(int type){
+			this.type = type;
+		}
 		@Override
 		public Object instantiateItem(ViewGroup container, final int position) {
-			CardDetailMediaData media =  mSelectedMediaGroup.mList.get(position);
 			View v = null;
-			if(media.mThumbnailMime != null && media.mThumbnailMime =="Image/JPEG"){
-				v = mInflater.inflate(R.layout.cardmediasubitemimage, null);
-				((FadeInNetworkImageView)v).setImageUrl(media.mThumbnailUrl, MyVolley.getImageLoader());
+			if(type == PAGE_MEDIAVIEW){
+				CardDetailMediaData media =  mSelectedMediaGroup.mList.get(position);
+				if(media.mThumbnailMime != null && media.mThumbnailMime =="Image/JPEG"){
+					v = mInflater.inflate(R.layout.cardmediasubitemimage, null);
+					((FadeInNetworkImageView)v).setImageUrl(media.mThumbnailUrl, MyVolley.getImageLoader());
+				}else{
+					docketVideoWidget videoWidget = new docketVideoWidget(mContext);
+					v = videoWidget.CreateView(media);
+				}
 			}else{
-				docketVideoWidget videoWidget = new docketVideoWidget(mContext);
-				v = videoWidget.CreateView(media);
+				CardDataRelatedCastItem relatedCastItem = mRelatedCastList.get(position);
+				v = mInflater.inflate(R.layout.fulldetailcastlayout, null);
+				TextView name = (TextView)v.findViewById(R.id.fullcast_name);
+				name.setTypeface(FontUtil.Roboto_Light);
+				TextView rolesTextView = (TextView)v.findViewById(R.id.fullcast_roles);
+				rolesTextView.setTypeface(FontUtil.Roboto_Medium);
+				TextView typesTextView = (TextView)v.findViewById(R.id.fullcast_types);
+				typesTextView.setTypeface(FontUtil.Roboto_Medium);
+				FadeInNetworkImageView image = (FadeInNetworkImageView)v.findViewById(R.id.fullcast_image);
+				image.setErrorImageResId(R.drawable.placeholder);
+				
+				String roleString = new String();
+				if(relatedCastItem.roles != null ){
+					for(String role:relatedCastItem.roles){
+						if(roleString.length() > 0){
+							roleString = ",";
+						}
+						roleString += role;
+					}
+				}
+				rolesTextView.setText(roleString);
+				
+				String typeString = new String();
+				if(relatedCastItem.types != null ){
+					for(String role:relatedCastItem.types){
+						if(typeString.length() > 0){
+							typeString = ",";
+						}
+						typeString += role;
+					}
+				}
+				typesTextView.setText(typeString);
+				Random rnd = new Random();
+				int Low = 100;
+				int High = 196;
+				int cardColor = Color.argb(255, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low);
+				image.setBackgroundColor(cardColor);
+				image.setErrorImageResId(R.drawable.placeholder);
+				name.setText(relatedCastItem.name);
+				if(relatedCastItem.images != null && relatedCastItem.images.values != null && relatedCastItem.images.values.size() > 0){
+					for(CardDataImagesItem item: relatedCastItem.images.values){
+						if(item.profile != null && item.profile.equalsIgnoreCase(myplexapplication.getApplicationConfig().type)){
+							image.setImageUrl(item.link,MyVolley.getImageLoader());
+							break;
+						}
+					}
+				}
+				image.setTag(relatedCastItem.name);
+				image.setOnClickListener(new OnClickListener() {
+					
+					@Override
+					public void onClick(View v) {
+						if(v.getTag() instanceof String){
+							onTextSelected((String)v.getTag());
+							mAlbumDialog.dismiss();
+						}
+					}
+				});
 			}
 			container.addView(v);
 			mJazzy.setObjectForPosition(v, position);
@@ -244,7 +304,11 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 
 		@Override
 		public int getCount() {
-			return mSelectedMediaGroup.mList.size();
+			if(type == PAGE_MEDIAVIEW){
+				return mSelectedMediaGroup.mList.size();
+			}else{
+				return mRelatedCastList.size();
+			}
 		}
 
 		@Override
@@ -297,73 +361,6 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 	private int mMinRawY = 0;
 	private int mQuickReturnHeight;
 	private TranslateAnimation anim;
-//	@Override
-//	public void scrollDirection(boolean value) {
-//		mQuickReturnHeight  = mBottomActionBar.getHeight();
-//		int translationY = 0;
-//
-//		int mScrollY = mScrollView.getScrollY();
-//		int rawY = mScrollY;
-//
-//
-//		switch (mState) {
-//		case STATE_OFFSCREEN:
-//			if (rawY >= mMinRawY) {
-//				mMinRawY = rawY;
-//			} else {
-//				mState = STATE_RETURNING;
-//			}
-//			translationY = rawY;
-//			break;
-//
-//
-//		case STATE_ONSCREEN:
-//			if (rawY > mQuickReturnHeight) {
-//				mState = STATE_OFFSCREEN;
-//				mMinRawY = rawY;
-//			}
-//			translationY = rawY;
-//			break;
-//
-//
-//		case STATE_RETURNING:
-//
-//
-//			translationY = (rawY - mMinRawY) + mQuickReturnHeight;
-//
-//
-//			System.out.println(translationY);
-//			if (translationY < 0) {
-//				translationY = 0;
-//				mMinRawY = rawY + mQuickReturnHeight;
-//			}
-//
-//
-//			if (rawY == 0) {
-//				mState = STATE_ONSCREEN;
-//				translationY = 0;
-//			}
-//
-//
-//			if (translationY > mQuickReturnHeight) {
-//				mState = STATE_OFFSCREEN;
-//				mMinRawY = rawY;
-//			}
-//			break;
-//		}
-//
-//
-//		/** this can be used if the build is below honeycomb **/
-//		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.HONEYCOMB) {
-//			anim = new TranslateAnimation(0, 0, translationY,
-//					translationY);
-//			anim.setFillAfter(true);
-//			anim.setDuration(0);
-//			 mBottomActionBar.startAnimation(anim);
-//		} else {
-//			 mBottomActionBar.setTranslationY(translationY);
-//		}
-//	}
 	@Override
 	public void onDescriptionExpanded() {
 		mDescriptionExpanded = true;
@@ -462,5 +459,12 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 			mRightScrollViewLayout.setVisibility(View.VISIBLE);
 			mBottomScrollView.setVisibility(View.VISIBLE);			
 		}
+	}
+	@Override
+	public void onFullDetailCastAction() {
+		mRelatedCastList = mCardData.relatedCast.values;
+		popupType = MainAdapter.PAGE_CASTVIEW;
+		showAlbumDialog();		
+		
 	}
 }

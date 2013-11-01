@@ -142,5 +142,11 @@ public class docketVideoWidget implements PlayerListener{
 		
 	}
 
+	@Override
+	public boolean onInfo(MediaPlayer mp, int arg1, int arg2) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 
 }

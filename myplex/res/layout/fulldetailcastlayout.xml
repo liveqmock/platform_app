@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:background="@drawable/fulldetail_cast_background"
+    android:layout_height="@dimen/detailcastheight" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+         >
+
+        <TextView
+            android:id="@+id/fullcast_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="@dimen/margin_gap_24"
+            android:layout_marginTop="@dimen/margin_gap_12"
+            android:text=""
+            android:textColor="#4b4b4c"
+            android:textSize="@dimen/textsize_16" />
+
+        <View
+            android:id="@+id/fullcast_name_separator"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/fullcast_name"
+            android:layout_marginLeft="@dimen/margin_gap_24"
+            android:layout_marginRight="@dimen/margin_gap_24"
+            android:layout_marginTop="@dimen/margin_gap_12"
+            android:background="#dbdbdb" />
+
+        <com.apalya.myplex.views.FadeInNetworkImageView
+            android:id="@+id/fullcast_image"
+            android:layout_width="200dp"
+            android:layout_height="300dp"
+            android:layout_below="@+id/fullcast_name_separator"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/margin_gap_12"
+            android:background="#000000"
+            android:scaleType="centerInside" />
+
+        <View
+            android:id="@+id/fullcast_name_separator1"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/fullcast_image"
+            android:layout_marginLeft="@dimen/margin_gap_24"
+            android:layout_marginRight="@dimen/margin_gap_24"
+            android:layout_marginTop="@dimen/margin_gap_12"
+            android:background="#dbdbdb" />
+
+        <TextView
+            android:id="@+id/fullcast_roles"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/fullcast_name_separator1"
+            android:layout_marginLeft="@dimen/margin_gap_24"
+            android:layout_marginTop="@dimen/margin_gap_12"
+            android:text=""
+            android:textColor="#4b4b4c"
+            android:textSize="@dimen/textsize_14" />
+
+        <View
+            android:id="@+id/fullcast_name_separator2"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/fullcast_roles"
+            android:layout_marginLeft="@dimen/margin_gap_24"
+            android:layout_marginRight="@dimen/margin_gap_24"
+            android:layout_marginTop="@dimen/margin_gap_12"
+            android:background="#dbdbdb" />
+
+        <TextView
+            android:id="@+id/fullcast_types"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/fullcast_name_separator2"
+            android:layout_marginLeft="@dimen/margin_gap_24"
+            android:layout_marginTop="@dimen/margin_gap_12"
+            android:text=""
+            android:textColor="#4b4b4c"
+            android:textSize="@dimen/textsize_14" />
+    </RelativeLayout>
+
+</ScrollView>

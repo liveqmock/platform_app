@@ -12,5 +12,6 @@ public class CardDataImagesItem implements Serializable{
 	public String profile;
 	public String link;
 	public String type;
+	public String resolution;
 	public CardDataImagesItem(){}
 }

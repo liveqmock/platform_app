@@ -1,6 +1,5 @@
 package com.apalya.myplex.views;
 
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -15,7 +14,6 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Base64;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -43,7 +41,6 @@ import com.apalya.myplex.media.VideoViewPlayer;
 import com.apalya.myplex.media.VideoViewPlayer.StreamType;
 import com.apalya.myplex.utils.MediaUtil;
 import com.apalya.myplex.utils.MediaUtil.MediaUtilEventListener;
-import com.apalya.myplex.utils.WidevineDrm.Settings;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.MyVolley;
@@ -76,8 +73,15 @@ public class CardVideoPlayer implements PlayerListener {
 	public void setFullScreenListener(PlayerFullScreen mListener){
 		this.mPlayerFullScreen = mListener;
 	}
+	public void setPlayerStatusUpdateListener(PlayerStatusUpdate listener){
+		mPlayerStatusListener = listener;
+	}
+	private PlayerStatusUpdate mPlayerStatusListener;
 	public interface PlayerFullScreen{
 		public void playerInFullScreen(boolean value);
+	}
+	public interface PlayerStatusUpdate{
+		public void playerStatusUpdate(String value);
 	}
 	public CardVideoPlayer(Context context, CardData data) {
 		this.mContext = context;
@@ -127,7 +131,7 @@ public class CardVideoPlayer implements PlayerListener {
 							|| imageItem.link.compareTo("Images/NoImage.jpg") == 0) {
 						mPreviewImage.setImageResource(0);
 					} else if (imageItem.link != null) {
-						mPreviewImage.setDefaultImageResId(R.drawable.placeholder);
+//						mPreviewImage.setDefaultImageResId(R.drawable.placeholder);
 						mPreviewImage.setErrorImageResId(R.drawable.placeholder);
 						mPreviewImage.setImageUrl(imageItem.link,
 								MyVolley.getImageLoader());
@@ -207,37 +211,31 @@ public class CardVideoPlayer implements PlayerListener {
 				if (!aStatus) {
 					closePlayer();
 					Util.showToast(mContext, "Failed in fetching the url.",Util.TOAST_TYPE_ERROR);
+					if(mPlayerStatusListener != null){
+						mPlayerStatusListener.playerStatusUpdate("Failed in fetching the url.");
+					}
 //					Toast.makeText(mContext, "Failed in fetching the url.",
 //							Toast.LENGTH_SHORT).show();
 					return;
 				}
 				if (url == null) {
 					closePlayer();
+					if(mPlayerStatusListener != null){
+						mPlayerStatusListener.playerStatusUpdate("No url to play.");
+					}
 					Util.showToast(mContext, "No url to play.",Util.TOAST_TYPE_ERROR);
 //					Toast.makeText(mContext, "No url to play.",
 //							Toast.LENGTH_SHORT).show();
 					return;
 				}
-				
-				/*if(Util.checkDownloadStatus( mData._id, mContext)==0)
-				{
-					long id=Util.startDownload(url, mData, mContext);
-					//myplexapplication.getUserProfileInstance().downloadMap.put(mData._id, id);
-				}
-				else
-				{
-					Util.showToast(mContext, "Your download is in progress,Please check your status in Downloads section.",Util.TOAST_TYPE_ERROR);
-//					Util.showToast("Your download is in progress,Please check your status in Downloads section", mContext);
-				}*/
-				
 				if(isESTPackPurchased)
 				{
 					closePlayer();
 					
 					if(Util.checkDownloadStatus( mData._id, mContext)==0)
 					{
-						long id=Util.startDownload(url, mData, mContext);
-						//myplexapplication.getUserProfileInstance().downloadMap.put(mData._id, id);
+						long id=Util.startDownload(url, mData.generalInfo.title, mContext);
+						myplexapplication.getUserProfileInstance().downloadMap.put(mData._id, id);
 					}
 					else
 					{
@@ -249,21 +247,6 @@ public class CardVideoPlayer implements PlayerListener {
 				}
 				else
 				{
-					
-					String licenseData="clientkey:"+myplexapplication.getDevDetailsInstance().getClientKey()+",contentid:"+mData._id+",type:st,profile:1";
-					
-					byte[] data;
-					try {
-						data = licenseData.getBytes("UTF-8");
-						String base64 = Base64.encodeToString(data, Base64.DEFAULT);
-						Settings.OP_DATA=base64;
-						Settings.DEVICE_ID=myplexapplication.getDevDetailsInstance().getClientDeviceId();
-					} catch (UnsupportedEncodingException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-						
-					
 				Uri uri ;
 //				uri = Uri.parse("rtsp://46.249.213.87:554/playlists/bollywood-action_qcif.hpl.3gp");
 //				uri = Uri.parse("http://59.162.166.211:8080/player/3G_H264_320x240_600kbps.3gp");
@@ -271,6 +254,9 @@ public class CardVideoPlayer implements PlayerListener {
 				uri = Uri.parse(url);
 				// Toast.makeText(getContext(), "URL:"+url,
 				// Toast.LENGTH_SHORT).show();
+				if(mPlayerStatusListener != null){
+					mPlayerStatusListener.playerStatusUpdate("Playing :: "+url);
+				}
 				VideoViewPlayer.StreamType streamType = StreamType.VOD;
 				if (mVideoViewPlayer == null) {
 					mVideoViewPlayer = new VideoViewPlayer(mVideoView,
@@ -281,6 +267,7 @@ public class CardVideoPlayer implements PlayerListener {
 					mVideoViewPlayer.setUri(uri, streamType);
 				}
 				mVideoViewPlayer.hideMediaController();
+				mVideoViewPlayer.setPlayerStatusUpdateListener(mPlayerStatusListener);
 				mVideoView.setOnTouchListener(new OnTouchListener() {
 
 					@Override
@@ -415,6 +402,9 @@ public class CardVideoPlayer implements PlayerListener {
 
 	@Override
 	public void onBufferingUpdate(MediaPlayer mp, int perBuffer) {
+//		if(mPlayerStatusListener != null){
+//			mPlayerStatusListener.playerStatusUpdate("buffering :: "+perBuffer);
+//		}
 		if (this.mPerBuffer <= perBuffer) {
 			this.mPerBuffer = perBuffer;
 		}
@@ -438,12 +428,82 @@ public class CardVideoPlayer implements PlayerListener {
 
 	@Override
 	public boolean onError(MediaPlayer mp, int arg1, int arg2) {
+		if(mPlayerStatusListener != null){
+			String what = new String();
+			switch (arg1) {
+				case MediaPlayer.MEDIA_ERROR_UNKNOWN:
+					what = "MEDIA_ERROR_UNKNOWN";
+					break;
+				case MediaPlayer.MEDIA_ERROR_SERVER_DIED:
+					what = "MEDIA_ERROR_SERVER_DIED";
+					break;
+				default:
+					what = ""+arg1;
+					break;
+			}
+			String error = new String();
+			switch (arg2) {
+			default:
+				error = ""+arg2;
+				break;
+		}
+			mPlayerStatusListener.playerStatusUpdate("Play Error :: what = "+what+" extra= "+error);
+		}
 		closePlayer();
 		return false;
 	}
+	@Override
+	public boolean onInfo(MediaPlayer mp, int arg1, int arg2) {
+		if(mPlayerStatusListener != null){
+			String what = new String();
+			switch (arg1) {
+			case MediaPlayer.MEDIA_INFO_UNKNOWN:
+				what = "MEDIA_INFO_UNKNOWN";
+				break;
+			case MediaPlayer.MEDIA_INFO_VIDEO_TRACK_LAGGING:
+				what = "MEDIA_INFO_VIDEO_TRACK_LAGGING";
+				break;
+//			case MediaPlayer.MEDIA_INFO_VIDEO_RENDERING_START: 
+//				break;
 
+			case MediaPlayer.MEDIA_INFO_BUFFERING_START:
+				what = "MEDIA_INFO_BUFFERING_START";
+				break;
+
+			case MediaPlayer.MEDIA_INFO_BUFFERING_END:
+				what = "MEDIA_INFO_BUFFERING_END";
+				break;
+
+			case MediaPlayer.MEDIA_INFO_BAD_INTERLEAVING:
+				what = "MEDIA_INFO_BAD_INTERLEAVING";
+				break;
+
+			case MediaPlayer.MEDIA_INFO_NOT_SEEKABLE:
+				what = "MEDIA_INFO_NOT_SEEKABLE";
+				break;
+
+			case MediaPlayer.MEDIA_INFO_METADATA_UPDATE:
+				what = "MEDIA_INFO_METADATA_UPDATE";
+				break;
+//			case MediaPlayer.MEDIA_INFO_UNSUPPORTED_SUBTITLE: 
+//				break;
+//			case MediaPlayer.MEDIA_INFO_SUBTITLE_TIMED_OUT: 
+//				break;
+			default:
+				what = ""+arg1;
+				break;
+			}
+			String extra = new String();
+			extra = ""+arg2;
+			mPlayerStatusListener.playerStatusUpdate("Play Info :: what = "+what+" extra= "+extra);
+		}
+		return false;
+	}
 	@Override
 	public void onCompletion(MediaPlayer mp) {
+		if(mPlayerStatusListener != null){
+			mPlayerStatusListener.playerStatusUpdate("Play complete :: ");
+		}
 		closePlayer();
 	}
 	public void resumePreviousOrientaionTimer(){
@@ -503,6 +563,9 @@ public class CardVideoPlayer implements PlayerListener {
 		
 	}
 	public void playInLandscape() {
+		if(mPlayerStatusListener != null){
+			mPlayerStatusListener.playerStatusUpdate("Play in lanscape :: ");
+		}
 		if(mVideoViewPlayer != null){
 			mVideoViewPlayer.playerInFullScreen(true);
 		}
@@ -529,6 +592,9 @@ public class CardVideoPlayer implements PlayerListener {
 		// mParentLayout.setLayoutParams(mParentLayoutParams);
 	}
 	public void playInPortrait() {
+		if(mPlayerStatusListener != null){
+			mPlayerStatusListener.playerStatusUpdate("Play in portrait :: ");
+		}
 		if(mVideoViewPlayer != null){
 			mVideoViewPlayer.playerInFullScreen(false);
 		}
@@ -554,4 +620,5 @@ public class CardVideoPlayer implements PlayerListener {
 		}
 		// mParentLayout.setLayoutParams(params);
 	}
+	
 }

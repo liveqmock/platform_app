@@ -15,6 +15,7 @@ import android.drm.DrmInfoRequest;
 import android.drm.DrmManagerClient;
 import android.drm.DrmRights;
 import android.drm.DrmStore;
+import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.media.MediaPlayer.OnPreparedListener;
@@ -34,8 +35,10 @@ import com.apalya.myplex.data.ErrorManagerData;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.utils.WidevineDrm;
+import com.apalya.myplex.views.CardVideoPlayer.PlayerFullScreen;
+import com.apalya.myplex.views.CardVideoPlayer.PlayerStatusUpdate;
 import com.flurry.android.monolithic.sdk.impl.mc;
-public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
+public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.OnInfoListener,
 		MediaPlayer.OnCompletionListener, OnPreparedListener,
 		OnSeekCompleteListener, OnBufferingUpdateListener {
 
@@ -58,7 +61,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 	private VideoView mVideoView;
 
 	private Uri mUri;
-	
+
 	// State maintained for proper onPause/OnResume behaviour.
 
 	private int mPositionWhenPaused = -1;
@@ -149,7 +152,6 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 		}
 		return errordata;
 	}
-	
 	public void setUri(Uri videoUri,StreamType type){
 		mPositionWhenPaused = -1;
 		mMediaPlayer = null;
@@ -257,9 +259,9 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 		drmRequest.put("WVDeviceIDKey", "device12345");
 		drmRequest.put("WVPortalKey", "sotalapalya");*/
 		// Request license
-		int rightStatus= drmManager.checkRightsStatus(mUri.toString().replace("http:", "widevine:"));
+		int rightStatus= drmManager.checkRightsStatus(mUri.toString());
 		if(rightStatus!=DrmStore.RightsStatus.RIGHTS_VALID)
-			drmManager.acquireRights(mUri.toString().replace("http:", "widevine:")); 
+			drmManager.acquireRights(mUri.toString()); 
 		openVideo();
 	}
 	
@@ -419,7 +421,11 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 		}
 		
 	}
-	public void openVideo() {
+	private PlayerStatusUpdate mPlayerStatusListener;
+	public void setPlayerStatusUpdateListener(PlayerStatusUpdate listener){
+		mPlayerStatusListener = listener;
+	}
+	public void openVideo() { 
 		Log.d("PlayerScreen", "VideoViewPlayer openVideo Start");
 		// For streams that we expect to be slow to start up, show a
 		// progress spinner until playback starts.
@@ -448,16 +454,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 		mVideoView.setOnErrorListener(this);
 		mVideoView.setOnCompletionListener(this);
 		//mVideoView.setVideoURI(mUri);
-		if(mUri.toString().contains(".wvm"))
-		{
-			mVideoView.setVideoPath(mUri.toString().replace("http:", "widevine:"));
-			 
-		}
-		else
-		{
-			mVideoView.setVideoPath(mUri.toString());
-		}
-		
+		mVideoView.setVideoPath(mUri.toString());
 		mVideoView.setOnPreparedListener(this);
 
 		mBufferProgressHandler.sendEmptyMessage(START);
@@ -679,6 +676,9 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 		if(mVideoView == null){
 			return;
 		}
+		if(mPlayerStatusListener != null){
+			mPlayerStatusListener.playerStatusUpdate("Play onPrepared :: ");
+		}
 		if(mMediaPlayerController!= null){
 			mMediaPlayerController.setMediaPlayer(mp);
 		}
@@ -704,6 +704,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 		Log.d("PlayerScreen", "VideoViewPlayer onPrepared");
 		mp.setOnSeekCompleteListener(this);
 		mp.setOnBufferingUpdateListener(this);
+		mp.setOnInfoListener(this);
 //		mp.setOnVideoSizeChangedListener(new OnVideoSizeChangedListener() {
 //			
 //			@Override
@@ -729,6 +730,19 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 		mStopHandler = true;
 		if(mMediaPlayer != null){
 			mMediaPlayer.setOnBufferingUpdateListener(null);
+		}
+		if(mPlayerStatusListener != null){
+			mPlayerStatusListener.playerStatusUpdate("Play total duration :: "+mVideoView.getDuration());
+			MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+			if(retriever != null) {
+				try {
+					retriever.setDataSource(mUri.toString());
+				}
+				catch (IllegalArgumentException ex) {
+					ex.printStackTrace();
+				}
+			}
+
 		}
 	}
 	public boolean isControlResumed() {
@@ -877,5 +891,12 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 	}
 	public void setSplashScreenDismissed(boolean value){
 		mSplashScreenDismissed = value;
+	}
+	@Override
+	public boolean onInfo(MediaPlayer arg0, int arg1, int arg2) {
+		if (mPlayerListener != null) {
+			boolean ret = mPlayerListener.onInfo(arg0, arg1, arg2);
+		}
+		return false;
 	}
 }

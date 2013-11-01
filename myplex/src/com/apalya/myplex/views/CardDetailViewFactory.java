@@ -72,9 +72,10 @@ public class CardDetailViewFactory {
 		public void onTextSelected(String key);
 		public void onMediaGroupSelected(CardDetailMultiMediaGroup group);
 		public void onSimilarContentAction();
+		public void onFullDetailCastAction();
 	}
 	public void setOnCardDetailExpandListener(CardDetailViewFactoryListener listener){
-		this.mCardExpandListener = listener;
+		this.mListener = listener;
 	}
 //	private OnClickListener mOnMultiMediaExpand = new OnClickListener() {
 //		
@@ -88,7 +89,7 @@ public class CardDetailViewFactory {
 //			}
 //		}
 //	}; 
-	private CardDetailViewFactoryListener mCardExpandListener;
+	private CardDetailViewFactoryListener mListener;
 	private Context mContext;
 	private LayoutInflater mInflator;
 	private CardData mData;
@@ -404,8 +405,8 @@ public class CardDetailViewFactory {
 			
 			@Override
 			public void onClick(View arg0) {
-				if(mCardExpandListener != null){
-					mCardExpandListener.onSimilarContentAction();
+				if(mListener != null){
+					mListener.onSimilarContentAction();
 				}
 			}
 		});
@@ -589,14 +590,33 @@ public class CardDetailViewFactory {
 		mCredits = title;
 		LinearLayout leftLayout = (LinearLayout)v.findViewById(R.id.carddetailcastcrew_leftlayout);
 		LinearLayout rightLayout = (LinearLayout)v.findViewById(R.id.carddetailcastcrew_rightlayout);
+		RelativeLayout fullDetailLayout = (RelativeLayout)v.findViewById(R.id.carddetailcastcrew_fulldetails);
+		fullDetailLayout.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				if(mListener != null){
+					mListener.onFullDetailCastAction();
+				}
+			}
+		});
 		for(CardDataRelatedCastItem relatedCastItem: mData.relatedCast.values){
 			
 			String LeftString = new String();
-			for(String role:relatedCastItem.types){
-				if(LeftString.length() > 0){
-					LeftString = ",";
+			if(relatedCastItem.roles != null && relatedCastItem.roles.size() > 0){
+				for(String role:relatedCastItem.roles){
+					if(LeftString.length() > 0){
+						LeftString = ",";
+					}
+					LeftString += role;
 				}
-				LeftString += role;
+			}else{
+				for(String role:relatedCastItem.types){
+					if(LeftString.length() > 0){
+						LeftString = ",";
+					}
+					LeftString += role;
+				}
 			}
 			TextView leftText = new TextView(mContext);
 			LinearLayout.LayoutParams leftparams = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -631,8 +651,8 @@ public class CardDetailViewFactory {
 		
 		@Override
 		public void onClick(View v) {
-			if(mCardExpandListener != null && v.getTag() instanceof String){
-				mCardExpandListener.onTextSelected((String)v.getTag());
+			if(mListener != null && v.getTag() instanceof String){
+				mListener.onTextSelected((String)v.getTag());
 			}
 		}
 	};
@@ -640,8 +660,8 @@ public class CardDetailViewFactory {
 		
 		@Override
 		public void onClick(View v) {
-			if(mCardExpandListener != null && v.getTag() instanceof CardDetailMultiMediaGroup){
-				mCardExpandListener.onMediaGroupSelected((CardDetailMultiMediaGroup)v.getTag());
+			if(mListener != null && v.getTag() instanceof CardDetailMultiMediaGroup){
+				mListener.onMediaGroupSelected((CardDetailMultiMediaGroup)v.getTag());
 			}
 		}
 	};
@@ -720,8 +740,8 @@ public class CardDetailViewFactory {
 			
 			@Override
 			public void onClick(View v) {
-				if(mCardExpandListener != null){
-					mCardExpandListener.onDescriptionCollapsed();
+				if(mListener != null){
+					mListener.onDescriptionCollapsed();
 				}
 			}
 		});
@@ -800,8 +820,8 @@ public class CardDetailViewFactory {
 			
 			@Override
 			public void onClick(View v) {
-				if(mCardExpandListener != null){
-					mCardExpandListener.onDescriptionExpanded();
+				if(mListener != null){
+					mListener.onDescriptionExpanded();
 				}				
 			}
 		});

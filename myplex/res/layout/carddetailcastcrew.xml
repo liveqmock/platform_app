@@ -16,8 +16,8 @@
         android:id="@+id/carddetailcastandcrew_credits"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
         android:layout_marginLeft="12dp"
+        android:layout_marginTop="12dp"
         android:singleLine="true"
         android:text="@string/carddetailsectionheader_credits"
         android:textColor="#4b4b4c"
@@ -25,7 +25,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:orientation="horizontal" >
 
@@ -34,18 +34,39 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
-            android:layout_weight="1"
+            android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
+            android:layout_weight="1"
             android:orientation="vertical" >
         </LinearLayout>
+
         <LinearLayout
             android:id="@+id/carddetailcastcrew_rightlayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:layout_weight="1"
             android:orientation="vertical" >
         </LinearLayout>
     </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/carddetailcastcrew_fulldetails"
+        android:layout_width="match_parent"
+        android:layout_height="32dp"
+        android:layout_marginTop="12dp" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+			android:layout_alignParentRight="true"
+            android:paddingRight="12dp"
+            android:layout_centerVertical="true"
+            android:singleLine="true"
+            android:text="Full Details"
+            android:textColor="#54B5E9"
+            android:textSize="@dimen/textsize_14" />
+    </RelativeLayout>
 
 </LinearLayout>
