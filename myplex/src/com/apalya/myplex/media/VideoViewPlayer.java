@@ -58,7 +58,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 	private VideoView mVideoView;
 
 	private Uri mUri;
-
+	
 	// State maintained for proper onPause/OnResume behaviour.
 
 	private int mPositionWhenPaused = -1;
@@ -149,6 +149,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 		}
 		return errordata;
 	}
+	
 	public void setUri(Uri videoUri,StreamType type){
 		mPositionWhenPaused = -1;
 		mMediaPlayer = null;
@@ -256,7 +257,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 		drmRequest.put("WVDeviceIDKey", "device12345");
 		drmRequest.put("WVPortalKey", "sotalapalya");*/
 		// Request license
-		int rightStatus= drmManager.checkRightsStatus(mUri.toString());
+		int rightStatus= drmManager.checkRightsStatus(mUri.toString().replace("http:", "widevine:"));
 		if(rightStatus!=DrmStore.RightsStatus.RIGHTS_VALID)
 			drmManager.acquireRights(mUri.toString().replace("http:", "widevine:")); 
 		openVideo();

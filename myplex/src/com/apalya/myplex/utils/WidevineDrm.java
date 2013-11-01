@@ -42,10 +42,11 @@ public class WidevineDrm {
 
 	public static class Settings {
 		public static String WIDEVINE_MIME_TYPE = "video/wvm";
-		//public static String DRM_SERVER_URI = "https://staging.shibboleth.tv/widevine/cypherpc/cgi-bin/GetEMMs.cgi";
+		//public static String DRM_SERVER_URI = "http://api-beta.myplex.in/licenseproxy/v2/license";
 		public static String DRM_SERVER_URI = "http://122.248.233.48/widevine/cypherpc/cgi-bin/GetEMMs.cgi";
 		public static String DEVICE_ID = "device12345"; // use a unique device ID
 		public static String PORTAL_NAME = "sotalapalya";
+		public static String OP_DATA="optdata";
 
 		// test with a sizeable block of user data...
 		public static String USER_DATA = "01234567890123456789012345678901234567890123456789"
@@ -100,23 +101,23 @@ public class WidevineDrm {
 					break;
 				case DrmErrorEvent.TYPE_NOT_SUPPORTED:
 					logMessage("Not Supported\n");
-					logMessage(1,DrmErrorEvent.TYPE_NO_INTERNET_CONNECTION);
+					logMessage(1,DrmErrorEvent.TYPE_NOT_SUPPORTED);
 					break;
 				case DrmErrorEvent.TYPE_OUT_OF_MEMORY:
 					logMessage("Out of Memory\n");
-					logMessage(1,DrmErrorEvent.TYPE_NO_INTERNET_CONNECTION);
+					logMessage(1,DrmErrorEvent.TYPE_OUT_OF_MEMORY);
 					break;
 				case DrmErrorEvent.TYPE_PROCESS_DRM_INFO_FAILED:
 					logMessage("Process DRM Info failed\n");
-					logMessage(1,DrmErrorEvent.TYPE_NO_INTERNET_CONNECTION);
+					logMessage(1,DrmErrorEvent.TYPE_PROCESS_DRM_INFO_FAILED);
 					break;
 				case DrmErrorEvent.TYPE_REMOVE_ALL_RIGHTS_FAILED:
 					logMessage("Remove All Rights failed\n");
-					logMessage(1,DrmErrorEvent.TYPE_NO_INTERNET_CONNECTION);
+					logMessage(1,DrmErrorEvent.TYPE_REMOVE_ALL_RIGHTS_FAILED);
 					break;
 				case DrmErrorEvent.TYPE_RIGHTS_NOT_INSTALLED:
 					logMessage("Rights not installed\n");
-					logMessage(1,DrmErrorEvent.TYPE_NO_INTERNET_CONNECTION);
+					logMessage(1,DrmErrorEvent.TYPE_RIGHTS_NOT_INSTALLED);
 					break;
 				case DrmErrorEvent.TYPE_RIGHTS_RENEWAL_NOT_ALLOWED:
 					logMessage("Rights renewal not allowed\n");
@@ -138,9 +139,11 @@ public class WidevineDrm {
 		rightsAcquisitionInfo.put("WVDeviceIDKey", Settings.DEVICE_ID);
 		rightsAcquisitionInfo.put("WVPortalKey", Settings.PORTAL_NAME);
 		rightsAcquisitionInfo.put("WVCAUserDataKey", Settings.USER_DATA);
+		//rightsAcquisitionInfo.put("opdata", Settings.OP_DATA);
+		
 		return rightsAcquisitionInfo;
 	}
-
+	
 	public boolean isProvisionedDevice() {
 		return ((mWVDrmInfoRequestStatusKey == DEVICE_IS_PROVISIONED) ||
 				(mWVDrmInfoRequestStatusKey == DEVICE_IS_PROVISIONED_SD_ONLY));

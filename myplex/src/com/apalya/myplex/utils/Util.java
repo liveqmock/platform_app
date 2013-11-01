@@ -75,6 +75,8 @@ import com.apalya.myplex.cache.CacheManager;
 import com.apalya.myplex.cache.IndexHandler;
 import com.apalya.myplex.data.ApplicationConfig;
 import com.apalya.myplex.data.CardData;
+import com.apalya.myplex.data.CardDownloadData;
+import com.apalya.myplex.data.CardDownloadedDataList;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.fragments.CardExplorer;
 import com.apalya.myplex.tablet.MultiPaneActivity;
@@ -295,9 +297,17 @@ public class Util {
 				aMsg, 
 				Toast.LENGTH_LONG).show();
 	}
-	public static long startDownload(String aUrl,String aMovieName,Context mContext)
+	public static long startDownload(String aUrl,CardData aMovieData,Context mContext)
 	{
 		long lastDownloadId=-1L;
+		String aMovieName=aMovieData.generalInfo.title;
+		
+		CardDownloadedDataList downloadlist =  null;
+		try {
+			downloadlist = (CardDownloadedDataList) Util.loadObject(myplexapplication.getApplicationConfig().downloadCardsPath);	
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 		if(isDownloadManagerAvailable(mContext))
 		{
 			try{
@@ -335,15 +345,48 @@ public class Util {
 		{
 			//Download Manager is not available
 		}
+		if(downloadlist==null)
+		{
+			downloadlist= new CardDownloadedDataList();
+			downloadlist.mDownloadedList=new HashMap<String, CardDownloadData>();
+		}
+		
+		CardDownloadData downloadData= new CardDownloadData();
+		downloadData.ESTId=lastDownloadId;
+		downloadlist.mDownloadedList.put(aMovieData._id, downloadData);
+		Util.saveObject(downloadlist, myplexapplication.getApplicationConfig().downloadCardsPath);
+		
 		return lastDownloadId;
 	}
 	public static int checkDownloadStatus(String cardId,Context mContext){
 		
 		
-		Map<String, Long> ids=myplexapplication.getUserProfileInstance().downloadMap;
-		if(ids.get(cardId)==null){
+		CardDownloadedDataList downloadlist =  null;
+		try {
+			downloadlist = (CardDownloadedDataList) Util.loadObject(myplexapplication.getApplicationConfig().downloadCardsPath);	
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		
+		if(downloadlist!=null)
+		{
+			if(downloadlist.mDownloadedList.get(cardId)==null){
+				return 0;
+			}
+			else
+			{
+				return 1;
+			}
+		}
+		else
+		{
 			return 0;
 		}
+		
+		/*Map<String, Long> ids=myplexapplication.getUserProfileInstance().downloadMap;
+		if(ids.get(cardId)==null){
+			return 0;
+		}*/
 		
 /*		final long dwnlId=ids.get(cardId);
 		
@@ -365,7 +408,7 @@ public class Util {
 			}
 			
 		}).start();*/
-		return 1;
+		//return 1;
 		
 	}
 	public static void InviteFriends(final Context mContext) {

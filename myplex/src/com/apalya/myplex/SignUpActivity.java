@@ -386,8 +386,7 @@ public class SignUpActivity extends Activity{
 				//Util.showToast(Integer.toString(scrollWidth),LoginActivity.this);
 				if(getResources().getBoolean(R.bool.isTablet))
 				{
-					ImageView image2 = (ImageView) findViewById(R.id.imageView2);
-					image2.setImageResource(R.drawable.myplexbgimage);
+					
 					scrollWidth=parentScrollView.getChildAt(0).getMeasuredWidth()-getWindowManager().getDefaultDisplay().getWidth();
 					LinearLayout backgroundLayout= (LinearLayout)findViewById(R.id.relativeLayout1);
 					backgroundLayout.clearAnimation();
