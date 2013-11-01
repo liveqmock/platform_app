@@ -25,6 +25,7 @@ import android.view.View.OnFocusChangeListener;
 import android.view.ViewTreeObserver;
 import android.view.View.OnClickListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.TranslateAnimation;
@@ -182,10 +183,21 @@ public class SignUpActivity extends Activity{
 					{
 						if(mEmail.getText().toString().length() > 0 &&  mPassword.getText().toString().length()>0)
 						{
-							if(mEmail.getText().toString().contains("@")&& mEmail.getText().toString().contains(".") || isValidPhoneNumber)
+							if(mEmail.getText().toString().contains("@")&& mEmail.getText().toString().contains("."))
 							{
 								Map<String, String> params = new HashMap<String, String>();
 								params.put("userid", mEmail.getText().toString());
+								params.put("password", mPassword.getText().toString());
+								params.put("profile", "work");
+								params.put("clientKey",mDevInfo.getClientKey());
+								Log.d(TAG, "clientKey-----------: "+mDevInfo.getClientKey());
+								showProgressBar();
+								userLoginRequest(getString(R.string.signin), params);
+							}
+							else if(isValidPhoneNumber)
+							{
+								Map<String, String> params = new HashMap<String, String>();
+								params.put("userid", mEmail.getText().toString()+"@apalya.myplex.tv");
 								params.put("password", mPassword.getText().toString());
 								params.put("profile", "work");
 								params.put("clientKey",mDevInfo.getClientKey());
@@ -215,10 +227,20 @@ public class SignUpActivity extends Activity{
 					}
 					else
 					{
-						if(mEmail.getText().toString().contains("@")&& mEmail.getText().toString().contains(".") || isValidPhoneNumber)
+						if(mEmail.getText().toString().contains("@")&& mEmail.getText().toString().contains("."))
 						{
 							Map<String, String> params = new HashMap<String, String>();
 							params.put("email", mEmail.getText().toString());
+							params.put("profile", "work");
+							params.put("clientKey",mDevInfo.getClientKey());
+							Log.d(TAG, "clientKey-----------: "+mDevInfo.getClientKey());
+							showProgressBar();
+							forgotPasswordRequest(getString(R.string.forgotpassword), params);
+						}
+						else if(isValidPhoneNumber)
+						{
+							Map<String, String> params = new HashMap<String, String>();
+							params.put("email", mEmail.getText().toString()+"@apalya");
 							params.put("profile", "work");
 							params.put("clientKey",mDevInfo.getClientKey());
 							Log.d(TAG, "clientKey-----------: "+mDevInfo.getClientKey());
@@ -364,40 +386,34 @@ public class SignUpActivity extends Activity{
 				//Util.showToast(Integer.toString(scrollWidth),LoginActivity.this);
 				if(getResources().getBoolean(R.bool.isTablet))
 				{
+					ImageView image2 = (ImageView) findViewById(R.id.imageView2);
+					image2.setImageResource(R.drawable.myplexbgimage);
 					scrollWidth=parentScrollView.getChildAt(0).getMeasuredWidth()-getWindowManager().getDefaultDisplay().getWidth();
-					//Util.showToast(Integer.toString(scrollWidth),LoginActivity.this);
 					LinearLayout backgroundLayout= (LinearLayout)findViewById(R.id.relativeLayout1);
 					backgroundLayout.clearAnimation();
-
 					translateAnim = new TranslateAnimation(-scrollWidth,0,0,0); 
 					translateAnim.setDetachWallpaper(true);
-
 					translateAnim.setDuration((scrollWidth/2)*100);   
 					translateAnim.setRepeatCount(Animation.INFINITE);
-					translateAnim.setInterpolator(new LinearInterpolator());
+					translateAnim.setInterpolator(new AccelerateDecelerateInterpolator());
 					translateAnim.setRepeatMode(2);
-					//translateAnim.setFillEnabled(true);
-					//translateAnim.setFillBefore(true);
 					translateAnim.scaleCurrentDuration(1f);
 					backgroundLayout.startAnimation(translateAnim);
 				}
 				else
 				{
 					scrollWidth=parentScrollView.getChildAt(0).getMeasuredWidth()-getWindowManager().getDefaultDisplay().getWidth();
-					//Util.showToast(Integer.toString(scrollWidth),LoginActivity.this);
 					backgroundScrollLayout= (RelativeLayout)findViewById(R.id.relativeLayout1);
-					backgroundScrollLayout.clearAnimation();
-
-					translateAnim = new TranslateAnimation(-scrollWidth,0,0,0); 
-					translateAnim.setDetachWallpaper(true);
-
+					//backgroundScrollLayout.clearAnimation();
+					//backgroundScrollLayout.isAlwaysDrawnWithCacheEnabled();
+					translateAnim = new TranslateAnimation(0,-scrollWidth,0,0); 
+					//translateAnim.setDetachWallpaper(true);
+					//translateAnim.setFillEnabled(true);
 					translateAnim.setDuration(width*100);   
 					translateAnim.setRepeatCount(Animation.INFINITE);
-					translateAnim.setInterpolator(new LinearInterpolator());
+					translateAnim.setInterpolator(new AccelerateDecelerateInterpolator());
 					translateAnim.setRepeatMode(2);
-					//translateAnim.setFillEnabled(true);
-					//translateAnim.setFillBefore(true);
-					translateAnim.scaleCurrentDuration(1f);
+					//translateAnim.scaleCurrentDuration(1f);
 					backgroundScrollLayout.startAnimation(translateAnim);
 				}
 

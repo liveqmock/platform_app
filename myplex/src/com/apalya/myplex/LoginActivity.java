@@ -40,6 +40,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.TranslateAnimation;
@@ -171,7 +172,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Crashlytics.start(this);
+	    Crashlytics.start(this);
 		FontUtil.loadFonts(getAssets());
 		String trackingDistinctId = getTrackingDistinctId();
 		mMixpanel=myplexapplication.getMixPanel();
@@ -228,63 +229,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		mFacebookButton.setOnClickListener(this);
 		mFacebookButton.setTypeface(FontUtil.Roboto_Regular);
 
-		DisplayMetrics dm = new DisplayMetrics();
-		getWindowManager().getDefaultDisplay().getMetrics(dm);
-
-		final int height = dm.heightPixels;
-		final int width = dm.widthPixels;
-		final HorizontalScrollView parentScrollView= (HorizontalScrollView) findViewById(R.id.scrollView1);
-		parentScrollView.setOnTouchListener(new View.OnTouchListener() {
-			@Override
-			public boolean onTouch(View arg0, MotionEvent arg1) {
-				// TODO Auto-generated method stub
-				//parentScrollView.requestDisallowInterceptTouchEvent(false);
-				return true;
-			}
-		});
 		
-		ImageView image1 = (ImageView) findViewById(R.id.imageView1);
-		image1.setImageResource(R.drawable.myplexbgimage);
-
-		ViewTreeObserver vto = parentScrollView.getViewTreeObserver();
-
-		vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
-			@Override
-			public void onGlobalLayout() {
-				parentScrollView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-
-				if(getResources().getBoolean(R.bool.isTablet))
-				{
-					ImageView image2 = (ImageView) findViewById(R.id.imageView2);
-					image2.setImageResource(R.drawable.myplexbgimage);
-					scrollWidth=parentScrollView.getChildAt(0).getMeasuredWidth()-getWindowManager().getDefaultDisplay().getWidth();
-					LinearLayout backgroundLayout= (LinearLayout)findViewById(R.id.relativeLayout1);
-					backgroundLayout.clearAnimation();
-					translateAnim = new TranslateAnimation(-scrollWidth,0,0,0); 
-					translateAnim.setDetachWallpaper(true);
-					translateAnim.setDuration((scrollWidth/2)*100);   
-					translateAnim.setRepeatCount(Animation.INFINITE);
-					translateAnim.setInterpolator(new LinearInterpolator());
-					translateAnim.setRepeatMode(2);
-					translateAnim.scaleCurrentDuration(1f);
-					backgroundLayout.startAnimation(translateAnim);
-				}
-				else
-				{
-					scrollWidth=parentScrollView.getChildAt(0).getMeasuredWidth()-getWindowManager().getDefaultDisplay().getWidth();
-					backgroundScrollLayout= (RelativeLayout)findViewById(R.id.relativeLayout1);
-					backgroundScrollLayout.clearAnimation();
-					translateAnim = new TranslateAnimation(-scrollWidth,0,0,0); 
-					translateAnim.setDetachWallpaper(true);
-					translateAnim.setDuration(width*100);   
-					translateAnim.setRepeatCount(Animation.INFINITE);
-					translateAnim.setInterpolator(new LinearInterpolator());
-					translateAnim.setRepeatMode(2);
-					translateAnim.scaleCurrentDuration(1f);
-					backgroundScrollLayout.startAnimation(translateAnim);
-				}
-			}
-		});
 
 		mLoginText=(TextView)findViewById(R.id.logintext);
 		mLoginText.setTypeface(FontUtil.Roboto_Regular);
@@ -426,6 +371,61 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		}
 		CheckUserStatus();
 
+		DisplayMetrics dm = new DisplayMetrics();
+		getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+		final int height = dm.heightPixels;
+		final int width = dm.widthPixels;
+		final HorizontalScrollView parentScrollView= (HorizontalScrollView) findViewById(R.id.scrollView1);
+		parentScrollView.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View arg0, MotionEvent arg1) {
+				// TODO Auto-generated method stub
+				//parentScrollView.requestDisallowInterceptTouchEvent(false);
+				return true;
+			}
+		});
+		
+		ViewTreeObserver vto = parentScrollView.getViewTreeObserver();
+
+		vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+			@Override
+			public void onGlobalLayout() {
+				parentScrollView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+
+				if(getResources().getBoolean(R.bool.isTablet))
+				{
+					scrollWidth=parentScrollView.getChildAt(0).getMeasuredWidth()-getWindowManager().getDefaultDisplay().getWidth();
+					LinearLayout backgroundLayout= (LinearLayout)findViewById(R.id.relativeLayout1);
+					backgroundLayout.clearAnimation();
+					translateAnim = new TranslateAnimation(-scrollWidth,0,0,0); 
+					translateAnim.setDetachWallpaper(true);
+					translateAnim.setDuration((scrollWidth/2)*100);   
+					translateAnim.setRepeatCount(Animation.INFINITE);
+					translateAnim.setInterpolator(new AccelerateDecelerateInterpolator());
+					translateAnim.setRepeatMode(2);
+					translateAnim.scaleCurrentDuration(1f);
+					backgroundLayout.startAnimation(translateAnim);
+				}
+				else
+				{
+					scrollWidth=parentScrollView.getChildAt(0).getMeasuredWidth()-getWindowManager().getDefaultDisplay().getWidth();
+					backgroundScrollLayout= (RelativeLayout)findViewById(R.id.relativeLayout1);
+					//backgroundScrollLayout.clearAnimation();
+					//backgroundScrollLayout.isAlwaysDrawnWithCacheEnabled();
+					translateAnim = new TranslateAnimation(0,-scrollWidth,0,0); 
+					//translateAnim.setDetachWallpaper(true);
+					//translateAnim.setFillEnabled(true);
+					translateAnim.setDuration(width*100);   
+					translateAnim.setRepeatCount(Animation.INFINITE);
+					translateAnim.setInterpolator(new AccelerateDecelerateInterpolator());
+					translateAnim.setRepeatMode(2);
+					//translateAnim.scaleCurrentDuration(1f);
+					backgroundScrollLayout.startAnimation(translateAnim);
+				}
+			}
+		});
+		
 		//Check if Keyboard is visible or not
 		//mRootLayout = findViewById(R.id.rootlayout);  
 
@@ -937,9 +937,6 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 	}
 
 	private void onClickLogin() {
-
-		
-		
 		Session session = Session.getActiveSession();
 		if (!session.isOpened() && !session.isClosed()) {
 			session.openForRead(new Session.OpenRequest(this)
@@ -948,8 +945,6 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		} else {
 			Session.openActiveSession(this, true, statusCallback);
 		}
-
-
 	}
 
 	@Override

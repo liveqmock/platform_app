@@ -13,6 +13,12 @@
 
     <style name="action_bar_theme" parent="@android:style/Widget.Holo.ActionBar">
         <item name="android:background">@color/searchtags_color</item>
+        <item name="android:titleTextStyle">@style/NewWindowTitle</item>
+        </style>
+	
+	 <style name="NewWindowTitle">
+        <item name="android:textColor">#fff</item>
+        <item name="android:textSize">18sp</item>
     </style>
 
     <style name="YaSeekBar">

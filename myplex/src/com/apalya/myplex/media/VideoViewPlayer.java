@@ -258,7 +258,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 		// Request license
 		int rightStatus= drmManager.checkRightsStatus(mUri.toString());
 		if(rightStatus!=DrmStore.RightsStatus.RIGHTS_VALID)
-			drmManager.acquireRights(mUri.toString()); 
+			drmManager.acquireRights(mUri.toString().replace("http:", "widevine:")); 
 		openVideo();
 	}
 	
@@ -447,7 +447,16 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,
 		mVideoView.setOnErrorListener(this);
 		mVideoView.setOnCompletionListener(this);
 		//mVideoView.setVideoURI(mUri);
-		mVideoView.setVideoPath(mUri.toString());
+		if(mUri.toString().contains(".wvm"))
+		{
+			mVideoView.setVideoPath(mUri.toString().replace("http:", "widevine:"));
+			 
+		}
+		else
+		{
+			mVideoView.setVideoPath(mUri.toString());
+		}
+		
 		mVideoView.setOnPreparedListener(this);
 
 		mBufferProgressHandler.sendEmptyMessage(START);
