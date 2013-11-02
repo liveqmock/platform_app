@@ -712,6 +712,7 @@ public class CardDetailViewFactory {
 			}
 		}
 		parentalRating.setTypeface(FontUtil.Roboto_Medium);
+		
 		RatingBar ratingBar = (RatingBar)v.findViewById(R.id.carddetaildesc_setRating);
 		if(mData.userReviews != null){
 			ratingBar.setRating(mData.userReviews.averageRating);	
@@ -721,6 +722,14 @@ public class CardDetailViewFactory {
 			relaseDate.setText(mData.content.releaseDate);
 		}
 		relaseDate.setTypeface(FontUtil.Roboto_Medium);
+		
+		if(mData._id.equalsIgnoreCase("0")){
+			ImageView imgDuration = (ImageView) v.findViewById(R.id.carddetailbriefdescription_imgduration);
+			imgDuration.setVisibility(View.GONE);
+			parentalRating.setVisibility(View.GONE);
+			relaseDate.setVisibility(View.GONE);
+			ratingBar.setVisibility(View.GONE);
+		}
 		
 		TextView contentDuration = (TextView)v.findViewById(R.id.carddetaildesc_duration);
 		if(mData.content != null ){
@@ -812,6 +821,16 @@ public class CardDetailViewFactory {
 		}
 		relaseDate.setTypeface(FontUtil.Roboto_Medium);
 		
+		
+		
+		if(mData._id.equalsIgnoreCase("0")){
+			ImageView imgDuration = (ImageView) v.findViewById(R.id.carddetailbriefdescription_imgduration);
+			imgDuration.setVisibility(View.GONE);
+			parentalRating.setVisibility(View.GONE);
+			relaseDate.setVisibility(View.GONE);
+			ratingBar.setVisibility(View.GONE);
+		}
+		
 		TextView contentDuration = (TextView)v.findViewById(R.id.carddetailbriefdescription_duration);
 		if(mData.content != null ){
 			contentDuration.setText(""+mData.content.duration);
@@ -874,8 +893,12 @@ public class CardDetailViewFactory {
 						packageButton.setText("Free");
 						packageButton.setOnClickListener(null);
 					}
+					
 				}	
 			}
+		}
+		if(mData._id.equalsIgnoreCase("0")){
+			packageButton.setVisibility(View.GONE);
 		}
 	}
 	private Button mBriefDescPackageButton = null;
@@ -888,9 +911,11 @@ public class CardDetailViewFactory {
 		
 		@Override
 		public void onClick(View v) {
-			PackagePopUp popup = new PackagePopUp(mContext,mParentView);
-			myplexapplication.getCardExplorerData().cardDataToSubscribe =  mData;
-			popup.showPackDialog(mData, ((Activity)mContext).getActionBar().getCustomView());			
+			
+				PackagePopUp popup = new PackagePopUp(mContext,mParentView);
+				myplexapplication.getCardExplorerData().cardDataToSubscribe =  mData;
+				popup.showPackDialog(mData, ((Activity)mContext).getActionBar().getCustomView());	
+						
 		}
 	};
 	public View getSubSection(String label){

@@ -325,30 +325,38 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		Settings.addLoggingBehavior(LoggingBehavior.REQUESTS);
 		Session session = Session.getActiveSession();
 		if (session == null) {
+			//Util.showToast("Facebook No Session", this);
 			if (savedInstanceState != null) {
+			
 				session = Session.restoreSession(this, null, statusCallback, savedInstanceState);
 			}
 			if (session == null) {
+			
 				session = new Session(this);
 			}
 			Session.setActiveSession(session);
+			
 			if (session.getState().equals(SessionState.CREATED_TOKEN_LOADED)) {
+				//Util.showToast("Facebook new Session2", this);
 				//session.openForRead(new Session.OpenRequest(this).setCallback(statusCallback));
-				if (!session.isOpened() && !session.isClosed()) {
+				/*if (!session.isOpened() && !session.isClosed()) {
+					Util.showToast("Facebook new Session3", this);
 					session.openForRead(new Session.OpenRequest(this)
 					.setPermissions(Arrays.asList("basic_info","email","read_friendlists","user_about_me","friends_about_me","user_hometown"))
 					.setCallback(statusCallback));
 				} else {
 					Util.showToast("Facebook Opening Session", this);
 					Session.openActiveSession(this, true, statusCallback);
-				}
+				}*/
 			}
 
 		}
 		else
 		{
+			
 			if(session.isOpened())
 			{
+			
 				Map<String,String> params=new HashMap<String, String>();
 				params.put("status", "Success");
 				Analytics.trackEvent(Analytics.loginFacebook,params);
@@ -363,12 +371,12 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				.setScopes(AccountUtils.AUTH_SCOPES)
 				.build();
 
-		if(AccountUtils.isAuthenticated(LoginActivity.this) )
+		/*if(AccountUtils.isAuthenticated(LoginActivity.this) )
 		{
 
 			mPlusClient.connect();
 
-		}
+		}*/
 		CheckUserStatus();
 
 		DisplayMetrics dm = new DisplayMetrics();
@@ -712,13 +720,13 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 		//CheckUserStatus();
 
-		if(isAuthTwitter())
+		/*if(isAuthTwitter())
 		{
 			finish();
 			Util.launchMainActivity(LoginActivity.this);
 			//			Intent intent = new Intent(LoginActivity.this, MainActivity.class);
 			//			LoginActivity.this.startActivity(intent);
-		}
+		}*/
 	}
 
 	@Override
@@ -787,7 +795,13 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 						//mUserInfo.setProfileDesc(user.getProperty("hometown").);
 						mUserInfo.setLoginStatus(true);
 						mUserInfo.setProfilePic("https://graph.facebook.com/"+fbUserId+"/picture?width=480&height=320");
-
+						
+						SharedPrefUtils.writeToSharedPref(LoginActivity.this,
+								getString(R.string.devusername), user.getProperty("email").toString());
+						SharedPrefUtils.writeToSharedPref(LoginActivity.this,
+								getString(R.string.userprofilename), user.getName());
+						SharedPrefUtils.writeToSharedPref(LoginActivity.this,
+								getString(R.string.userpic), "https://graph.facebook.com/"+fbUserId+"/picture?width=480&height=320");
 
 						Log.d(TAG, "Facebook User Id:   "+fbUserId);
 						Map<String, String> params = new HashMap<String, String>();
@@ -940,7 +954,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		Session session = Session.getActiveSession();
 		if (!session.isOpened() && !session.isClosed()) {
 			session.openForRead(new Session.OpenRequest(this)
-			.setPermissions(Arrays.asList("basic_info","email"))
+			.setPermissions(Arrays.asList("basic_info","email","read_friendlists","user_about_me","friends_about_me","user_hometown"))
 			.setCallback(statusCallback));
 		} else {
 			Session.openActiveSession(this, true, statusCallback);
@@ -982,7 +996,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		}
 		else if (view.getId() == R.id.google ) {
 
-			if(!AccountUtils.isAuthenticated(LoginActivity.this))
+			//if(!AccountUtils.isAuthenticated(LoginActivity.this))
 			{
 				if(mDevInfo.getClientKey()!=null)
 				{
@@ -1009,7 +1023,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		{
 			if(mDevInfo.getClientKey()!=null)
 			{
-				if (!isAuthTwitter()){
+				//if (!isAuthTwitter())
+				{
 					Map<String,String> param1=new HashMap<String, String>();
 					param1.put("Duration", "");
 					Analytics.trackEvent(Analytics.loginTwitter,param1,true);
@@ -1113,6 +1128,9 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
 						Log.d(TAG, "########################################################");
 						Log.d(TAG, "---------------------------------------------------------");
+						
+						SharedPrefUtils.writeToSharedPref(LoginActivity.this,
+								getString(R.string.devusername), mUserInfo.getUserEmail());
 
 						finish();
 						Util.launchMainActivity(LoginActivity.this);
@@ -1331,6 +1349,10 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				mUserInfo.setGoogleId(person.getId());
 				mUserInfo.setName(person.getName().getGivenName());
 				mUserInfo.setProfilePic("https://plus.google.com/s2/photos/profile/"+person.getId()+"?sz=480");
+				SharedPrefUtils.writeToSharedPref(LoginActivity.this,
+						getString(R.string.userprofilename), person.getName().getGivenName());
+				SharedPrefUtils.writeToSharedPref(LoginActivity.this,
+						getString(R.string.userpic), "https://plus.google.com/s2/photos/profile/"+person.getId()+"?sz=480");
 				tryAuthenticate();
 
 			}
@@ -1618,6 +1640,18 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				//check if user is already logged in, if so take him to main screen or else login screen
 				if(username!=null)
 				{
+					
+					String profilename=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
+							getString(R.string.userprofilename));
+					String profilePic=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
+							getString(R.string.userpic));
+					
+					if(profilename!=null)
+						mUserInfo.setName(profilename);
+					if(profilePic!=null)
+						mUserInfo.setProfilePic(profilePic);
+					mUserInfo.setUserEmail(username);
+					
 					finish();
 					Util.launchMainActivity(LoginActivity.this);
 				}
@@ -1666,6 +1700,13 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 		String clientKeyExp=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
 				getString(R.string.devclientkeyexp)); 
+		
+		SharedPrefUtils.writeToSharedPref(LoginActivity.this,
+				getString(R.string.userprofilename), mUserInfo.getName());
+		SharedPrefUtils.writeToSharedPref(LoginActivity.this,
+				getString(R.string.userpic), mUserInfo.getProfilePic());
+		SharedPrefUtils.writeToSharedPref(LoginActivity.this,
+				getString(R.string.devusername), mUserInfo.getUserEmail());
 
 		Log.d(TAG, "Twitter User Id:   "+mUserInfo.getUserId());
 		Map<String, String> params = new HashMap<String, String>();

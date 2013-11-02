@@ -11,7 +11,9 @@ import android.animation.LayoutTransition;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -44,6 +46,7 @@ import com.apalya.myplex.data.CardDataCertifiedRatingsItem;
 import com.apalya.myplex.data.CardDataPackagePriceDetailsItem;
 import com.apalya.myplex.data.CardDataPackages;
 import com.apalya.myplex.data.CardDataPromotionDetailsItem;
+import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.Blur;
 import com.apalya.myplex.utils.ConsumerApi;
@@ -65,8 +68,8 @@ public class PackagePopUp {
 		this.mBackground = background;
 		this.mInflater = LayoutInflater.from(mContext);
 	}
-	
-	
+
+
 	private void dismissFilterMenuPopupWindow() {
 		if (mFilterMenuPopupWindow != null) {
 			mFilterMenuPopupWindowList.remove(mFilterMenuPopupWindow);
@@ -87,7 +90,7 @@ public class PackagePopUp {
 			}
 			mBlurEngine = new Blur();
 			mBlurEngine.fastblur(mContext, mOrginalBitmap, 12, new BlurResponse() {
-				
+
 				@Override
 				public void BlurredBitmap(Bitmap b) {
 					mOrginalBitmap.recycle();
@@ -128,81 +131,180 @@ public class PackagePopUp {
 	}
 	private LinearLayout mLastPaymentModeLayout;
 	private OnClickListener mPackClickListener = new OnClickListener() {
-		
-		@Override
-		public void onClick(View v) {
-			if(v.getTag() instanceof LinearLayout){
-				if(mLastPaymentModeLayout != null){
-					mLastPaymentModeLayout.removeAllViews();
-				}
-				LinearLayout subLayout = (LinearLayout)v.getTag();if(subLayout == null){return;}
-				
-				mLastPaymentModeLayout = new LinearLayout(mContext);
-				LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT);
-				params.leftMargin = ((int)mContext.getResources().getDimension(R.dimen.margin_gap_12));
-				mLastPaymentModeLayout.setLayoutParams(params);
-				mLastPaymentModeLayout.setOrientation(LinearLayout.VERTICAL);
-				
-				LayoutTransition transition = new LayoutTransition();
-				transition.setStartDelay(LayoutTransition.CHANGE_APPEARING, 0);
-				mLastPaymentModeLayout.setLayoutTransition(transition);
-				
-				
-				subLayout.addView(mLastPaymentModeLayout);
-				
-				deSelectViews();
-				v.setAlpha(1.0f);
-				CardDataPackages packageitem = (CardDataPackages)subLayout.getTag();
-				if(packageitem == null){return;}
-				if(packageitem.priceDetails == null){return;}
-				int count = 0;
-				for(CardDataPackagePriceDetailsItem priceItem:packageitem.priceDetails){
-					if(count == 0){
-						TextView heading = (TextView)mInflater.inflate(R.layout.pricepopmodeheading,null);
-						heading.setTypeface(FontUtil.Roboto_Medium);
-						mLastPaymentModeLayout.addView(heading);
-					}
-					View paymentModeItem = mInflater.inflate(R.layout.paymentmodeitemlayout,null);
-					TextView paymentModeText = (TextView)paymentModeItem.findViewById(R.id.paymentmodetext);
-					paymentModeText.setTypeface(FontUtil.Roboto_Medium);
-					paymentModeText.setText(priceItem.name);
-					mLastPaymentModeLayout.addView(paymentModeItem);
-					Util.showFeedback(paymentModeItem);
-					paymentModeItem.setId(count);
-					count++;
-					paymentModeItem.setTag(packageitem);
-					paymentModeItem.setOnClickListener(new OnClickListener() {
 
-						@Override
-						public void onClick(View arg0) {
-							try {
-								if(arg0.getTag() instanceof CardDataPackages){
-									CardDataPackages packageitem = (CardDataPackages)arg0.getTag();
-									int id = arg0.getId();
-									CardDataPackagePriceDetailsItem priceItem = packageitem.priceDetails.get(id);
-									String requestUrl = ConsumerApi.getSusbcriptionRequesr(priceItem.paymentChannel, packageitem.packageId);
-									Log.e(TAG, "RequestURL = "+requestUrl);
-									Intent i = new Intent(mContext,SubscriptionView.class);
-									Bundle b = new Bundle();
-									b.putString("url", requestUrl);
-									i.putExtras(b);
-									FlurryAgent.onStartSession(mContext, "X6WWX57TJQM54CVZRB3K");
-									Map<String,String> params=new HashMap<String, String>();
-									params.put("PackageId",packageitem.packageId);
-									params.put("PackageName", packageitem.packageName);
-									params.put("PaymentChannel", priceItem.paymentChannel);
-									params.put("Action", "Purchase");
-									Analytics.trackEvent(Analytics.PackagesPurchase,params);
-									FlurryAgent.onEndSession(mContext);
-									((Activity) mContext).startActivityForResult(i, ConsumerApi.SUBSCRIPTIONREQUEST);
-									dismissFilterMenuPopupWindow();
-								}
-							} catch (Exception e) {
-								// TODO: handle exception
-							}
-						}
-					});
-				}
+		@Override
+		public void onClick(final View v) {
+			
+			String email=myplexapplication.getUserProfileInstance().getUserEmail();
+			if(email.equalsIgnoreCase("NA") || email.equalsIgnoreCase(""))
+			{	
+				final String account=Util.getGoogleAccountName(mContext);
+				
+				
+				AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+				 builder.setMessage("Continue using app with account "+account+" ?")
+				 		.setTitle("Login Required!!!")
+				        .setCancelable(false)
+				        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+				            public void onClick(DialogInterface dialog, int id) {
+				            	if(v.getTag() instanceof LinearLayout){
+				    				if(mLastPaymentModeLayout != null){
+				    					mLastPaymentModeLayout.removeAllViews();
+				    				}
+				    				LinearLayout subLayout = (LinearLayout)v.getTag();if(subLayout == null){return;}
+
+				    				mLastPaymentModeLayout = new LinearLayout(mContext);
+				    				LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+				    				params.leftMargin = ((int)mContext.getResources().getDimension(R.dimen.margin_gap_12));
+				    				mLastPaymentModeLayout.setLayoutParams(params);
+				    				mLastPaymentModeLayout.setOrientation(LinearLayout.VERTICAL);
+
+				    				LayoutTransition transition = new LayoutTransition();
+				    				transition.setStartDelay(LayoutTransition.CHANGE_APPEARING, 0);
+				    				mLastPaymentModeLayout.setLayoutTransition(transition);
+
+
+				    				subLayout.addView(mLastPaymentModeLayout);
+
+				    				deSelectViews();
+				    				v.setAlpha(1.0f);
+				    				CardDataPackages packageitem = (CardDataPackages)subLayout.getTag();
+				    				if(packageitem == null){return;}
+				    				if(packageitem.priceDetails == null){return;}
+				    				int count = 0;
+				    				for(CardDataPackagePriceDetailsItem priceItem:packageitem.priceDetails){
+				    					if(count == 0){
+				    						TextView heading = (TextView)mInflater.inflate(R.layout.pricepopmodeheading,null);
+				    						heading.setTypeface(FontUtil.Roboto_Medium);
+				    						mLastPaymentModeLayout.addView(heading);
+				    					}
+				    					View paymentModeItem = mInflater.inflate(R.layout.paymentmodeitemlayout,null);
+				    					TextView paymentModeText = (TextView)paymentModeItem.findViewById(R.id.paymentmodetext);
+				    					paymentModeText.setTypeface(FontUtil.Roboto_Medium);
+				    					paymentModeText.setText(priceItem.name);
+				    					mLastPaymentModeLayout.addView(paymentModeItem);
+				    					Util.showFeedback(paymentModeItem);
+				    					paymentModeItem.setId(count);
+				    					count++;
+				    					paymentModeItem.setTag(packageitem);
+				    					paymentModeItem.setOnClickListener(new OnClickListener() {
+
+				    						@Override
+				    						public void onClick(View arg0) {
+				    							try {
+				    								if(arg0.getTag() instanceof CardDataPackages){
+				    									CardDataPackages packageitem = (CardDataPackages)arg0.getTag();
+				    									int id = arg0.getId();
+				    									CardDataPackagePriceDetailsItem priceItem = packageitem.priceDetails.get(id);
+				    									String requestUrl = ConsumerApi.getSusbcriptionRequesr(priceItem.paymentChannel, packageitem.packageId);
+				    									Log.e(TAG, "RequestURL = "+requestUrl);
+				    									Intent i = new Intent(mContext,SubscriptionView.class);
+				    									Bundle b = new Bundle();
+				    									b.putString("url", requestUrl);
+				    									i.putExtras(b);
+				    									FlurryAgent.onStartSession(mContext, "X6WWX57TJQM54CVZRB3K");
+				    									Map<String,String> params=new HashMap<String, String>();
+				    									params.put("PackageId",packageitem.packageId);
+				    									params.put("PackageName", packageitem.packageName);
+				    									params.put("PaymentChannel", priceItem.paymentChannel);
+				    									params.put("Action", "Purchase");
+				    									Analytics.trackEvent(Analytics.PackagesPurchase,params);
+				    									FlurryAgent.onEndSession(mContext);
+				    									((Activity) mContext).startActivityForResult(i, ConsumerApi.SUBSCRIPTIONREQUEST);
+				    									dismissFilterMenuPopupWindow();
+				    								}
+				    							} catch (Exception e) {
+				    								// TODO: handle exception
+				    							}
+				    						}
+				    					});
+				    				}
+				    			}
+				            }
+				        })
+				        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+				            public void onClick(DialogInterface dialog, int id) {
+				                 dialog.cancel();
+				            }
+				        });
+				 AlertDialog alert = builder.create();
+				 alert.show();
+				
+			}
+			else{
+				if(v.getTag() instanceof LinearLayout){
+    				if(mLastPaymentModeLayout != null){
+    					mLastPaymentModeLayout.removeAllViews();
+    				}
+    				LinearLayout subLayout = (LinearLayout)v.getTag();if(subLayout == null){return;}
+
+    				mLastPaymentModeLayout = new LinearLayout(mContext);
+    				LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+    				params.leftMargin = ((int)mContext.getResources().getDimension(R.dimen.margin_gap_12));
+    				mLastPaymentModeLayout.setLayoutParams(params);
+    				mLastPaymentModeLayout.setOrientation(LinearLayout.VERTICAL);
+
+    				LayoutTransition transition = new LayoutTransition();
+    				transition.setStartDelay(LayoutTransition.CHANGE_APPEARING, 0);
+    				mLastPaymentModeLayout.setLayoutTransition(transition);
+
+
+    				subLayout.addView(mLastPaymentModeLayout);
+
+    				deSelectViews();
+    				v.setAlpha(1.0f);
+    				CardDataPackages packageitem = (CardDataPackages)subLayout.getTag();
+    				if(packageitem == null){return;}
+    				if(packageitem.priceDetails == null){return;}
+    				int count = 0;
+    				for(CardDataPackagePriceDetailsItem priceItem:packageitem.priceDetails){
+    					if(count == 0){
+    						TextView heading = (TextView)mInflater.inflate(R.layout.pricepopmodeheading,null);
+    						heading.setTypeface(FontUtil.Roboto_Medium);
+    						mLastPaymentModeLayout.addView(heading);
+    					}
+    					View paymentModeItem = mInflater.inflate(R.layout.paymentmodeitemlayout,null);
+    					TextView paymentModeText = (TextView)paymentModeItem.findViewById(R.id.paymentmodetext);
+    					paymentModeText.setTypeface(FontUtil.Roboto_Medium);
+    					paymentModeText.setText(priceItem.name);
+    					mLastPaymentModeLayout.addView(paymentModeItem);
+    					Util.showFeedback(paymentModeItem);
+    					paymentModeItem.setId(count);
+    					count++;
+    					paymentModeItem.setTag(packageitem);
+    					paymentModeItem.setOnClickListener(new OnClickListener() {
+
+    						@Override
+    						public void onClick(View arg0) {
+    							try {
+    								if(arg0.getTag() instanceof CardDataPackages){
+    									CardDataPackages packageitem = (CardDataPackages)arg0.getTag();
+    									int id = arg0.getId();
+    									CardDataPackagePriceDetailsItem priceItem = packageitem.priceDetails.get(id);
+    									String requestUrl = ConsumerApi.getSusbcriptionRequesr(priceItem.paymentChannel, packageitem.packageId);
+    									Log.e(TAG, "RequestURL = "+requestUrl);
+    									Intent i = new Intent(mContext,SubscriptionView.class);
+    									Bundle b = new Bundle();
+    									b.putString("url", requestUrl);
+    									i.putExtras(b);
+    									FlurryAgent.onStartSession(mContext, "X6WWX57TJQM54CVZRB3K");
+    									Map<String,String> params=new HashMap<String, String>();
+    									params.put("PackageId",packageitem.packageId);
+    									params.put("PackageName", packageitem.packageName);
+    									params.put("PaymentChannel", priceItem.paymentChannel);
+    									params.put("Action", "Purchase");
+    									Analytics.trackEvent(Analytics.PackagesPurchase,params);
+    									FlurryAgent.onEndSession(mContext);
+    									((Activity) mContext).startActivityForResult(i, ConsumerApi.SUBSCRIPTIONREQUEST);
+    									dismissFilterMenuPopupWindow();
+    								}
+    							} catch (Exception e) {
+    								// TODO: handle exception
+    							}
+    						}
+    					});
+    				}
+    			}
 			}
 		}
 	};
@@ -213,7 +315,7 @@ public class PackagePopUp {
 	}
 	List<View> mPackViewList = new ArrayList<View>();
 	private void createPackItem(CardDataPackagePriceDetailsItem priceDetailItem,CardDataPackages packageitem,LinearLayout parentLayout){
-		
+
 		LinearLayout packLayout = new LinearLayout(mContext);
 		LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.FILL_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
 		packLayout.setLayoutParams(params);
@@ -222,7 +324,7 @@ public class PackagePopUp {
 		LayoutTransition transition = new LayoutTransition();
 		transition.setStartDelay(LayoutTransition.CHANGE_APPEARING, 0);
 		packLayout.setLayoutTransition(transition);
-		
+
 		View v = mInflater.inflate(R.layout.purchasepackitem, null);
 		LinearLayout promotionalLayout = (LinearLayout)v.findViewById(R.id.purchasepackItem1_offer);
 		if(packageitem.promotionDetails == null ){ promotionalLayout.setVisibility(View.INVISIBLE);}
@@ -243,7 +345,7 @@ public class PackagePopUp {
 				offerAmount.setText(" "+promotionAmount+"%");
 			}
 		}
-		
+
 		TextView amount = (TextView)v.findViewById(R.id.purchasepackItem1_price);
 		amount.setTypeface(FontUtil.Roboto_Medium);
 		amount.setText(mContext.getResources().getString(R.string.price_rupeecode)+" "+priceDetailItem.price);

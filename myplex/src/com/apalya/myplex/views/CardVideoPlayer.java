@@ -1,5 +1,6 @@
 package com.apalya.myplex.views;
 
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -14,6 +15,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Base64;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -41,6 +43,7 @@ import com.apalya.myplex.media.VideoViewPlayer;
 import com.apalya.myplex.media.VideoViewPlayer.StreamType;
 import com.apalya.myplex.utils.MediaUtil;
 import com.apalya.myplex.utils.MediaUtil.MediaUtilEventListener;
+import com.apalya.myplex.utils.WidevineDrm.Settings;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.MyVolley;
@@ -228,14 +231,19 @@ public class CardVideoPlayer implements PlayerListener {
 //							Toast.LENGTH_SHORT).show();
 					return;
 				}
+				
+				/*//TODO:: REMOVE THIS, ENABLED ONLY TO TEST DOWNLOAD
+				Util.startDownload(url, mData, mContext);*/
+				
+				
 				if(isESTPackPurchased)
 				{
 					closePlayer();
 					
 					if(Util.checkDownloadStatus( mData._id, mContext)==0)
 					{
-						long id=Util.startDownload(url, mData, mContext);
-						myplexapplication.getUserProfileInstance().downloadMap.put(mData._id, id);
+						Util.startDownload(url, mData, mContext);
+						//myplexapplication.getUserProfileInstance().downloadMap.put(mData._id, id);
 					}
 					else
 					{
@@ -247,6 +255,22 @@ public class CardVideoPlayer implements PlayerListener {
 				}
 				else
 				{
+					
+					String licenseData="clientkey:"+myplexapplication.getDevDetailsInstance().getClientKey()+",contentid:"+mData._id+",type:st,profile:1";
+					
+					byte[] data;
+					try {
+						data = licenseData.getBytes("UTF-8");
+						String base64 = Base64.encodeToString(data, Base64.DEFAULT);
+						Settings.USER_DATA=base64;
+						Settings.DEVICE_ID=myplexapplication.getDevDetailsInstance().getClientDeviceId();
+						//Settings.DRM_SERVER_URI="http://dev.myplex.in:80/licenseproxy/v2/license"+base64;
+					} catch (UnsupportedEncodingException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+						
+					
 				Uri uri ;
 //				uri = Uri.parse("rtsp://46.249.213.87:554/playlists/bollywood-action_qcif.hpl.3gp");
 //				uri = Uri.parse("http://59.162.166.211:8080/player/3G_H264_320x240_600kbps.3gp");
