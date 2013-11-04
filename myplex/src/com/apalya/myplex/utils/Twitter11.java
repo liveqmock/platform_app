@@ -3,6 +3,7 @@ package com.apalya.myplex.utils;
 
 import com.apalya.myplex.LoginActivity;
 import com.apalya.myplex.MainActivity;
+import com.apalya.myplex.R;
 import com.apalya.myplex.TwitterWebView;
 import com.apalya.myplex.data.myplexapplication;
 
@@ -115,8 +116,10 @@ public class Twitter11{
 						User user= twitter.showUser(userID);
 						String username= user.getName();
 						myplexapplication.getUserProfileInstance().setUserId(String.valueOf(userID));
-						myplexapplication.getUserProfileInstance().setName(user.getScreenName());
+						myplexapplication.getUserProfileInstance().setName(user.getName());
+						myplexapplication.getUserProfileInstance().setUserEmail(user.getScreenName());
 						myplexapplication.getUserProfileInstance().setProfilePic(user.getBiggerProfileImageURL());
+						
 						ed.putString("twitter_name", username);
 						ed.commit();
 						Log.e("UserID: ", "userID: " + userID + "" + username);

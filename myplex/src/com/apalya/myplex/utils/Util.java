@@ -18,10 +18,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.regex.Pattern;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.animation.Animator;
 import android.animation.Animator.AnimatorListener;
 import android.animation.AnimatorSet;
@@ -49,6 +52,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.Patterns;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -370,18 +374,13 @@ public class Util {
 		
 		if(downloadlist!=null)
 		{
-			if(downloadlist.mDownloadedList.get(cardId)==null){
-				return 0;
-			}
-			else
-			{
+			if(downloadlist.mDownloadedList.get(cardId)!=null){
 				return 1;
 			}
+			
 		}
-		else
-		{
-			return 0;
-		}
+		return 0;
+	
 		
 		/*Map<String, Long> ids=myplexapplication.getUserProfileInstance().downloadMap;
 		if(ids.get(cardId)==null){
@@ -712,6 +711,20 @@ public class Util {
 			}
 		};
 	}
+	
+	public static String getGoogleAccountName(Context context){
+		String possibleEmail=null;
+		Pattern emailPattern = Patterns.EMAIL_ADDRESS; // API level 8+
+		Account[] accounts = AccountManager.get(context).getAccounts();
+		for (Account account : accounts) {
+		    if (emailPattern.matcher(account.name).matches()) {
+		    	possibleEmail = account.name;
+		        return possibleEmail;
+		    }
+		}
+		return possibleEmail;
+	}
+	
 	public static void serializeData(Context context) {
 		try {
 			String joinedDate;
@@ -848,4 +861,5 @@ public class Util {
 
 	    return result;
 	}
+	
 }

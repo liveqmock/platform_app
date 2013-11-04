@@ -72,16 +72,35 @@ public class LogOutUtil {
 		String username=SharedPrefUtils.getFromSharedPreference(mContext,
 				mContext.getString(R.string.devusername));
 		
-		if(AccountUtils.isAuthenticated(logoutContext) || session!=null || username!=null)
+		if(username==null)
+		{
+			
+			SharedPrefUtils.writeToSharedPref(logoutContext,
+					((Activity) logoutContext).getString(R.string.devusername), "");
+			SharedPrefUtils.writeToSharedPref(logoutContext,
+					((Activity) logoutContext).getString(R.string.devpassword),"");
+			SharedPrefUtils.writeToSharedPref(logoutContext,
+					((Activity) logoutContext).getString(R.string.userprofilename), "");
+			SharedPrefUtils.writeToSharedPref(logoutContext,
+					((Activity) logoutContext).getString(R.string.userpic), "");
+			
+			myplexapplication.getUserProfileInstance().setLoginStatus(false);
+			myplexapplication.getUserProfileInstance().setName("");
+			myplexapplication.getUserProfileInstance().setProfilePic("");
+			((Activity) logoutContext).finish();
+			Util.launchActivity(LoginActivity.class,((Activity) logoutContext) , null);
+		}
+		else 
 		{
 			showProgressBar();
 
-			if(session.isOpened())
+			if(session!=null)
 			{
+				if(session.isOpened())
 				session.closeAndClearTokenInformation();
 
 			}
-			else if(AccountUtils.isAuthenticated(logoutContext))
+			if(AccountUtils.isAuthenticated(logoutContext))
 			{
 				AccountUtils.signOut(logoutContext);
 			}
@@ -95,12 +114,7 @@ public class LogOutUtil {
 			signOutRequest(ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+ConsumerApi.USER_CONTEXT+ConsumerApi.SLASH+ConsumerApi.SIGN_OUT_ACTION, params);
 
 		}
-		else
-		{
-			
-			((Activity) logoutContext).finish();
-			Util.launchActivity(LoginActivity.class,((Activity) logoutContext) , null);
-		}
+		
 		
 		
 	}
@@ -158,6 +172,10 @@ public class LogOutUtil {
 								((Activity) logoutContext).getString(R.string.devusername), "");
 						SharedPrefUtils.writeToSharedPref(logoutContext,
 								((Activity) logoutContext).getString(R.string.devpassword),"");
+						SharedPrefUtils.writeToSharedPref(logoutContext,
+								((Activity) logoutContext).getString(R.string.userprofilename), "");
+						SharedPrefUtils.writeToSharedPref(logoutContext,
+								((Activity) logoutContext).getString(R.string.userpic), "");
 						
 						myplexapplication.getUserProfileInstance().setLoginStatus(false);
 						myplexapplication.getUserProfileInstance().setName("");

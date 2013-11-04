@@ -459,12 +459,13 @@ public class MainActivity extends Activity implements MainBaseOptions {
 				
 				@Override
 				public void sendMessage(boolean status) {
-					if(status){
-						Util.showToast(mContext, "Review has posted successfully.",Util.TOAST_TYPE_INFO);
+					/*if(status){
+						Util.showToast(mContext, "Thanks for your feedback.",Util.TOAST_TYPE_INFO);
 						
 					}else{
 						Util.showToast(mContext, "Unable to post your review.",Util.TOAST_TYPE_ERROR);
-					}
+					}*/
+					Util.showToast(mContext, "Thanks for your valuable feedback.",Util.TOAST_TYPE_INFO);
 					exitApp();
 				}
 				

@@ -74,6 +74,8 @@
     
     <string name="listempty">No Data</string>
     
+    <string name="userprofilename">profilename</string>
+    <string name="userpic">userpicurl</string>
     
     <string-array name="hometabletanim">
         <item>Bottom-In</item>
