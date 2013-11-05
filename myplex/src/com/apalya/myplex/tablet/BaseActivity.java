@@ -542,7 +542,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		// transaction.setCustomAnimations(android.R.animator.fade_in,
 		// android.R.animator.fade_out);
 		// transaction.
-		setActionBarTitle("Myplex");
+		setActionBarTitle("myplex");
 		updateActionBarTitle();
 		transaction.replace(R.id.content_frame, mCurrentFragment);
 		transaction.addToBackStack(null);

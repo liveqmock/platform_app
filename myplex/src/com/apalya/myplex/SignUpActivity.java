@@ -81,7 +81,7 @@ public class SignUpActivity extends Activity{
 		super.onCreate(savedInstanceState);
 		
 		if(getResources().getBoolean(R.bool.isTablet))
-			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
 		else
 			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 

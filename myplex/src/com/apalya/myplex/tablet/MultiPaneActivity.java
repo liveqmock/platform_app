@@ -16,6 +16,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -95,6 +96,12 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 		setContentView(R.layout.cardexplorer_tablet);
 		setParentView(findViewById(R.id.parentlayout));
 		super.onCreate(savedInstanceState);
+		
+		if(getResources().getBoolean(R.bool.isTablet))
+			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+		else
+			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		
 		mLeftNavigationListView = (ListView) findViewById(R.id.left_drawer);
 		prepareNavigationMenuList(mLeftNavigationListView);
 		mContentLayout = (FrameLayout) findViewById(R.id.content_frame);

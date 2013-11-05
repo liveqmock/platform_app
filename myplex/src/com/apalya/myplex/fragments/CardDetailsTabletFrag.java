@@ -91,7 +91,7 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 			mCardData = (CardData) mDataObject;
 		}
 		Log.d(TAG,"content ID ="+mCardData._id);
-		mMainActivity.setOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+		mMainActivity.setOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
 		mInflater = LayoutInflater.from(getContext());
 		rootView = inflater.inflate(R.layout.carddetailstablet, container, false);
 		mRightScrollViewLayout = (LinearLayout)rootView.findViewById(R.id.carddetailtablet_rightscrollviewlayout);
