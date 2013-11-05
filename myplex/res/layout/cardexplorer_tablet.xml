@@ -14,6 +14,7 @@
             android:layout_height="50dp"
             layout="@layout/searchlayout"
             android:visibility="gone" >
+
         </include>
 
         <RelativeLayout
@@ -27,9 +28,11 @@
                 android:id="@+id/searchBox"
                 android:layout_width="fill_parent"
                 android:layout_height="48dp"
-                android:drawableRight="@drawable/iconsearchgrey"
-                android:gravity="center"
-                android:textSize="@dimen/textsize_14" />
+                android:drawableLeft="@drawable/iconsearchgrey"
+                android:gravity="center_vertical"
+                android:text="@string/searchhint"
+                android:textSize="@dimen/textsize_14"
+                android:background="#FFFFFF" />
 
             <ListView
                 android:id="@+id/left_drawer"
@@ -57,6 +60,7 @@
         </RelativeLayout>
     </RelativeLayout>
 
+    <TextView android:layout_width="6dp" android:layout_height="match_parent" android:background="@drawable/layoutseparator"/>
     <FrameLayout
         android:id="@+id/content_frame"
         android:animateLayoutChanges="true"
