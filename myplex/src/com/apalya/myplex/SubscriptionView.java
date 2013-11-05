@@ -164,23 +164,30 @@ public class SubscriptionView extends Activity {
 					URL aURL = new URL(url);
 					String query = aURL.getQuery();
 					StringTokenizer token = new StringTokenizer(query,"&");
-					List<String> params = new ArrayList<String>();
+					HashMap<String, String> paramMap = new HashMap<String, String>();
 					while (token.hasMoreTokens()) {
-						params.add(token.nextToken());
-				    }
-					for(String param:params){
-						if(param.equalsIgnoreCase("status")){
-							status = getTokenValue(param);
-						}else if(param.equalsIgnoreCase("message")){
-							message = getTokenValue(param);
+						String tokenName = token.nextToken();
+						try {
+							String key = tokenName.split("=")[0];
+							String value = tokenName.split("=")[1];
+							paramMap.put(key, value);
+						} catch (Exception e) {
+							e.printStackTrace();
 						}
-					}
-					if(status.equalsIgnoreCase("FAILURE")){
-						Util.showToast(SubscriptionView.this, "Subscription: "+ status,Util.TOAST_TYPE_ERROR);
-//						Toast.makeText(SubscriptionView.this, "Subscription: "+ status, Toast.LENGTH_SHORT).show();
-						dofinish(ConsumerApi.SUBSCRIPTIONERROR);
-					}else{
+				    }
+					String statusString = "status";
+					String messageString = "message";
+					
+					if(paramMap.containsKey(statusString))
+						status = paramMap.get(statusString);
+					if(paramMap.containsKey(messageString))
+						message = paramMap.get(messageString);
+					
+					if(status.equalsIgnoreCase("SUCCESS")){
 						dofinish(ConsumerApi.SUBSCRIPTIONSUCCESS);
+					}else{
+						Util.showToast(SubscriptionView.this, "Subscription: "+ status,Util.TOAST_TYPE_ERROR);
+						dofinish(ConsumerApi.SUBSCRIPTIONERROR);
 					}
 					
 				} catch (MalformedURLException e) {
