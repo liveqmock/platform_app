@@ -15,6 +15,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -38,7 +40,7 @@ import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
 
-public class CardTabletAdapater extends BaseAdapter{
+public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 	private static final String TAG = "CardGoogleLayoutAdapater";
 	private List<CardData> mDataList = new ArrayList<CardData>();
 	private Context mContext;
@@ -92,17 +94,19 @@ public class CardTabletAdapater extends BaseAdapter{
 	private int cardColor = -1;
 	@Override
 	public View getView(int position, View v, ViewGroup parent) {
-		CardData data = mDataList.get(position);
-		CardDataHolder dataHolder = null;
-		if(v == null){
+		if(v ==null)
 			v = mInflater.inflate(R.layout.card, null);
+		CardData data = mDataList.get(position);
+		v.setId(position);
+		CardDataHolder dataHolder = (CardDataHolder)v.getTag();
+		if(dataHolder == null){
 			dataHolder = new CardDataHolder();
 			dataHolder.mTitleLayout = (RelativeLayout)v.findViewById(R.id.card_title_layout); 
 			dataHolder.mTitle = (TextView)v.findViewById(R.id.card_title_name);
 			dataHolder.mDelete = (TextView)v.findViewById(R.id.card_title_deleteText);
-			dataHolder.mDeleteLayout = (RelativeLayout)v.findViewById(R.id.card_title_delete);
-			dataHolder.mFavLayout = (RelativeLayout)v.findViewById(R.id.card_title_favlayout);
 			dataHolder.mFavourite = (TextView)v.findViewById(R.id.card_title_fav);
+			dataHolder.mFavLayout = (RelativeLayout)v.findViewById(R.id.card_title_favlayout);
+			dataHolder.mDeleteLayout = (RelativeLayout)v.findViewById(R.id.card_title_delete);
 			dataHolder.mPreview = (CardImageView)v.findViewById(R.id.card_preview_image);
 //			dataHolder.mPreviewLayout = (RelativeLayout)v.findViewById(R.id.card_preview_layout);
 			dataHolder.mOverLayPlay = (ImageView)v.findViewById(R.id.card_play);
@@ -113,18 +117,24 @@ public class CardTabletAdapater extends BaseAdapter{
 			dataHolder.mRentLayout = (RelativeLayout)v.findViewById(R.id.card_rent_layout);
 			dataHolder.mRentText = (TextView)v.findViewById(R.id.card_rent_text);
 			dataHolder.mFavProgressBar = (ProgressBar) v.findViewById(R.id.card_title_fav_progress);
-			
+//			dataHolder.mESTDownloadBar = (ProgressBar) v.findViewById(R.id.card_eststatus);
+//			dataHolder.mESTDownloadStatus = (TextView) v.findViewById(R.id.card_eststatus_text);
 			dataHolder.mFavProgressBar.getIndeterminateDrawable().setColorFilter(0xFF54B5E9, android.graphics.PorterDuff.Mode.MULTIPLY);
-			
 			// fonts
-			
+			Random rnd = new Random();
+			int Low = 100;
+			int High = 196;
+			if(cardColor == -1){
+				cardColor = Color.argb(255, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low);
+			}
+	        dataHolder.mPreview.setBackgroundColor(cardColor);
 			
 			dataHolder.mTitle.setTypeface(FontUtil.Roboto_Medium);
 			dataHolder.mRentText.setTypeface(FontUtil.Roboto_Medium);
 			dataHolder.mCommentsText.setTypeface(FontUtil.Roboto_Medium);
 			dataHolder.mReviewsText.setTypeface(FontUtil.Roboto_Medium);
 			
-			
+//			dataHolder.mESTDownloadStatus.setTypeface(FontUtil.Roboto_Medium);
 			dataHolder.mDelete.setTypeface(FontUtil.ss_symbolicons_line);
 			dataHolder.mFavourite.setTypeface(FontUtil.ss_symbolicons_line);
 			dataHolder.mComments.setTypeface(FontUtil.ss_symbolicons_line);
@@ -133,20 +143,12 @@ public class CardTabletAdapater extends BaseAdapter{
 //			dataHolder.mOverLayPlay.setText(R.string.card_play);
 //			dataHolder.mDelete.setText(R.string.card_delete);
 //			dataHolder.mFavourite.setText(R.string.card_heart);
-//			dataHolder.mComments.bringToFront();
+			dataHolder.mComments.bringToFront();
 //			dataHolder.mReviews.setText(R.string.card_people);
 			
 //			CardData dataHolder.mDataObject = (TextView)v.findViewById(id);
 			v.setTag(dataHolder);
-		}else{
-			dataHolder = (CardDataHolder)v.getTag();
 		}
-		Random rnd = new Random();
-		int Low = 100;
-		int High = 196;
-		cardColor = Color.argb(255, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low, rnd.nextInt(High-Low)+Low);
-        dataHolder.mPreview.setBackgroundColor(cardColor);
-		v.setId(position);
 		dataHolder.mDataObject = data;
 		dataHolder.mPreview.mCardId = position;
 		dataHolder.mPreview.mImageUrl = null;
@@ -158,6 +160,9 @@ public class CardTabletAdapater extends BaseAdapter{
 			dataHolder.mTitle.setText(data.generalInfo.title);
 		}
 		
+
+        dataHolder.mPreview.setImageBitmap(null);
+//		Log.e(TAG,"Erasing "+position+" for "+dataHolder.mTitle.getTextSize()+"  "+dataHolder.mTitle.getWidth() );
 		if(data.images != null){
 			for(CardDataImagesItem imageItem:data.images.values){
 				if(imageItem.profile != null && imageItem.profile.equalsIgnoreCase("xxhdpi")){
@@ -192,24 +197,34 @@ public class CardTabletAdapater extends BaseAdapter{
 			dataHolder.mCommentsText.setText("0");
 		}
 		
+//		int reqsize = (int) mContext.getResources().getDimension(R.dimen.margin_gap_24);
+//		reqsize = 40;
+//		 ShapeDrawable biggerCircle= new ShapeDrawable( new OvalShape());
+//	        biggerCircle.setIntrinsicHeight( reqsize );
+//	        biggerCircle.setIntrinsicWidth( reqsize);
+//	        biggerCircle.setBounds(new Rect(0, 0, reqsize, reqsize));
+//	        biggerCircle.getPaint().setColor(Color.BLUE);
+//
+//	        dataHolder.mOverLayPlay.setBackgroundDrawable(biggerCircle);
 		dataHolder.mDeleteLayout.setOnClickListener(mDeleteListener);
 		dataHolder.mDeleteLayout.setTag(dataHolder);
 		Util.showFeedback(dataHolder.mDeleteLayout);
+		dataHolder.mDeleteLayout.setBackgroundColor(Color.TRANSPARENT);
 		dataHolder.mOverLayPlay.setOnClickListener(mOpenCardListener);
 		dataHolder.mOverLayPlay.setTag(dataHolder);
 		dataHolder.mPreview.setOnClickListener(mOpenCardListener);
 		dataHolder.mPreview.setTag(dataHolder);
 		dataHolder.mRentLayout.setOnClickListener(mPurchaseListener);
 		dataHolder.mRentLayout.setTag(dataHolder);
-		
 		dataHolder.mFavLayout.setOnClickListener(mFavListener);
 		dataHolder.mFavLayout.setTag(dataHolder);
+		dataHolder.mFavLayout.setBackgroundColor(Color.TRANSPARENT);
 		Util.showFeedback(dataHolder.mFavLayout);
-		
+		//17 chars
 		float price = 10000f;
 		if(data.packages == null){
 			dataHolder.mRentText.setText("Free");
-			dataHolder.mRentText.setOnClickListener(null);
+			dataHolder.mRentLayout.setOnClickListener(null);
 		}else{
 			if(data.currentUserData != null && data.currentUserData.purchase != null && data.currentUserData.purchase.size() != 0){
 				dataHolder.mRentText.setText("Watch now");
@@ -233,58 +248,26 @@ public class CardTabletAdapater extends BaseAdapter{
 				}	
 			}
 		}
+//		updateDownloadStatus(data);
 		return v;
 	}
 	private CardItemClickListener mDeleteListener = new CardItemClickListener() {
 
 		@Override
 		public void onDelayedClick(View v) {
-//			Log.e(TAG, "mDeleteListener onClick");
-//			CardDataHolder dataHolder = null;
-//			if(v.getTag() instanceof CardDataHolder){
-//				dataHolder = (CardDataHolder) v.getTag();
-//				if(dataHolder == null){return;}
-//				if(dataHolder.mDataObject == null){return;}
-//			}else{
-//				return;
-//			}
-//			int index = mDataList.indexOf(dataHolder.mDataObject);
-//			mDataList.remove(index);
-//			mNumberofItems = mDataList.size();
-//			View localv = mCardsLayout.mCardViewReusePool.getView(index);
-//			AnimatorSet set = new AnimatorSet();
-//			set.play(ObjectAnimator.ofFloat(localv, View.TRANSLATION_X, 0,-localv.getWidth()));
-//			set.setDuration(2000);
-//			set.setInterpolator(new DecelerateInterpolator());
-//			set.addListener(new AnimatorListener() {
-//				
-//				@Override
-//				public void onAnimationStart(Animator animation) {
-//					// TODO Auto-generated method stub
-//					
-//				}
-//				
-//				@Override
-//				public void onAnimationRepeat(Animator animation) {
-//					// TODO Auto-generated method stub
-//					
-//				}
-//				
-//				@Override
-//				public void onAnimationEnd(Animator animation) {
-//					// TODO Auto-generated method stub
-//					mCardsLayout.removeAllViews();
-//					mCardsLayout.refresh();
-//					mCardsLayout.updateCardsPosition(getScrollY());
-//				}
-//				
-//				@Override
-//				public void onAnimationCancel(Animator animation) {
-//					// TODO Auto-generated method stub
-//					
-//				}
-//			});
-//			set.start();
+			Log.e(TAG, "mDeleteListener onClick");
+			CardDataHolder dataHolder = null;
+			if(v.getTag() instanceof CardDataHolder){
+				dataHolder = (CardDataHolder) v.getTag();
+				if(dataHolder == null){return;}
+				if(dataHolder.mDataObject == null){return;}
+			}else{
+				return;
+			}
+			int index = mDataList.indexOf(dataHolder.mDataObject);
+			mDataList.remove(index);
+			mNumberofItems = mDataList.size();
+			notifyDataSetChanged();
 		}
 	};
 
@@ -337,4 +320,24 @@ public class CardTabletAdapater extends BaseAdapter{
 			}
 		}
 	};
+	private int mLoadMoreLastCalledNumberofItems;
+	@Override
+	public void onScroll(AbsListView view, int firstVisibleItem,
+			int visibleItemCount, int totalItemCount) {
+		if (mCardActionListener != null) {
+			if (mNumberofItems > mLoadMoreLastCalledNumberofItems && firstVisibleItem > mNumberofItems / 2) {
+				mCardActionListener.loadmore(mNumberofItems);
+				mLoadMoreLastCalledNumberofItems = mNumberofItems;
+			}
+			/*if(mDataList.size() > currentSelectedIndex){
+				mCardActionListener.selectedCard(mDataList.get(currentSelectedIndex),currentSelectedIndex);
+			}*/
+		}
+		
+	}
+	@Override
+	public void onScrollStateChanged(AbsListView view, int scrollState) {
+		// TODO Auto-generated method stub
+		
+	}
 }

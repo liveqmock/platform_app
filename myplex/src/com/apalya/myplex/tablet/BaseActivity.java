@@ -253,6 +253,8 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 
 			@Override
 			public void onClick(View arg0) {
+				if(mDrawerLayout == null)
+					return;
 				if (mNavigationDrawerOpened) {
 					mDrawerLayout.closeDrawer(mDrawerList);
 					mNavigationDrawerOpened = false;

@@ -158,13 +158,17 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		mCardView = (CardView) mRootView.findViewById(R.id.framelayout);
 		mGridView = (GridView)mRootView.findViewById(R.id.tabletview);
 		arangeWaterMark();
+		if(getContext() == null)
+		{
+			return mRootView;
+		}
 		if(getResources().getBoolean(R.bool.isTablet)){
 			mTabletAdapter = new CardTabletAdapater(getContext());
 			mTabletAdapter.setCardActionListener(this);
 			mCardView.setVisibility(View.GONE);
 			mGridView.setVisibility(View.VISIBLE);
 			mGridView.setAdapter(mTabletAdapter);
-			
+			mGridView.setOnScrollListener(mTabletAdapter);
 		}else{
 			mCardView.setVisibility(View.VISIBLE);
 			mGridView.setVisibility(View.GONE);
@@ -283,7 +287,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		attrib.put("Category", screenName);
 		attrib.put("Duration", "");
 		Analytics.trackEvent(Analytics.cardBrowseDuration,attrib,true);
-		
+		requestUrl = requestUrl.replaceAll(" ", "%20");
 		StringRequest myReg = new StringRequest(requestMethod, requestUrl, deviceMinSuccessListener(), responseErrorListener());
 //		myReg.setShouldCache(true);
 		Log.d(TAG,"Min Request:"+requestUrl);
@@ -403,9 +407,14 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		if(mData.mMasterEntries == null || mData.mMasterEntries.size() == 0){
 			return;
 		}
+		if(!isAdded())
+		{
+			Log.e(TAG, "acitivty is NULL");
+			return;
+		}
 		updateText("preparing ui");
 		if(getResources() != null && getResources().getBoolean(R.bool.isTablet)){
-			mTabletAdapter.setData(mData.mMasterEntries);
+				mTabletAdapter.setData(mData.mMasterEntries);
 		}else{
 			mCardView.addData(mData.mMasterEntries);
 			mCardView.show();

@@ -83,7 +83,7 @@ public class CacheManager {
 	}
 	
 	private void issueOnlineRequest(String cardIds){
-		cardIds.replace(" ", "%20");
+		cardIds = cardIds.replace(" ", "%20");
 		String url = ConsumerApi.getContentDetail(cardIds, ConsumerApi.LEVELDEVICEMAX);
 		RequestQueue queue = MyVolley.getRequestQueue();
 		StringRequest myReg = new StringRequest(url, onlineRequestSuccessListener(), onlineRequestErrorListener());

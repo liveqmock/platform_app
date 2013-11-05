@@ -190,9 +190,9 @@ public class SearchActivity extends BaseFragment implements
 			// data.getButtonName();
 			temp._id = data.getButtonName();
 			if (searchQuery.length() > 0) {
-				searchQuery = ",";
+				searchQuery += ",";
 			}
-			searchQuery = data.getButtonName();
+			searchQuery += data.getButtonName();
 			searchString.add(temp);
 			
 			Map<String,String> params=new HashMap<String, String>();
