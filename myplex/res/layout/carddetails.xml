@@ -14,12 +14,22 @@
         android:background="#000000" >
     </RelativeLayout>
 
+    <ProgressBar
+        android:id="@+id/carddetail_progressBar"
+        style="@style/CustomProgressBar"
+        android:layout_width="fill_parent"
+        android:indeterminateDrawable="@drawable/custom_progress_bar_horizontal"
+        android:layout_height="4dp"
+        android:layout_below="@+id/carddetail_videolayout"
+        android:indeterminate="true"
+        android:visibility="invisible" />
+
     <com.apalya.myplex.views.CustomScrollView
         android:id="@+id/carddetail_scroll_view"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/margin_gap_12"
         android:layout_below="@+id/carddetail_videolayout"
+        android:layout_marginTop="@dimen/margin_gap_12"
         android:background="#e6e6e6"
         android:scrollbars="none" >
 
@@ -36,7 +46,7 @@
     </com.apalya.myplex.views.CustomScrollView>
 
     <RelativeLayout
-         android:id="@+id/carddetail_bottomactionbar"
+        android:id="@+id/carddetail_bottomactionbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -58,12 +68,12 @@
                 android:orientation="horizontal" >
 
                 <ImageView
-                    android:contentDescription="@string/hello_world"
                     android:id="@+id/carddetail_fav"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_gravity="center_vertical"
                     android:layout_weight="1"
+                    android:contentDescription="@string/hello_world"
                     android:src="@drawable/card_iconheartblue" />
 
                 <View
@@ -72,12 +82,12 @@
                     android:background="#D8D8D8" />
 
                 <ImageView
-                    android:contentDescription="@string/hello_world"
                     android:id="@+id/carddetail_share"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:layout_gravity="center_vertical"
                     android:layout_weight="1"
+                    android:contentDescription="@string/hello_world"
                     android:src="@drawable/social_share" />
             </LinearLayout>
         </LinearLayout>

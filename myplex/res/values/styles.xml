@@ -14,11 +14,18 @@
     <style name="action_bar_theme" parent="@android:style/Widget.Holo.ActionBar">
         <item name="android:background">@color/searchtags_color</item>
         <item name="android:titleTextStyle">@style/NewWindowTitle</item>
-        </style>
-	
-	 <style name="NewWindowTitle">
+    </style>
+
+    <style name="NewWindowTitle">
         <item name="android:textColor">#fff</item>
         <item name="android:textSize">18sp</item>
+    </style>
+
+    <style name="CustomProgressBar" parent="android:Widget.ProgressBar.Horizontal">
+        <item name="android:indeterminateOnly">false</item>
+        <item name="android:progressDrawable">@drawable/custom_progress_bar_horizontal</item>
+        <item name="android:minHeight">4dip</item>
+        <item name="android:maxHeight">4dip</item>
     </style>
 
     <style name="YaSeekBar">
@@ -30,12 +37,11 @@
         <item name="android:thumbOffset">25dp</item>
     </style>
 
-
-      <style name="movieRatingBar" parent="@android:style/Widget.RatingBar">
-          <item name="android:progressDrawable">@drawable/movie_rating_bar_full</item>
-          <item name="android:minHeight">23dip</item>
-          <item name="android:maxHeight">25dip</item>
-      </style>
+    <style name="movieRatingBar" parent="@android:style/Widget.RatingBar">
+        <item name="android:progressDrawable">@drawable/movie_rating_bar_full</item>
+        <item name="android:minHeight">23dip</item>
+        <item name="android:maxHeight">25dip</item>
+    </style>
 
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppBaseTheme">

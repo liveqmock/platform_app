@@ -356,7 +356,7 @@ public class Util {
 		}
 		
 		CardDownloadData downloadData= new CardDownloadData();
-		downloadData.ESTId=lastDownloadId;
+		downloadData.mDownloadId=lastDownloadId;
 		downloadlist.mDownloadedList.put(aMovieData._id, downloadData);
 		Util.saveObject(downloadlist, myplexapplication.getApplicationConfig().downloadCardsPath);
 		

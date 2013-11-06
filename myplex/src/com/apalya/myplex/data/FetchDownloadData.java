@@ -12,8 +12,10 @@ import com.apalya.myplex.cache.IndexHandler;
 import com.apalya.myplex.utils.Util;
 
 import android.content.Context;
+import android.util.Log;
 
 public class FetchDownloadData implements CacheManagerCallback{
+	public static final String TAG = "FetchDownloadData";
 	private Context mContext;
 	private FetchDownloadDataListener mListener;
 	private CacheManager mCacheManager = new CacheManager();
@@ -33,6 +35,7 @@ public class FetchDownloadData implements CacheManagerCallback{
 		mSavedCount = 0;
 		mBrowseData = myplexapplication.getCardExplorerData();
 		mBrowseData.reset();
+		mBrowseData.requestType = CardExplorerData.REQUEST_DOWNLOADS;
 		CardDownloadedDataList downloadlist =  null;
 		try {
 			downloadlist = (CardDownloadedDataList) Util.loadObject(myplexapplication.getApplicationConfig().downloadCardsPath);	
@@ -43,9 +46,11 @@ public class FetchDownloadData implements CacheManagerCallback{
 			if(mListener != null){
 				mListener.completed();
 			}
+			Log.d(TAG,"user has not requested for a download yet");
 			return;
 		}
 		mSavedCount = downloadlist.mDownloadedList.size();
+		Log.d(TAG,"user has requested for a "+mSavedCount+" downloads");
 		List<CardData> downloadCards = new ArrayList<CardData>();
 		Set<String> keySet = downloadlist.mDownloadedList.keySet();
 		for(String key:keySet){
@@ -58,6 +63,7 @@ public class FetchDownloadData implements CacheManagerCallback{
 	}
 	@Override
 	public void OnCacheResults(HashMap<String, CardData> obj,boolean issuedRequest) {
+		Log.d(TAG,"reading form cache ");
 		Set<String> keySet = obj.keySet();
 		for(String key:keySet){
 			if(mBrowseData.mEntries.get(key) == null){
@@ -66,6 +72,7 @@ public class FetchDownloadData implements CacheManagerCallback{
 			}
 		}
 		if(mBrowseData.mEntries.size() == mSavedCount){
+			Log.d(TAG,"got the complete list form cache ");
 			if(mListener != null){
 				mListener.completed();
 			}
@@ -81,12 +88,14 @@ public class FetchDownloadData implements CacheManagerCallback{
 				mBrowseData.mMasterEntries.add(data);
 			}
 		}		
+		Log.d(TAG,"got the complete list form online ");
 		if(mListener != null){
 			mListener.completed();
 		}
 	}
 	@Override
 	public void OnOnlineError(VolleyError error) {
+		Log.d(TAG,"problem while reading form cache ");
 		if(mListener != null){
 			mListener.completed();
 		}		

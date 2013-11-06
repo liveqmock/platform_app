@@ -60,7 +60,7 @@
     <string name="rating_high">&#x263B; </string>
     <string name="toast_warning">&#x26A0; </string>
     <string name="toast_info">&#x2139; </string>
-    
+    <string name="actionbar_filter">&#x25E2; </string>
     <string name="ratingheading">Rate this Movie </string>
     <string name="ratingmessageheading">Add a movie review </string>
     <string name="ratingmessagehint">Add a review</string>

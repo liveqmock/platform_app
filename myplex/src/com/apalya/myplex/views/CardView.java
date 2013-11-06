@@ -42,6 +42,8 @@ import com.apalya.myplex.adapters.CardItemClickListener;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDataHolder;
 import com.apalya.myplex.data.CardDataImagesItem;
+import com.apalya.myplex.data.CardDownloadData;
+import com.apalya.myplex.data.CardDownloadedDataList;
 import com.apalya.myplex.data.CardImageView;
 import com.apalya.myplex.data.CardDataPackagePriceDetailsItem;
 import com.apalya.myplex.data.CardDataPackages;
@@ -211,6 +213,13 @@ public class CardView extends ScrollView {
 	}
 
 	public void addData(List<CardData> datalist) {
+		try {
+			if(myplexapplication.mDownloadList == null){
+				myplexapplication.mDownloadList = (CardDownloadedDataList) Util.loadObject(myplexapplication.getApplicationConfig().downloadCardsPath);
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 		mDataList = new ArrayList<CardData>();
 		if (datalist != null) {
 			for (CardData data : datalist) {
@@ -234,32 +243,40 @@ public class CardView extends ScrollView {
 	private String mPriceStarts = "Starts from ";
 	private String mRupeeCode  = null;
 	private HashMap<String,String> ImageUrlMap = new HashMap<String, String>();
-//	public void updateDownloadStatus(CardData data){
-//		if(data == null){return;}
-//		if(!data.isESTEnabled){return;}
-//		int index = -1;
-//		index = mDataList.indexOf(data);
-//		
-//		if(index == -1){return;}
-//		View localv = mCardsLayout.mCardViewReusePool.getView(index);
-//		if (localv == null) {
-//			return;
-//		}
-//		CardDataHolder dataHolder = (CardDataHolder)localv.getTag();
-//		if(dataHolder != null){
-//			if(data.ESTStatus == CardData.ESTDOWNLOADINPROGRESS){
-//				dataHolder.mESTDownloadBar.setVisibility(View.VISIBLE);
-//				dataHolder.mESTDownloadStatus.setVisibility(View.VISIBLE);
-//				dataHolder.mESTDownloadBar.setProgress(data.ESTProgressStatus);
-//				dataHolder.mESTDownloadStatus.setText(data.ESTProgressStatus+"");
-//				Log.e(TAG, "updateDownloadStatus " +data.ESTProgressStatus);
-//			}else{
-//				dataHolder.mESTDownloadBar.setVisibility(View.GONE);
-//				dataHolder.mESTDownloadStatus.setVisibility(View.GONE);
-//			}
-//		}
-//		applyData(localv, index);
-//	}
+	public void updateDownloadStatus(CardData data,CardDownloadData downloadData){
+		CardDownloadData localDownloadData;
+		if(myplexapplication.mDownloadList == null){
+			return;
+		}
+		localDownloadData = myplexapplication.mDownloadList.mDownloadedList.get(data._id); 
+		if(localDownloadData == null){
+			return;
+		}
+		int index = -1;
+		index = mDataList.indexOf(data);
+		Log.e(TAG, "updateData " +index);
+		if(index == -1){return;}
+		View localv = mCardsLayout.mCardViewReusePool.getView(index);
+		if(localv == null){
+			return;
+		}
+		CardDataHolder dataHolder = (CardDataHolder)localv.getTag();
+		if(dataHolder == null){
+			return;
+		}
+		if(downloadData != null){
+			localDownloadData = downloadData;
+		}
+		dataHolder.mESTDownloadStatus.setVisibility(View.VISIBLE);
+		if(!localDownloadData.mCompleted){
+			dataHolder.mESTDownloadStatus.setText("Downloading "+localDownloadData.mPercentage+" %");
+			dataHolder.mESTDownloadBar.setVisibility(View.VISIBLE);
+			dataHolder.mESTDownloadBar.setProgress(localDownloadData.mPercentage);
+		}else{
+			dataHolder.mESTDownloadBar.setVisibility(View.INVISIBLE);
+			dataHolder.mESTDownloadStatus.setText("Download Complete");
+		}
+	}
 	private int cardColor = -1;
 	public void applyData(View v, int position) {
 		if (v == null || !(position >= 0 && position < mNumberofItems)) {
@@ -286,8 +303,8 @@ public class CardView extends ScrollView {
 			dataHolder.mRentLayout = (RelativeLayout)v.findViewById(R.id.card_rent_layout);
 			dataHolder.mRentText = (TextView)v.findViewById(R.id.card_rent_text);
 			dataHolder.mFavProgressBar = (ProgressBar) v.findViewById(R.id.card_title_fav_progress);
-//			dataHolder.mESTDownloadBar = (ProgressBar) v.findViewById(R.id.card_eststatus);
-//			dataHolder.mESTDownloadStatus = (TextView) v.findViewById(R.id.card_eststatus_text);
+			dataHolder.mESTDownloadBar = (ProgressBar) v.findViewById(R.id.card_download_progressBar);
+			dataHolder.mESTDownloadStatus = (TextView) v.findViewById(R.id.card_download_status);
 			dataHolder.mFavProgressBar.getIndeterminateDrawable().setColorFilter(0xFF54B5E9, android.graphics.PorterDuff.Mode.MULTIPLY);
 			// fonts
 			Random rnd = new Random();
@@ -302,6 +319,7 @@ public class CardView extends ScrollView {
 			dataHolder.mRentText.setTypeface(FontUtil.Roboto_Medium);
 			dataHolder.mCommentsText.setTypeface(FontUtil.Roboto_Medium);
 			dataHolder.mReviewsText.setTypeface(FontUtil.Roboto_Medium);
+			dataHolder.mESTDownloadStatus.setTypeface(FontUtil.Roboto_Medium);
 			
 //			dataHolder.mESTDownloadStatus.setTypeface(FontUtil.Roboto_Medium);
 			dataHolder.mDelete.setTypeface(FontUtil.ss_symbolicons_line);
@@ -417,7 +435,7 @@ public class CardView extends ScrollView {
 				}	
 			}
 		}
-//		updateDownloadStatus(data);
+		updateDownloadStatus(data,null);
 	}
 	public void show() {
 //		Log.e(TAG, "updateCardsPosition show =");

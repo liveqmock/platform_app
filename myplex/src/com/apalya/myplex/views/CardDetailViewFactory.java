@@ -73,6 +73,7 @@ public class CardDetailViewFactory {
 		public void onMediaGroupSelected(CardDetailMultiMediaGroup group);
 		public void onSimilarContentAction();
 		public void onFullDetailCastAction();
+		public void onProgressBarVisibility(int value);
 	}
 	public void setOnCardDetailExpandListener(CardDetailViewFactoryListener listener){
 		this.mListener = listener;
@@ -151,6 +152,13 @@ public class CardDetailViewFactory {
 		return null;
 	}
 
+	public void scrollReachedEnd(){
+		if(!mContext.getResources().getBoolean(R.bool.isTablet)){
+			if(!mRefreshInProgress){
+				refreshSection();
+			}
+		}
+	}
 	public static final int  COMMENTSECTION_COMMENTS = 101;
 	public static final int COMMENTSECTION_REVIEW = 102;
 	private void fillCommentSectionData(int type,CardData card){
@@ -207,6 +215,7 @@ public class CardDetailViewFactory {
 		}
 	}
 	private LinearLayout mCommentContentLayout;
+	private int mCurrentCommentViewType = COMMENTSECTION_COMMENTS;
 	private View createCommentsView() {
 		mComments = null;
 //		if(mData.comments == null){return null;}
@@ -250,7 +259,8 @@ public class CardDetailViewFactory {
 							if(status){
 								Util.showToast(mContext, "Comment has posted successfully.",Util.TOAST_TYPE_INFO);
 //								Toast.makeText(mContext, "Comment has posted successfully.", Toast.LENGTH_SHORT).show();
-								refreshSection(COMMENTSECTION_COMMENTS);
+								mCurrentCommentViewType = COMMENTSECTION_COMMENTS;
+								refreshSection();
 							}else{
 								Util.showToast(mContext, "Unable to post your comment.",Util.TOAST_TYPE_ERROR);
 //								Toast.makeText(mContext, "Unable to post your comment.", Toast.LENGTH_SHORT).show();
@@ -268,7 +278,8 @@ public class CardDetailViewFactory {
 							if(status){
 								Util.showToast(mContext, "Review has posted successfully.",Util.TOAST_TYPE_INFO);
 //								Toast.makeText(mContext, "Review has posted successfully.", Toast.LENGTH_SHORT).show();
-								refreshSection(COMMENTSECTION_REVIEW);
+								mCurrentCommentViewType = COMMENTSECTION_REVIEW;
+								refreshSection();
 							}else{
 								Util.showToast(mContext, "Unable to post your review.",Util.TOAST_TYPE_ERROR);
 //								Toast.makeText(mContext, "Unable to post your review.", Toast.LENGTH_SHORT).show();
@@ -293,7 +304,8 @@ public class CardDetailViewFactory {
 				editBox.setText(R.string.carddetailcommentsection_editcomment);
 //				editBox.setOnClickListener(null);
 //				fillCommentSectionData(COMMENTSECTION_COMMENTS,mData);
-				refreshSection(COMMENTSECTION_COMMENTS);
+				mCurrentCommentViewType = COMMENTSECTION_COMMENTS;
+				refreshSection();
 			}
 		});
 		
@@ -310,7 +322,8 @@ public class CardDetailViewFactory {
 				editBox.setText(R.string.carddetailcommentsection_editreview);
 //				editBox.setOnClickListener(mRateListener);
 //				fillCommentSectionData(COMMENTSECTION_REVIEW,mData);
-				refreshSection(COMMENTSECTION_REVIEW);
+				mCurrentCommentViewType = COMMENTSECTION_REVIEW;
+				refreshSection();
 			}
 		});
 		mCommentSectionProgressBar  = (ProgressBar)v.findViewById(R.id.carddetailcomment_progressBar);
@@ -325,26 +338,40 @@ public class CardDetailViewFactory {
 //				refreshSection(type);
 //			}
 //		});
-		refreshSection(COMMENTSECTION_COMMENTS);
+		refreshSection();
 		return v;
 	}
 	private ImageView mCommentRefresh;
 	private ProgressBar mCommentSectionProgressBar;
 	private void rotateRefresh(){
+		if(!mContext.getResources().getBoolean(R.bool.isTablet)){
+			if(mListener != null){
+				mListener.onProgressBarVisibility(View.VISIBLE);
+			}
+			return;
+		}
+		
 		mCommentSectionProgressBar.setVisibility(View.VISIBLE);
 //		 Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.rotate);
 //		 mCommentRefresh.startAnimation(animation);
 	}
 	private void stopRefresh(){
+		if(!mContext.getResources().getBoolean(R.bool.isTablet)){
+			if(mListener != null){
+				mListener.onProgressBarVisibility(View.INVISIBLE);
+			}
+			return;
+		}
 		mCommentSectionProgressBar.setVisibility(View.GONE);
 //		 Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.stoprotate);
 //		 mCommentRefresh.startAnimation(animation);
 	}
-	
-	private void refreshSection(final int type) {
+	private boolean mRefreshInProgress = false;
+	private void refreshSection() {
+		mRefreshInProgress = true;
 		rotateRefresh();
 		String FieldName = new  String();
-		if(type == COMMENTSECTION_COMMENTS){
+		if(mCurrentCommentViewType == COMMENTSECTION_COMMENTS){
 			FieldName = ConsumerApi.FIELD_COMMENTS;
 		}else{
 			FieldName = ConsumerApi.FIELD_USERREVIEWS;
@@ -354,12 +381,13 @@ public class CardDetailViewFactory {
 			
 			@Override
 			public void response(CardResponseData data) {
+				mRefreshInProgress = false;
 				stopRefresh();
 				if(data == null){return;}
 				if(data.results == null){return;}
 				if(data.results.size() == 0 ){return;}
 				CardData cardData = data.results.get(0);
-				fillCommentSectionData(type,cardData);
+				fillCommentSectionData(mCurrentCommentViewType,cardData);
 			}
 		});
 		

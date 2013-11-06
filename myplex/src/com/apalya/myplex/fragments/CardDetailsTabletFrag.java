@@ -113,7 +113,6 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 //		prepareContent();
 		if(mCardData.generalInfo != null){
 			mMainActivity.setActionBarTitle(mCardData.generalInfo.title);
-			mMainActivity.updateActionBarTitle();
 		}
 		prepareContent();
 		return rootView;
@@ -335,6 +334,7 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		searchQuery = key;
 		searchString.add(temp);
 		mSearchQuery = searchQuery;
+		mMainActivity.setActionBarTitle(mSearchQuery);
 		mCacheManager.getCardDetails(searchString, IndexHandler.OperationType.FTSEARCH, CardDetailsTabletFrag.this);
 
 		
@@ -405,6 +405,7 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		
 		dataBundle.reset();
 		dataBundle.searchQuery = mSearchQuery;
+		mMainActivity.setActionBarTitle(mSearchQuery);
 		dataBundle.requestType = CardExplorerData.REQUEST_SEARCH;
 		
 		mMainActivity.addFilterData(new ArrayList<FilterMenudata>(), null);
@@ -465,6 +466,11 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		mRelatedCastList = mCardData.relatedCast.values;
 		popupType = MainAdapter.PAGE_CASTVIEW;
 		showAlbumDialog();		
+		
+	}
+	@Override
+	public void onProgressBarVisibility(int value) {
+		// TODO Auto-generated method stub
 		
 	}
 }

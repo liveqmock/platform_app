@@ -24,6 +24,7 @@ import android.view.ViewGroup;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -81,6 +82,7 @@ public class CardDetails extends BaseFragment implements
 	private ImageView mShareButton;
 	private ImageView mFavButton;
 
+	private ProgressBar mProgressBar;
 	private boolean mDescriptionExpanded = false;
 	private int mDetailType = Profile;
 	public static final int Profile = 0;
@@ -110,6 +112,7 @@ public class CardDetails extends BaseFragment implements
 		rootView = inflater.inflate(R.layout.carddetails, container, false);
 		mScrollView = (CustomScrollView) rootView
 				.findViewById(R.id.carddetail_scroll_view);
+		mProgressBar =(ProgressBar)rootView.findViewById(R.id.carddetail_progressBar);
 		mBottomActionBar = (RelativeLayout) rootView
 				.findViewById(R.id.carddetail_bottomactionbar);
 		if (mCardData._id == null || mCardData._id.equalsIgnoreCase("0")) {
@@ -136,11 +139,9 @@ public class CardDetails extends BaseFragment implements
 		mCardDetailViewFactory.setParent(rootView);
 		mCardDetailViewFactory.setOnCardDetailExpandListener(this);
 		mMainActivity.setSearchBarVisibilty(View.VISIBLE);
-		mMainActivity.enableFilterAction(false);
 		// prepareContent();
 		if (mCardData.generalInfo != null) {
 			mMainActivity.setActionBarTitle(mCardData.generalInfo.title);
-			mMainActivity.updateActionBarTitle();
 		}
 		prepareContent();
 		mFavButton.setOnClickListener(new OnClickListener() {
@@ -440,7 +441,7 @@ public class CardDetails extends BaseFragment implements
 						rnd.nextInt(High - Low) + Low, rnd.nextInt(High - Low)
 								+ Low);
 				image.setBackgroundColor(cardColor);
-				image.setErrorImageResId(R.drawable.placeholder);
+//				image.setErrorImageResId(R.drawable.placeholder);
 				name.setText(relatedCastItem.name);
 				if (relatedCastItem.images != null
 						&& relatedCastItem.images.values != null
@@ -511,6 +512,7 @@ public class CardDetails extends BaseFragment implements
 		searchQuery = key;
 		searchString.add(temp);
 		mSearchQuery = searchQuery;
+		mMainActivity.setActionBarTitle(mSearchQuery);
 		mCacheManager.getCardDetails(searchString,
 				IndexHandler.OperationType.FTSEARCH, CardDetails.this);
 
@@ -539,12 +541,18 @@ public class CardDetails extends BaseFragment implements
 	private int mQuickReturnHeight;
 	private TranslateAnimation anim;
 
+	private int mLastScrollPosition = 0;
 	@Override
 	public void scrollDirection(boolean value) {
 		mQuickReturnHeight = mBottomActionBar.getHeight();
 		int translationY = 0;
 
 		int mScrollY = mScrollView.getScrollY();
+		if(mLastScrollPosition != 0 && mLastScrollPosition == mScrollY  ){
+			mLastScrollPosition = 0;
+			mCardDetailViewFactory.scrollReachedEnd();
+		}
+		mLastScrollPosition = mScrollY;
 		int rawY = mScrollY;
 
 		switch (mState) {
@@ -679,6 +687,7 @@ public class CardDetails extends BaseFragment implements
 
 		dataBundle.reset();
 		dataBundle.searchQuery = mSearchQuery;
+		mMainActivity.setActionBarTitle(mSearchQuery);
 		dataBundle.requestType = CardExplorerData.REQUEST_SEARCH;
 
 		mMainActivity.addFilterData(new ArrayList<FilterMenudata>(), null);
@@ -724,6 +733,7 @@ public class CardDetails extends BaseFragment implements
 		data.requestType = CardExplorerData.REQUEST_SIMILARCONTENT;
 		data.mMasterEntries = (ArrayList<CardData>) mCardData.similarContent.values;
 		mMainActivity.bringFragment(fragment);
+		mMainActivity.setActionBarTitle("Similar Content");
 
 	}
 
@@ -758,5 +768,12 @@ public class CardDetails extends BaseFragment implements
 			mPlayerLogsLayout.addView(text);
 		}
 		updatePlayerLogVisiblity();
+	}
+
+	@Override
+	public void onProgressBarVisibility(int value) {
+		if(mProgressBar != null){
+			mProgressBar.setVisibility(value);
+		}
 	}
 }

@@ -36,7 +36,9 @@ public interface MainBaseOptions {
 
 	public void setActionBarTitle(String title);
 
-	public void updateActionBarTitle();
-	
+	public String getActionBarTitle();
+
+	public void saveActionBarTitle();
+
 	public void searchButtonClicked();
 }

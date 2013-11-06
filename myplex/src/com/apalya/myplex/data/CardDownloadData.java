@@ -11,7 +11,7 @@ public class CardDownloadData implements Serializable{
 	 */
 	private static final long serialVersionUID = -8475605841159873373L;
 	public CardDownloadData(){}
-	public int ESTStatus;
-	public int ESTProgressStatus;
-	public long ESTId;
+	public boolean mCompleted = false;
+	public int mPercentage;
+	public long mDownloadId = -1;
 }

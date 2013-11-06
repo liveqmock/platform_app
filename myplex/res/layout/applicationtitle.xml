@@ -1,9 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:background="#54B5E9" >
 
-    <LinearLayout
+    <ProgressBar
+        android:id="@+id/customactionbar_progressBar"
+        style="@style/CustomProgressBar"
+        android:layout_width="fill_parent"
+        android:layout_height="4dp"
+        android:layout_alignParentBottom="true"
+        android:indeterminate="true"
+        android:indeterminateBehavior="repeat"
+        android:indeterminateDuration="2000"
+        android:indeterminateDrawable="@drawable/custom_progress_bar_horizontal"
+        android:visibility="invisible" />
+
+    <RelativeLayout
         android:id="@+id/customactionbar_drawerLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -13,30 +26,31 @@
 
         <ImageView
             android:id="@+id/customactionbar_drawer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
+            android:layout_width="24dp"
+            android:layout_height="48dp"
+            android:layout_centerVertical="true"
             android:contentDescription="@string/hello_world"
             android:src="@drawable/iconmenu" />
 
         <ImageView
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_margin="0dp"
-            android:layout_gravity="center_vertical"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="20dp"
             android:contentDescription="@string/hello_world"
-            android:src="@drawable/watermark" /> 
-    </LinearLayout>
+            android:src="@drawable/watermark" />
+    </RelativeLayout>
 
     <RelativeLayout
         android:id="@+id/customactionbar_filter"
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
-        android:layout_centerInParent="true"
-        android:layout_marginLeft="68dp"
-        android:paddingLeft="4dp"
-        android:paddingRight="4dp"
-        android:layout_marginRight="80dp" >
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="64dp"
+        android:layout_marginRight="50dp"
+        android:orientation="horizontal"
+        android:paddingLeft="8dp" >
 
         <TextView
             android:id="@+id/customactionbar_filter_text"
@@ -44,24 +58,27 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_centerVertical="true"
+            android:ellipsize="marquee"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:marqueeRepeatLimit="marquee_forever"
             android:singleLine="true"
-    		android:ellipsize="marquee" 
-    		android:focusable="true"
-			android:focusableInTouchMode="true"
-    		android:marqueeRepeatLimit="marquee_forever"
             android:text="@string/app_name"
             android:textColor="#ffffff"
             android:textSize="22sp" />
 
-        <ImageView
-            android:id="@+id/customactionbar_filter_button"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="5dp"
+        <TextView
+            android:id="@+id/customactionbar_filter_text1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="2dp"
             android:layout_toRightOf="@+id/customactionbar_filter_text"
-            android:contentDescription="@string/hello_world"
-            android:src="@drawable/iconexpose" />
+            android:paddingBottom="4dp"
+            android:singleLine="true"
+            android:text="@string/actionbar_filter"
+            android:textColor="#ffffff"
+            android:textSize="20sp" />
     </RelativeLayout>
 
     <ImageView
@@ -74,12 +91,5 @@
         android:contentDescription="@string/hello_world"
         android:src="@drawable/iconsearch" />
 
-    <ProgressBar
-        android:id="@+id/customactionbar_progressBar"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_centerVertical="true"
-        android:layout_margin="5dp"
-        android:layout_toLeftOf="@+id/customactionbar_search_button" />
 
 </RelativeLayout>

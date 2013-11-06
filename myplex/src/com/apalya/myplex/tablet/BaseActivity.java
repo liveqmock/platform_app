@@ -116,6 +116,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		if (actionBar != null) {
 			actionBar.show();
 		}
+		changeVisibility(mTitleFilterSymbol,View.GONE);
 	}
 
 	protected List<NavigationOptionsMenu> mMenuItemList = new ArrayList<NavigationOptionsMenu>();
@@ -189,24 +190,24 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		 mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LIVETV,R.drawable.iconlivetv,null,NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 //		 mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.TVSHOWS,R.drawable.icontv,null,NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 	}
-
-	public void updateActionBarTitle() {
+	@Override
+	public String getActionBarTitle() {
+		return mTitle;
+	}
+	public void saveActionBarTitle(){
+		mLastActionBarTitle = mTitle;
+	}
+	public String mLastActionBarTitle = new String();
+	public void setActionBarTitle(String title) {
+		this.mTitle = title;
 		if (mTitleTextView != null) {
 			mTitleTextView.setText(mTitle);
 		}
 	}
 
-	public String getActionBarTitle() {
-		return mTitle;
-	}
-
-	public void setActionBarTitle(String title) {
-		this.mTitle = title;
-	}
-
 	private TextView mTitleTextView;
+	private TextView mTitleFilterSymbol;
 	private String mTitle;
-	private ImageView mCustomActionBarFilterImage;
 	private RelativeLayout mCustomActionBarTitleLayout;
 	private ProgressBar mCustomActionBarProgressBar;
 	private ImageView mCustomActionBarSearch;
@@ -217,7 +218,11 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		public void onClick(View v) {
 			showFilterMenuPopup();
 		}
-	};
+	}; 	private void changeVisibility(View v,int value){
+		if(v != null){
+			v.setVisibility(value);
+		}
+	}
 	private ImageView mNavigationMenu;
 	private void showNavigationFullImage(boolean value){
 		AnimatorSet set = new AnimatorSet();
@@ -243,7 +248,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		if (v == null) {
 			return;
 		}
-		LinearLayout navigationMenuLayout = (LinearLayout)v.findViewById(R.id.customactionbar_drawerLayout);
+		RelativeLayout navigationMenuLayout = (RelativeLayout)v.findViewById(R.id.customactionbar_drawerLayout);
 		Util.showFeedbackOnSame(navigationMenuLayout);
 		mNavigationMenu = (ImageView) v.findViewById(R.id.customactionbar_drawer);
 		if (mDrawerLayout == null) {
@@ -264,20 +269,16 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 				}
 			}
 		});
-
-		mCustomActionBarTitleLayout = (RelativeLayout) v
-				.findViewById(R.id.customactionbar_filter);
+		mCustomActionBarTitleLayout = (RelativeLayout) v.findViewById(R.id.customactionbar_filter);
 		mCustomActionBarTitleLayout.setOnClickListener(mOnFilterClickListener);
 		Util.showFeedbackOnSame(mCustomActionBarTitleLayout);
-		mCustomActionBarFilterImage = (ImageView) v
-				.findViewById(R.id.customactionbar_filter_button);
-		mTitleTextView = (TextView) v
-				.findViewById(R.id.customactionbar_filter_text);
-		mTitleTextView.setTypeface(FontUtil.Roboto_Medium);
-		mCustomActionBarSearch = (ImageView) v
-				.findViewById(R.id.customactionbar_search_button);
-		mCustomActionBarSearch.setVisibility(View.INVISIBLE);
-
+		
+		mTitleTextView = (TextView) v.findViewById(R.id.customactionbar_filter_text);
+		mTitleTextView.setTypeface(FontUtil.Roboto_Regular);
+		
+		mTitleFilterSymbol = (TextView)v.findViewById(R.id.customactionbar_filter_text1);
+		changeVisibility(mTitleFilterSymbol,View.GONE);		
+		mCustomActionBarSearch = (ImageView) v.findViewById(R.id.customactionbar_search_button);
 		mCustomActionBarSearch.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -290,6 +291,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 					mCurrentFragment.searchButtonClicked();
 				} else {
 					SearchActivity fragment = new SearchActivity();
+					setActionBarTitle("Search");
 					bringFragment(fragment);
 				}
 			}
@@ -298,21 +300,12 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		mCustomActionBarProgressBar = (ProgressBar) v
 				.findViewById(R.id.customactionbar_progressBar);
 	}
-	private void rotateUp(){
-		 Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.rotateup);
-		 mCustomActionBarFilterImage.startAnimation(animation);
-	}
-	private void rotateDown(){
-		 Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.rotatedown);
-		 mCustomActionBarFilterImage.startAnimation(animation);
-	}
+	@Override
 	public void enableFilterAction(boolean value){
 		if(value){
 			mCustomActionBarTitleLayout.setOnClickListener(mOnFilterClickListener);
-			mCustomActionBarFilterImage.setVisibility(View.VISIBLE);
 		}else{
 			mCustomActionBarTitleLayout.setOnClickListener(null);
-			mCustomActionBarFilterImage.setVisibility(View.INVISIBLE);
 		}
 	}
 	@Override
@@ -372,6 +365,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 	@Override
 	public void onBackPressed() {
 		try {
+			showActionBar();
 			setSearchBarVisibilty(View.VISIBLE);
 			BaseFragment fragment = mFragmentStack.peek();
 			if (fragment instanceof CardExplorer) {
@@ -384,6 +378,8 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 			mFragmentStack.pop();
 			fragment = mFragmentStack.peek();
 			if (fragment != null) {
+				mFragmentStack.pop();
+				setActionBarTitle(mLastActionBarTitle);
 				bringFragment(fragment);
 				return;
 			}
@@ -425,6 +421,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 			return;
 		}
 		mCurrentFragment = fragment;
+		enableFilterAction(false);
 		pushFragment();
 	}
 
@@ -440,6 +437,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 	}
 
 	public void OnSelectedOption(int screenType,String label) {
+		changeVisibility(mTitleFilterSymbol, View.GONE);
 		
 		
 		switch (screenType) {
@@ -483,6 +481,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 			mCurrentFragment.mDataObject=profileData;
 			myplexapplication.mSelectedCard = profileData;
 			startActivity(new Intent(this,TabletCardDetails.class));
+				setActionBarTitle("My Profile");
 			return;
 		}
 		case NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION: {
@@ -492,23 +491,29 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 			if (label
 					.equalsIgnoreCase(NavigationOptionsMenuAdapter.FAVOURITE)) {
 				data.requestType = CardExplorerData.REQUEST_FAVOURITE;
+				setActionBarTitle("Favourites");
 			} else if (label
 					.equalsIgnoreCase(NavigationOptionsMenuAdapter.RECOMMENDED)) {
 				data.requestType = CardExplorerData.REQUEST_RECOMMENDATION;
+				setActionBarTitle("Recommended");
 			} else if (label
 					.equalsIgnoreCase(NavigationOptionsMenuAdapter.MOVIES)) {
 				data.requestType = CardExplorerData.REQUEST_BROWSE;
 				data.searchQuery = "movie";
+				setActionBarTitle("Movies");
 			} else if (label
 					.equalsIgnoreCase(NavigationOptionsMenuAdapter.LIVETV)) {
 				data.requestType = CardExplorerData.REQUEST_BROWSE;
 				data.searchQuery = "live";
+				setActionBarTitle("Live TV");
 			} else if (label
 					.equalsIgnoreCase(NavigationOptionsMenuAdapter.TVSHOWS)) {
 				data.requestType = CardExplorerData.REQUEST_BROWSE;
 				data.searchQuery = "tvshows";
+				setActionBarTitle("TV Shows");
 			}else if(label.equalsIgnoreCase(NavigationOptionsMenuAdapter.PURCHASES)){
 				data.requestType = CardExplorerData.REQUEST_PURCHASES;
+				setActionBarTitle("Subscribed");
 			}
 			if(this instanceof TabletCardDetails){
 				myplexapplication.mSelectedOption_Tablet = screenType;
@@ -533,6 +538,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 	}
 
 	protected void pushFragment() {
+		addFilterData(new ArrayList<FilterMenudata>(), null);
 		mFragmentStack.push(mCurrentFragment);
 		mCurrentFragment.setContext(this);
 		mCurrentFragment.setActionBar(getActionBar());
@@ -543,7 +549,6 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		// android.R.animator.fade_out);
 		// transaction.
 		setActionBarTitle("myplex");
-		updateActionBarTitle();
 		transaction.replace(R.id.content_frame, mCurrentFragment);
 		transaction.addToBackStack(null);
 		transaction.commit();
@@ -692,15 +697,6 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		mFilterMenuPopupWindow = new PopupWindow(mFilterMenuPopup,LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, true);
 		mFilterMenuPopupWindowList.add(mFilterMenuPopupWindow);
 		mFilterMenuPopupWindow.setOutsideTouchable(true);
-		rotateUp();
-		mFilterMenuPopupWindow.setOnDismissListener(new OnDismissListener() {
-			
-			@Override
-			public void onDismiss() {
-				// TODO Auto-generated method stub
-				rotateDown();
-			}
-		});
 		mFilterMenuPopupWindow.setBackgroundDrawable(new BitmapDrawable());
 		mFilterMenuPopupWindow.showAsDropDown(mCustomActionBarTitleLayout);
 	}
@@ -743,9 +739,9 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		if(mCustomActionBarTitleLayout != null){
 			mCustomActionBarTitleLayout.setOnClickListener(null);
 		}
-		if(mCustomActionBarFilterImage != null){
-			mCustomActionBarFilterImage.setVisibility(View.INVISIBLE);
-		}
+//		if(mCustomActionBarFilterImage != null){
+//			mCustomActionBarFilterImage.setVisibility(View.INVISIBLE);
+//		}
 	}
 	@Override
 	public void showfilterMenu() {
@@ -753,9 +749,9 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 			mCustomActionBarTitleLayout.setOnClickListener(mOnFilterClickListener);
 			Util.showFeedback(mCustomActionBarTitleLayout);
 		}
-		if(mCustomActionBarFilterImage != null){
-			mCustomActionBarFilterImage.setVisibility(View.VISIBLE);
-		}
+//		if(mCustomActionBarFilterImage != null){
+//			mCustomActionBarFilterImage.setVisibility(View.VISIBLE);
+//		}
 	}
 	@Override
 	public void searchButtonClicked() {

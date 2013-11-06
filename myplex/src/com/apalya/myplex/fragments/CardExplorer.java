@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -22,6 +23,7 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.widget.RelativeLayout.LayoutParams;
@@ -32,6 +34,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.Request.Method;
 import com.android.volley.toolbox.StringRequest;
 import com.apalya.myplex.BaseFragment;
+import com.apalya.myplex.MainActivity;
 import com.apalya.myplex.R;
 import com.apalya.myplex.R.id;
 import com.apalya.myplex.R.layout;
@@ -43,6 +46,7 @@ import com.apalya.myplex.cache.CacheManager;
 import com.apalya.myplex.cache.IndexHandler;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDataGenre;
+import com.apalya.myplex.data.CardDownloadData;
 import com.apalya.myplex.data.CardExplorerData;
 import com.apalya.myplex.data.CardResponseData;
 import com.apalya.myplex.data.FetchDownloadData;
@@ -55,13 +59,15 @@ import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FavouriteUtil;
 import com.apalya.myplex.utils.FavouriteUtil.FavouriteCallback;
+import com.apalya.myplex.utils.FetchDownloadProgress;
+import com.apalya.myplex.utils.FetchDownloadProgress.DownloadProgressStatus;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.views.CardView;
 import com.apalya.myplex.views.PackagePopUp;
 import com.fasterxml.jackson.core.JsonParseException;
 
-public class CardExplorer extends BaseFragment implements CardActionListener,CacheManagerCallback,
+public class CardExplorer extends BaseFragment implements CardActionListener,CacheManagerCallback,DownloadProgressStatus,
 		OnDismissCallback {
 	public static final String TAG = "CardExplorer";
 	private CardView mCardView;
@@ -73,6 +79,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	private ProgressDialog mProgressDialog = null;
 	public CardData mSelectedCard = null;
 	private String screenName;
+	private LinearLayout mStackFrame;
 
 	@Override
 	public void open(CardData object) {
@@ -82,7 +89,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		params.put("CardType", object.generalInfo.type);
 		params.put("CardName", object.generalInfo.title);
 		Analytics.trackEvent(Analytics.cardBrowseTouch,params);
-		
+		mMainActivity.saveActionBarTitle();
 		if(getResources().getBoolean(R.bool.isTablet)){
 			myplexapplication.mSelectedCard = object;
 			startActivity(new Intent(getContext(),TabletCardDetails.class));
@@ -144,7 +151,26 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	public void onStop() {
 	// TODO Auto-generated method stub
 		Log.d(TAG,"onStop");
+		if(mDownloadProgressManager != null){
+			mDownloadProgressManager.stopPolling();
+		}
 		super.onStop();
+	}
+	private void showStackedFrame(){
+		if(getResources() != null && getResources().getBoolean(R.bool.isTablet)){
+			return;
+		}
+		if(mStackFrame != null){
+			mStackFrame.setVisibility(View.VISIBLE);
+		}
+	}
+	private void hideStackedFrame(){
+		if(getResources() != null && getResources().getBoolean(R.bool.isTablet)){
+			return;
+		}
+		if(mStackFrame != null){
+			mStackFrame.setVisibility(View.INVISIBLE);
+		}
 	}
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -157,6 +183,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		mRootView = inflater.inflate(R.layout.cardbrowsing, container, false);
 		mCardView = (CardView) mRootView.findViewById(R.id.framelayout);
 		mGridView = (GridView)mRootView.findViewById(R.id.tabletview);
+		mStackFrame = (LinearLayout)mRootView.findViewById(R.id.cardstackframe);
 		arangeWaterMark();
 		if(getContext() == null)
 		{
@@ -184,7 +211,6 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			mMainActivity.setOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		}
 		mMainActivity.setSearchBarVisibilty(View.VISIBLE);
-		mMainActivity.enableFilterAction(true);
 		delayedAction();
 		return mRootView;
 	}
@@ -245,7 +271,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			@Override
 			public void completed() {
 			showNoDataMessage(false);
-				
+				applyData();
 			}
 		});
 	}
@@ -480,10 +506,15 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			}
 		});
 	}
-
+	private FetchDownloadProgress mDownloadProgressManager; 
 	@Override
 	public void selectedCard(CardData data,int index) {
 		
+		if(index == 0 ){
+			hideStackedFrame();
+		}else{
+			showStackedFrame();
+		}
 		Map<String,String> params=new HashMap<String, String>();
 		params.put("CardId", data._id);
 		params.put("CardType", data.generalInfo.type);
@@ -492,6 +523,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		
 		mData.currentSelectedCard = index;
 		mSelectedCard = data;
+		isDownloadView(mSelectedCard);
 	}
 
 //	public void updateDownloadInformation(){
@@ -503,6 +535,15 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 //			}
 //		}
 //	}
+	private void isDownloadView(CardData data){
+		if(mData.requestType == CardExplorerData.REQUEST_DOWNLOADS){
+			if(mDownloadProgressManager == null){
+				mDownloadProgressManager = new FetchDownloadProgress(getContext());
+			}
+			mDownloadProgressManager.setDownloadProgressListener(this);
+			mDownloadProgressManager.startPolling(data);
+		}
+	}
 	@Override
 	public void deletedCard(CardData data) {
 		// TODO Auto-generated method stub
@@ -534,7 +575,9 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	@Override
 	public void viewReady() {
 		
-		
+		if(mData.mMasterEntries.size() > 0 ){
+			isDownloadView(mData.mMasterEntries.get(0));
+		}
 		
 		if(getResources().getBoolean(R.bool.isTablet)){
 			
@@ -569,7 +612,6 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				}
 			}
 		}
-//		updateDownloadInformation();
 		if(mData.mMasterEntries.size() != 0){
 			showNoDataMessage(issuedRequest);
 		}
@@ -612,12 +654,6 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			
 			Analytics.trackEvent(Analytics.cardBrowseScreen,params);
 		}
-		
-		
-//		if(mData.requestType == CardExplorerData.REQUEST_DOWNLOADS){
-//			showProgress();
-//		}
-		
 	}
 
 	@Override
@@ -649,8 +685,6 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			}
 			
 			Analytics.trackEvent(Analytics.cardBrowseScreen,params);
-		
-//		updateDownloadInformation();
 		showNoDataMessage(false);
 		applyData();		
 	}
@@ -659,56 +693,15 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	public void OnOnlineError(VolleyError error) {
 		showNoDataMessage(false);
 	}
-//	private void showProgress(){
-//		final DownloadManager manager = (DownloadManager) getContext().getSystemService(Context.DOWNLOAD_SERVICE);
-//
-//		new Thread(new Runnable() {
-//
-//			@Override
-//			public void run() {
-//				boolean downloading = true;
-//
-//				while (downloading) {
-//					try {
-//						if(mSelectedCard == null){
-//							continue;
-//						}
-//						DownloadManager.Query q = new DownloadManager.Query();
-//						if(q == null){
-//							continue;
-//						}
-//						Log.d(TAG,"Download information for "+mSelectedCard.ESTId);
-//						q.setFilterById(mSelectedCard.ESTId);
-//						if(mSelectedCard.ESTId == 0){
-//							continue;
-//						}
-//						Cursor cursor = manager.query(q);
-//						if(cursor == null){
-//							continue;
-//						}
-//						cursor.moveToFirst();
-//						int bytes_downloaded = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
-//						int bytes_total = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
-//
-//						if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
-//							downloading = false;
-//							mSelectedCard.ESTProgressStatus = CardData.ESTDOWNLOADCOMPLETE;
-//							mCardView.updateDownloadStatus(mSelectedCard);
-//						}
-//						else{
-//							final int dl_progress = (bytes_downloaded * 100) / bytes_total;
-//							mSelectedCard.ESTStatus = CardData.ESTDOWNLOADINPROGRESS;
-//							mSelectedCard.ESTProgressStatus = dl_progress;
-//							Log.d(TAG,"Download inform progress  "+dl_progress);
-//							mCardView.updateDownloadStatus(mSelectedCard);
-//						}
-//						cursor.close();
-//					} catch (Exception e) {
-//						// TODO: handle exception
-//					}
-//					
-//				}
-//			}
-//		}).start();
-//	}
+
+	@Override
+	public void DownloadProgress(CardData cardData,
+			CardDownloadData downloadData) {
+		if(getResources() != null && getResources().getBoolean(R.bool.isTablet)){
+			
+		}else{
+			mCardView.updateDownloadStatus(cardData,downloadData);
+		}
+		
+	}
 }

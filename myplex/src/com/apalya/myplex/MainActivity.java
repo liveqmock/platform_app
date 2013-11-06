@@ -138,6 +138,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		if(actionBar != null){
 			actionBar.show();
 		}
+		changeVisibility(mTitleFilterSymbol,View.GONE);
 	}
 	private List<NavigationOptionsMenu> mMenuItemList = new ArrayList<NavigationOptionsMenu>();
 	private void fillMenuItem() {
@@ -267,36 +268,23 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		set.start();
 	}
 	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		Log.e("pref","onSaveInstanceState");
-		// TODO Auto-generated method stub
-		super.onSaveInstanceState(outState);
+	public String getActionBarTitle() {
+		return mTitle;
 	}
-
-	@Override
-	protected void onRestoreInstanceState(Bundle savedInstanceState) {
-		Log.e("pref","onRestoreInstanceState");
-		// TODO Auto-generated method stub
-		super.onRestoreInstanceState(savedInstanceState);
+	public void saveActionBarTitle(){
+		mLastActionBarTitle = mTitle;
 	}
-
-	public void updateActionBarTitle() {
+	public String mLastActionBarTitle = new String();
+	public void setActionBarTitle(String title) {
+		this.mTitle = title;
 		if (mTitleTextView != null) {
 			mTitleTextView.setText(mTitle);
 		}
 	}
 
-	public String getActionBarTitle() {
-		return mTitle;
-	}
-
-	public void setActionBarTitle(String title) {
-		this.mTitle = title;
-	}
-
 	private TextView mTitleTextView;
+	private TextView mTitleFilterSymbol;
 	private String mTitle;
-	private ImageView mCustomActionBarFilterImage;
 	private RelativeLayout mCustomActionBarTitleLayout;
 	private ProgressBar mCustomActionBarProgressBar;
 	private ImageView mCustomActionBarSearch;
@@ -308,7 +296,11 @@ public class MainActivity extends Activity implements MainBaseOptions {
 			showFilterMenuPopup();
 		}
 	};
-
+	private void changeVisibility(View v,int value){
+		if(v != null){
+			v.setVisibility(value);
+		}
+	}
 	private ImageView mNavigationMenu;
 	public void prepareCustomActionBar() {
 		getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
@@ -317,7 +309,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		if (v == null) {
 			return;
 		}
-		LinearLayout navigationMenuLayout = (LinearLayout)v.findViewById(R.id.customactionbar_drawerLayout);
+		RelativeLayout navigationMenuLayout = (RelativeLayout)v.findViewById(R.id.customactionbar_drawerLayout);
 		Util.showFeedbackOnSame(navigationMenuLayout);
 		mNavigationMenu = (ImageView) v.findViewById(R.id.customactionbar_drawer);
 		navigationMenuLayout.setOnClickListener(new OnClickListener() {
@@ -333,18 +325,16 @@ public class MainActivity extends Activity implements MainBaseOptions {
 				}
 			}
 		});
-		mCustomActionBarTitleLayout = (RelativeLayout) v
-				.findViewById(R.id.customactionbar_filter);
+		mCustomActionBarTitleLayout = (RelativeLayout) v.findViewById(R.id.customactionbar_filter);
 		mCustomActionBarTitleLayout.setOnClickListener(mOnFilterClickListener);
 		Util.showFeedbackOnSame(mCustomActionBarTitleLayout);
-		mCustomActionBarFilterImage = (ImageView) v
-				.findViewById(R.id.customactionbar_filter_button);
-		mTitleTextView = (TextView) v
-				.findViewById(R.id.customactionbar_filter_text);
+		
+		mTitleTextView = (TextView) v.findViewById(R.id.customactionbar_filter_text);
 		mTitleTextView.setTypeface(FontUtil.Roboto_Regular);
-		mTitleTextView.setEnabled(true);
-		mCustomActionBarSearch = (ImageView) v
-				.findViewById(R.id.customactionbar_search_button);
+		
+		mTitleFilterSymbol = (TextView)v.findViewById(R.id.customactionbar_filter_text1);
+		changeVisibility(mTitleFilterSymbol,View.GONE);		
+		mCustomActionBarSearch = (ImageView) v.findViewById(R.id.customactionbar_search_button);
 		mCustomActionBarSearch.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -353,6 +343,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 					mCurrentFragment.searchButtonClicked();
 				} else {
 					SearchActivity fragment = new SearchActivity();
+					setActionBarTitle("Search");
 					bringFragment(fragment);
 				}
 			}
@@ -361,62 +352,12 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		mCustomActionBarProgressBar = (ProgressBar) v
 				.findViewById(R.id.customactionbar_progressBar);
 	}
-	private void rotateUp(){
-		 Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.rotateup);
-		 animation.setAnimationListener(new AnimationListener() {
-			
-			@Override
-			public void onAnimationStart(Animation animation) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void onAnimationRepeat(Animation animation) {
-				// TODO Auto-generated method stub
-				
-			}
-			
-			@Override
-			public void onAnimationEnd(Animation animation) {
-				// TODO Auto-generated method stub
-				mCustomActionBarFilterImage.setImageResource(R.drawable.iconhide);
-			}
-		});
-		 mCustomActionBarFilterImage.startAnimation(animation);
-	}
-	private void rotateDown(){
-		 Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.rotatedown);
-		 animation.setAnimationListener(new AnimationListener() {
-				
-				@Override
-				public void onAnimationStart(Animation animation) {
-					// TODO Auto-generated method stub
-					
-				}
-				
-				@Override
-				public void onAnimationRepeat(Animation animation) {
-					// TODO Auto-generated method stub
-					
-				}
-				
-				@Override
-				public void onAnimationEnd(Animation animation) {
-					// TODO Auto-generated method stub
-					mCustomActionBarFilterImage.setImageResource(R.drawable.iconexpose);
-				}
-			});
-		 mCustomActionBarFilterImage.startAnimation(animation);
-	}
 	@Override
 	public void enableFilterAction(boolean value){
 		if(value){
 			mCustomActionBarTitleLayout.setOnClickListener(mOnFilterClickListener);
-			mCustomActionBarFilterImage.setVisibility(View.VISIBLE);
 		}else{
 			mCustomActionBarTitleLayout.setOnClickListener(null);
-			mCustomActionBarFilterImage.setVisibility(View.GONE);
 		}
 	}
 	@Override
@@ -521,6 +462,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 			fragment = mFragmentStack.peek();
 			if (fragment != null) {
 				mFragmentStack.pop();
+				setActionBarTitle(mLastActionBarTitle);
 				bringFragment(fragment);
 				return;
 			}
@@ -563,6 +505,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 			return;
 		}
 		mCurrentFragment = fragment;
+		enableFilterAction(false);
 		pushFragment();
 	}
 
@@ -572,6 +515,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 	private SearchActivity mSearchActivity;
 	private SetttingsFragment mSettingsScreen;
 	private void selectItem(int position) {
+		changeVisibility(mTitleFilterSymbol, View.GONE);
 		NavigationOptionsMenu menu = mMenuItemList.get(position);
 		
 		switch (menu.mScreenType) {
@@ -610,6 +554,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 				profileData.images=pics;
 				mCurrentFragment=mCardDetails;
 				mCurrentFragment.mDataObject=profileData;
+				setActionBarTitle("My Profile");
 			}else{
 				mDrawerLayout.closeDrawer(mDrawerList);
 				return;
@@ -622,22 +567,29 @@ public class MainActivity extends Activity implements MainBaseOptions {
 			data.reset();
 			
 			if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.FAVOURITE)){
+				setActionBarTitle("Favourites");
 				data.requestType = CardExplorerData.REQUEST_FAVOURITE;
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.RECOMMENDED)){
 				data.requestType = CardExplorerData.REQUEST_RECOMMENDATION;
+				setActionBarTitle("myplex");
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.MOVIES)){
 				data.requestType = CardExplorerData.REQUEST_BROWSE;
 				data.searchQuery ="movie";
+				setActionBarTitle("Movies");
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.LIVETV)){
 				data.requestType = CardExplorerData.REQUEST_BROWSE;
 				data.searchQuery ="live";
+				setActionBarTitle("Live TV");
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.TVSHOWS)){
 				data.requestType = CardExplorerData.REQUEST_BROWSE;
 				data.searchQuery ="tvshows";
+				setActionBarTitle("TV Shows");
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.DOWNLOADS)){
 				data.requestType = CardExplorerData.REQUEST_DOWNLOADS;
+				setActionBarTitle("My Downloads");
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.PURCHASES)){
 				data.requestType = CardExplorerData.REQUEST_PURCHASES;
+				setActionBarTitle("Subscribed");
 			}
 			mCurrentFragment = mCardExplorer;
 			break;
@@ -646,6 +598,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		{
 			mSettingsScreen = (SetttingsFragment) createFragment(NavigationOptionsMenuAdapter.SETTINGS_ACTION);
 			mCurrentFragment = mSettingsScreen;
+			setActionBarTitle("Settings");
 			break;
 		}
 		default: {
@@ -664,6 +617,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 	}
 
 	private void pushFragment() {
+		addFilterData(new ArrayList<FilterMenudata>(), null);
 		mFragmentStack.push(mCurrentFragment);
 		mCurrentFragment.setContext(this);
 		mCurrentFragment.setActionBar(getActionBar());
@@ -673,8 +627,6 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		// transaction.setCustomAnimations(android.R.animator.fade_in,
 		// android.R.animator.fade_out);
 		// transaction.
-		setActionBarTitle("myplex");
-		updateActionBarTitle();
 		transaction.replace(R.id.content_frame, mCurrentFragment);
 		transaction.addToBackStack(null);
 		transaction.commit();
@@ -836,15 +788,6 @@ public class MainActivity extends Activity implements MainBaseOptions {
 				LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, true);
 		mFilterMenuPopupWindowList.add(mFilterMenuPopupWindow);
 		mFilterMenuPopupWindow.setOutsideTouchable(true);
-		rotateUp();
-		mFilterMenuPopupWindow.setOnDismissListener(new OnDismissListener() {
-			
-			@Override
-			public void onDismiss() {
-				// TODO Auto-generated method stub
-				rotateDown();
-			}
-		});
 		mFilterMenuPopupWindow.setBackgroundDrawable(new BitmapDrawable());
 		mFilterMenuPopupWindow.showAsDropDown(mCustomActionBarTitleLayout);
 	}
@@ -852,6 +795,13 @@ public class MainActivity extends Activity implements MainBaseOptions {
 	@Override
 	public void addFilterData(List<FilterMenudata> datalist,
 			OnClickListener listener) {
+		if(datalist != null && datalist.size() > 0){
+			enableFilterAction(true);
+			changeVisibility(mTitleFilterSymbol,View.VISIBLE);
+		}else{
+			enableFilterAction(false);
+			changeVisibility(mTitleFilterSymbol,View.GONE);
+		}
 		mFilterDelegate = listener;
 		
 		mFilterMenuPopup = mInflater.inflate(R.layout.filtermenupopup, null);

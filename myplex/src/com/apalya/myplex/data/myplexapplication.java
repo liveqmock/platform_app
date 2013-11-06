@@ -11,6 +11,7 @@ public class myplexapplication extends Application {
 	public static ApplicationConfig mDisplayInfo; 
 	public static CardExplorerData mCardExplorerData;
 	public static CardData mSelectedCard;
+	public static CardDownloadedDataList mDownloadList;
 	public static ApplicationSettings mApplicationSettings;
 	private static UserProfile mUserProfile;
 	private static DeviceDetails mDeviceDetails;
