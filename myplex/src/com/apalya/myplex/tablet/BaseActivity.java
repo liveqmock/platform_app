@@ -178,7 +178,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		 mMenuItemList.add(new NavigationOptionsMenu(myplexapplication.getUserProfileInstance().getName(),R.drawable.menu_profile,myplexapplication.getUserProfileInstance().getProfilePic(),NavigationOptionsMenuAdapter.CARDDETAILS_ACTION,R.layout.navigation_menuitemlarge));
 		 mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FAVOURITE,R.drawable.iconfav,null,NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		 mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.PURCHASES,R.drawable.iconpurchases, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-		 mMenuItemList.add(new NavigationOptionsMenu("Downloads",R.drawable.icondnload, null,NavigationOptionsMenuAdapter.NOACTION_ACTION,R.layout.navigation_menuitemsmall));
+		 mMenuItemList.add(new NavigationOptionsMenu("Downloads",R.drawable.icondnload, null,NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		 mMenuItemList.add(new NavigationOptionsMenu("Settings",R.drawable.iconsettings, null,NavigationOptionsMenuAdapter.SETTINGS_ACTION,R.layout.navigation_menuitemsmall));
 		 Session fbSession=Session.getActiveSession();
 			if(fbSession!=null && fbSession.isOpened())
@@ -408,6 +408,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		case NavigationOptionsMenuAdapter.SETTINGS_ACTION:
 			mSettingsScreen = new SetttingsFragment();
 			fragment = mSettingsScreen;
+			break;
 		default:
 			mCardDetails = new CardDetailsTabletFrag();
 			fragment = mCardDetails;
@@ -448,14 +449,18 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 			LogOutUtil.onClickLogout(this);
 			return;
 		}
-		case NavigationOptionsMenuAdapter.DOWNLOAD_ACTION: {
+		case NavigationOptionsMenuAdapter.SETTINGS_ACTION:{
+			setActionBarTitle("Settings");
 			if(this instanceof TabletCardDetails){
 				myplexapplication.mSelectedOption_Tablet = screenType;
+				startActivity(new Intent(this,MultiPaneActivity.class));
 				finish();
 				return;
+			}else{
+				mSettingsScreen = (SetttingsFragment) createFragment(NavigationOptionsMenuAdapter.SETTINGS_ACTION);
+				mCurrentFragment = mSettingsScreen;
+				break;
 			}
-			Util.showDownloads(this);
-			return;
 		}
 		case NavigationOptionsMenuAdapter.CARDDETAILS_ACTION: {
 			mCardDetails = new CardDetailsTabletFrag();
@@ -511,6 +516,9 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 				data.requestType = CardExplorerData.REQUEST_BROWSE;
 				data.searchQuery = "tvshows";
 				setActionBarTitle("TV Shows");
+			}else if(label.equalsIgnoreCase(NavigationOptionsMenuAdapter.DOWNLOADS)){
+				data.requestType = CardExplorerData.REQUEST_DOWNLOADS;
+				setActionBarTitle("My Downloads");
 			}else if(label.equalsIgnoreCase(NavigationOptionsMenuAdapter.PURCHASES)){
 				data.requestType = CardExplorerData.REQUEST_PURCHASES;
 				setActionBarTitle("Subscribed");

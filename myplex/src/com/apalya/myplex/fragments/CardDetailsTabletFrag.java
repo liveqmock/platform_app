@@ -340,11 +340,13 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		
 		
 		BaseFragment fragment = mMainActivity.createFragment(NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION);
+		
 		CardExplorerData data = myplexapplication.getCardExplorerData();
 		data.reset();
 		data.requestType = CardExplorerData.REQUEST_SEARCH;
 		data.searchQuery = key;
-		mMainActivity.bringFragment(fragment);
+		getActivity().startActivity(new Intent(getActivity(),MultiPaneActivity.class));
+		getActivity().finish();
 	}
 
 	private CardDetailMultiMediaGroup mSelectedMediaGroup;

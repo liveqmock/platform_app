@@ -129,7 +129,7 @@ public class CardVideoPlayer implements PlayerListener {
 		if (mData.images != null) {
 			for (CardDataImagesItem imageItem : mData.images.values) {
 				if (imageItem.profile != null
-						&& imageItem.profile.equalsIgnoreCase("xxhdpi")) {
+						&& imageItem.profile.equalsIgnoreCase(myplexapplication.getApplicationConfig().type)) {
 					if (imageItem.link == null
 							|| imageItem.link.compareTo("Images/NoImage.jpg") == 0) {
 						mPreviewImage.setImageResource(0);

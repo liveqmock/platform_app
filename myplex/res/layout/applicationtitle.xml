@@ -12,7 +12,6 @@
         android:layout_alignParentBottom="true"
         android:indeterminate="true"
         android:indeterminateBehavior="repeat"
-        android:indeterminateDuration="2000"
         android:indeterminateDrawable="@drawable/custom_progress_bar_horizontal"
         android:visibility="invisible" />
 
