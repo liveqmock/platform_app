@@ -13,6 +13,7 @@ import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.GZipRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.apalya.myplex.adapters.CacheManagerCallback;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardResponseData;

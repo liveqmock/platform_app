@@ -10,6 +10,8 @@ import java.util.EventListener;
 //import java.util.HashMap;
 import java.util.Set;
 
+import com.apalya.myplex.views.CardVideoPlayer.PlayerStatusUpdate;
+
 import android.content.ContentValues;
 import android.content.Context;
 
@@ -20,6 +22,8 @@ import android.drm.DrmInfoEvent;
 import android.drm.DrmInfoRequest;
 import android.drm.DrmManagerClient;
 import android.drm.DrmStore;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.Toast;
 
 public class WidevineDrm {
@@ -42,7 +46,7 @@ public class WidevineDrm {
 
 	public static class Settings {
 		public static String WIDEVINE_MIME_TYPE = "video/wvm";
-		public static String DRM_SERVER_URI = "http://dev.myplex.in:80/licenseproxy/v2/license";
+		public static String DRM_SERVER_URI = "http://api-beta.myplex.in/licenseproxy/v2/license";
 //		public static String DRM_SERVER_URI = "http://122.248.233.48/widevine/cypherpc/cgi-bin/GetEMMs.cgi";
 		public static String DEVICE_ID = "device12345"; // use a unique device ID
 		public static String PORTAL_NAME = "sotalapalya";
@@ -284,16 +288,34 @@ public class WidevineDrm {
 
 	private void logMessage( int typeConnectionStatus,int typeRightsInstalled) {
 		// TODO Auto-generated method stub
-		if (logEventListener != null) {
-			logEventListener.logUpdated(typeConnectionStatus,typeRightsInstalled);
-			logEventListener=null;
-		}
+//		if (logEventListener != null) {
+//			logEventListener.logUpdated(typeConnectionStatus,typeRightsInstalled);
+//			logEventListener=null;
+//		}
 	}
 	private void logMessage(String message) {
+		sendMessage(message);
 		//logBuffer.append(message);
 
 		/* if (logEventListener != null) {
             logEventListener.logUpdated(message);
         }*/
+	}
+	private void sendMessage(final String str){
+		Handler h = new Handler(Looper.getMainLooper());
+		h.post(new Runnable() {
+			
+			@Override
+			public void run() {
+				if(mPlayerStatusListener != null){
+					mPlayerStatusListener.playerStatusUpdate(str);
+				}
+			}
+		});
+		
+	}
+	private PlayerStatusUpdate mPlayerStatusListener;
+	public void setPlayerListener(PlayerStatusUpdate listener) {
+		this.mPlayerStatusListener = listener;
 	}
 }

@@ -166,7 +166,7 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 //		Log.e(TAG,"Erasing "+position+" for "+dataHolder.mTitle.getTextSize()+"  "+dataHolder.mTitle.getWidth() );
 		if(data.images != null){
 			for(CardDataImagesItem imageItem:data.images.values){
-				if(imageItem.profile != null && imageItem.profile.equalsIgnoreCase(myplexapplication.getApplicationConfig().type)){
+				if(imageItem.type != null && imageItem.type.equalsIgnoreCase("coverposter") && imageItem.profile != null && imageItem.profile.equalsIgnoreCase(myplexapplication.getApplicationConfig().type)){
 					if (imageItem.link != null && !(imageItem.link.compareTo("Images/NoImage.jpg") == 0)) {
 						dataHolder.mPreview.mImageUrl = imageItem.link;
 //						Log.d("CardExplorer","imageItem.link ="+imageItem.link+" profile = "+imageItem.profile);

@@ -128,7 +128,7 @@ public class CardVideoPlayer implements PlayerListener {
 
 		if (mData.images != null) {
 			for (CardDataImagesItem imageItem : mData.images.values) {
-				if (imageItem.profile != null
+				if (imageItem.type != null && imageItem.type.equalsIgnoreCase("coverposter") && imageItem.profile != null
 						&& imageItem.profile.equalsIgnoreCase(myplexapplication.getApplicationConfig().type)) {
 					if (imageItem.link == null
 							|| imageItem.link.compareTo("Images/NoImage.jpg") == 0) {
@@ -421,7 +421,9 @@ public class CardVideoPlayer implements PlayerListener {
 	@Override
 	public void onSeekComplete(MediaPlayer mp) {
 		// TODO Auto-generated method stub
-
+		if(mPlayerStatusListener != null){
+			mPlayerStatusListener.playerStatusUpdate("onSeekComplete");
+		}
 	}
 
 	@Override
@@ -444,6 +446,9 @@ public class CardVideoPlayer implements PlayerListener {
 			mProgressBarLayout.setVisibility(View.GONE);
 			mVideoViewPlayer.showMediaController();
 			mPlayerState = PLAYER_PLAY;
+			if(mPlayerStatusListener != null){
+				mPlayerStatusListener.playerStatusUpdate("Buffering ended");
+			}
 			if(!mContext.getResources().getBoolean(R.bool.isTablet)){
 				((MainBaseOptions) mContext).setOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
 			}
@@ -519,7 +524,7 @@ public class CardVideoPlayer implements PlayerListener {
 			}
 			String extra = new String();
 			extra = ""+arg2;
-			mPlayerStatusListener.playerStatusUpdate("Play Info :: what = "+what+" extra= "+extra);
+//			mPlayerStatusListener.playerStatusUpdate("Play Info :: what = "+what+" extra= "+extra);
 		}
 		return false;
 	}

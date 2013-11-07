@@ -47,6 +47,11 @@ public class MediaUtil {
 	}
 	private static void sendResponse(boolean status,String url){
 		if (urlEventListener != null) {
+			if(url != null){
+				if(url.contains(".wvm")){
+					url = url.replace("http:", "widevine:");	
+				}
+			}
 			urlEventListener.urlReceived(status,url);
 		}
 	}

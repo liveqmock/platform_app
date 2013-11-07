@@ -1,5 +1,9 @@
 package com.apalya.myplex.fragments;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -10,11 +14,14 @@ import java.util.Random;
 import java.util.Set;
 
 import android.animation.LayoutTransition;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v4.view.PagerAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,11 +29,13 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.TranslateAnimation;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.RelativeLayout.LayoutParams;
 
 import com.android.volley.VolleyError;
 import com.apalya.myplex.BaseFragment;
@@ -447,7 +456,7 @@ public class CardDetails extends BaseFragment implements
 						&& relatedCastItem.images.values != null
 						&& relatedCastItem.images.values.size() > 0) {
 					for (CardDataImagesItem item : relatedCastItem.images.values) {
-						if (item.profile != null
+						if (item.type != null && item.type.equalsIgnoreCase("thumbnail") && item.profile != null
 								&& item.profile
 										.equalsIgnoreCase(myplexapplication
 												.getApplicationConfig().type)) {
@@ -752,19 +761,81 @@ public class CardDetails extends BaseFragment implements
 		}
 	}
 
+	private boolean saveButtonAdded = false;
+	private List<String> playerLogs = new ArrayList<String>();
 	@Override
 	public void playerStatusUpdate(String value) {
-		if (mPlayerLogsLayout != null) {
-			TextView text = (TextView) mInflater.inflate(
-					R.layout.pricepopmodeheading, null);
-			text.setTextColor(Color.parseColor("#000000"));
-			text.setPadding(4, 4, 4, 4);
-			SimpleDateFormat sdf = new SimpleDateFormat("MMM dd,yyyy HH:mm");
-
+		if(value != null){
+			SimpleDateFormat sdf = new SimpleDateFormat("MMM dd,yyyy HH:mm:ss");
 			Date resultdate = new Date(System.currentTimeMillis());
-
-			text.setText(sdf.format(resultdate) +"::"+ value+"\n");
-			text.setTypeface(FontUtil.RobotoCondensed_Light);
+			value = sdf.format(resultdate)+"::"+ value;
+			playerLogs.add(value);	
+		}
+		if (mPlayerLogsLayout != null) {
+			if(!saveButtonAdded){
+				RelativeLayout subLayout = new RelativeLayout(getContext());
+				LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+				subLayout.setLayoutParams(params);
+				mPlayerLogsLayout.addView(subLayout);
+				TextView text = (TextView) mInflater.inflate(R.layout.pricepopmodeheading, null);
+				text.setTextColor(Color.parseColor("#54B5E9"));
+				text.setPadding(8, 12, 12, 8);
+				text.setText("Player Logs:");
+				text.setTextSize(18);
+				text.setTypeface(FontUtil.Roboto_Medium);
+				subLayout.addView(text);
+				
+				
+				ImageView saveTofileSystem = new ImageView(getContext());
+				int imagesize = (int) getResources().getDimension(R.dimen.margin_gap_36);
+				RelativeLayout.LayoutParams buttonparams = new RelativeLayout.LayoutParams(imagesize,imagesize);
+				buttonparams.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+				saveTofileSystem.setLayoutParams(buttonparams);
+				Util.showFeedback(saveTofileSystem);
+				saveTofileSystem.setImageResource(R.drawable.download);
+				saveTofileSystem.setOnClickListener(new OnClickListener() {
+					
+					@Override
+					public void onClick(View arg0) {
+						String path = Environment.getExternalStorageDirectory() + File.separator + "playerlogs.txt";
+						
+						try {
+							File file = new File(path);
+							file.createNewFile();
+							if(file.exists())
+							{
+							     OutputStream fo = new FileOutputStream(file);         
+							     for(String str:playerLogs){
+							    	 fo.write(str.getBytes());	 
+							     }
+							     fo.close();
+							}  
+							Util.showToast(getContext(), "Logs saved at "+path, Util.TOAST_TYPE_INFO);
+							Intent intent = new Intent(Intent.ACTION_SEND);
+							intent.setType("text/plain");
+							intent.putExtra(Intent.EXTRA_EMAIL, new String[] {"dev@apalya.myplex.tv","qa@apalya.myplex.tv"});
+							intent.putExtra(Intent.EXTRA_SUBJECT, "Player Logs");
+							String manufacturer = Build.MANUFACTURER;
+							String model = Build.MODEL;
+							intent.putExtra(Intent.EXTRA_TEXT, "Please find the attached logs for "+manufacturer+" "+model);
+							Uri uri = Uri.parse("file://" + file);
+							intent.putExtra(Intent.EXTRA_STREAM, uri);
+							startActivity(Intent.createChooser(intent, "Send email..."));
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
+					}
+				});
+				subLayout.addView(saveTofileSystem);
+				saveButtonAdded = true;
+			}
+			TextView text = (TextView) mInflater.inflate(R.layout.pricepopmodeheading, null);
+			text.setTextColor(Color.parseColor("#000000"));
+			text.setPadding(8, 2, 8, 2);
+			text.setText(value);
+			text.setTypeface(FontUtil.Roboto_Regular);
 			mPlayerLogsLayout.addView(text);
 		}
 		updatePlayerLogVisiblity();

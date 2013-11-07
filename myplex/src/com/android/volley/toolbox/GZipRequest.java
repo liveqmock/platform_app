@@ -75,9 +75,21 @@ public class GZipRequest extends Request<String> {
 	        	byte[] buf = new byte[BUF_SIZE_MAX];
 	        	GZIPInputStream zis;
 	        	zis = new GZIPInputStream(responseStream, BUF_SIZE_MAX);
-	            while(zis.read(buf )>0){
-	            	parsed +=new String(buf, "UTF-8");
-	            }
+	        	boolean stop = false;
+	        	int bytesRead = 0;
+				while (stop == false) {
+					int pos = 0;
+					do {
+						bytesRead = zis.read(buf, pos, (BUF_SIZE_MAX - pos));
+						if (bytesRead == -1) {
+							stop = true;
+							break;
+						} else {
+							pos += bytesRead;
+						}
+					} while (pos < BUF_SIZE_MAX);
+					parsed +=new String(buf, "UTF-8");
+				}
 				zis.close();
 	        } catch (UnsupportedEncodingException e) {
 	            parsed = new String(response.data);

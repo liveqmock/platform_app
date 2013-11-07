@@ -226,9 +226,9 @@ public class CardDetailViewFactory {
 			v.setBackgroundResource(0);
 		}
 		mCommentContentLayout = (LinearLayout)v.findViewById(R.id.carddetailcomment_contentlayout);
-		LayoutTransition transition = new LayoutTransition();
-		transition.setStartDelay(LayoutTransition.CHANGE_APPEARING, 0);
-		mCommentContentLayout.setLayoutTransition(transition);
+//		LayoutTransition transition = new LayoutTransition();
+//		transition.setStartDelay(LayoutTransition.CHANGE_APPEARING, 0);
+//		mCommentContentLayout.setLayoutTransition(transition);
 		mComments = mCommentContentLayout;
 		addSpace(mCommentContentLayout, (int)mContext.getResources().getDimension(R.dimen.margin_gap_16));
 		fillCommentSectionData(COMMENTSECTION_COMMENTS,mData);

@@ -31,6 +31,7 @@
     <dimen name="margin_gap_14">14dp</dimen>
     <dimen name="margin_gap_16">16dp</dimen>
  	<dimen name="margin_gap_24">24dp</dimen>
+ 	<dimen name="margin_gap_36">36dp</dimen>
  	<dimen name="margin_gap_48">48dp</dimen>   
     <dimen name="margin_gap_54">54dp</dimen>
     
