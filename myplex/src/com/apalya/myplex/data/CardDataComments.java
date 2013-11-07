@@ -12,6 +12,7 @@ public class CardDataComments implements Serializable{
 	 */
 	private static final long serialVersionUID = 564071273732829007L;
 	public List<CardDataCommentsItem> values = new ArrayList<CardDataCommentsItem>();
+	public int numComments;
 	public CardDataComments(){
 		
 	}

@@ -16,6 +16,8 @@
 
 package com.android.volley.toolbox;
 
+import android.util.Log;
+
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -28,6 +30,8 @@ import java.io.UnsupportedEncodingException;
  * A canned request for retrieving the response body at a given URL as a String.
  */
 public class StringRequest extends Request<String> {
+	public static final String TAG = "StringRequest";
+	private boolean mShowLogs = false;
     private final Listener<String> mListener;
 
     /**
@@ -59,14 +63,25 @@ public class StringRequest extends Request<String> {
     protected void deliverResponse(String response) {
         mListener.onResponse(response);
     }
-
+    public void printLogs(boolean value){
+		mShowLogs = value;
+	}
     @Override
     protected Response<String> parseNetworkResponse(NetworkResponse response) {
+    	if(mShowLogs && response != null && response.headers != null ){
+			Log.d(TAG,"Response Headers");
+			for(String key:response.headers.keySet()){
+				Log.d(TAG,key+":"+response.headers.get(key));
+			}
+		}
         String parsed;
         try {
             parsed = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
         } catch (UnsupportedEncodingException e) {
             parsed = new String(response.data);
+        }
+        if(mShowLogs){
+        	Log.d(TAG,"Response :: " +parsed);
         }
         return Response.success(parsed, HttpHeaderParser.parseCacheHeaders(response));
     }

@@ -1,6 +1,7 @@
 package com.apalya.myplex.cache;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -11,7 +12,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.RetryPolicy;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.GZipRequest;
 import com.apalya.myplex.adapters.CacheManagerCallback;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardResponseData;
@@ -26,6 +27,7 @@ public class CacheManager {
 	private boolean mAutoSave = true;
 	private CacheManagerCallback mListener;
 
+	private List<CardData> mDynamicDetailList;
 	public void autoSaved(boolean value){
 		this.mAutoSave = value;
 	}
@@ -34,6 +36,7 @@ public class CacheManager {
 	}
 	public void getCardDetails(final List<CardData> Ids,IndexHandler.OperationType operationType,CacheManagerCallback listener){
 		this.mListener = listener;
+		this.mDynamicDetailList = Ids;
 		if(operationType == IndexHandler.OperationType.DONTSEARCHDB)
 		{
 			String cardIds = new String();
@@ -75,18 +78,48 @@ public class CacheManager {
 						issueOnlineRequest(missingCardId);
 					}
 					if(mListener != null){
+						fillDynamicData(resultMap);
 						mListener.OnCacheResults(resultMap,issuedOnlineRequest);
 					}
 				}
 			}
 		});
 	}
-	
+	private void fillDynamicData(HashMap<String, CardData> resultMap){
+		if(mDynamicDetailList == null || mDynamicDetailList.size() == 0 || resultMap == null || resultMap.size() == 0){
+			return;
+		}
+		List<CardData> modifiedDataList = new ArrayList<CardData>();
+		for(CardData data:mDynamicDetailList){
+			CardData resultData = resultMap.get(data._id);
+			if(resultData == null ){continue;}
+			Log.d(TAG,"updating dynamic data for "+data._id);
+			resultData.userReviews = data.userReviews;
+			resultData.currentUserData = data.currentUserData;
+			resultData.criticReviews = data.criticReviews;
+			resultData._expiresAt = data._expiresAt;
+			if(data.comments != null){
+				Log.d(TAG,"number of comments for  "+data._id+" "+data.comments.numComments);	
+			}
+			resultData.comments = data.comments;
+			modifiedDataList.add(resultData);
+		}
+		if(modifiedDataList.size() > 0){
+			myplexapplication.getCacheHolder().UpdataDataAsync(modifiedDataList, new InsertionResult() {
+				
+				@Override
+				public void updateComplete(Boolean updateStatus) {
+					// TODO Auto-generated method stub
+				}
+			});
+		}
+	}
 	private void issueOnlineRequest(String cardIds){
 		cardIds = cardIds.replace(" ", "%20");
 		String url = ConsumerApi.getContentDetail(cardIds, ConsumerApi.LEVELDEVICEMAX);
 		RequestQueue queue = MyVolley.getRequestQueue();
-		StringRequest myReg = new StringRequest(url, onlineRequestSuccessListener(), onlineRequestErrorListener());
+		GZipRequest myReg = new GZipRequest(url, onlineRequestSuccessListener(), onlineRequestErrorListener());
+//		myReg.printLogs(true);
 //		myReg.setShouldCache(true);
 		myReg.setRetryPolicy(new CacheRetry());
 		queue.add(myReg);

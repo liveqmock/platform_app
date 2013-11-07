@@ -42,8 +42,8 @@ public class WidevineDrm {
 
 	public static class Settings {
 		public static String WIDEVINE_MIME_TYPE = "video/wvm";
-//		public static String DRM_SERVER_URI = "http://api-beta.myplex.in/licenseproxy/v2/license";
-		public static String DRM_SERVER_URI = "http://122.248.233.48/widevine/cypherpc/cgi-bin/GetEMMs.cgi";
+		public static String DRM_SERVER_URI = "http://dev.myplex.in:80/licenseproxy/v2/license";
+//		public static String DRM_SERVER_URI = "http://122.248.233.48/widevine/cypherpc/cgi-bin/GetEMMs.cgi";
 		public static String DEVICE_ID = "device12345"; // use a unique device ID
 		public static String PORTAL_NAME = "sotalapalya";
 		//public static String OP_DATA="optdata";

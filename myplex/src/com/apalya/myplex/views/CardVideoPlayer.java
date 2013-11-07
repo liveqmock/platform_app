@@ -262,8 +262,8 @@ public class CardVideoPlayer implements PlayerListener {
 					try {
 						data = licenseData.getBytes("UTF-8");
 						String base64 = Base64.encodeToString(data, Base64.DEFAULT);
-//						Settings.USER_DATA=base64;
-//						Settings.DEVICE_ID=myplexapplication.getDevDetailsInstance().getClientDeviceId();
+						Settings.USER_DATA=base64;
+						Settings.DEVICE_ID=myplexapplication.getDevDetailsInstance().getClientDeviceId();
 						//Settings.DRM_SERVER_URI="http://dev.myplex.in:80/licenseproxy/v2/license"+base64;
 					} catch (UnsupportedEncodingException e) {
 						// TODO Auto-generated catch block

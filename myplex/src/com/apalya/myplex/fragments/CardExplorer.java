@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -25,19 +23,14 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
-import android.widget.RelativeLayout.LayoutParams;
 
+import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.Request.Method;
-import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.GZipRequest;
 import com.apalya.myplex.BaseFragment;
-import com.apalya.myplex.MainActivity;
 import com.apalya.myplex.R;
-import com.apalya.myplex.R.id;
-import com.apalya.myplex.R.layout;
 import com.apalya.myplex.adapters.CacheManagerCallback;
 import com.apalya.myplex.adapters.CardActionListener;
 import com.apalya.myplex.adapters.CardTabletAdapater;
@@ -80,7 +73,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	public CardData mSelectedCard = null;
 	private String screenName;
 	private LinearLayout mStackFrame;
-
+	
 	@Override
 	public void open(CardData object) {
 		
@@ -282,7 +275,6 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			fetchMinData();
 		}
 	}
-
 	private void fetchMinData() {
 		if(mData.requestType == CardExplorerData.REQUEST_SIMILARCONTENT){
 			return;
@@ -292,21 +284,21 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		int requestMethod = Method.GET;
 		String requestUrl = new String();
 		if(mData.requestType == CardExplorerData.REQUEST_SEARCH){
-			requestUrl = ConsumerApi.getSearch(mData.searchQuery,ConsumerApi.LEVELMIN,mData.mStartIndex);
+			requestUrl = ConsumerApi.getSearch(mData.searchQuery,ConsumerApi.LEVELDYNAMIC,mData.mStartIndex);
 			screenName="Search";
 		}else if(mData.requestType == CardExplorerData.REQUEST_RECOMMENDATION){
-			requestUrl = ConsumerApi.getRecommendation(ConsumerApi.LEVELMIN,mData.mStartIndex);
+			requestUrl = ConsumerApi.getRecommendation(ConsumerApi.LEVELDYNAMIC,mData.mStartIndex);
 			screenName="Search";
 		}else if(mData.requestType == CardExplorerData.REQUEST_FAVOURITE){
 			screenName="Favourite";
-			requestUrl = ConsumerApi.getFavourites(ConsumerApi.LEVELMIN,mData.mStartIndex);
+			requestUrl = ConsumerApi.getFavourites(ConsumerApi.LEVELDYNAMIC,mData.mStartIndex);
 		}else if(mData.requestType == CardExplorerData.REQUEST_PURCHASES){
 			screenName="Purchases";
-			requestUrl = ConsumerApi.getPurchases(ConsumerApi.LEVELMIN,mData.mStartIndex);
+			requestUrl = ConsumerApi.getPurchases(ConsumerApi.LEVELDYNAMIC,mData.mStartIndex);
 			requestMethod = Method.POST;
 		}else if(mData.requestType == CardExplorerData.REQUEST_BROWSE){
 			screenName="Browse" + mData.searchQuery;
-			requestUrl = ConsumerApi.getBrowse(mData.searchQuery,ConsumerApi.LEVELMIN, mData.mStartIndex);
+			requestUrl = ConsumerApi.getBrowse(mData.searchQuery,ConsumerApi.LEVELDYNAMIC, mData.mStartIndex);
 		}
 		
 		Map<String,String> attrib=new HashMap<String, String>();
@@ -314,10 +306,11 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		attrib.put("Duration", "");
 		Analytics.trackEvent(Analytics.cardBrowseDuration,attrib,true);
 		requestUrl = requestUrl.replaceAll(" ", "%20");
-		StringRequest myReg = new StringRequest(requestMethod, requestUrl, deviceMinSuccessListener(), responseErrorListener());
+		GZipRequest mVolleyRequest = new GZipRequest(requestMethod, requestUrl, deviceMinSuccessListener(), responseErrorListener());
+//		mVolleyRequest.printLogs(true);
 //		myReg.setShouldCache(true);
 		Log.d(TAG,"Min Request:"+requestUrl);
-		queue.add(myReg);
+		queue.add(mVolleyRequest);
 	}
 	
 	private Response.Listener<String> deviceMinSuccessListener() {

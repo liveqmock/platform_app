@@ -384,7 +384,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 				Map<String,String> params=new HashMap<String, String>();
 				params.put("Status", "PlayerRightsAcqusition");
 				Analytics.trackEvent(Analytics.PlayerRightsAcqusition,params);
-				//Util.showToast(mContext,"RIGHTS INSTALLED",Util.TOAST_TYPE_INFO);
+				Util.showToast(mContext,"RIGHTS INSTALLED",Util.TOAST_TYPE_INFO);
 				//openVideo();
 				isPlayStarted=true;
 				
