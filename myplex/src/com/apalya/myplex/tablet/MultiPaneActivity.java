@@ -67,6 +67,7 @@ import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
+import com.apalya.myplex.views.FlowLayout;
 import com.apalya.myplex.views.PinnedSectionListView;
 
 public class MultiPaneActivity extends BaseActivity implements OpenCallBackListener, CacheManagerCallback{
@@ -243,7 +244,7 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 
 			@Override
 			public void onClick(View v) {
-				final LinearLayout spannablelayout = (LinearLayout)findViewById(R.id.spannable);
+				final FlowLayout spannablelayout = (FlowLayout)findViewById(R.id.spannable);
 				spannablelayout.removeAllViews();
 				ClearSearchTags();
 				clearButton.setVisibility(View.GONE);
@@ -347,10 +348,12 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 				switch (i) {
 				case 0:
 					innerObj = qualifiers;
-					Iterator<?> it = innerObj.keys();
-					while (it.hasNext()) {
-						String key = (String) it.next();
-						FillListData(key, innerObj);
+					if (innerObj != null){
+						Iterator<?> it = innerObj.keys();
+						while (it.hasNext()) {
+							String key = (String) it.next();
+							FillListData(key, innerObj);
+						}
 					}
 					break;
 				case 1:
@@ -401,8 +404,8 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 		mSearchData.getSearchTags().get(btn.getId()).setCLicked(true);
 		mAdapter.notifyDataSetChanged();
 
-		LinearLayout spannablelayout = (LinearLayout)findViewById(R.id.spannable);
-		final HorizontalScrollView scroll = (HorizontalScrollView) findViewById(R.id.selectionscroll);
+		FlowLayout spannablelayout = (FlowLayout)findViewById(R.id.spannable);
+//		final HorizontalScrollView scroll = (HorizontalScrollView) findViewById(R.id.selectionscroll);
 
 		Button button = CreateButton(mSearchData.getSearchTags().get(
 				btn.getId()));
@@ -415,21 +418,25 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 
 			@Override
 			public void onClick(final View v) {
-
+				FlowLayout spannablelayout = (FlowLayout) findViewById(R.id.spannable);
+				spannablelayout.removeView(v);
+				UpdateSearchTags(
+						mSearchData.getSearchTags().get(btn.getId()),
+						false);
 				// FadeOut Animation of Clicked button Start
-				ValueAnimator fadeAnim = ObjectAnimator.ofFloat(v, "alpha", 1f,
-						0f);
-				fadeAnim.setDuration(800);
-				fadeAnim.addListener(new AnimatorListenerAdapter() {
-					public void onAnimationEnd(Animator animation) {
-						LinearLayout spannablelayout = (LinearLayout) findViewById(R.id.spannable);
-						spannablelayout.removeView(v);
-						UpdateSearchTags(
-								mSearchData.getSearchTags().get(btn.getId()),
-								false);
-					}
-				});
-				fadeAnim.start();
+//				ValueAnimator fadeAnim = ObjectAnimator.ofFloat(v, "alpha", 1f,
+//						0f);
+//				fadeAnim.setDuration(800);
+//				fadeAnim.addListener(new AnimatorListenerAdapter() {
+//					public void onAnimationEnd(Animator animation) {
+//						LinearLayout spannablelayout = (LinearLayout) findViewById(R.id.spannable);
+//						spannablelayout.removeView(v);
+//						UpdateSearchTags(
+//								mSearchData.getSearchTags().get(btn.getId()),
+//								false);
+//					}
+//				});
+//				fadeAnim.start();
 
 				// FadeOut Animation of Clicked button End
 
@@ -437,19 +444,24 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 				// FadeIn Animation in list
 				final Button ownerButton = (Button) v.getTag(R.string.tag2);
 				ownerButton.setAlpha(1f);
-				ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(ownerButton,
-						"alpha", mButtonApha, 1f);
-				fadeAnim2.setDuration(800);
-				fadeAnim2.addListener(new AnimatorListenerAdapter() {
-					public void onAnimationEnd(Animator animation) {
-						SearchData mSearchData = (SearchData) v
-								.getTag(R.string.tag1);
-						mSearchData.getSearchTags().get(ownerButton.getId())
-								.setCLicked(false);
-						mAdapter.notifyDataSetChanged();
-					}
-				});
-				fadeAnim2.start();
+				SearchData mSearchData = (SearchData) v
+						.getTag(R.string.tag1);
+				mSearchData.getSearchTags().get(ownerButton.getId())
+						.setCLicked(false);
+				mAdapter.notifyDataSetChanged();
+//				ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(ownerButton,
+//						"alpha", mButtonApha, 1f);
+//				fadeAnim2.setDuration(800);
+//				fadeAnim2.addListener(new AnimatorListenerAdapter() {
+//					public void onAnimationEnd(Animator animation) {
+//						SearchData mSearchData = (SearchData) v
+//								.getTag(R.string.tag1);
+//						mSearchData.getSearchTags().get(ownerButton.getId())
+//								.setCLicked(false);
+//						mAdapter.notifyDataSetChanged();
+//					}
+//				});
+//				fadeAnim2.start();
 				// FadeIn Animation in list
 			}
 		});
@@ -460,15 +472,15 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
 				marginParams);
 
-		ValueAnimator fadeinAnimation = ObjectAnimator.ofFloat(button, "alpha",
-				0f, 1f);
-		fadeinAnimation.setDuration(800);
-		fadeinAnimation.addListener(new AnimatorListenerAdapter() {
-			public void onAnimationEnd(Animator animation) {
-				scroll.fullScroll(View.FOCUS_RIGHT);
-			}
-		});
-		fadeinAnimation.start();
+//		ValueAnimator fadeinAnimation = ObjectAnimator.ofFloat(button, "alpha",
+//				0f, 1f);
+//		fadeinAnimation.setDuration(800);
+//		fadeinAnimation.addListener(new AnimatorListenerAdapter() {
+//			public void onAnimationEnd(Animator animation) {
+////				scroll.fullScroll(View.FOCUS_RIGHT);
+//			}
+//		});
+//		fadeinAnimation.start();
 		spannablelayout.addView(button, layoutParams);
 		UpdateSearchTags(mSearchData.getSearchTags().get(btn.getId()), true);
 //		UpdateRecentList(button.getText().toString());
@@ -476,8 +488,8 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 	}
 	
 	private void FillEditText(String buttonName) {
-		final LinearLayout spannablelayout = (LinearLayout) findViewById(R.id.spannable);
-		final HorizontalScrollView scroll = (HorizontalScrollView) findViewById(R.id.selectionscroll);
+		final FlowLayout spannablelayout = (FlowLayout) findViewById(R.id.spannable);
+//		final HorizontalScrollView scroll = (HorizontalScrollView) findViewById(R.id.selectionscroll);
 
 		ImageView clearButton = (ImageView) findViewById(R.id.clearSearchresults);
 		clearButton.setVisibility(View.VISIBLE);
@@ -495,29 +507,32 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 
 			@Override
 			public void onClick(final View v) {
-				ValueAnimator fadeAnim = ObjectAnimator.ofFloat(v, "alpha", 1f,
-						0f);
-				fadeAnim.setDuration(800);
-
-				fadeAnim.addListener(new AnimatorListenerAdapter() {
-					public void onAnimationEnd(Animator animation) {
-						spannablelayout.removeView(v);
-						Button btn = (Button) v;
-						UpdateSearchTags((ButtonData) btn.getTag(), false);
-					}
-				});
-				fadeAnim.start();
+				spannablelayout.removeView(v);
+				Button btn = (Button) v;
+				UpdateSearchTags((ButtonData) btn.getTag(), false);
+//				ValueAnimator fadeAnim = ObjectAnimator.ofFloat(v, "alpha", 1f,
+//						0f);
+//				fadeAnim.setDuration(800);
+//
+//				fadeAnim.addListener(new AnimatorListenerAdapter() {
+//					public void onAnimationEnd(Animator animation) {
+//						spannablelayout.removeView(v);
+//						Button btn = (Button) v;
+//						UpdateSearchTags((ButtonData) btn.getTag(), false);
+//					}
+//				});
+//				fadeAnim.start();
 			}
 		});
-		ValueAnimator fadeinAnimation = ObjectAnimator.ofFloat(button, "alpha",
-				0f, 1f);
-		fadeinAnimation.setDuration(800);
-		fadeinAnimation.addListener(new AnimatorListenerAdapter() {
-			public void onAnimationEnd(Animator animation) {
-				scroll.fullScroll(View.FOCUS_RIGHT);
-			}
-		});
-		fadeinAnimation.start();
+//		ValueAnimator fadeinAnimation = ObjectAnimator.ofFloat(button, "alpha",
+//				0f, 1f);
+//		fadeinAnimation.setDuration(800);
+//		fadeinAnimation.addListener(new AnimatorListenerAdapter() {
+//			public void onAnimationEnd(Animator animation) {
+////				scroll.fullScroll(View.FOCUS_RIGHT);
+//			}
+//		});
+//		fadeinAnimation.start();
 		spannablelayout.addView(button, layoutParams);
 		UpdateSearchTags(userButton, true);
 		/*UpdateRecentList(button.getText().toString());*/
@@ -527,16 +542,17 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 		final Button btn = new Button(mContext);
 		btn.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT,
 				LayoutParams.WRAP_CONTENT));
-
+		btn.setMinimumHeight(0);
+		btn.setMinHeight(0);
 		btn.setTextColor(Color.parseColor("#FFFFFF"));
-		btn.setText(tagData.getButtonName());
+		btn.setText(tagData.getButtonName()+" ");
 		btn.setTextSize(14f);
 		btn.setTypeface(FontUtil.Roboto_Light);
 		btn.setBackgroundResource(R.drawable.roundedbutton);
 		Drawable drawableRight = getResources().getDrawable(R.drawable.tagclose);
 		drawableRight.setBounds(0, 0, (int) (drawableRight.getIntrinsicWidth()), (int) (drawableRight.getIntrinsicHeight()));
 		btn.setCompoundDrawables(null, null, drawableRight, null);
-		btn.setCompoundDrawablePadding(8);
+//		btn.setCompoundDrawablePadding(8);
 		btn.setBackgroundResource(R.drawable.roundedbuttonwithclose);
 
 		return btn;

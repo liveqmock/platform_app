@@ -13,10 +13,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
 import android.app.ProgressDialog;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -32,12 +28,10 @@ import android.view.ViewGroup.MarginLayoutParams;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
-import android.widget.Toast;
 
 import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
@@ -61,12 +55,14 @@ import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
+import com.apalya.myplex.views.FlowLayout;
 import com.apalya.myplex.views.PinnedSectionListView;
 
 public class SearchActivity extends BaseFragment implements
 		OpenCallBackListener, CacheManagerCallback {
 
 	EditText mSearchInput;
+	ImageView mSearchLens; 
 	private PinnedSectionListView mPinnedListView;
 	private float mButtonApha = 0.25f;
 	private SearchListAdapter mAdapter;
@@ -93,6 +89,9 @@ public class SearchActivity extends BaseFragment implements
 		}
 		rootView = inflater.inflate(R.layout.searchlayout, container, false);
 		mSearchInput = (EditText) rootView.findViewById(R.id.inputSearch);
+		mSearchLens = (ImageView)rootView.findViewById(R.id.searchlens);
+		mSearchLens.setOnClickListener(mSearchClickListener);
+		Util.showFeedback(mSearchLens);
 		mSearchInput.setTypeface(FontUtil.Roboto_Regular);
 		mMainActivity.setSearchBarVisibilty(View.INVISIBLE);
 		mSearchInput.setOnEditorActionListener(new OnEditorActionListener() {
@@ -114,15 +113,14 @@ public class SearchActivity extends BaseFragment implements
 			}
 
 		});
-
 		final ImageView clearButton = (ImageView) rootView
 				.findViewById(R.id.clearSearchresults);
+		Util.showFeedback(clearButton);
 		clearButton.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				final LinearLayout spannablelayout = (LinearLayout) rootView
-						.findViewById(R.id.spannable);
+				final FlowLayout spannablelayout = (FlowLayout) rootView.findViewById(R.id.spannable);
 				spannablelayout.removeAllViews();
 				ClearSearchTags();
 				clearButton.setVisibility(View.GONE);
@@ -171,6 +169,41 @@ public class SearchActivity extends BaseFragment implements
 
 	private String mSearchQuery = new String();
 
+	private OnClickListener mSearchClickListener = new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+
+			if (mSearchbleTags == null || mSearchbleTags.size() <= 0)
+			{
+				Util.showToast(mContext, "Select search tags or enter text for search ",Util.TOAST_TYPE_INFO);
+//				Toast.makeText(mContext,  "Select search tags or enter text for search ",  Toast.LENGTH_LONG).show();
+				return;
+			}
+			mMainActivity.showActionBarProgressBar();
+
+			String searchQuery = new String();
+			final List<CardData> searchString = new ArrayList<CardData>();
+			for (ButtonData data : mSearchbleTags) {
+				CardData temp = new CardData();
+				// temp._id = data.getButtonId() != null ? data.getButtonId() :
+				// data.getButtonName();
+				temp._id = data.getButtonName();
+				if (searchQuery.length() > 0) {
+					searchQuery += ",";
+				}
+				searchQuery += data.getButtonName();
+				searchString.add(temp);
+				
+				Map<String,String> params=new HashMap<String, String>();
+				params.put("tagsSelected", searchQuery);
+				Analytics.trackEvent(Analytics.SearchQuery,params);
+			}
+			mSearchQuery = searchQuery;
+			mCacheManager.getCardDetails(searchString, IndexHandler.OperationType.DONTSEARCHDB, SearchActivity.this);
+
+		}
+	};
 	@Override
 	public void searchButtonClicked() {
 
@@ -222,10 +255,10 @@ public class SearchActivity extends BaseFragment implements
 			mSearchbleTags.remove(tagData);
 		}
 		Analytics.trackEvent(Analytics.SearchQuery,params);
-		if (mSearchbleTags.size() == 0)
-			mMainActivity.setSearchBarVisibilty(View.INVISIBLE);
-		else
-			mMainActivity.setSearchBarVisibilty(View.VISIBLE);
+//		if (mSearchbleTags.size() == 0)
+//			mMainActivity.setSearchBarVisibilty(View.INVISIBLE);
+//		else
+//			mMainActivity.setSearchBarVisibilty(View.VISIBLE);
 	}
 
 	private void ClearSearchTags() {
@@ -302,10 +335,12 @@ public class SearchActivity extends BaseFragment implements
 				switch (i) {
 				case 0:
 					innerObj = qualifiers;
-					Iterator<?> it = innerObj.keys();
-					while (it.hasNext()) {
-						String key = (String) it.next();
-						FillListData(key, innerObj);
+					if (innerObj != null){
+						Iterator<?> it = innerObj.keys();
+						while (it.hasNext()) {
+							String key = (String) it.next();
+							FillListData(key, innerObj);
+						}
 					}
 					break;
 				case 1:
@@ -474,10 +509,10 @@ public class SearchActivity extends BaseFragment implements
 	}
 
 	private void FillEditText(String buttonName) {
-		final LinearLayout spannablelayout = (LinearLayout) rootView
+		final FlowLayout spannablelayout = (FlowLayout) rootView
 				.findViewById(R.id.spannable);
-		final HorizontalScrollView scroll = (HorizontalScrollView) rootView
-				.findViewById(R.id.selectionscroll);
+//		final HorizontalScrollView scroll = (HorizontalScrollView) rootView
+//				.findViewById(R.id.selectionscroll);
 
 		ImageView clearButton = (ImageView) rootView
 				.findViewById(R.id.clearSearchresults);
@@ -488,7 +523,7 @@ public class SearchActivity extends BaseFragment implements
 		button.setTag(userButton);
 		MarginLayoutParams marginParams = new MarginLayoutParams(
 				spannablelayout.getLayoutParams());
-		marginParams.setMargins(0, 0, 10, 0);
+		marginParams.setMargins(0, 0, 0, 0);
 		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
 				marginParams);
 
@@ -496,29 +531,32 @@ public class SearchActivity extends BaseFragment implements
 
 			@Override
 			public void onClick(final View v) {
-				ValueAnimator fadeAnim = ObjectAnimator.ofFloat(v, "alpha", 1f,
-						0f);
-				fadeAnim.setDuration(800);
-
-				fadeAnim.addListener(new AnimatorListenerAdapter() {
-					public void onAnimationEnd(Animator animation) {
-						spannablelayout.removeView(v);
-						Button btn = (Button) v;
-						UpdateSearchTags((ButtonData) btn.getTag(), false);
-					}
-				});
-				fadeAnim.start();
+				spannablelayout.removeView(v);
+				Button btn = (Button) v;
+				UpdateSearchTags((ButtonData) btn.getTag(), false);
+//				ValueAnimator fadeAnim = ObjectAnimator.ofFloat(v, "alpha", 1f,
+//						0f);
+//				fadeAnim.setDuration(800);
+//
+//				fadeAnim.addListener(new AnimatorListenerAdapter() {
+//					public void onAnimationEnd(Animator animation) {
+//						spannablelayout.removeView(v);
+//						Button btn = (Button) v;
+//						UpdateSearchTags((ButtonData) btn.getTag(), false);
+//					}
+//				});
+//				fadeAnim.start();
 			}
 		});
-		ValueAnimator fadeinAnimation = ObjectAnimator.ofFloat(button, "alpha",
-				0f, 1f);
-		fadeinAnimation.setDuration(800);
-		fadeinAnimation.addListener(new AnimatorListenerAdapter() {
-			public void onAnimationEnd(Animator animation) {
-				scroll.fullScroll(View.FOCUS_RIGHT);
-			}
-		});
-		fadeinAnimation.start();
+//		ValueAnimator fadeinAnimation = ObjectAnimator.ofFloat(button, "alpha",
+//				0f, 1f);
+//		fadeinAnimation.setDuration(800);
+//		fadeinAnimation.addListener(new AnimatorListenerAdapter() {
+//			public void onAnimationEnd(Animator animation) {
+////				scroll.fullScroll(View.FOCUS_RIGHT);
+//			}
+//		});
+//		fadeinAnimation.start();
 		spannablelayout.addView(button, layoutParams);
 		UpdateSearchTags(userButton, true);
 		UpdateRecentList(button.getText().toString());
@@ -538,10 +576,10 @@ public class SearchActivity extends BaseFragment implements
 		mSearchData.getSearchTags().get(btn.getId()).setCLicked(true);
 		mAdapter.notifyDataSetChanged();
 
-		LinearLayout spannablelayout = (LinearLayout) rootView
+		FlowLayout spannablelayout = (FlowLayout) rootView
 				.findViewById(R.id.spannable);
-		final HorizontalScrollView scroll = (HorizontalScrollView) rootView
-				.findViewById(R.id.selectionscroll);
+//		final HorizontalScrollView scroll = (HorizontalScrollView) rootView
+//				.findViewById(R.id.selectionscroll);
 
 		Button button = CreateButton(mSearchData.getSearchTags().get(
 				btn.getId()));
@@ -555,60 +593,72 @@ public class SearchActivity extends BaseFragment implements
 			@Override
 			public void onClick(final View v) {
 
+				FlowLayout spannablelayout = (FlowLayout) rootView
+						.findViewById(R.id.spannable);
+				spannablelayout.removeView(v);
+				UpdateSearchTags(
+						mSearchData.getSearchTags().get(btn.getId()),
+						false);
 				// FadeOut Animation of Clicked button Start
-				ValueAnimator fadeAnim = ObjectAnimator.ofFloat(v, "alpha", 1f,
-						0f);
-				fadeAnim.setDuration(800);
-				fadeAnim.addListener(new AnimatorListenerAdapter() {
-					public void onAnimationEnd(Animator animation) {
-						LinearLayout spannablelayout = (LinearLayout) rootView
-								.findViewById(R.id.spannable);
-						spannablelayout.removeView(v);
-						UpdateSearchTags(
-								mSearchData.getSearchTags().get(btn.getId()),
-								false);
-					}
-				});
-				fadeAnim.start();
+//				ValueAnimator fadeAnim = ObjectAnimator.ofFloat(v, "alpha", 1f,
+//						0f);
+//				fadeAnim.setDuration(800);
+//				fadeAnim.addListener(new AnimatorListenerAdapter() {
+//					public void onAnimationEnd(Animator animation) {
+//						FlowLayout spannablelayout = (FlowLayout) rootView
+//								.findViewById(R.id.spannable);
+//						spannablelayout.removeView(v);
+//						UpdateSearchTags(
+//								mSearchData.getSearchTags().get(btn.getId()),
+//								false);
+//					}
+//				});
+//				fadeAnim.start();
 
 				// FadeOut Animation of Clicked button End
 
 				// TODO:: fadein Animation not working. need to fix this 
 				// FadeIn Animation in list
+				
 				final Button ownerButton = (Button) v.getTag(R.string.tag2);
 				ownerButton.setAlpha(1f);
-				ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(ownerButton,
-						"alpha", mButtonApha, 1f);
-				fadeAnim2.setDuration(800);
-				fadeAnim2.addListener(new AnimatorListenerAdapter() {
-					public void onAnimationEnd(Animator animation) {
-						SearchData mSearchData = (SearchData) v
-								.getTag(R.string.tag1);
-						mSearchData.getSearchTags().get(ownerButton.getId())
-								.setCLicked(false);
-						mAdapter.notifyDataSetChanged();
-					}
-				});
-				fadeAnim2.start();
+				SearchData mSearchData = (SearchData) v
+						.getTag(R.string.tag1);
+				mSearchData.getSearchTags().get(ownerButton.getId())
+						.setCLicked(false);
+				mAdapter.notifyDataSetChanged();
+//				ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(ownerButton,
+//						"alpha", mButtonApha, 1f);
+//				fadeAnim2.setDuration(800);
+//				fadeAnim2.addListener(new AnimatorListenerAdapter() {
+//					public void onAnimationEnd(Animator animation) {
+//						SearchData mSearchData = (SearchData) v
+//								.getTag(R.string.tag1);
+//						mSearchData.getSearchTags().get(ownerButton.getId())
+//								.setCLicked(false);
+//						mAdapter.notifyDataSetChanged();
+//					}
+//				});
+//				fadeAnim2.start();
 				// FadeIn Animation in list
 			}
 		});
 
 		MarginLayoutParams marginParams = new MarginLayoutParams(
 				spannablelayout.getLayoutParams());
-		marginParams.setMargins(0, 0, 10, 0);
+		marginParams.setMargins(0, 0, 0, 0);
 		LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
 				marginParams);
 
-		ValueAnimator fadeinAnimation = ObjectAnimator.ofFloat(button, "alpha",
-				0f, 1f);
-		fadeinAnimation.setDuration(800);
-		fadeinAnimation.addListener(new AnimatorListenerAdapter() {
-			public void onAnimationEnd(Animator animation) {
-				scroll.fullScroll(View.FOCUS_RIGHT);
-			}
-		});
-		fadeinAnimation.start();
+//		ValueAnimator fadeinAnimation = ObjectAnimator.ofFloat(button, "alpha",
+//				0f, 1f);
+//		fadeinAnimation.setDuration(800);
+//		fadeinAnimation.addListener(new AnimatorListenerAdapter() {
+//			public void onAnimationEnd(Animator animation) {
+////				scroll.fullScroll(View.FOCUS_RIGHT);
+//			}
+//		});
+//		fadeinAnimation.start();
 		spannablelayout.addView(button, layoutParams);
 		UpdateSearchTags(mSearchData.getSearchTags().get(btn.getId()), true);
 		UpdateRecentList(button.getText().toString());
@@ -639,16 +689,17 @@ public class SearchActivity extends BaseFragment implements
 		final Button btn = new Button(getContext());
 		btn.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT,
 				LayoutParams.WRAP_CONTENT));
-
+		btn.setMinimumHeight(0);
+		btn.setMinHeight(0);
 		btn.setTextColor(Color.parseColor("#FFFFFF"));
-		btn.setText(tagData.getButtonName());
+		btn.setText(tagData.getButtonName()+" ");
 		btn.setTextSize(14f);
 		btn.setTypeface(FontUtil.Roboto_Medium);
-		btn.setBackgroundResource(R.drawable.roundedbutton);
+//		btn.setBackgroundResource(R.drawable.roundedbutton);
 		Drawable drawableRight = getResources().getDrawable(R.drawable.tagclose);
 		drawableRight.setBounds(0, 0, (int) (drawableRight.getIntrinsicWidth()), (int) (drawableRight.getIntrinsicHeight()));
 		btn.setCompoundDrawables(null, null, drawableRight, null);
-		btn.setCompoundDrawablePadding(8);
+//		btn.setCompoundDrawablePadding(8);
 		btn.setBackgroundResource(R.drawable.roundedbuttonwithclose);
 
 		return btn;

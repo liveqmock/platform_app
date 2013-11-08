@@ -459,7 +459,7 @@ public class CardVideoPlayer implements PlayerListener {
 
 		if (mData.images != null) {
 			for (CardDataImagesItem imageItem : mData.images.values) {
-				if (imageItem.profile != null
+				if (imageItem.type != null && imageItem.type.equalsIgnoreCase("coverposter") && imageItem.profile != null
 						&& imageItem.profile.equalsIgnoreCase("xxhdpi")) {
 					if (imageItem.link == null
 							|| imageItem.link.compareTo("Images/NoImage.jpg") == 0) {
