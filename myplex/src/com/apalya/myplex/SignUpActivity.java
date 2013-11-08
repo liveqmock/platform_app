@@ -55,6 +55,7 @@ import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.utils.Util;
+import com.crashlytics.android.Crashlytics;
 import com.flurry.android.FlurryAgent;
 
 
@@ -548,6 +549,9 @@ public class SignUpActivity extends Activity{
 								getString(R.string.devusername), mEmail.getText().toString());
 						SharedPrefUtils.writeToSharedPref(SignUpActivity.this,
 								getString(R.string.devpassword), mPassword.getText().toString());
+						
+						Crashlytics.setUserEmail(mEmail.getText().toString());
+						
 						finish();
 						Util.launchMainActivity(SignUpActivity.this);
 						//						Util.launchActivity(MainActivity.class,SignUpActivity.this , null);
@@ -709,6 +713,8 @@ public class SignUpActivity extends Activity{
 								getString(R.string.devusername), mEmail.getText().toString());
 						SharedPrefUtils.writeToSharedPref(SignUpActivity.this,
 								getString(R.string.devpassword), mPassword.getText().toString());
+						
+						Crashlytics.setUserEmail(mEmail.getText().toString());
 
 						finish();
 						Util.launchMainActivity(SignUpActivity.this);

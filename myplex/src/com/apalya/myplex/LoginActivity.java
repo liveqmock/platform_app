@@ -172,7 +172,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-	    //Crashlytics.start(this);
+	    Crashlytics.start(this);
 		FontUtil.loadFonts(getAssets());
 		String trackingDistinctId = getTrackingDistinctId();
 		mMixpanel=myplexapplication.getMixPanel();
@@ -802,6 +802,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 								getString(R.string.userprofilename), user.getName());
 						SharedPrefUtils.writeToSharedPref(LoginActivity.this,
 								getString(R.string.userpic), "https://graph.facebook.com/"+fbUserId+"/picture?width=480&height=320");
+						
+						Crashlytics.setUserEmail(user.getProperty("email").toString());
 
 						Log.d(TAG, "Facebook User Id:   "+fbUserId);
 						Map<String, String> params = new HashMap<String, String>();
@@ -1131,6 +1133,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 						
 						SharedPrefUtils.writeToSharedPref(LoginActivity.this,
 								getString(R.string.devusername), mUserInfo.getUserEmail());
+						
+						Crashlytics.setUserEmail(mUserInfo.getUserEmail());
 
 						finish();
 						Util.launchMainActivity(LoginActivity.this);
@@ -1607,7 +1611,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				//check if user is already logged in, if so take him to main screen or else login screen
 				if(username!=null)
 				{
-					
+					Crashlytics.setUserEmail(username);
 					String profilename=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
 							getString(R.string.userprofilename));
 					String profilePic=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
