@@ -157,4 +157,10 @@ public class ConsumerApi {
 		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + BILLING_TAG
 				+ SLASH + SUBSCRIBE_TAG+ SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY + AMPERSAND+ PAYMENTCHANNEL +paymentChannel+ AMPERSAND +PACKAGEID+packageId;
 	}
+	
+	public static String getDrmProxy()
+	{
+		return SCHEME+DOMAIN+SLASH+"licenseproxy/v2/license";
+		//return "https://api-beta.myplex.in/licenseproxy/v2/license"
+	}
 }
