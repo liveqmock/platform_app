@@ -12,7 +12,10 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -333,9 +336,11 @@ public class Util {
 							.setTitle("myplex")
 							.setDescription(aMovieName)
 							.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,
-									aMovieName+".wvm"));
+									aMovieName+".mp4"));
 			if(lastDownloadId>0)
-			Util.showToast("Your Download has been started, Please check progress in Downloads Section",mContext);
+			{
+				Util.showToast(mContext, "Your download is in progress,Please check your status in Downloads section.",Util.TOAST_TYPE_INFO);
+			}
 			
 			
 			}
@@ -357,7 +362,9 @@ public class Util {
 		
 		CardDownloadData downloadData= new CardDownloadData();
 		downloadData.mDownloadId=lastDownloadId;
+		downloadData.mDownloadPath=Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath() +"/"+aMovieName+".mp4";
 		downloadlist.mDownloadedList.put(aMovieData._id, downloadData);
+		
 		Util.saveObject(downloadlist, myplexapplication.getApplicationConfig().downloadCardsPath);
 		
 		return lastDownloadId;
@@ -375,7 +382,10 @@ public class Util {
 		if(downloadlist!=null)
 		{
 			if(downloadlist.mDownloadedList.get(cardId)!=null){
-				return 1;
+				if(downloadlist.mDownloadedList.get(cardId).mCompleted)
+					return 1;
+				else
+				return 2;
 			}
 			
 		}
@@ -861,5 +871,38 @@ public class Util {
 
 	    return result;
 	}
-	
+	public static boolean isTokenValid(String clientKeyExp) {
+
+		//Util.showToast(clientKeyExp);
+
+		List<SimpleDateFormat> knownPatterns = new ArrayList<SimpleDateFormat>();
+		knownPatterns.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"));
+		knownPatterns.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZZ"));
+		knownPatterns.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZZ"));
+		knownPatterns.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm.ss'Z'"));
+		knownPatterns.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"));
+		knownPatterns.add(new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss"));
+		
+		Date convertedDate = new Date();
+		for (SimpleDateFormat pattern : knownPatterns) {
+		    try {
+		    	convertedDate = pattern.parse(clientKeyExp);
+		    	break;
+		    } catch (ParseException pe) {
+		    	pe.printStackTrace();
+		    }
+		}
+		Date currentDate = new Date();
+		if(convertedDate.compareTo(currentDate)>0)
+		{
+			//Util.showToast("Valid");
+			return true;
+		}
+		else
+		{
+			//Util.showToast("Invalid");
+			return false;
+		}
+
+	}
 }

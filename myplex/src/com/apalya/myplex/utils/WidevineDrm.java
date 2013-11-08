@@ -288,10 +288,10 @@ public class WidevineDrm {
 
 	private void logMessage( int typeConnectionStatus,int typeRightsInstalled) {
 		// TODO Auto-generated method stub
-//		if (logEventListener != null) {
-//			logEventListener.logUpdated(typeConnectionStatus,typeRightsInstalled);
-//			logEventListener=null;
-//		}
+		if (logEventListener != null) {
+			logEventListener.logUpdated(typeConnectionStatus,typeRightsInstalled);
+			logEventListener=null;
+		}
 	}
 	private void logMessage(String message) {
 		sendMessage(message);

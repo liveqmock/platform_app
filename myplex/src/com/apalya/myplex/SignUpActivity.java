@@ -540,6 +540,9 @@ public class SignUpActivity extends Activity{
 						Log.d(TAG, "---------------------------------------------------------");
 
 						myplexapplication.getUserProfileInstance().setName(mEmail.getText().toString());
+						
+						SharedPrefUtils.writeToSharedPref(SignUpActivity.this,
+								getString(R.string.userprofilename),mEmail.getText().toString());
 
 						SharedPrefUtils.writeToSharedPref(SignUpActivity.this,
 								getString(R.string.devusername), mEmail.getText().toString());
@@ -698,7 +701,10 @@ public class SignUpActivity extends Activity{
 
 						myplexapplication.getUserProfileInstance().setName(mEmail.getText().toString());
 
-
+						
+						SharedPrefUtils.writeToSharedPref(SignUpActivity.this,
+								getString(R.string.userprofilename),mEmail.getText().toString());
+						
 						SharedPrefUtils.writeToSharedPref(SignUpActivity.this,
 								getString(R.string.devusername), mEmail.getText().toString());
 						SharedPrefUtils.writeToSharedPref(SignUpActivity.this,

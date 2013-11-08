@@ -83,15 +83,15 @@ public class FetchDownloadProgress {
 						return;
 					}
 					cursor.moveToFirst();
-					int bytes_downloaded = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
-					int bytes_total = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+					long bytes_downloaded = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+					long bytes_total = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
 
 					if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
 						mDownloadData.mCompleted = true;
 						mDownloadData.mPercentage = 100;
 					}
 					else{
-						final int dl_progress = (bytes_downloaded * 100) / bytes_total;
+						final int dl_progress = (int) ((bytes_downloaded * 100) / bytes_total);
 						mDownloadData.mCompleted = false;
 						mDownloadData.mPercentage = dl_progress;
 						continuePolling = true;

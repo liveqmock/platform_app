@@ -172,7 +172,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-	    Crashlytics.start(this);
+	    //Crashlytics.start(this);
 		FontUtil.loadFonts(getAssets());
 		String trackingDistinctId = getTrackingDistinctId();
 		mMixpanel=myplexapplication.getMixPanel();
@@ -377,7 +377,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			mPlusClient.connect();
 
 		}*/
-		CheckUserStatus();
+		//CheckUserStatus();
 
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -718,7 +718,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			throw new RuntimeException("Could not encode hour of the day in JSON");
 		}
 
-		//CheckUserStatus();
+		CheckUserStatus();
 
 		/*if(isAuthTwitter())
 		{
@@ -1461,40 +1461,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		}
 		Log.d(TAG, "******************************************************************");
 	}
-	private boolean isTokenValid(String clientKeyExp) {
-
-		//Util.showToast(clientKeyExp);
-
-		List<SimpleDateFormat> knownPatterns = new ArrayList<SimpleDateFormat>();
-		knownPatterns.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'"));
-		knownPatterns.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZZ"));
-		knownPatterns.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZZ"));
-		knownPatterns.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm.ss'Z'"));
-		knownPatterns.add(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss"));
-		knownPatterns.add(new SimpleDateFormat("yyyy-MM-dd' 'HH:mm:ss"));
-		
-		Date convertedDate = new Date();
-		for (SimpleDateFormat pattern : knownPatterns) {
-		    try {
-		    	convertedDate = pattern.parse(clientKeyExp);
-		    	break;
-		    } catch (ParseException pe) {
-		    	pe.printStackTrace();
-		    }
-		}
-		Date currentDate = new Date();
-		if(convertedDate.compareTo(currentDate)>0)
-		{
-			//Util.showToast("Valid");
-			return true;
-		}
-		else
-		{
-			//Util.showToast("Invalid");
-			return false;
-		}
-
-	}
+	
 
 
 	private void devRegRequest(String contextPath, final Map<String, String> bodyParams) {
@@ -1624,7 +1591,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 
 			//check if the client key is valid or not, if expired give generate key request
-			if(isTokenValid(clientKeyExp))
+			if(Util.isTokenValid(clientKeyExp))
 			{
 				mDevInfo.setClientKey(clientKey);
 				mDevInfo.setClientDeviceId(SharedPrefUtils.getFromSharedPreference(LoginActivity.this,

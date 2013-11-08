@@ -72,7 +72,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 	private Context mContext = null;
 	private ErrorManagerData errordata = null; 
 	private ProgressBar mProgressBar = null;
-	private WidevineDrm drmManager;
+	
 
 	public static enum StreamType {
 		LIVE, VOD
@@ -161,17 +161,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 		this.mStreamType = type; 
 		mVideoView.setVisibility(View.VISIBLE);
 		initilizeMediaController();
-		if(videoUri.toString().contains(".wvm"))
-		{
-			//DRM CONTENT, GET THE RIGHTS
-			acquireRights();
-		}
-		else
-		{
-			openVideo();	
-		}
-			
-		
+		openVideo();	
 		
 	}
 	private void initilizeMediaController() {
@@ -183,8 +173,6 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 		if (!(mVideoView.getParent() instanceof RelativeLayout)) {
 			return;
 		}
-		//PREPARE DRM MANAGER
-		prepareDrmManager();
 		
 		// As of now , only RelativeLayout as VideoView parent is supported.
 
@@ -233,200 +221,10 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 //		mCenterPlayButton.setVisibility(View.GONE);
 
 	}
-	private void displayAlert(String message){
-		Log.i(TAG, message);
-/*		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-		builder.setMessage(message)
-		.setPositiveButton("OK", null);
-		AlertDialog dialog = builder.create();
-		dialog.show();*/
-	}
-	/*private Handler handler = new Handler(){
-		public void
-		handleMessage (Message msg){
-			//if (msg.what== DISPLAY_MESSAGE){
-			displayAlert(msg.obj.toString());
-			//}
-		}
-	};*/
-	
-	public void acquireRights(){
-		/*DrmInfoRequest drmRequest = new DrmInfoRequest(
-				DrmInfoRequest.TYPE_RIGHTS_ACQUISITION_INFO,"video/wvm");
-		// Setup drm info object
-		drmRequest.put("WVDRMServerKey","http://122.248.233.48/widevine/cypherpc/cgi-bin/GetEMMs.cgi");
-		drmRequest.put("WVAssetURIKey", mUri.toString());
-		drmRequest.put("WVDeviceIDKey", "device12345");
-		drmRequest.put("WVPortalKey", "sotalapalya");*/
-		// Request license
-		int rightStatus= drmManager.checkRightsStatus(mUri.toString());
-		if(rightStatus!=DrmStore.RightsStatus.RIGHTS_VALID)
-			drmManager.acquireRights(mUri.toString()); 
-		openVideo();
-	}
-	
-	private void prepareDrmManager(){
-		
-		drmManager = new WidevineDrm(mContext);
-		
-		
-		drmManager.logBuffer.append("Asset Uri: " + mUri.toString() + "\n");
-		drmManager.logBuffer.append("Drm Server: " + WidevineDrm.Settings.DRM_SERVER_URI + "\n");
-		drmManager.logBuffer.append("Device Id: " + WidevineDrm.Settings.DEVICE_ID + "\n");
-		drmManager.logBuffer.append("Portal Name: " + WidevineDrm.Settings.PORTAL_NAME + "\n");
 
-        // Set log update listener
-        WidevineDrm.WidevineDrmLogEventListener drmLogListener =
-            new WidevineDrm.WidevineDrmLogEventListener() {
-
-            public void logUpdated(int status,int value) {
-                
-            	updateLogs(status,value);
-            }
-        };
-		
-        drmManager.setLogListener(drmLogListener);
-        drmManager.registerPortal(WidevineDrm.Settings.PORTAL_NAME);
-        
-		/*if (drmManager.isProvisionedDevice()) {
-            setContentView(R.layout.activity_main);
-        } else {
-            setContentView(R.layout.notprovisioned);
-        }*/
-		
-		
-		
-		/*
-		
-		// Setup the DRM Client
-		drmManager = new DrmManagerClient(mContext); 
-		
-		// Set log update listener
-        WidevineDrm.WidevineDrmLogEventListener drmLogListener =
-            new WidevineDrm.WidevineDrmLogEventListener() {
-
-            public void logUpdated() {
-                
-            	updateLogs();
-            }
-        };
-		
-        drm.setLogListener(drmLogListener);
-		
-		drmManager.setOnEventListener( new DrmManagerClient.OnEventListener() {
-			public void onEvent( DrmManagerClient client, DrmEvent event){
-				switch(event.getType()){
-				case DrmEvent.TYPE_DRM_INFO_PROCESSED:
-					// Handle event
-					displayAlert("DRM Info Processed");
-					
-					break;
-				case DrmEvent.TYPE_ALL_RIGHTS_REMOVED:
-					// Handle event
-					displayAlert("All Rights Removed");
-					break;
-				}
-			}
-		}); 
-
-		drmManager.setOnInfoListener( new DrmManagerClient.OnInfoListener() {
-			public void onInfo( DrmManagerClient client, DrmInfoEvent event){
-				switch(event.getType()){
-				case DrmInfoEvent.TYPE_RIGHTS_INSTALLED:
-					// Handle event
-					displayAlert("Rights Installed");
-					//openVideo();
-					break;
-				case DrmInfoEvent.TYPE_RIGHTS_REMOVED:
-					// Handle event
-					displayAlert("Rights Removed");
-					break;
-				}
-			}
-		}); 
-
-		drmManager.setOnErrorListener( new DrmManagerClient.OnErrorListener() {
-			public void onError( DrmManagerClient client, DrmErrorEvent event){
-				switch(event.getType()){
-				case DrmErrorEvent.TYPE_NO_INTERNET_CONNECTION:
-					displayAlert("No Internet Connetion");
-					break;
-				case DrmErrorEvent.TYPE_NOT_SUPPORTED:
-					displayAlert("Not Supported");
-					break;
-				case DrmErrorEvent.TYPE_OUT_OF_MEMORY:
-					displayAlert("Out of Memory");
-					break;
-				case DrmErrorEvent.TYPE_PROCESS_DRM_INFO_FAILED:
-					displayAlert("DRM Failed");
-					break;
-				case DrmErrorEvent.TYPE_REMOVE_ALL_RIGHTS_FAILED:
-					displayAlert("Rights Removed"); break;
-				case DrmErrorEvent.TYPE_RIGHTS_NOT_INSTALLED:
-					displayAlert("No Rights Installed"); break;
-				case DrmErrorEvent.TYPE_RIGHTS_RENEWAL_NOT_ALLOWED:
-					displayAlert("Renew Rights Not Allowed"); break;
-				default:
-					displayAlert("Unknown Error"); break;
-				}
-			}
-		});
-	*/}
-
-	protected void updateLogs(int status,int value) {
-		// TODO Auto-generated method stub
-		
-		//displayAlert(String.msg);
-		if(!isPlayStarted)
-		{
-			if(status==0 && value== DrmInfoEvent.TYPE_RIGHTS_INSTALLED)
-			{
-				Map<String,String> params=new HashMap<String, String>();
-				params.put("Status", "PlayerRightsAcqusition");
-				Analytics.trackEvent(Analytics.PlayerRightsAcqusition,params);
-				Util.showToast(mContext,"RIGHTS INSTALLED",Util.TOAST_TYPE_INFO);
-				//openVideo();
-				isPlayStarted=true;
-				
-			}
-			if(status==1 ){
-				String errMsg = "Error while playing";
-				switch (value) {
-				case DrmErrorEvent.TYPE_NO_INTERNET_CONNECTION:
-					errMsg="No Internet Connection";
-					break;
-				case DrmErrorEvent.TYPE_NOT_SUPPORTED:
-					errMsg="Device Not Supported";
-					break;
-				case DrmErrorEvent.TYPE_OUT_OF_MEMORY:
-					errMsg="Out of Memory";
-					break;
-				case DrmErrorEvent.TYPE_PROCESS_DRM_INFO_FAILED:
-					errMsg="Process DRM Info failed";
-					break;
-				case DrmErrorEvent.TYPE_REMOVE_ALL_RIGHTS_FAILED:
-					errMsg="Remove All Rights failed";
-					break;
-				case DrmErrorEvent.TYPE_RIGHTS_NOT_INSTALLED:
-					errMsg="Rights not installed";
-					break;
-				case DrmErrorEvent.TYPE_RIGHTS_RENEWAL_NOT_ALLOWED:
-					errMsg="Rights renewal not allowed";
-					break;
-				}
-				Util.showToast(mContext,errMsg,Util.TOAST_TYPE_INFO);
-				
-				return;
-			}
-		}
-		
-	}
 	private PlayerStatusUpdate mPlayerStatusListener;
 	public void setPlayerStatusUpdateListener(PlayerStatusUpdate listener){
 		mPlayerStatusListener = listener;
-		if(drmManager != null){
-			drmManager.setPlayerListener(mPlayerStatusListener);
-		}
 	}
 	public void openVideo() { 
 		Log.d("PlayerScreen", "VideoViewPlayer openVideo Start");
@@ -457,15 +255,8 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 		mVideoView.setOnErrorListener(this);
 		mVideoView.setOnCompletionListener(this);
 		//mVideoView.setVideoURI(mUri);
-		if(mUri.toString().contains(".wvm"))
-		{
-			mVideoView.setVideoPath(mUri.toString());
-			 
-		}
-		else
-		{
-			mVideoView.setVideoPath(mUri.toString());
-		}
+		mVideoView.setVideoPath(mUri.toString());
+		
 		
 		mVideoView.setOnPreparedListener(this);
 

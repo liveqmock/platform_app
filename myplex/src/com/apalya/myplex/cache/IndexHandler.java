@@ -174,7 +174,8 @@ public class IndexHandler {
 			document =  new Document();
 			document.add(new Field(LUCENE_CONTENT_ID, indexableObj._id, Field.Store.YES, Field.Index.NOT_ANALYZED, Field.TermVector.NO));
 			// We want to store the expire data, but we don't want to index it because it is useless searching through these
-			document.add(new Field(LUCENE_CONTENT_EXPIRY, indexableObj._expiresAt, Field.Store.YES, Field.Index.NO, Field.TermVector.NO));
+			if(indexableObj._expiresAt!=null)
+				document.add(new Field(LUCENE_CONTENT_EXPIRY, indexableObj._expiresAt, Field.Store.YES, Field.Index.NO, Field.TermVector.NO));
 			document.add(new Field(LUCENE_CONTENT_INFO, Util.toJson(indexableObj, false), Field.Store.YES, Field.Index.ANALYZED, Field.TermVector.NO));
 		} catch (JsonMappingException e) {
 			document = null;

@@ -78,17 +78,18 @@ public class MediaUtil {
 				if(minResultSet.results == null){
 					sendResponse(false,null);
 				}
+				String url="";
 				for(CardData data:minResultSet.results){
 					if(data.videos == null || data.videos.values == null || data.videos.values.size() == 0){sendResponse(false,null);}
 					for(CardDataVideosItem video:data.videos.values){
-						if(sDownloadStatus)
+						//if(sDownloadStatus)
 						{
 							if(video.profile != null && video.profile.equalsIgnoreCase(sQualityType) && video.link != null && video.type.equalsIgnoreCase(ConsumerApi.STREAMDOWNLOAD)){
 								sendResponse(true,video.link);
 								return;
 							}
 						}
-						else
+						//else
 						{
 							if (video.profile != null
 									&& video.profile.equalsIgnoreCase(sQualityType)
@@ -99,11 +100,17 @@ public class MediaUtil {
 									&& video.type !=null
 									&& video.type.equalsIgnoreCase(sStreamingType)) {
 								Log.i(TAG, video.link);
-								sendResponse(true, video.link);
-								return;
+								url=video.link;
+								//sendResponse(true, video.link);
+								//return;
 							}
 						}
 					}
+				}
+				if(url.length()>0)
+				{
+					sendResponse(true, url);
+					return;
 				}
 				sendResponse(false,null);
 			}

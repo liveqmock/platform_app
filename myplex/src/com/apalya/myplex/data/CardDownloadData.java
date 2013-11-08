@@ -14,4 +14,5 @@ public class CardDownloadData implements Serializable{
 	public boolean mCompleted = false;
 	public int mPercentage;
 	public long mDownloadId = -1;
+	public String mDownloadPath;
 }

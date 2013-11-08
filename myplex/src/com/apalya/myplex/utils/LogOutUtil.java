@@ -161,36 +161,47 @@ public class LogOutUtil {
 						Log.d(TAG, "########################################################");
 						Log.d(TAG, "---------------------------------------------------------");
 
-						myplexapplication.getUserProfileInstance().lastVisitedCardData.clear();
-						myplexapplication.getUserProfileInstance().joinedDate="NA";
-						myplexapplication.getUserProfileInstance().lastVisitedDate="NA";
 						
-						Util.serializeData(logoutContext);
-						
-						//Util.showToast("Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),logoutContext);
-						SharedPrefUtils.writeToSharedPref(logoutContext,
-								((Activity) logoutContext).getString(R.string.devusername), "");
-						SharedPrefUtils.writeToSharedPref(logoutContext,
-								((Activity) logoutContext).getString(R.string.devpassword),"");
-						SharedPrefUtils.writeToSharedPref(logoutContext,
-								((Activity) logoutContext).getString(R.string.userprofilename), "");
-						SharedPrefUtils.writeToSharedPref(logoutContext,
-								((Activity) logoutContext).getString(R.string.userpic), "");
-						
-						myplexapplication.getUserProfileInstance().setLoginStatus(false);
-						myplexapplication.getUserProfileInstance().setName("");
-						myplexapplication.getUserProfileInstance().setProfilePic("");
-
-						((Activity) logoutContext).finish();
-						Util.launchActivity(LoginActivity.class,((Activity) logoutContext) , null);
 					}
 					else
 					{
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
 						Util.showToast(logoutContext,"Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),Util.TOAST_TYPE_ERROR);
+						
+						if(jsonResponse.getString("code").equalsIgnoreCase("401")){
+							String devId=SharedPrefUtils.getFromSharedPreference(logoutContext,
+									((Activity) logoutContext).getString(R.string.devclientdevid));
+
+							Map<String, String> params = new HashMap<String, String>();
+							params.put("deviceId", devId);
+
+							Util.genKeyRequest(logoutContext,((Activity) logoutContext).getString(R.string.genKeyReqPath),params);
+						}
 //						Util.showToast("Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),logoutContext);
 					}
+					myplexapplication.getUserProfileInstance().lastVisitedCardData.clear();
+					myplexapplication.getUserProfileInstance().joinedDate="NA";
+					myplexapplication.getUserProfileInstance().lastVisitedDate="NA";
+					
+					Util.serializeData(logoutContext);
+					
+					//Util.showToast("Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),logoutContext);
+					SharedPrefUtils.writeToSharedPref(logoutContext,
+							((Activity) logoutContext).getString(R.string.devusername), "");
+					SharedPrefUtils.writeToSharedPref(logoutContext,
+							((Activity) logoutContext).getString(R.string.devpassword),"");
+					SharedPrefUtils.writeToSharedPref(logoutContext,
+							((Activity) logoutContext).getString(R.string.userprofilename), "");
+					SharedPrefUtils.writeToSharedPref(logoutContext,
+							((Activity) logoutContext).getString(R.string.userpic), "");
+					
+					myplexapplication.getUserProfileInstance().setLoginStatus(false);
+					myplexapplication.getUserProfileInstance().setName("");
+					myplexapplication.getUserProfileInstance().setProfilePic("");
+
+					((Activity) logoutContext).finish();
+					Util.launchActivity(LoginActivity.class,((Activity) logoutContext) , null);
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
