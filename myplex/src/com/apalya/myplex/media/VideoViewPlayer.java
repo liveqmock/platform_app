@@ -5,6 +5,8 @@ package com.apalya.myplex.media;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.lucene.index.LogMergePolicy;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -28,6 +30,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
@@ -35,6 +38,7 @@ import com.apalya.myplex.data.ErrorManagerData;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.utils.WidevineDrm;
+import com.apalya.myplex.views.CardVideoPlayer;
 import com.apalya.myplex.views.CardVideoPlayer.PlayerFullScreen;
 import com.apalya.myplex.views.CardVideoPlayer.PlayerStatusUpdate;
 import com.flurry.android.monolithic.sdk.impl.mc;
@@ -61,6 +65,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 	private VideoView mVideoView;
 
 	private Uri mUri;
+	private WidevineDrm drmManager;
 
 	// State maintained for proper onPause/OnResume behaviour.
 
@@ -72,7 +77,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 	private Context mContext = null;
 	private ErrorManagerData errordata = null; 
 	private ProgressBar mProgressBar = null;
-	
+	private boolean iPlayerStarted=false;
 
 	public static enum StreamType {
 		LIVE, VOD
@@ -161,7 +166,15 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 		this.mStreamType = type; 
 		mVideoView.setVisibility(View.VISIBLE);
 		initilizeMediaController();
-		openVideo();	
+		if(mUri.toString().contains(".wvm")||mUri.toString().contains("file:"))
+		{
+			prepareDrmManager(mUri.toString());
+			acquireRights(mUri.toString());
+		}
+		else
+		{
+			openVideo();
+		}
 		
 	}
 	private void initilizeMediaController() {
@@ -225,6 +238,8 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 	private PlayerStatusUpdate mPlayerStatusListener;
 	public void setPlayerStatusUpdateListener(PlayerStatusUpdate listener){
 		mPlayerStatusListener = listener;
+		if(drmManager!=null)
+		drmManager.setPlayerListener(mPlayerStatusListener);
 	}
 	public void openVideo() { 
 		Log.d("PlayerScreen", "VideoViewPlayer openVideo Start");
@@ -340,6 +355,11 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 
 	public void onPause() {
 		Log.d("PlayerScreen", "VideoViewPlayer onPause Start");
+		
+		Map<String,String> params=new HashMap<String, String>();
+		params.put("status", "pause");
+		Analytics.trackEvent(Analytics.PlayerPlaySelect,params);
+		
 		if(mVideoView == null){
 			return;
 		}
@@ -404,6 +424,11 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 
 	public void onResume() {
 		Log.d("PlayerScreen", "VideoViewPlayer onResume Start");
+		
+		Map<String,String> params=new HashMap<String, String>();
+		params.put("status", "resume");
+		Analytics.trackEvent(Analytics.PlayerPlaySelect,params);
+		
 		if(mVideoView == null){
 			return;
 		}
@@ -555,6 +580,11 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 	@Override
 	public void onSeekComplete(MediaPlayer mp) {
 		Log.d("PlayerScreen", "VideoViewPlayer onSeekComplete");
+		
+		Map<String,String> params=new HashMap<String, String>();
+		params.put("status", "seek");
+		Analytics.trackEvent(Analytics.PlayerPlaySelect,params);
+		
 		if (mPlayerListener != null) {
 			mPlayerListener.onSeekComplete(mp);
 
@@ -701,5 +731,120 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 			boolean ret = mPlayerListener.onInfo(arg0, arg1, arg2);
 		}
 		return false;
+	}
+	public void acquireRights(String url){
+		int rightStatus= drmManager.checkRightsStatus(url);
+		if(rightStatus!=DrmStore.RightsStatus.RIGHTS_VALID)
+		{
+			int status=drmManager.acquireRights(url);
+			if(status!=0)
+			{
+				Util.showToast(mContext, "Acquire Rights Failed", Util.TOAST_TYPE_INFO);
+				//closeSession();
+				if(mPlayerListener!=null)
+				{
+					mPlayerListener.onDrmError();
+				}
+			}
+		}
+		else
+		{
+			startPlayer(true);
+		}
+		
+	}
+	
+	private void prepareDrmManager(String url){
+		
+		drmManager = new WidevineDrm(mContext);
+		
+		
+		drmManager.logBuffer.append("Asset Uri: " + url + "\n");
+		drmManager.logBuffer.append("Drm Server: " + WidevineDrm.Settings.DRM_SERVER_URI + "\n");
+		drmManager.logBuffer.append("Device Id: " + WidevineDrm.Settings.DEVICE_ID + "\n");
+		drmManager.logBuffer.append("Portal Name: " + WidevineDrm.Settings.PORTAL_NAME + "\n");
+
+		
+        // Set log update listener
+        WidevineDrm.WidevineDrmLogEventListener drmLogListener =
+            new WidevineDrm.WidevineDrmLogEventListener() {
+
+            public void logUpdated(int status,int value) {
+                
+            	updateLogs(status,value);
+            }
+        };
+		
+        drmManager.setLogListener(drmLogListener);
+        
+        drmManager.registerPortal(WidevineDrm.Settings.PORTAL_NAME);
+        
+		}
+	private void startPlayer(final boolean status){
+		Handler h = new Handler(Looper.getMainLooper());
+		h.post(new Runnable() {
+			
+			@Override
+			public void run() {
+				if(status){
+					openVideo();
+				}
+				else
+				{
+					if(mPlayerListener!=null)
+					{
+						mPlayerListener.onDrmError();
+					}
+				}
+			}
+		});
+	}
+	protected void updateLogs(int status,int value) {
+		// TODO Auto-generated method stub
+		if(!iPlayerStarted)
+		{
+			if(status==0 && value== DrmInfoEvent.TYPE_RIGHTS_INSTALLED)
+			{
+				iPlayerStarted=true;
+				Map<String,String> params=new HashMap<String, String>();
+				params.put("Status", "PlayerRightsAcqusition");
+				Analytics.trackEvent(Analytics.PlayerRightsAcqusition,params);
+				//Util.showToast(mContext,"RIGHTS INSTALLED",Util.TOAST_TYPE_INFO);
+				startPlayer(true);
+			}
+			if(status==1 ){
+				iPlayerStarted=true;
+				String errMsg = "Error while playing";
+				switch (value) {
+				case DrmErrorEvent.TYPE_NO_INTERNET_CONNECTION:
+					errMsg="No Internet Connection";
+					break;
+				case DrmErrorEvent.TYPE_NOT_SUPPORTED:
+					errMsg="Device Not Supported";
+					break;
+				case DrmErrorEvent.TYPE_OUT_OF_MEMORY:
+					errMsg="Out of Memory";
+					break;
+				case DrmErrorEvent.TYPE_PROCESS_DRM_INFO_FAILED:
+					errMsg="Process DRM Info failed";
+					break;
+				case DrmErrorEvent.TYPE_REMOVE_ALL_RIGHTS_FAILED:
+					errMsg="Remove All Rights failed";
+					break;
+				case DrmErrorEvent.TYPE_RIGHTS_NOT_INSTALLED:
+					errMsg="Rights not installed";
+					break;
+				case DrmErrorEvent.TYPE_RIGHTS_RENEWAL_NOT_ALLOWED:
+					errMsg="Rights renewal not allowed";
+					break;
+				}
+				Util.showToast(mContext,errMsg,Util.TOAST_TYPE_INFO);
+				startPlayer(false);
+				//drmManager.
+			}
+			if(drmManager!=null)
+				drmManager.unRegisterLogListener();
+		
+		}
 	}
 }

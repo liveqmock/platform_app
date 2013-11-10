@@ -551,7 +551,10 @@ public class SignUpActivity extends Activity{
 								getString(R.string.devpassword), mPassword.getText().toString());
 						
 						Crashlytics.setUserEmail(mEmail.getText().toString());
-						
+						String userIdSha1=Util.sha1Hash(mEmail.getText().toString());
+						FlurryAgent.setUserId(userIdSha1);
+						Crashlytics.setUserName(userIdSha1);
+						Crashlytics.setUserIdentifier(userIdSha1);
 						finish();
 						Util.launchMainActivity(SignUpActivity.this);
 						//						Util.launchActivity(MainActivity.class,SignUpActivity.this , null);
@@ -715,7 +718,10 @@ public class SignUpActivity extends Activity{
 								getString(R.string.devpassword), mPassword.getText().toString());
 						
 						Crashlytics.setUserEmail(mEmail.getText().toString());
-
+						String userIdSha1=Util.sha1Hash(mEmail.getText().toString());
+						FlurryAgent.setUserId(userIdSha1);
+						Crashlytics.setUserName(userIdSha1);
+						Crashlytics.setUserIdentifier(userIdSha1);
 						finish();
 						Util.launchMainActivity(SignUpActivity.this);
 					}

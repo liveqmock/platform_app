@@ -274,7 +274,15 @@ public class CardView extends ScrollView {
 			dataHolder.mESTDownloadBar.setProgress(localDownloadData.mPercentage);
 		}else{
 			dataHolder.mESTDownloadBar.setVisibility(View.INVISIBLE);
-			dataHolder.mESTDownloadStatus.setText("Download Complete");
+			if(localDownloadData.mPercentage==0)
+			{
+				dataHolder.mESTDownloadStatus.setText("Download Failed");
+			}
+			else
+			{
+				dataHolder.mESTDownloadStatus.setText("Download Complete");	
+			}
+			
 		}
 	}
 	private int cardColor = -1;

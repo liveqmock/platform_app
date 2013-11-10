@@ -16,4 +16,6 @@ public interface PlayerListener {
 	public void onCompletion(MediaPlayer mp) ;
 	
 	public void onFullScreen(boolean value);
+	
+	public void onDrmError();
 }

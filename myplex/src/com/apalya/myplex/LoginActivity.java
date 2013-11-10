@@ -805,6 +805,12 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 						
 						Crashlytics.setUserEmail(user.getProperty("email").toString());
 
+						String userIdSha1=Util.sha1Hash(user.getProperty("email").toString());
+						FlurryAgent.setUserId(userIdSha1);
+						Crashlytics.setUserName(userIdSha1);
+						Crashlytics.setUserIdentifier(userIdSha1);
+						
+						
 						Log.d(TAG, "Facebook User Id:   "+fbUserId);
 						Map<String, String> params = new HashMap<String, String>();
 						params.put("facebookId", fbUserId);
@@ -1136,6 +1142,11 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 						
 						Crashlytics.setUserEmail(mUserInfo.getUserEmail());
 
+						String userIdSha1=Util.sha1Hash(mUserInfo.getUserEmail());
+						FlurryAgent.setUserId(userIdSha1);
+						Crashlytics.setUserName(userIdSha1);
+						Crashlytics.setUserIdentifier(userIdSha1);
+						
 						finish();
 						Util.launchMainActivity(LoginActivity.this);
 					}
@@ -1612,6 +1623,13 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				if(username!=null)
 				{
 					Crashlytics.setUserEmail(username);
+					
+					String userIdSha1=Util.sha1Hash(username);
+					FlurryAgent.setUserId(userIdSha1);
+					Crashlytics.setUserName(userIdSha1);
+					Crashlytics.setUserIdentifier(userIdSha1);
+					
+					
 					String profilename=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
 							getString(R.string.userprofilename));
 					String profilePic=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,

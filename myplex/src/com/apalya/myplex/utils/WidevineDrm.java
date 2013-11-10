@@ -47,7 +47,7 @@ public class WidevineDrm {
 	public static class Settings {
 		public static String WIDEVINE_MIME_TYPE = "video/wvm";
 		public static String DRM_SERVER_URI = ConsumerApi.getDrmProxy();
-//		public static String DRM_SERVER_URI = "http://122.248.233.48/widevine/cypherpc/cgi-bin/GetEMMs.cgi";
+		//public static String DRM_SERVER_URI = "http://122.248.233.48/widevine/cypherpc/cgi-bin/GetEMMs.cgi";
 		public static String DEVICE_ID = "device12345"; // use a unique device ID
 		public static String PORTAL_NAME = "sotalapalya";
 		//public static String OP_DATA="optdata";
@@ -144,7 +144,6 @@ public class WidevineDrm {
 		rightsAcquisitionInfo.put("WVPortalKey", Settings.PORTAL_NAME);
 		rightsAcquisitionInfo.put("WVCAUserDataKey", Settings.USER_DATA);
 		
-		
 		return rightsAcquisitionInfo;
 	}
 	
@@ -174,7 +173,12 @@ public class WidevineDrm {
 	public int acquireRights(String assetUri) {
 
 		int rights = mDrmManager.acquireRights(getDrmInfoRequest(assetUri));
-		logMessage("acquireRights = " + rights + "\n");
+		logMessage("\n DRM SERVER URI: "+Settings.DRM_SERVER_URI);
+		logMessage("\n DRM assetUri: "+assetUri);
+		logMessage("\n DRM DEVICE_ID: "+Settings.DEVICE_ID);
+		logMessage("\n DRM PORTAL_NAME: "+Settings.PORTAL_NAME);
+		logMessage("\n DRM USER_DATA: "+Settings.USER_DATA);
+		logMessage("\n acquireRights = " + rights + "\n");
 
 		return rights;
 	}
@@ -284,6 +288,9 @@ public class WidevineDrm {
 
 	public void setLogListener(WidevineDrmLogEventListener logEventListener) {
 		this.logEventListener = logEventListener;
+	}
+	public void unRegisterLogListener() {
+		this.logEventListener = null;
 	}
 
 	private void logMessage( int typeConnectionStatus,int typeRightsInstalled) {

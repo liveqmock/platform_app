@@ -336,10 +336,10 @@ public class Util {
 							.setTitle("myplex")
 							.setDescription(aMovieName)
 							.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,
-									aMovieName+".mp4"));
+									aMovieName+".wvm"));
 			if(lastDownloadId>0)
 			{
-				Util.showToast(mContext, "Your download is in progress,Please check your status in Downloads section.",Util.TOAST_TYPE_INFO);
+				Util.showToast(mContext, "Your download has been started, Please check download status in Downloads section.",Util.TOAST_TYPE_INFO);
 			}
 			
 			
@@ -362,9 +362,9 @@ public class Util {
 		
 		CardDownloadData downloadData= new CardDownloadData();
 		downloadData.mDownloadId=lastDownloadId;
-		downloadData.mDownloadPath=Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath() +"/"+aMovieName+".mp4";
+		downloadData.mDownloadPath=Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath() +"/"+aMovieName+".wvm";
 		downloadlist.mDownloadedList.put(aMovieData._id, downloadData);
-		
+		myplexapplication.mDownloadList=downloadlist;
 		Util.saveObject(downloadlist, myplexapplication.getApplicationConfig().downloadCardsPath);
 		
 		return lastDownloadId;

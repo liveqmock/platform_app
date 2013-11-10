@@ -148,5 +148,12 @@ public class docketVideoWidget implements PlayerListener{
 		return false;
 	}
 
+	@Override
+	public void onDrmError() {
+		// TODO Auto-generated method stub
+		mProgressBar.setVisibility(View.GONE);
+		showImagePreview();
+	}
+
 
 }

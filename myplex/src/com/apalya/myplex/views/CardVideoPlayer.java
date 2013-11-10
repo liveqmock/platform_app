@@ -10,9 +10,6 @@ import java.util.TimerTask;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.drm.DrmErrorEvent;
-import android.drm.DrmInfoEvent;
-import android.drm.DrmStore;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -79,10 +76,11 @@ public class CardVideoPlayer implements PlayerListener {
 	private static int PLAYER_BUFFERING = 4;
 	private PlayerFullScreen mPlayerFullScreen;
 	boolean isESTPackPurchased=false;
-	private WidevineDrm drmManager;
+	private String drmLicenseType="st";
+	
 	private String mVideoUrl;
 	private Uri mVideoUri ;
-	private boolean iPlayerStarted=false;
+	
 
 	public void setFullScreenListener(PlayerFullScreen mListener){
 		this.mPlayerFullScreen = mListener;
@@ -247,44 +245,47 @@ public class CardVideoPlayer implements PlayerListener {
 				}*/
 				if(isESTPackPurchased || url.contains("_est_"))
 				{
-					closePlayer();
+					
 					url=url.replace("widevine:", "http:");
-					/*if(Util.checkDownloadStatus( mData._id, mContext)==0)
-					{
-						Util.startDownload(url, mData, mContext);
-						return;
-						
-					}
-					else*/
-					{
-						if(myplexapplication.mDownloadList != null){
-							CardDownloadData mDownloadData = myplexapplication.mDownloadList.mDownloadedList.get(mData._id);
-							if(mDownloadData!=null){
-								if(mDownloadData.mCompleted)
+					if(myplexapplication.mDownloadList != null){
+						CardDownloadData mDownloadData = myplexapplication.mDownloadList.mDownloadedList.get(mData._id);
+						if(mDownloadData!=null){
+							if(mDownloadData.mCompleted)
+							{
+								if(mDownloadData.mPercentage==0)
 								{
-									url="file://"+mDownloadData.mDownloadPath;
-								}
-								else
-								{
-									Util.showToast(mContext, "Your download is in progress,Please check your status in Downloads section.",Util.TOAST_TYPE_ERROR);
+									closePlayer();
+									Util.showToast(mContext, "Download has failed, Please check if sufficent memory is available.",Util.TOAST_TYPE_ERROR);
 									return;
 								}
+								else{
+								drmLicenseType="lp";
+								url="file://"+mDownloadData.mDownloadPath;
+								}
 							}
-							else{
-								Util.startDownload(url, mData, mContext);
+							else
+							{
+								closePlayer();
+								Util.showToast(mContext, "Your download is in progress, Please check your status in Downloads section.",Util.TOAST_TYPE_ERROR);
 								return;
 							}
 						}
 						else{
+							closePlayer();
 							Util.startDownload(url, mData, mContext);
 							return;
 						}
+					}
+					else{
+						closePlayer();
+						Util.startDownload(url, mData, mContext);
+						return;
 					}
 				}				
 				
 				if(mData.content !=null && mData.content.drmEnabled)
 				{
-					String licenseData="clientkey:"+myplexapplication.getDevDetailsInstance().getClientKey()+",contentid:"+mData._id+",type:st,profile:1";
+					String licenseData="clientkey:"+myplexapplication.getDevDetailsInstance().getClientKey()+",contentid:"+mData._id+",type:"+drmLicenseType+",profile:1";
 					
 					byte[] data;
 					try {
@@ -292,33 +293,11 @@ public class CardVideoPlayer implements PlayerListener {
 						String base64 = Base64.encodeToString(data, Base64.DEFAULT);
 						Settings.USER_DATA=base64;
 						Settings.DEVICE_ID=myplexapplication.getDevDetailsInstance().getClientDeviceId();
-//						Settings.DRM_SERVER_URI=ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+"licenseproxy/v2/license";
-						//http://api-beta.myplex.in/licenseproxy/v2/license"
-						//Settings.DRM_SERVER_URI="http://dev.myplex.in:80/licenseproxy/v2/license"+base64;
 					} catch (UnsupportedEncodingException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-					}
-						
-					
-					mVideoUrl=url;
-					mVideoUri = Uri.parse(url);
-					
-					prepareDrmManager(mVideoUri.toString());
-					
-					acquireRights(mVideoUri.toString());
-					
-					
-					
-					if(mPlayerStatusListener != null){
-						mPlayerStatusListener.playerStatusUpdate("Playing :: "+url);
-					}
-					
+					}	
 				}
-				else
-				{
-					
-					
 				Uri uri ;
 //				uri = Uri.parse("rtsp://46.249.213.87:554/playlists/bollywood-action_qcif.hpl.3gp");
 //				uri = Uri.parse("http://59.162.166.211:8080/player/3G_H264_320x240_600kbps.3gp");
@@ -334,8 +313,10 @@ public class CardVideoPlayer implements PlayerListener {
 					mVideoViewPlayer = new VideoViewPlayer(mVideoView,
 							mContext, uri, streamType);
 					//mVideoViewPlayer.openVideo();
+					mVideoViewPlayer.setPlayerListener(CardVideoPlayer.this);
 					mVideoViewPlayer.setUri(uri, streamType);
 				} else {
+					mVideoViewPlayer.setPlayerListener(CardVideoPlayer.this);
 					mVideoViewPlayer.setUri(uri, streamType);
 				}
 				mVideoViewPlayer.hideMediaController();
@@ -348,8 +329,7 @@ public class CardVideoPlayer implements PlayerListener {
 						return false;
 					}
 				});
-				mVideoViewPlayer.setPlayerListener(CardVideoPlayer.this);
-			}
+				
 			}
 		});
 
@@ -603,6 +583,11 @@ public class CardVideoPlayer implements PlayerListener {
 		}
 		closePlayer();
 	}
+	@Override
+	public void onDrmError(){
+		closePlayer();
+	}
+	
 	public void resumePreviousOrientaionTimer(){
 		if(mTimer != null ){
 			mTimer.cancel();
@@ -719,116 +704,5 @@ public class CardVideoPlayer implements PlayerListener {
 	}
 	
 	
-	public void acquireRights(String url){
-		int rightStatus= drmManager.checkRightsStatus(url);
-		if(rightStatus!=DrmStore.RightsStatus.RIGHTS_VALID)
-			drmManager.acquireRights(url); 
-		
-	}
-	
-	private void prepareDrmManager(String url){
-		
-		drmManager = new WidevineDrm(mContext);
-		
-		
-		drmManager.logBuffer.append("Asset Uri: " + url + "\n");
-		drmManager.logBuffer.append("Drm Server: " + WidevineDrm.Settings.DRM_SERVER_URI + "\n");
-		drmManager.logBuffer.append("Device Id: " + WidevineDrm.Settings.DEVICE_ID + "\n");
-		drmManager.logBuffer.append("Portal Name: " + WidevineDrm.Settings.PORTAL_NAME + "\n");
 
-        // Set log update listener
-        WidevineDrm.WidevineDrmLogEventListener drmLogListener =
-            new WidevineDrm.WidevineDrmLogEventListener() {
-
-            public void logUpdated(int status,int value) {
-                
-            	updateLogs(status,value);
-            }
-        };
-		
-        drmManager.setLogListener(drmLogListener);
-        if(mPlayerStatusListener != null){
-        drmManager.setPlayerListener(mPlayerStatusListener);
-        }
-        drmManager.registerPortal(WidevineDrm.Settings.PORTAL_NAME);
-        
-		}
-	public void startPlayer(){
-		Handler mainThread=new Handler(Looper.getMainLooper());
-		mainThread.post(new Runnable() {
-            @Override
-            public void run() {
-            	if(mPlayerStatusListener != null){
-					mPlayerStatusListener.playerStatusUpdate("Playing :: "+mVideoUrl);
-				}
-				VideoViewPlayer.StreamType streamType = StreamType.VOD;
-				if (mVideoViewPlayer == null) {
-					mVideoViewPlayer = new VideoViewPlayer(mVideoView,
-							mContext, mVideoUri, streamType);
-					//mVideoViewPlayer.openVideo();
-					mVideoViewPlayer.setUri(mVideoUri, streamType);
-				} else {
-					mVideoViewPlayer.setUri(mVideoUri, streamType);
-				}
-				mVideoViewPlayer.hideMediaController();
-				mVideoViewPlayer.setPlayerStatusUpdateListener(mPlayerStatusListener);
-				mVideoView.setOnTouchListener(new OnTouchListener() {
-
-					@Override
-					public boolean onTouch(View arg0, MotionEvent event) {
-						mVideoViewPlayer.onTouchEvent(event);
-						return false;
-					}
-				});
-				mVideoViewPlayer.setPlayerListener(CardVideoPlayer.this);
-            }
-        });
-	}
-	protected void updateLogs(int status,int value) {
-		// TODO Auto-generated method stub
-		if(!iPlayerStarted)
-		{
-			if(status==0 && value== DrmInfoEvent.TYPE_RIGHTS_INSTALLED)
-			{
-				iPlayerStarted=true;
-				Map<String,String> params=new HashMap<String, String>();
-				params.put("Status", "PlayerRightsAcqusition");
-				Analytics.trackEvent(Analytics.PlayerRightsAcqusition,params);
-				//Util.showToast(mContext,"RIGHTS INSTALLED",Util.TOAST_TYPE_INFO);
-				startPlayer();
-				
-				
-			}
-			if(status==1 ){
-				String errMsg = "Error while playing";
-				switch (value) {
-				case DrmErrorEvent.TYPE_NO_INTERNET_CONNECTION:
-					errMsg="No Internet Connection";
-					break;
-				case DrmErrorEvent.TYPE_NOT_SUPPORTED:
-					errMsg="Device Not Supported";
-					break;
-				case DrmErrorEvent.TYPE_OUT_OF_MEMORY:
-					errMsg="Out of Memory";
-					break;
-				case DrmErrorEvent.TYPE_PROCESS_DRM_INFO_FAILED:
-					errMsg="Process DRM Info failed";
-					break;
-				case DrmErrorEvent.TYPE_REMOVE_ALL_RIGHTS_FAILED:
-					errMsg="Remove All Rights failed";
-					break;
-				case DrmErrorEvent.TYPE_RIGHTS_NOT_INSTALLED:
-					errMsg="Rights not installed";
-					break;
-				case DrmErrorEvent.TYPE_RIGHTS_RENEWAL_NOT_ALLOWED:
-					errMsg="Rights renewal not allowed";
-					break;
-				}
-				//Util.showToast(mContext,errMsg,Util.TOAST_TYPE_INFO);
-				
-				return;
-			}
-		
-		}
-	}
 }

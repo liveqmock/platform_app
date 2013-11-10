@@ -89,6 +89,9 @@ public class FetchDownloadProgress {
 					if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
 						mDownloadData.mCompleted = true;
 						mDownloadData.mPercentage = 100;
+					}else if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_FAILED) {
+						mDownloadData.mCompleted = true;
+						mDownloadData.mPercentage = 0;
 					}
 					else{
 						final int dl_progress = (int) ((bytes_downloaded * 100) / bytes_total);
