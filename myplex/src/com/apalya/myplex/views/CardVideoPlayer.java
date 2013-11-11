@@ -245,43 +245,14 @@ public class CardVideoPlayer implements PlayerListener {
 				}*/
 				if(isESTPackPurchased || url.contains("_est_"))
 				{
-					
 					url=url.replace("widevine:", "http:");
-					if(myplexapplication.mDownloadList != null){
-						CardDownloadData mDownloadData = myplexapplication.mDownloadList.mDownloadedList.get(mData._id);
-						if(mDownloadData!=null){
-							if(mDownloadData.mCompleted)
-							{
-								if(mDownloadData.mPercentage==0)
-								{
-									closePlayer();
-									Util.showToast(mContext, "Download has failed, Please check if sufficent memory is available.",Util.TOAST_TYPE_ERROR);
-									return;
-								}
-								else{
-								drmLicenseType="lp";
-								url="file://"+mDownloadData.mDownloadPath;
-								}
-							}
-							else
-							{
-								closePlayer();
-								Util.showToast(mContext, "Your download is in progress, Please check your status in Downloads section.",Util.TOAST_TYPE_ERROR);
-								return;
-							}
-						}
-						else{
-							closePlayer();
-							Util.startDownload(url, mData, mContext);
-							return;
-						}
-					}
-					else{
-						closePlayer();
-						Util.startDownload(url, mData, mContext);
-						return;
-					}
+					closePlayer();
+					Util.startDownload(url, mData, mContext);
+					return;
 				}				
+				else{
+					drmLicenseType="st";
+				}
 				
 				if(mData.content !=null && mData.content.drmEnabled)
 				{
@@ -375,7 +346,7 @@ public class CardVideoPlayer implements PlayerListener {
         
 		if(allowPlaying)
 		{
-	        String qualityType = new String();
+			String qualityType = new String();
 	        String streamingType = new String();
 	        
 	        streamingType = ConsumerApi.STREAMNORMAL;
@@ -398,8 +369,81 @@ public class CardVideoPlayer implements PlayerListener {
 	        	else
 	        		qualityType= ConsumerApi.VIDEOQUALTYHIGH;
 	        }
-	        MediaUtil.getVideoUrl(mData._id,qualityType,streamingType,isESTPackPurchased);
-		}
+			
+	        if(myplexapplication.mDownloadList != null){
+				CardDownloadData mDownloadData = myplexapplication.mDownloadList.mDownloadedList.get(mData._id);
+				if(mDownloadData!=null){
+					if(mDownloadData.mCompleted)
+					{
+						if(mDownloadData.mPercentage==0)
+						{
+							closePlayer();
+							Util.showToast(mContext, "Download has failed, Please check if sufficent memory is available.",Util.TOAST_TYPE_ERROR);
+							
+						}
+						else{
+						drmLicenseType="lp";
+						String url="file://"+mDownloadData.mDownloadPath;
+
+			        	if(mData.content !=null && mData.content.drmEnabled)
+						{
+							String licenseData="clientkey:"+myplexapplication.getDevDetailsInstance().getClientKey()+",contentid:"+mData._id+",type:"+drmLicenseType+",profile:1";
+							
+							byte[] data;
+							try {
+								data = licenseData.getBytes("UTF-8");
+								String base64 = Base64.encodeToString(data, Base64.DEFAULT);
+								Settings.USER_DATA=base64;
+								Settings.DEVICE_ID=myplexapplication.getDevDetailsInstance().getClientDeviceId();
+							} catch (UnsupportedEncodingException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}	
+						}
+						Uri uri ;
+						uri = Uri.parse(url);
+						if(mPlayerStatusListener != null){
+							mPlayerStatusListener.playerStatusUpdate("Playing :: "+url);
+						}
+						VideoViewPlayer.StreamType streamType = StreamType.VOD;
+						if (mVideoViewPlayer == null) {
+							mVideoViewPlayer = new VideoViewPlayer(mVideoView,
+									mContext, uri, streamType);
+							//mVideoViewPlayer.openVideo();
+							mVideoViewPlayer.setPlayerListener(CardVideoPlayer.this);
+							mVideoViewPlayer.setUri(uri, streamType);
+						} else {
+							mVideoViewPlayer.setPlayerListener(CardVideoPlayer.this);
+							mVideoViewPlayer.setUri(uri, streamType);
+						}
+						mVideoViewPlayer.hideMediaController();
+						mVideoViewPlayer.setPlayerStatusUpdateListener(mPlayerStatusListener);
+						mVideoView.setOnTouchListener(new OnTouchListener() {
+
+							@Override
+							public boolean onTouch(View arg0, MotionEvent event) {
+								mVideoViewPlayer.onTouchEvent(event);
+								return false;
+							}
+						});
+			        			
+						}
+					}
+					else
+					{
+						closePlayer();
+						Util.showToast(mContext, "Your download is in progress, Please check your status in Downloads section.",Util.TOAST_TYPE_ERROR);
+					}
+				}
+				else{
+					MediaUtil.getVideoUrl(mData._id,qualityType,streamingType,isESTPackPurchased);
+				}
+			}
+	        else 
+	        {
+	        	MediaUtil.getVideoUrl(mData._id,qualityType,streamingType,isESTPackPurchased);	
+	        }
+	      }
 	}
 
 	public View CreateTabletPlayerView(View parentLayout) {

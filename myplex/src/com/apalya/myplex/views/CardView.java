@@ -635,6 +635,17 @@ public class CardView extends ScrollView {
 				return;
 			}
 			int index = mDataList.indexOf(dataHolder.mDataObject);
+			/*****************************DELTEING DOWNLOAD DATA************************************/
+			
+			if(myplexapplication.mDownloadList != null){
+				CardDownloadData mDownloadData = myplexapplication.mDownloadList.mDownloadedList.get(mDataList.get(index)._id);
+				if(mDownloadData!=null){
+					Util.removeDownload(mDownloadData.mDownloadId,mContext);
+					myplexapplication.mDownloadList.mDownloadedList.remove(mDataList.get(index)._id);
+					Util.saveObject(myplexapplication.mDownloadList, myplexapplication.getApplicationConfig().downloadCardsPath);
+				}
+			}
+			/***************************************************************************************/
 			mDataList.remove(index);
 			mNumberofItems = mDataList.size();
 			View localv = mCardsLayout.mCardViewReusePool.getView(index);

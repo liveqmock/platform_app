@@ -5,6 +5,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.LayoutTransition;
@@ -38,8 +41,16 @@ import android.widget.Space;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.Request.Method;
+import com.android.volley.Response.ErrorListener;
+import com.android.volley.Response.Listener;
+import com.android.volley.toolbox.StringRequest;
 import com.apalya.myplex.LoginActivity;
 import com.apalya.myplex.R;
+import com.apalya.myplex.SignUpActivity;
 import com.apalya.myplex.SubscriptionView;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDataCertifiedRatingsItem;
@@ -51,8 +62,11 @@ import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.Blur;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FontUtil;
+import com.apalya.myplex.utils.MyVolley;
+import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.utils.Blur.BlurResponse;
+import com.crashlytics.android.Crashlytics;
 import com.flurry.android.FlurryAgent;
 
 public class PackagePopUp {
@@ -67,6 +81,19 @@ public class PackagePopUp {
 		this.mContext = cxt;
 		this.mBackground = background;
 		this.mInflater = LayoutInflater.from(mContext);
+		String email=myplexapplication.getUserProfileInstance().getUserEmail();
+		if(email.equalsIgnoreCase("NA") || email.equalsIgnoreCase(""))
+		{	
+			final String account=Util.getGoogleAccountName(mContext);
+			String password=Util.sha1Hash(account);
+			Map<String, String> params = new HashMap<String, String>();
+			params.put("email",account);
+			params.put("password", password);
+			params.put("password2", password);
+			params.put("profile", "work");
+			params.put("clientKey",myplexapplication.getDevDetailsInstance().getClientKey());
+			RegisterUserReq(mContext.getString(R.string.signuppath), params);
+		}
 	}
 
 
@@ -135,176 +162,80 @@ public class PackagePopUp {
 		@Override
 		public void onClick(final View v) {
 			
-			String email=myplexapplication.getUserProfileInstance().getUserEmail();
-			if(email.equalsIgnoreCase("NA") || email.equalsIgnoreCase(""))
-			{	
-				final String account=Util.getGoogleAccountName(mContext);
-				
-				
-				AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-				 builder.setMessage("Continue using app with account "+account+" ?")
-				 		.setTitle("Login Required!!!")
-				        .setCancelable(false)
-				        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-				            public void onClick(DialogInterface dialog, int id) {
-				            	if(v.getTag() instanceof LinearLayout){
-				    				if(mLastPaymentModeLayout != null){
-				    					mLastPaymentModeLayout.removeAllViews();
-				    				}
-				    				LinearLayout subLayout = (LinearLayout)v.getTag();if(subLayout == null){return;}
+			
+			
+			if(v.getTag() instanceof LinearLayout){
+				if(mLastPaymentModeLayout != null){
+					mLastPaymentModeLayout.removeAllViews();
+				}
+				LinearLayout subLayout = (LinearLayout)v.getTag();if(subLayout == null){return;}
 
-				    				mLastPaymentModeLayout = new LinearLayout(mContext);
-				    				LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT);
-				    				params.leftMargin = ((int)mContext.getResources().getDimension(R.dimen.margin_gap_12));
-				    				mLastPaymentModeLayout.setLayoutParams(params);
-				    				mLastPaymentModeLayout.setOrientation(LinearLayout.VERTICAL);
+				mLastPaymentModeLayout = new LinearLayout(mContext);
+				LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+				params.leftMargin = ((int)mContext.getResources().getDimension(R.dimen.margin_gap_12));
+				mLastPaymentModeLayout.setLayoutParams(params);
+				mLastPaymentModeLayout.setOrientation(LinearLayout.VERTICAL);
 
-				    				LayoutTransition transition = new LayoutTransition();
-				    				transition.setStartDelay(LayoutTransition.CHANGE_APPEARING, 0);
-				    				mLastPaymentModeLayout.setLayoutTransition(transition);
+				LayoutTransition transition = new LayoutTransition();
+				transition.setStartDelay(LayoutTransition.CHANGE_APPEARING, 0);
+				mLastPaymentModeLayout.setLayoutTransition(transition);
 
 
-				    				subLayout.addView(mLastPaymentModeLayout);
+				subLayout.addView(mLastPaymentModeLayout);
 
-				    				deSelectViews();
-				    				v.setAlpha(1.0f);
-				    				CardDataPackages packageitem = (CardDataPackages)subLayout.getTag();
-				    				if(packageitem == null){return;}
-				    				if(packageitem.priceDetails == null){return;}
-				    				int count = 0;
-				    				for(CardDataPackagePriceDetailsItem priceItem:packageitem.priceDetails){
-				    					if(count == 0){
-				    						TextView heading = (TextView)mInflater.inflate(R.layout.pricepopmodeheading,null);
-				    						heading.setTypeface(FontUtil.Roboto_Medium);
-				    						mLastPaymentModeLayout.addView(heading);
-				    					}
-				    					View paymentModeItem = mInflater.inflate(R.layout.paymentmodeitemlayout,null);
-				    					TextView paymentModeText = (TextView)paymentModeItem.findViewById(R.id.paymentmodetext);
-				    					paymentModeText.setTypeface(FontUtil.Roboto_Medium);
-				    					paymentModeText.setText(priceItem.name);
-				    					mLastPaymentModeLayout.addView(paymentModeItem);
-				    					Util.showFeedback(paymentModeItem);
-				    					paymentModeItem.setId(count);
-				    					count++;
-				    					paymentModeItem.setTag(packageitem);
-				    					paymentModeItem.setOnClickListener(new OnClickListener() {
+				deSelectViews();
+				v.setAlpha(1.0f);
+				CardDataPackages packageitem = (CardDataPackages)subLayout.getTag();
+				if(packageitem == null){return;}
+				if(packageitem.priceDetails == null){return;}
+				int count = 0;
+				for(CardDataPackagePriceDetailsItem priceItem:packageitem.priceDetails){
+					if(count == 0){
+						TextView heading = (TextView)mInflater.inflate(R.layout.pricepopmodeheading,null);
+						heading.setTypeface(FontUtil.Roboto_Medium);
+						mLastPaymentModeLayout.addView(heading);
+					}
+					View paymentModeItem = mInflater.inflate(R.layout.paymentmodeitemlayout,null);
+					TextView paymentModeText = (TextView)paymentModeItem.findViewById(R.id.paymentmodetext);
+					paymentModeText.setTypeface(FontUtil.Roboto_Medium);
+					paymentModeText.setText(priceItem.name);
+					mLastPaymentModeLayout.addView(paymentModeItem);
+					Util.showFeedback(paymentModeItem);
+					paymentModeItem.setId(count);
+					count++;
+					paymentModeItem.setTag(packageitem);
+					paymentModeItem.setOnClickListener(new OnClickListener() {
 
-				    						@Override
-				    						public void onClick(View arg0) {
-				    							try {
-				    								if(arg0.getTag() instanceof CardDataPackages){
-				    									CardDataPackages packageitem = (CardDataPackages)arg0.getTag();
-				    									int id = arg0.getId();
-				    									CardDataPackagePriceDetailsItem priceItem = packageitem.priceDetails.get(id);
-				    									String requestUrl = ConsumerApi.getSusbcriptionRequesr(priceItem.paymentChannel, packageitem.packageId);
-				    									Log.e(TAG, "RequestURL = "+requestUrl);
-				    									Intent i = new Intent(mContext,SubscriptionView.class);
-				    									Bundle b = new Bundle();
-				    									b.putString("url", requestUrl);
-				    									i.putExtras(b);
-				    									FlurryAgent.onStartSession(mContext, "X6WWX57TJQM54CVZRB3K");
-				    									Map<String,String> params=new HashMap<String, String>();
-				    									params.put("PackageId",packageitem.packageId);
-				    									params.put("PackageName", packageitem.packageName);
-				    									params.put("PaymentChannel", priceItem.paymentChannel);
-				    									params.put("Action", "Purchase");
-				    									Analytics.trackEvent(Analytics.PackagesPurchase,params);
-				    									FlurryAgent.onEndSession(mContext);
-				    									((Activity) mContext).startActivityForResult(i, ConsumerApi.SUBSCRIPTIONREQUEST);
-				    									dismissFilterMenuPopupWindow();
-				    								}
-				    							} catch (Exception e) {
-				    								// TODO: handle exception
-				    							}
-				    						}
-				    					});
-				    				}
-				    			}
-				            }
-				        })
-				        .setNegativeButton("No", new DialogInterface.OnClickListener() {
-				            public void onClick(DialogInterface dialog, int id) {
-				                 dialog.cancel();
-				            }
-				        });
-				 AlertDialog alert = builder.create();
-				 alert.show();
-				
-			}
-			else{
-				if(v.getTag() instanceof LinearLayout){
-    				if(mLastPaymentModeLayout != null){
-    					mLastPaymentModeLayout.removeAllViews();
-    				}
-    				LinearLayout subLayout = (LinearLayout)v.getTag();if(subLayout == null){return;}
-
-    				mLastPaymentModeLayout = new LinearLayout(mContext);
-    				LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT);
-    				params.leftMargin = ((int)mContext.getResources().getDimension(R.dimen.margin_gap_12));
-    				mLastPaymentModeLayout.setLayoutParams(params);
-    				mLastPaymentModeLayout.setOrientation(LinearLayout.VERTICAL);
-
-    				LayoutTransition transition = new LayoutTransition();
-    				transition.setStartDelay(LayoutTransition.CHANGE_APPEARING, 0);
-    				mLastPaymentModeLayout.setLayoutTransition(transition);
-
-
-    				subLayout.addView(mLastPaymentModeLayout);
-
-    				deSelectViews();
-    				v.setAlpha(1.0f);
-    				CardDataPackages packageitem = (CardDataPackages)subLayout.getTag();
-    				if(packageitem == null){return;}
-    				if(packageitem.priceDetails == null){return;}
-    				int count = 0;
-    				for(CardDataPackagePriceDetailsItem priceItem:packageitem.priceDetails){
-    					if(count == 0){
-    						TextView heading = (TextView)mInflater.inflate(R.layout.pricepopmodeheading,null);
-    						heading.setTypeface(FontUtil.Roboto_Medium);
-    						mLastPaymentModeLayout.addView(heading);
-    					}
-    					View paymentModeItem = mInflater.inflate(R.layout.paymentmodeitemlayout,null);
-    					TextView paymentModeText = (TextView)paymentModeItem.findViewById(R.id.paymentmodetext);
-    					paymentModeText.setTypeface(FontUtil.Roboto_Medium);
-    					paymentModeText.setText(priceItem.name);
-    					mLastPaymentModeLayout.addView(paymentModeItem);
-    					Util.showFeedback(paymentModeItem);
-    					paymentModeItem.setId(count);
-    					count++;
-    					paymentModeItem.setTag(packageitem);
-    					paymentModeItem.setOnClickListener(new OnClickListener() {
-
-    						@Override
-    						public void onClick(View arg0) {
-    							try {
-    								if(arg0.getTag() instanceof CardDataPackages){
-    									CardDataPackages packageitem = (CardDataPackages)arg0.getTag();
-    									int id = arg0.getId();
-    									CardDataPackagePriceDetailsItem priceItem = packageitem.priceDetails.get(id);
-    									String requestUrl = ConsumerApi.getSusbcriptionRequesr(priceItem.paymentChannel, packageitem.packageId);
-    									Log.e(TAG, "RequestURL = "+requestUrl);
-    									Intent i = new Intent(mContext,SubscriptionView.class);
-    									Bundle b = new Bundle();
-    									b.putString("url", requestUrl);
-    									i.putExtras(b);
-    									FlurryAgent.onStartSession(mContext, "X6WWX57TJQM54CVZRB3K");
-    									Map<String,String> params=new HashMap<String, String>();
-    									params.put("PackageId",packageitem.packageId);
-    									params.put("PackageName", packageitem.packageName);
-    									params.put("PaymentChannel", priceItem.paymentChannel);
-    									params.put("Action", "Purchase");
-    									Analytics.trackEvent(Analytics.PackagesPurchase,params);
-    									FlurryAgent.onEndSession(mContext);
-    									((Activity) mContext).startActivityForResult(i, ConsumerApi.SUBSCRIPTIONREQUEST);
-    									dismissFilterMenuPopupWindow();
-    								}
-    							} catch (Exception e) {
-    								// TODO: handle exception
-    							}
-    						}
-    					});
-    				}
-    			}
+						@Override
+						public void onClick(View arg0) {
+							try {
+								if(arg0.getTag() instanceof CardDataPackages){
+									CardDataPackages packageitem = (CardDataPackages)arg0.getTag();
+									int id = arg0.getId();
+									CardDataPackagePriceDetailsItem priceItem = packageitem.priceDetails.get(id);
+									String requestUrl = ConsumerApi.getSusbcriptionRequesr(priceItem.paymentChannel, packageitem.packageId);
+									Log.e(TAG, "RequestURL = "+requestUrl);
+									Intent i = new Intent(mContext,SubscriptionView.class);
+									Bundle b = new Bundle();
+									b.putString("url", requestUrl);
+									i.putExtras(b);
+									FlurryAgent.onStartSession(mContext, "X6WWX57TJQM54CVZRB3K");
+									Map<String,String> params=new HashMap<String, String>();
+									params.put("PackageId",packageitem.packageId);
+									params.put("PackageName", packageitem.packageName);
+									params.put("PaymentChannel", priceItem.paymentChannel);
+									params.put("Action", "Purchase");
+									Analytics.trackEvent(Analytics.PackagesPurchase,params);
+									FlurryAgent.onEndSession(mContext);
+									((Activity) mContext).startActivityForResult(i, ConsumerApi.SUBSCRIPTIONREQUEST);
+									dismissFilterMenuPopupWindow();
+								}
+							} catch (Exception e) {
+								// TODO: handle exception
+							}
+						}
+					});
+				}
 			}
 		}
 	};
@@ -402,5 +333,99 @@ public class PackagePopUp {
 			description.setText(data.generalInfo.description);
 		}
 	}
+	private void RegisterUserReq(String contextPath, final Map<String,String> bodyParams) {
 
+		Map<String,String> attribs=new HashMap<String, String>();
+		attribs.put("Duration", "");
+		Analytics.trackEvent(Analytics.loginSignUp,attribs,true);
+		
+		RequestQueue queue = MyVolley.getRequestQueue();
+
+		String url=ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+ConsumerApi.USER_CONTEXT+ConsumerApi.SLASH+contextPath;
+		StringRequest myReq = new StringRequest(Method.POST,
+				url,
+				RegisterUserSuccessListener(),
+				RegisterUserErrorListener()) {
+
+			protected Map<String, String> getParams() throws com.android.volley.AuthFailureError {
+				Map<String, String> params = new HashMap<String, String>();
+				params=bodyParams;
+				return params;
+			};
+		};
+		Log.d(TAG,"Request sent ");
+		myReq.setShouldCache(false);
+		queue.add(myReq);
+	}
+	protected Listener<String> RegisterUserSuccessListener() {
+		return new Response.Listener<String>() {
+			@Override
+			public void onResponse(String response) {
+				
+				Analytics.endTimedEvent(Analytics.loginSignUp);
+				
+				Log.d(TAG,"Response: "+response);
+				try {	
+					Log.d(TAG, "########################################################");
+					JSONObject jsonResponse= new JSONObject(response);
+
+					if(jsonResponse.getString("status").equalsIgnoreCase("SUCCESS"))
+					{
+						Map<String,String> attribs=new HashMap<String, String>();
+						attribs.put("Status", "Success");
+						Analytics.trackEvent(Analytics.loginSignUp,attribs);
+						Log.d(TAG, "status: "+jsonResponse.getString("status"));
+						Log.d(TAG, "code: "+jsonResponse.getString("code"));
+						Log.d(TAG, "message: "+jsonResponse.getString("message"));
+						Log.d(TAG, "########################################################");
+						Log.d(TAG, "---------------------------------------------------------");
+
+						final String account=Util.getGoogleAccountName(mContext);
+						
+						myplexapplication.getUserProfileInstance().setName(account);
+
+						myplexapplication.getUserProfileInstance().setUserEmail(account);
+						
+						SharedPrefUtils.writeToSharedPref(mContext,
+								mContext.getString(R.string.userprofilename),account);
+						
+						Crashlytics.setUserEmail(account);
+						String userIdSha1=Util.sha1Hash(account);
+						FlurryAgent.setUserId(userIdSha1);
+						Crashlytics.setUserName(userIdSha1);
+						Crashlytics.setUserIdentifier(userIdSha1);
+						
+						//						Util.launchActivity(MainActivity.class,SignUpActivity.this , null);
+					}
+					else
+					{
+						Map<String,String> attribs=new HashMap<String, String>();
+						attribs.put("Status", "Failed");
+						attribs.put("Msg", jsonResponse.getString("code"));
+						Analytics.trackEvent(Analytics.loginSignUp,attribs);
+						Log.d(TAG, "code: "+jsonResponse.getString("code"));
+						Log.d(TAG, "message: "+jsonResponse.getString("message"));
+						
+					}
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+		};
+	}
+	protected ErrorListener RegisterUserErrorListener() {
+		return new Response.ErrorListener() {
+			@Override
+			public void onErrorResponse(VolleyError error) {
+				Analytics.endTimedEvent(Analytics.loginSignUp);
+				Map<String,String> attribs=new HashMap<String, String>();
+				attribs.put("Status", "Failed");
+				attribs.put("Msg", error.toString());
+				Analytics.trackEvent(Analytics.loginSignUp,attribs);
+				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+				Log.d(TAG,"Error: "+error.toString());
+				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+			}
+		};
+	}
 }

@@ -34,6 +34,8 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.DownloadManager;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -304,6 +306,19 @@ public class Util {
 				aMsg, 
 				Toast.LENGTH_LONG).show();
 	}
+	public static void removeDownload(long id,Context mContext){
+		if(isDownloadManagerAvailable(mContext))
+		{
+			try{
+			// get download service and enqueue file
+			DownloadManager manager = (DownloadManager) mContext.getSystemService(Context.DOWNLOAD_SERVICE);
+			manager.remove(id);
+			}
+			catch(Exception e){
+				e.printStackTrace();
+			}
+		}
+	}
 	public static long startDownload(String aUrl,CardData aMovieData,Context mContext)
 	{
 		long lastDownloadId=-1L;
@@ -325,9 +340,11 @@ public class Util {
 			//Uri uri=Uri.parse("http://commonsware.com/misc/test.mp4");
 			Uri uri=Uri.parse(aUrl);
 
-			Environment
-			.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-			.mkdirs();
+			/*Environment
+			.getDownloadCacheDirectory()
+			.mkdirs();*/
+			
+			
 
 			lastDownloadId=
 					manager.enqueue(new DownloadManager.Request(uri)
@@ -335,13 +352,15 @@ public class Util {
 							.setAllowedOverRoaming(false)
 							.setTitle("myplex")
 							.setDescription(aMovieName)
-							.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS,
-									aMovieName+".wvm"));
+							.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN)
+							.setDestinationInExternalFilesDir(mContext, "", aMovieName+".wvm"));
 			if(lastDownloadId>0)
 			{
 				Util.showToast(mContext, "Your download has been started, Please check download status in Downloads section.",Util.TOAST_TYPE_INFO);
 			}
-			
+			else{
+				Util.showToast(mContext, "Download Request has failed, Please check your WIFI is turned on.",Util.TOAST_TYPE_INFO);
+			}
 			
 			}
 			catch(IllegalArgumentException e)
@@ -362,7 +381,7 @@ public class Util {
 		
 		CardDownloadData downloadData= new CardDownloadData();
 		downloadData.mDownloadId=lastDownloadId;
-		downloadData.mDownloadPath=Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath() +"/"+aMovieName+".wvm";
+		downloadData.mDownloadPath=mContext.getExternalFilesDir(null).getPath() +"/"+aMovieName+".wvm";
 		downloadlist.mDownloadedList.put(aMovieData._id, downloadData);
 		myplexapplication.mDownloadList=downloadlist;
 		Util.saveObject(downloadlist, myplexapplication.getApplicationConfig().downloadCardsPath);
