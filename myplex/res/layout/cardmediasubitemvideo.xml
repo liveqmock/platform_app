@@ -17,7 +17,7 @@
         android:layout_height="match_parent"
         android:visibility="gone" />
 
-    <ImageView
+    <TextView
         android:id="@+id/cardmediasubitemvideo_play"
         android:layout_width="32dp"
         android:layout_height="32dp"
@@ -25,8 +25,32 @@
         android:layout_alignParentTop="true"
         android:layout_marginRight="14dp"
         android:layout_marginTop="14dp"
-        android:background="@drawable/cardplayselector"
-        android:gravity="center" />
+        android:text="@string/card_play_font"
+        android:textSize="32sp"
+        android:textColor="@color/searchtags_color"
+        android:gravity="center"
+        android:shadowColor="@color/grey"
+        android:shadowDx="-1"
+        android:shadowDy="1"
+        android:shadowRadius="0.01"
+        android:hint="@string/playhint" />
+    
+        <TextView
+        android:id="@+id/cardmediasubitemtrailer_play"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="14dp"
+        android:layout_marginTop="14dp"
+        android:text="@string/card_trailer_font"
+        android:textSize="32sp"
+        android:textColor="@color/searchtags_color"
+        android:shadowColor="@color/grey"
+        android:shadowDx="-1"
+        android:shadowDy="1"
+        android:shadowRadius="0.01"
+        android:hint="@string/trailerhint" />
 
     <RelativeLayout
         android:id="@+id/cardmediasubitemvideo_progressbarLayout"

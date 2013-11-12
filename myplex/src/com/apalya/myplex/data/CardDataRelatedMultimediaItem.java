@@ -9,6 +9,7 @@ public class CardDataRelatedMultimediaItem implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = -7658987893462658720L;
+	public CardData content;
 	public String _id;
 	public CardDataGenralInfo generalInfo;
 	public CardDataRelatedMultimediaItem(){}

@@ -17,6 +17,7 @@ public class CardData implements Serializable{
 	public static final int ESTDOWNLOADFAILED = 3;
 	
 	public CardDataContent content;
+	public String categoryName;
 	public CardDataUserReviews userReviews;
 	public CardDataVideos videos;
 	public CardDataRelatedCast relatedCast;
