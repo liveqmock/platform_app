@@ -27,6 +27,7 @@ public class ConsumerApi {
 	public static final String CONTENT_CONTEXT = "content/v2";
 	public static final String USER_CONTEXT = "user/v2";
 	public static final String SCHEME = "https://";
+	public static final String HTTPSCHEME = "http://";
 	public static final String SLASH = "/";
 	public static final String QUESTION_MARK = "?";
 	public static final String AMPERSAND = "&";
@@ -160,7 +161,7 @@ public class ConsumerApi {
 	
 	public static String getDrmProxy()
 	{
-		return SCHEME+DOMAIN+SLASH+"licenseproxy/v2/license";
+		return HTTPSCHEME+DOMAIN+SLASH+"licenseproxy/v2/license";
 		//return "https://api-beta.myplex.in/licenseproxy/v2/license"
 	}
 }
