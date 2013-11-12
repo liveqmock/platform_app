@@ -85,7 +85,7 @@ public class PackagePopUp {
 		if(email.equalsIgnoreCase("NA") || email.equalsIgnoreCase(""))
 		{	
 			final String account=Util.getGoogleAccountName(mContext);
-			String password=Util.sha1Hash(account);
+			String password="myplexnew";
 			Map<String, String> params = new HashMap<String, String>();
 			params.put("email",account);
 			params.put("password", password);

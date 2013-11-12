@@ -45,10 +45,7 @@
             android:name=".SearchActivity"
             android:screenOrientation="portrait" >
         </activity>
-        <activity
-            android:name=".DownloadsActivity"
-            android:screenOrientation="portrait" >
-        </activity>
+        
         <activity
             android:name=".DownloadStatus"
             android:screenOrientation="portrait" >

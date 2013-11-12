@@ -1,6 +1,7 @@
 package com.apalya.myplex.views;
 
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -269,7 +270,15 @@ public class CardView extends ScrollView {
 		}
 		dataHolder.mESTDownloadStatus.setVisibility(View.VISIBLE);
 		if(!localDownloadData.mCompleted){
-			dataHolder.mESTDownloadStatus.setText("Downloading "+localDownloadData.mPercentage+" %");
+			if(localDownloadData.mPercentage==0)
+			{
+				dataHolder.mESTDownloadStatus.setText("Downloading "+localDownloadData.mPercentage+" %");
+			}
+			else
+			{
+				DecimalFormat dec = new DecimalFormat("0.00");
+				dataHolder.mESTDownloadStatus.setText(dec.format(localDownloadData.mDownloadedBytes)+"MB / "+dec.format(localDownloadData.mDownloadTotalSize)+"MB   "+localDownloadData.mPercentage+" %");
+			}
 			dataHolder.mESTDownloadBar.setVisibility(View.VISIBLE);
 			dataHolder.mESTDownloadBar.setProgress(localDownloadData.mPercentage);
 		}else{

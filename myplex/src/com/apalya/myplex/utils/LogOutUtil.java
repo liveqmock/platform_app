@@ -72,25 +72,7 @@ public class LogOutUtil {
 		String username=SharedPrefUtils.getFromSharedPreference(mContext,
 				mContext.getString(R.string.devusername));
 		
-		if(username==null)
-		{
-			
-			SharedPrefUtils.writeToSharedPref(logoutContext,
-					((Activity) logoutContext).getString(R.string.devusername), "");
-			SharedPrefUtils.writeToSharedPref(logoutContext,
-					((Activity) logoutContext).getString(R.string.devpassword),"");
-			SharedPrefUtils.writeToSharedPref(logoutContext,
-					((Activity) logoutContext).getString(R.string.userprofilename), "");
-			SharedPrefUtils.writeToSharedPref(logoutContext,
-					((Activity) logoutContext).getString(R.string.userpic), "");
-			
-			myplexapplication.getUserProfileInstance().setLoginStatus(false);
-			myplexapplication.getUserProfileInstance().setName("");
-			myplexapplication.getUserProfileInstance().setProfilePic("");
-			((Activity) logoutContext).finish();
-			Util.launchActivity(LoginActivity.class,((Activity) logoutContext) , null);
-		}
-		else 
+		if(username!=null)
 		{
 			showProgressBar();
 
@@ -115,8 +97,28 @@ public class LogOutUtil {
 
 		}
 		
+		myplexapplication.getUserProfileInstance().lastVisitedCardData.clear();
+		myplexapplication.getUserProfileInstance().joinedDate="NA";
+		myplexapplication.getUserProfileInstance().lastVisitedDate="NA";
 		
+		Util.serializeData(logoutContext);
 		
+		//Util.showToast("Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),logoutContext);
+		SharedPrefUtils.writeToSharedPref(logoutContext,
+				((Activity) logoutContext).getString(R.string.devusername), "");
+		SharedPrefUtils.writeToSharedPref(logoutContext,
+				((Activity) logoutContext).getString(R.string.devpassword),"");
+		SharedPrefUtils.writeToSharedPref(logoutContext,
+				((Activity) logoutContext).getString(R.string.userprofilename), "");
+		SharedPrefUtils.writeToSharedPref(logoutContext,
+				((Activity) logoutContext).getString(R.string.userpic), "");
+		
+		myplexapplication.getUserProfileInstance().setLoginStatus(false);
+		myplexapplication.getUserProfileInstance().setName("");
+		myplexapplication.getUserProfileInstance().setProfilePic("");
+
+		((Activity) logoutContext).finish();
+		Util.launchActivity(LoginActivity.class,((Activity) logoutContext) , null);
 	}
 	public static void twitterlogOut(){
 		SharedPreferences prefs = logoutContext.getSharedPreferences("TWITTERTIME", 0);
@@ -180,28 +182,7 @@ public class LogOutUtil {
 						}
 //						Util.showToast("Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),logoutContext);
 					}
-					myplexapplication.getUserProfileInstance().lastVisitedCardData.clear();
-					myplexapplication.getUserProfileInstance().joinedDate="NA";
-					myplexapplication.getUserProfileInstance().lastVisitedDate="NA";
-					
-					Util.serializeData(logoutContext);
-					
-					//Util.showToast("Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),logoutContext);
-					SharedPrefUtils.writeToSharedPref(logoutContext,
-							((Activity) logoutContext).getString(R.string.devusername), "");
-					SharedPrefUtils.writeToSharedPref(logoutContext,
-							((Activity) logoutContext).getString(R.string.devpassword),"");
-					SharedPrefUtils.writeToSharedPref(logoutContext,
-							((Activity) logoutContext).getString(R.string.userprofilename), "");
-					SharedPrefUtils.writeToSharedPref(logoutContext,
-							((Activity) logoutContext).getString(R.string.userpic), "");
-					
-					myplexapplication.getUserProfileInstance().setLoginStatus(false);
-					myplexapplication.getUserProfileInstance().setName("");
-					myplexapplication.getUserProfileInstance().setProfilePic("");
-
-					((Activity) logoutContext).finish();
-					Util.launchActivity(LoginActivity.class,((Activity) logoutContext) , null);
+				
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

@@ -319,7 +319,7 @@ public class Util {
 			}
 		}
 	}
-	public static long startDownload(String aUrl,CardData aMovieData,Context mContext)
+	public static String startDownload(String aUrl,CardData aMovieData,Context mContext)
 	{
 		long lastDownloadId=-1L;
 		String aMovieName=aMovieData.generalInfo.title;
@@ -386,7 +386,7 @@ public class Util {
 		myplexapplication.mDownloadList=downloadlist;
 		Util.saveObject(downloadlist, myplexapplication.getApplicationConfig().downloadCardsPath);
 		
-		return lastDownloadId;
+		return downloadData.mDownloadPath;
 	}
 	public static int checkDownloadStatus(String cardId,Context mContext){
 		

@@ -89,6 +89,7 @@ public class FetchDownloadProgress {
 					if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
 						mDownloadData.mCompleted = true;
 						mDownloadData.mPercentage = 100;
+						
 					}else if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_FAILED) {
 						mDownloadData.mCompleted = true;
 						mDownloadData.mPercentage = 0;
@@ -97,6 +98,9 @@ public class FetchDownloadProgress {
 						final int dl_progress = (int) ((bytes_downloaded * 100) / bytes_total);
 						mDownloadData.mCompleted = false;
 						mDownloadData.mPercentage = dl_progress;
+						long mb=1024L*1024L;
+						mDownloadData.mDownloadedBytes=(double)bytes_downloaded/mb;
+						mDownloadData.mDownloadTotalSize=(double)bytes_total/mb;
 						continuePolling = true;
 					}
 					Log.d(TAG,"Download information for "+mDownloadData.mDownloadId+" isCompleted = "+mDownloadData.mCompleted+" percentage = "+mDownloadData.mPercentage);
