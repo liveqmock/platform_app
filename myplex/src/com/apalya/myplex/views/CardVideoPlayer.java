@@ -148,6 +148,8 @@ public class CardVideoPlayer implements PlayerListener {
 		mTrailerButton = (TextView)v.findViewById(R.id.cardmediasubitemtrailer_play);
 		mTrailerButton.setTypeface(FontUtil.ss_symbolicons_line);
 		
+		mTrailerButton.setVisibility(mTrailerAvailable == true ? View.VISIBLE : View.GONE);
+		
 		mTrailerButton.setOnClickListener(new OnClickListener() {
 					
 					@Override

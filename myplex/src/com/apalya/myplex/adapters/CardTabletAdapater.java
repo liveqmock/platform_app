@@ -1,6 +1,7 @@
 package com.apalya.myplex.adapters;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -31,6 +32,7 @@ import com.apalya.myplex.data.CardDataHolder;
 import com.apalya.myplex.data.CardDataImagesItem;
 import com.apalya.myplex.data.CardDataPackagePriceDetailsItem;
 import com.apalya.myplex.data.CardDataPackages;
+import com.apalya.myplex.data.CardDownloadData;
 import com.apalya.myplex.data.CardImageView;
 import com.apalya.myplex.data.CardViewHolder;
 import com.apalya.myplex.data.CardViewMeta;
@@ -72,6 +74,59 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 	}
 	public void setCardActionListener(CardActionListener listener) {
 		this.mCardActionListener = listener;
+	}
+	
+//	private CardDownloadData mDownloadData = null;
+//	private CardData mCardDatatoUpdate = null;
+	private HashMap<CardData,CardDownloadData> mDownloaddataMap = new HashMap<CardData, CardDownloadData>();
+	
+	public void setDownloadStatus(CardData data,CardDownloadData downloadData)
+	{
+		mDownloaddataMap.put(data,downloadData);
+//		mCardDatatoUpdate = data;
+//		mDownloadData = downloadData;
+	}
+	
+	private void updateDownloadStatus(CardData data,CardDownloadData downloadData,View v){
+		CardDownloadData localDownloadData;
+		if(myplexapplication.mDownloadList == null || data ==null){
+			return;
+		}
+		localDownloadData = myplexapplication.mDownloadList.mDownloadedList.get(data._id); 
+		if(localDownloadData == null){
+			return;
+		}
+		int index = -1;
+		index = mDataList.indexOf(data);
+		Log.e(TAG, "updateData " +index);
+		if(index == -1){return;}
+		if(v == null){
+			return;
+		}
+		CardDataHolder dataHolder = (CardDataHolder)v.getTag();
+		if(dataHolder == null){
+			return;
+		}
+		if(downloadData != null){
+			localDownloadData = downloadData;
+		}
+		dataHolder.mESTDownloadStatus.setVisibility(View.VISIBLE);
+		if(!localDownloadData.mCompleted){
+			dataHolder.mESTDownloadStatus.setText("Downloading "+localDownloadData.mPercentage+" %");
+			dataHolder.mESTDownloadBar.setVisibility(View.VISIBLE);
+			dataHolder.mESTDownloadBar.setProgress(localDownloadData.mPercentage);
+		}else{
+			dataHolder.mESTDownloadBar.setVisibility(View.INVISIBLE);
+			if(localDownloadData.mPercentage==0)
+			{
+				dataHolder.mESTDownloadStatus.setText("Download Failed");
+			}
+			else
+			{
+				dataHolder.mESTDownloadStatus.setText("Download Complete");	
+			}
+			
+		}
 	}
 	@Override
 	public int getCount() {
@@ -118,8 +173,8 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 			dataHolder.mRentLayout = (RelativeLayout)v.findViewById(R.id.card_rent_layout);
 			dataHolder.mRentText = (TextView)v.findViewById(R.id.card_rent_text);
 			dataHolder.mFavProgressBar = (ProgressBar) v.findViewById(R.id.card_title_fav_progress);
-//			dataHolder.mESTDownloadBar = (ProgressBar) v.findViewById(R.id.card_eststatus);
-//			dataHolder.mESTDownloadStatus = (TextView) v.findViewById(R.id.card_eststatus_text);
+			dataHolder.mESTDownloadBar = (ProgressBar) v.findViewById(R.id.card_download_progressBar);
+			dataHolder.mESTDownloadStatus = (TextView) v.findViewById(R.id.card_download_status);
 			dataHolder.mFavProgressBar.getIndeterminateDrawable().setColorFilter(0xFF54B5E9, android.graphics.PorterDuff.Mode.MULTIPLY);
 			// fonts
 			Random rnd = new Random();
@@ -135,7 +190,7 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 			dataHolder.mCommentsText.setTypeface(FontUtil.Roboto_Medium);
 			dataHolder.mReviewsText.setTypeface(FontUtil.Roboto_Medium);
 			
-//			dataHolder.mESTDownloadStatus.setTypeface(FontUtil.Roboto_Medium);
+			dataHolder.mESTDownloadStatus.setTypeface(FontUtil.Roboto_Medium);
 			dataHolder.mDelete.setTypeface(FontUtil.ss_symbolicons_line);
 			dataHolder.mFavourite.setTypeface(FontUtil.ss_symbolicons_line);
 			dataHolder.mComments.setTypeface(FontUtil.ss_symbolicons_line);
@@ -249,7 +304,8 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 				}	
 			}
 		}
-//		updateDownloadStatus(data);
+		if(mDownloaddataMap.containsKey(data))
+			updateDownloadStatus(data,mDownloaddataMap.get(data),v);
 		return v;
 	}
 	private CardItemClickListener mDeleteListener = new CardItemClickListener() {
@@ -330,9 +386,6 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 				mCardActionListener.loadmore(mNumberofItems);
 				mLoadMoreLastCalledNumberofItems = mNumberofItems;
 			}
-			/*if(mDataList.size() > currentSelectedIndex){
-				mCardActionListener.selectedCard(mDataList.get(currentSelectedIndex),currentSelectedIndex);
-			}*/
 		}
 		
 	}

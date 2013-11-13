@@ -1,5 +1,7 @@
 package com.apalya.myplex.utils;
 
+import java.util.List;
+
 import android.app.DownloadManager;
 import android.content.Context;
 import android.database.Cursor;
@@ -17,6 +19,7 @@ public class FetchDownloadProgress {
 	public static final String TAG = "FetchDownloadProgress";
 	private Context mContext;
 	private CardData mCardData;
+	private List<CardData> mCardDatalist;
 	private DownloadProgressStatus mListener;
 	private DownloadManager mDownloadManager;
 	private CardDownloadData mDownloadData;
@@ -53,6 +56,17 @@ public class FetchDownloadProgress {
 		Log.d(TAG,"size of list"+myplexapplication.mDownloadList.mDownloadedList.size());
 		mDownloadData = myplexapplication.mDownloadList.mDownloadedList.get(mCardData._id);
 		mPollingHandler.sendEmptyMessage(CONTINUE_POLLING);
+	}
+	
+	public void startPolling(List<CardData> data){
+		
+		if(myplexapplication.mDownloadList == null){
+			return;
+		}
+		Log.d(TAG,"Download startPolling ");
+		mStopPolling = false;
+		mCardDatalist = data;
+		mPollingHandlerMultiple.sendEmptyMessage(CONTINUE_POLLING);
 	}
 
 	private static final int CONTINUE_POLLING = -1;
@@ -107,6 +121,77 @@ public class FetchDownloadProgress {
 					cursor.close();
 					if(mListener != null && !mStopPolling){
 						mListener.DownloadProgress(mCardData, mDownloadData);
+					}
+				} catch (Exception e) {
+					Log.d(TAG,"handleMessage4");
+					// TODO: handle exception
+				}
+				if(continuePolling){
+					sendEmptyMessage(CONTINUE_POLLING);
+				}
+				break;
+			}
+			case POLLING_ABORT: {
+				break;
+			}
+			}
+		}
+	};
+
+	private Handler mPollingHandlerMultiple = new Handler(Looper.getMainLooper()) {
+
+		@Override
+		public void handleMessage(Message msg) {
+			Log.d(TAG,"handleMessage");
+			if(mStopPolling){
+				return;
+			}
+			switch (msg.what) {
+			case CONTINUE_POLLING: {
+				Log.d(TAG,"handleMessage1");
+				boolean continuePolling = false;
+				try {
+					Log.d(TAG,"size of list"+myplexapplication.mDownloadList.mDownloadedList.size());
+					for (CardData data : mCardDatalist) {
+						CardDownloadData downloadData = myplexapplication.mDownloadList.mDownloadedList.get(data._id);
+						if(downloadData == null || downloadData.mDownloadId == -1)
+						{
+							continue;
+						}
+						Log.d(TAG,"handleMessageMultiple");
+						DownloadManager.Query q = new DownloadManager.Query();
+						Log.d(TAG,"Download information for "+downloadData.mDownloadId);
+						q.setFilterById(downloadData.mDownloadId);
+						Cursor cursor = mDownloadManager.query(q);
+						if(cursor == null){
+							return;
+						}
+						cursor.moveToFirst();
+						long bytes_downloaded = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+						long bytes_total = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+
+						if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
+							downloadData.mCompleted = true;
+							downloadData.mPercentage = 100;
+						}else if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_FAILED) {
+							downloadData.mCompleted = true;
+							downloadData.mPercentage = 0;
+						}
+						else{
+							final int dl_progress = (int) ((bytes_downloaded * 100) / bytes_total);
+							downloadData.mCompleted = false;
+							downloadData.mPercentage = dl_progress;
+						long mb=1024L*1024L;
+						downloadData.mDownloadedBytes=(double)bytes_downloaded/mb;
+						downloadData.mDownloadTotalSize=(double)bytes_total/mb;
+
+							continuePolling = true;
+						}
+						Log.d(TAG,"Download information for "+downloadData.mDownloadId+" isCompleted = "+downloadData.mCompleted+" percentage = "+downloadData.mPercentage);
+						cursor.close();
+						if(mListener != null && !mStopPolling){
+							mListener.DownloadProgress(data, downloadData);
+						}
 					}
 				} catch (Exception e) {
 					Log.d(TAG,"handleMessage4");

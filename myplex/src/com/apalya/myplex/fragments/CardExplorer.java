@@ -73,6 +73,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	public CardData mSelectedCard = null;
 	private String screenName;
 	private LinearLayout mStackFrame;
+	private HashMap<CardData,Integer> mDownloadTracker= new HashMap<CardData,Integer>();
+	private boolean mRefreshOnce = false;
 	
 	@Override
 	public void open(CardData object) {
@@ -433,6 +435,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		}
 		updateText("preparing ui");
 		if(getResources() != null && getResources().getBoolean(R.bool.isTablet)){
+				startPolling(mData.mMasterEntries);
 				mTabletAdapter.setData(mData.mMasterEntries);
 		}else{
 			mCardView.addData(mData.mMasterEntries);
@@ -535,6 +538,16 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			}
 			mDownloadProgressManager.setDownloadProgressListener(this);
 			mDownloadProgressManager.startPolling(data);
+		}
+	}
+	
+	private void startPolling(List<CardData> datalist) {
+		if(mData.requestType == CardExplorerData.REQUEST_DOWNLOADS){
+			if(mDownloadProgressManager == null){
+				mDownloadProgressManager = new FetchDownloadProgress(getContext());
+			}
+			mDownloadProgressManager.setDownloadProgressListener(this);
+			mDownloadProgressManager.startPolling(datalist);
 		}
 	}
 	@Override
@@ -691,6 +704,20 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	public void DownloadProgress(CardData cardData,
 			CardDownloadData downloadData) {
 		if(getResources() != null && getResources().getBoolean(R.bool.isTablet)){
+			Log.i(TAG, "DownloadProgress");
+			mTabletAdapter.setDownloadStatus(cardData,downloadData);
+			
+			//Refresh only when download percentage has changed to avoid continuus drawing
+			if(!mRefreshOnce)
+			{
+				mRefreshOnce = true;
+				mTabletAdapter.notifyDataSetChanged();
+			}
+			if(mDownloadTracker.containsKey(cardData) && mDownloadTracker.get(cardData) != downloadData.mPercentage)
+			{
+				mDownloadTracker.put(cardData, downloadData.mPercentage);
+				mTabletAdapter.notifyDataSetChanged();
+			}
 			
 		}else{
 			mCardView.updateDownloadStatus(cardData,downloadData);
