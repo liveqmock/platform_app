@@ -3,7 +3,7 @@ package com.apalya.myplex.utils;
 import com.apalya.myplex.data.myplexapplication;
 
 public class ConsumerApi {
-	public static String DOMAIN = "api-beta.myplex.in";
+	public static String DOMAIN = "api.myplex.com";
 	public static final String SEARCH_ACTION = "search";
 	public static final String CONTENTLIST = "contentList";
 	public static final String TAG_ACTION = "tags";
