@@ -567,7 +567,10 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 					retriever.setDataSource(mUri.toString());
 				}
 				catch (IllegalArgumentException ex) {
-					ex.printStackTrace();
+					Log.e(TAG, "deregisteronBufferingUpdate IllegalArgumentException");
+				}
+				catch (Exception e) {
+					Log.e(TAG, "deregisteronBufferingUpdate Exception");
 				}
 			}
 

@@ -85,6 +85,8 @@ public class CardVideoPlayer implements PlayerListener {
 	private Uri mVideoUri ;
 	private boolean mTrailerAvailable = false;
 	
+	private static final String TAG = "CardVideoPlayer";
+	
 
 	public void setFullScreenListener(PlayerFullScreen mListener){
 		this.mPlayerFullScreen = mListener;
@@ -150,6 +152,14 @@ public class CardVideoPlayer implements PlayerListener {
 		
 		mTrailerButton.setVisibility(mTrailerAvailable == true ? View.VISIBLE : View.GONE);
 		
+		int[] location = new int[2];
+		mTrailerButton.getLocationOnScreen(location);
+		if(location.length >0)
+		{
+			Log.i(TAG, "Toast pos, X:"+mTrailerButton.getBottom()+5+" Y:"+location[1]+10);
+			//Util.showToastAt(mContext, "Play Trailer", Util.TOAST_TYPE_INFO, Gravity.TOP|Gravity.LEFT,mTrailerButton.getBottom()+5, location[1]+10);
+		}
+
 		mTrailerButton.setOnClickListener(new OnClickListener() {
 					
 					@Override
@@ -610,6 +620,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		mTrailerButton = (TextView)v.findViewById(R.id.cardmediasubitemtrailer_play);
 		mTrailerButton.setTypeface(FontUtil.ss_symbolicons_line);
 		mTrailerButton.setVisibility(mTrailerAvailable == true ? View.VISIBLE : View.GONE);
+		
 		mTrailerButton.setOnClickListener(new OnClickListener() {
 			
 			@Override
