@@ -109,8 +109,7 @@ public class GZipRequest extends Request<String> {
 	        } catch (UnsupportedEncodingException e) {
 	            parsed = new String(response.data);
 	        }catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+	        	parsed = new String(response.data);
 			}
 	        if(mShowLogs){
 	        	Log.d(TAG,"Response :: " +parsed);

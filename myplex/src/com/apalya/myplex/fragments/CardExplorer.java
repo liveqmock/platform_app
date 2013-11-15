@@ -38,6 +38,7 @@ import com.apalya.myplex.adapters.NavigationOptionsMenuAdapter;
 import com.apalya.myplex.cache.CacheManager;
 import com.apalya.myplex.cache.IndexHandler;
 import com.apalya.myplex.data.CardData;
+import com.apalya.myplex.data.CardDataGenralInfo;
 import com.apalya.myplex.data.CardDataGenre;
 import com.apalya.myplex.data.CardDownloadData;
 import com.apalya.myplex.data.CardExplorerData;
@@ -210,6 +211,30 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		return mRootView;
 	}
 
+	public void addCustomFavourites()
+	{
+		CardData addfav = new CardData();
+		addfav._id = "257";
+		addfav.generalInfo = new CardDataGenralInfo();
+		addfav.generalInfo.title = "Bad Boys";
+		addfav.generalInfo.type = "favourite";
+		favouriteAction(addfav,FavouriteUtil.FAVOURITEUTIL_ADD);
+		
+		addfav = new CardData();
+		addfav._id = "258";
+		addfav.generalInfo = new CardDataGenralInfo();
+		addfav.generalInfo.title = "Pursuit of happyness";
+		addfav.generalInfo.type = "favourite";
+		favouriteAction(addfav,FavouriteUtil.FAVOURITEUTIL_ADD);
+		
+		addfav = new CardData();
+		addfav._id = "260";
+		addfav.generalInfo = new CardDataGenralInfo();
+		addfav.generalInfo.title = "Hitch";
+		addfav.generalInfo.type = "favourite";
+		favouriteAction(addfav,FavouriteUtil.FAVOURITEUTIL_ADD);
+	}
+	
 	public void delayedAction() {
 		Handler h = new Handler(Looper.getMainLooper());
 		h.post(new Runnable() {
