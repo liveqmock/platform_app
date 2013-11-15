@@ -377,7 +377,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			mPlusClient.connect();
 
 		}*/
-		//CheckUserStatus();
+		
 
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -434,6 +434,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			}
 		});
 		
+		CheckUserStatus();
 		//Check if Keyboard is visible or not
 		//mRootLayout = findViewById(R.id.rootlayout);  
 
@@ -718,7 +719,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			throw new RuntimeException("Could not encode hour of the day in JSON");
 		}
 
-		CheckUserStatus();
+		
 
 		/*if(isAuthTwitter())
 		{

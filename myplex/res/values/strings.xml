@@ -25,7 +25,7 @@
     <string name="uName">Username:</string>
     <string name="msgUpdate">Receive SMS Updates</string>
     <string name="mailUpdate">Receive Mail Updates</string>
-    <string name="signup">Create Account</string>
+    <string name="signup">Join myplex</string>
     <string name="submit">Continue to Myplex</string>
     <string name="hinttextemail">"Email address / phone number"</string>
     <string name="hinttextphone">10 digit mobile number</string>
