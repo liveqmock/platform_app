@@ -105,6 +105,7 @@ public class Util {
 
 	public final static int TOAST_TYPE_INFO = 1;
 	public final static int TOAST_TYPE_ERROR = 2;
+	public final static String downloadStoragePath="/sdcard/Android/data/com.apalya.myplex/files/";
 	public static void showToast(Context context,String msg,int type){
 		if(context == null){return;}
 		try {
@@ -329,6 +330,16 @@ public class Util {
 				aMsg, 
 				Toast.LENGTH_LONG).show();
 	}
+	public static boolean isFileExist(String fileName){
+		// Get path for the file on external storage.  If external
+	    // storage is not currently mounted this will fail.
+	    File file = new File(downloadStoragePath, fileName);
+	    if (file != null) {
+	        return file.exists();
+	    }
+	    return false;
+
+	}
 	public static void removeDownload(long id,Context mContext){
 		if(isDownloadManagerAvailable(mContext))
 		{
@@ -336,14 +347,36 @@ public class Util {
 			// get download service and enqueue file
 			DownloadManager manager = (DownloadManager) mContext.getSystemService(Context.DOWNLOAD_SERVICE);
 			manager.remove(id);
+			Uri path=manager.getUriForDownloadedFile(id);
+			if(path!=null)
+			{
+				File file = new File(path.toString());
+			    if (file != null) {
+			        file.delete();
+			    }
+
+			}
+				
 			}
 			catch(Exception e){
 				e.printStackTrace();
 			}
 		}
 	}
+	
+	public static long getSpaceAvailable(){
+		long bytes=0;
+		File file = new File(Environment.getExternalStorageDirectory().getPath());
+	    if (file != null) {
+	    	long gb=1024L*1024L*1024L;
+	    	bytes=file.getFreeSpace()/gb;
+	    }
+	    return bytes;
+	}
+	
 	public static String startDownload(String aUrl,CardData aMovieData,Context mContext)
 	{
+		
 		long lastDownloadId=-1L;
 		String aMovieName=aMovieData.generalInfo.title;
 		
@@ -377,6 +410,8 @@ public class Util {
 							.setDescription(aMovieName)
 							.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN)
 							.setDestinationInExternalFilesDir(mContext, "", aMovieName+".wvm"));
+			
+			
 			if(lastDownloadId>0)
 			{
 				Util.showToast(mContext, "Your download has been started, Please check download status in Downloads section.",Util.TOAST_TYPE_INFO);
@@ -404,7 +439,8 @@ public class Util {
 		
 		CardDownloadData downloadData= new CardDownloadData();
 		downloadData.mDownloadId=lastDownloadId;
-		downloadData.mDownloadPath=mContext.getExternalFilesDir(null).getPath() +"/"+aMovieName+".wvm";
+		downloadData.mDownloadPath="file://"+downloadStoragePath+aMovieName+".wvm";
+		//downloadData.mDownloadPath=mContext.getExternalFilesDir(null).getPath() +"/"+aMovieName+".wvm";
 		downloadlist.mDownloadedList.put(aMovieData._id, downloadData);
 		myplexapplication.mDownloadList=downloadlist;
 		Util.saveObject(downloadlist, myplexapplication.getApplicationConfig().downloadCardsPath);
