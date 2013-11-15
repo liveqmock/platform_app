@@ -126,6 +126,29 @@ public class Util {
 			// TODO: handle exception
 		}
 	}
+	
+	public static void showToastAt(Context context,String msg,int type, int gravity, int xOffset, int yOffset){
+		if(context == null){return;}
+		try {
+			Toast toast = new Toast(context);
+			LayoutInflater inflate = LayoutInflater.from(context);
+			View v = inflate.inflate(R.layout.toastlayout, null);
+			TextView header = (TextView)v.findViewById(R.id.toast_type);
+			header.setTypeface(FontUtil.ss_symbolicons_line);
+			TextView message = (TextView)v.findViewById(R.id.toast_text);
+			message.setTypeface(FontUtil.Roboto_Medium);
+			if(type == TOAST_TYPE_ERROR){
+				header.setText(R.string.toast_warning);
+			}
+			message.setText(msg);
+			toast.setGravity(gravity, xOffset, yOffset);
+			toast.setView(v);
+			toast.setDuration(Toast.LENGTH_SHORT);
+			toast.show();
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
 
 	public static int getStatusBarHeight(Context context) {
 		if(context == null){return 48;}
@@ -860,6 +883,18 @@ public class Util {
 		boolean isWiFi = activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
 		return isWiFi;
 	}
+	
+	public static boolean isNetworkAvailable(Context mContext)
+	{
+		ConnectivityManager cm = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+		if(cm == null)
+			return false;
+		NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+		if(networkInfo !=null && networkInfo.isAvailable())
+			return true;
+		return false;
+	}
+	
 	public static void saveObject(Object obj,String path) {		try {			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(path))); 			oos.writeObject(obj); 			oos.flush(); 			oos.close();		} catch (Exception ex) {			Log.v("Util", ex.getMessage());			ex.printStackTrace();		}	}	public static Object loadObject(String path) {		try {			File f = new File(path);			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(f));			Object o = ois.readObject();			return o;		} catch (Exception ex) {			Log.v("Util", ex.getMessage());			ex.printStackTrace();		}		return null;	}
 	
 	public static long dirSize(File dir) {

@@ -200,7 +200,10 @@ public class SearchActivity extends BaseFragment implements
 				Analytics.trackEvent(Analytics.SearchQuery,params);
 			}
 			mSearchQuery = searchQuery;
-			mCacheManager.getCardDetails(searchString, IndexHandler.OperationType.DONTSEARCHDB, SearchActivity.this);
+			IndexHandler.OperationType searchType = IndexHandler.OperationType.DONTSEARCHDB;
+			if(!Util.isNetworkAvailable(mContext))
+				searchType = IndexHandler.OperationType.FTSEARCH;
+			mCacheManager.getCardDetails(searchString, searchType, SearchActivity.this);
 
 		}
 	};
@@ -233,8 +236,10 @@ public class SearchActivity extends BaseFragment implements
 			Analytics.trackEvent(Analytics.SearchQuery,params);
 		}
 		mSearchQuery = searchQuery;
-		mCacheManager.getCardDetails(searchString, IndexHandler.OperationType.DONTSEARCHDB, SearchActivity.this);
-
+		IndexHandler.OperationType searchType = IndexHandler.OperationType.DONTSEARCHDB;
+		if(!Util.isNetworkAvailable(mContext))
+			searchType = IndexHandler.OperationType.FTSEARCH;
+		mCacheManager.getCardDetails(searchString, searchType, SearchActivity.this);
 	}
 
 	// Boolean true to add, false to remove
