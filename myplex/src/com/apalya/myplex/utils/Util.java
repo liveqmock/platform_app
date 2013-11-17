@@ -33,10 +33,12 @@ import android.animation.Animator.AnimatorListener;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -106,6 +108,9 @@ public class Util {
 	public final static int TOAST_TYPE_INFO = 1;
 	public final static int TOAST_TYPE_ERROR = 2;
 	public final static String downloadStoragePath="/sdcard/Android/data/com.apalya.myplex/files/";
+	
+	
+	
 	public static void showToast(Context context,String msg,int type){
 		if(context == null){return;}
 		try {
@@ -447,57 +452,7 @@ public class Util {
 		
 		return downloadData.mDownloadPath;
 	}
-	public static int checkDownloadStatus(String cardId,Context mContext){
-		
-		
-		CardDownloadedDataList downloadlist =  null;
-		try {
-			downloadlist = (CardDownloadedDataList) Util.loadObject(myplexapplication.getApplicationConfig().downloadCardsPath);	
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
-		
-		if(downloadlist!=null)
-		{
-			if(downloadlist.mDownloadedList.get(cardId)!=null){
-				if(downloadlist.mDownloadedList.get(cardId).mCompleted)
-					return 1;
-				else
-				return 2;
-			}
-			
-		}
-		return 0;
 	
-		
-		/*Map<String, Long> ids=myplexapplication.getUserProfileInstance().downloadMap;
-		if(ids.get(cardId)==null){
-			return 0;
-		}*/
-		
-/*		final long dwnlId=ids.get(cardId);
-		
-		final DownloadManager manager = (DownloadManager) mContext.getSystemService(Context.DOWNLOAD_SERVICE);
-
-		new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-					int dStatus;
-					DownloadManager.Query q = new DownloadManager.Query();
-					q.setFilterById(dwnlId);
-
-					Cursor cursor = manager.query(q);
-					cursor.moveToFirst();
-					dStatus=cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
-					cursor.close();
-					
-			}
-			
-		}).start();*/
-		//return 1;
-		
-	}
 	public static void InviteFriends(final Context mContext) {
 
 		if(Session.getActiveSession()!=null)
@@ -776,7 +731,7 @@ public class Util {
 						SharedPrefUtils.writeToSharedPref(mContext,
 								mContext.getString(R.string.devclientkeyexp), jsonResponse.getString("expiresAt"));
 
-
+						//Util.showToast(mContext,"Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),Util.TOAST_TYPE_ERROR);
 					}
 					else
 					{
@@ -790,7 +745,7 @@ public class Util {
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
 						
-						Util.showToast(mContext,"Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),Util.TOAST_TYPE_ERROR);
+						//Util.showToast(mContext,"Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),Util.TOAST_TYPE_ERROR);
 //						Util.showToast("Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),mContext);
 					}
 				} catch (JSONException e) {

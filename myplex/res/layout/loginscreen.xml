@@ -79,7 +79,7 @@
             android:paddingBottom="6dp"
             android:paddingLeft="32dp"
             android:paddingTop="6dp"
-            android:text="create account"
+            android:text="@string/signup"
             android:textColor="#9f9f9f" />
 
         <LinearLayout

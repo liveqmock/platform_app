@@ -49,6 +49,7 @@ import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.listboxanimation.OnDismissCallback;
 import com.apalya.myplex.tablet.TabletCardDetails;
+import com.apalya.myplex.utils.AlertDialogUtil;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FavouriteUtil;
@@ -62,7 +63,7 @@ import com.apalya.myplex.views.PackagePopUp;
 import com.fasterxml.jackson.core.JsonParseException;
 
 public class CardExplorer extends BaseFragment implements CardActionListener,CacheManagerCallback,DownloadProgressStatus,
-		OnDismissCallback {
+		OnDismissCallback, AlertDialogUtil.NoticeDialogListener {
 	public static final String TAG = "CardExplorer";
 	private CardView mCardView;
 	private GridView mGridView;
@@ -375,7 +376,21 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		}
 		dismissProgressBar();
 		if(mData.mMasterEntries.size() == 0){
-			Util.showToast(getContext(),"No data found,Please try again.",Util.TOAST_TYPE_INFO);
+			
+			String msg="No Results Found, Continue using...";
+			if(mData.requestType == CardExplorerData.REQUEST_FAVOURITE){
+				msg="No Favourites... \nUse <heart> symbol on any card to add some titles here.";
+			}else if(mData.requestType == CardExplorerData.REQUEST_PURCHASES){
+				msg="No purchased content … \nLet's change that!";
+			}else if(mData.requestType == CardExplorerData.REQUEST_SEARCH){
+				msg="Unable to find results … \nTry one of our suggested search terms?";
+			}else if(mData.requestType == CardExplorerData.REQUEST_DOWNLOADS){
+				msg="No Downloads yet… \nLet's start one, can watch it while downloading itself";
+			}
+			
+			AlertDialogUtil.showAlert(mContext, msg, "Cancel", "Discover trending content?", this);
+			
+			//Util.showToast(getContext(),"No data found,Please try again.",Util.TOAST_TYPE_INFO);
 //			Toast.makeText(getContext(), "No data found,Please try again.", Toast.LENGTH_SHORT).show();
 		}
 	}
@@ -417,6 +432,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 					sort(mData.mMasterEntries);
 					return;
 				}
+				mMainActivity.setActionBarTitle(label);
 				ArrayList<CardData> localData = new ArrayList<CardData>();
 				for (CardData data : mData.mMasterEntries) {
 					boolean itemPresent = false;
@@ -473,7 +489,19 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	}
 
 	private void showErrorDialog() {
-		Util.showToast(getContext(), "No Response from server", Util.TOAST_TYPE_INFO);
+		String msg="No Results Found, Continue using...";
+		if(mData.requestType == CardExplorerData.REQUEST_FAVOURITE){
+			msg="No Favourites... \nUse <heart> symbol on any card to add some titles here.";
+		}else if(mData.requestType == CardExplorerData.REQUEST_PURCHASES){
+			msg="No purchased content … \nLet's change that!";
+		}else if(mData.requestType == CardExplorerData.REQUEST_SEARCH){
+			msg="Unable to find results … \nTry one of our suggested search terms?";
+		}else if(mData.requestType == CardExplorerData.REQUEST_DOWNLOADS){
+			msg="No Downloads yet… \nLet's start one, can watch it while downloading itself";
+		}
+		
+		AlertDialogUtil.showAlert(mContext, msg, "Cancel", "Discover trending content?", this);
+		//Util.showToast(getContext(), "No Response from server", Util.TOAST_TYPE_INFO);
 //		AlertDialog.Builder b = new AlertDialog.Builder(getContext());
 //		b.setMessage("No Response from server");
 //		b.show();
@@ -747,6 +775,28 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		}else{
 			mCardView.updateDownloadStatus(cardData,downloadData);
 		}
+		
+	}
+
+	@Override
+	public void onDialogOption2Click() {
+		// TODO Auto-generated method stub
+		
+		CardExplorerData dataBundle = myplexapplication.getCardExplorerData();
+
+		dataBundle.reset();
+		dataBundle.requestType = CardExplorerData.REQUEST_RECOMMENDATION;
+		
+		BaseFragment fragment = mMainActivity
+				.createFragment(NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION);
+		mMainActivity.setActionBarTitle("myplex");
+		mMainActivity.bringFragment(fragment);
+		
+	}
+
+	@Override
+	public void onDialogOption1Click() {
+		// TODO Auto-generated method stub
 		
 	}
 }
