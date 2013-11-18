@@ -1,5 +1,6 @@
 package com.apalya.myplex.adapters;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -111,8 +112,19 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 			localDownloadData = downloadData;
 		}
 		dataHolder.mESTDownloadStatus.setVisibility(View.VISIBLE);
+		dataHolder.mESTDownloadStatus.setTextSize(16f);
 		if(!localDownloadData.mCompleted){
-			dataHolder.mESTDownloadStatus.setText("Downloading "+localDownloadData.mPercentage+" %");
+			if(localDownloadData.mDownloadedBytes==0)
+			{
+				dataHolder.mESTDownloadStatus.setText("Downloading "+localDownloadData.mPercentage+" %");
+			}
+			else
+			{
+				DecimalFormat dec = new DecimalFormat("0.00");
+				dataHolder.mESTDownloadStatus.setTextSize(12f);
+				dataHolder.mESTDownloadStatus.setText(dec.format(localDownloadData.mDownloadedBytes)+"MB / "+dec.format(localDownloadData.mDownloadTotalSize)+"MB   "+localDownloadData.mPercentage+" %");
+				
+			}
 			dataHolder.mESTDownloadBar.setVisibility(View.VISIBLE);
 			dataHolder.mESTDownloadBar.setProgress(localDownloadData.mPercentage);
 		}else{
@@ -125,7 +137,6 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 			{
 				dataHolder.mESTDownloadStatus.setText("Download Complete");	
 			}
-			
 		}
 	}
 	@Override
@@ -296,7 +307,13 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 						if(mRupeeCode == null){
 							mRupeeCode = mContext.getResources().getString(R.string.price_rupeecode); 
 						}
-						dataHolder.mRentText.setText(mPriceStarts + mRupeeCode + " "+price);
+						if(price == 0)
+						{
+							dataHolder.mRentText.setText("Watch now for Free");
+							dataHolder.mRentLayout.setOnClickListener(null);
+						}
+						else
+							dataHolder.mRentText.setText(mPriceStarts + mRupeeCode + " "+price);
 					}else{
 						dataHolder.mRentText.setText("Free");
 						dataHolder.mRentLayout.setOnClickListener(null);

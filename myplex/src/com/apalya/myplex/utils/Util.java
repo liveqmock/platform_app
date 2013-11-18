@@ -33,10 +33,12 @@ import android.animation.Animator.AnimatorListener;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -105,6 +107,10 @@ public class Util {
 
 	public final static int TOAST_TYPE_INFO = 1;
 	public final static int TOAST_TYPE_ERROR = 2;
+	public final static String downloadStoragePath="/sdcard/Android/data/com.apalya.myplex/files/";
+	
+	
+	
 	public static void showToast(Context context,String msg,int type){
 		if(context == null){return;}
 		try {
@@ -119,6 +125,29 @@ public class Util {
 				header.setText(R.string.toast_warning);
 			}
 			message.setText(msg);
+			toast.setView(v);
+			toast.setDuration(Toast.LENGTH_SHORT);
+			toast.show();
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+	}
+	
+	public static void showToastAt(Context context,String msg,int type, int gravity, int xOffset, int yOffset){
+		if(context == null){return;}
+		try {
+			Toast toast = new Toast(context);
+			LayoutInflater inflate = LayoutInflater.from(context);
+			View v = inflate.inflate(R.layout.toastlayout, null);
+			TextView header = (TextView)v.findViewById(R.id.toast_type);
+			header.setTypeface(FontUtil.ss_symbolicons_line);
+			TextView message = (TextView)v.findViewById(R.id.toast_text);
+			message.setTypeface(FontUtil.Roboto_Medium);
+			if(type == TOAST_TYPE_ERROR){
+				header.setText(R.string.toast_warning);
+			}
+			message.setText(msg);
+			toast.setGravity(gravity, xOffset, yOffset);
 			toast.setView(v);
 			toast.setDuration(Toast.LENGTH_SHORT);
 			toast.show();
@@ -306,6 +335,16 @@ public class Util {
 				aMsg, 
 				Toast.LENGTH_LONG).show();
 	}
+	public static boolean isFileExist(String fileName){
+		// Get path for the file on external storage.  If external
+	    // storage is not currently mounted this will fail.
+	    File file = new File(downloadStoragePath, fileName);
+	    if (file != null) {
+	        return file.exists();
+	    }
+	    return false;
+
+	}
 	public static void removeDownload(long id,Context mContext){
 		if(isDownloadManagerAvailable(mContext))
 		{
@@ -313,14 +352,36 @@ public class Util {
 			// get download service and enqueue file
 			DownloadManager manager = (DownloadManager) mContext.getSystemService(Context.DOWNLOAD_SERVICE);
 			manager.remove(id);
+			Uri path=manager.getUriForDownloadedFile(id);
+			if(path!=null)
+			{
+				File file = new File(path.toString());
+			    if (file != null) {
+			        file.delete();
+			    }
+
+			}
+				
 			}
 			catch(Exception e){
 				e.printStackTrace();
 			}
 		}
 	}
+	
+	public static long getSpaceAvailable(){
+		long bytes=0;
+		File file = new File(Environment.getExternalStorageDirectory().getPath());
+	    if (file != null) {
+	    	long gb=1024L*1024L*1024L;
+	    	bytes=file.getFreeSpace()/gb;
+	    }
+	    return bytes;
+	}
+	
 	public static String startDownload(String aUrl,CardData aMovieData,Context mContext)
 	{
+		
 		long lastDownloadId=-1L;
 		String aMovieName=aMovieData.generalInfo.title;
 		
@@ -354,6 +415,8 @@ public class Util {
 							.setDescription(aMovieName)
 							.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN)
 							.setDestinationInExternalFilesDir(mContext, "", aMovieName+".wvm"));
+			
+			
 			if(lastDownloadId>0)
 			{
 				Util.showToast(mContext, "Your download has been started, Please check download status in Downloads section.",Util.TOAST_TYPE_INFO);
@@ -381,64 +444,15 @@ public class Util {
 		
 		CardDownloadData downloadData= new CardDownloadData();
 		downloadData.mDownloadId=lastDownloadId;
-		downloadData.mDownloadPath=mContext.getExternalFilesDir(null).getPath() +"/"+aMovieName+".wvm";
+		downloadData.mDownloadPath="file://"+downloadStoragePath+aMovieName+".wvm";
+		//downloadData.mDownloadPath=mContext.getExternalFilesDir(null).getPath() +"/"+aMovieName+".wvm";
 		downloadlist.mDownloadedList.put(aMovieData._id, downloadData);
 		myplexapplication.mDownloadList=downloadlist;
 		Util.saveObject(downloadlist, myplexapplication.getApplicationConfig().downloadCardsPath);
 		
 		return downloadData.mDownloadPath;
 	}
-	public static int checkDownloadStatus(String cardId,Context mContext){
-		
-		
-		CardDownloadedDataList downloadlist =  null;
-		try {
-			downloadlist = (CardDownloadedDataList) Util.loadObject(myplexapplication.getApplicationConfig().downloadCardsPath);	
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
-		
-		if(downloadlist!=null)
-		{
-			if(downloadlist.mDownloadedList.get(cardId)!=null){
-				if(downloadlist.mDownloadedList.get(cardId).mCompleted)
-					return 1;
-				else
-				return 2;
-			}
-			
-		}
-		return 0;
 	
-		
-		/*Map<String, Long> ids=myplexapplication.getUserProfileInstance().downloadMap;
-		if(ids.get(cardId)==null){
-			return 0;
-		}*/
-		
-/*		final long dwnlId=ids.get(cardId);
-		
-		final DownloadManager manager = (DownloadManager) mContext.getSystemService(Context.DOWNLOAD_SERVICE);
-
-		new Thread(new Runnable() {
-			
-			@Override
-			public void run() {
-					int dStatus;
-					DownloadManager.Query q = new DownloadManager.Query();
-					q.setFilterById(dwnlId);
-
-					Cursor cursor = manager.query(q);
-					cursor.moveToFirst();
-					dStatus=cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS));
-					cursor.close();
-					
-			}
-			
-		}).start();*/
-		//return 1;
-		
-	}
 	public static void InviteFriends(final Context mContext) {
 
 		if(Session.getActiveSession()!=null)
@@ -717,7 +731,7 @@ public class Util {
 						SharedPrefUtils.writeToSharedPref(mContext,
 								mContext.getString(R.string.devclientkeyexp), jsonResponse.getString("expiresAt"));
 
-
+						//Util.showToast(mContext,"Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),Util.TOAST_TYPE_ERROR);
 					}
 					else
 					{
@@ -731,7 +745,7 @@ public class Util {
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
 						
-						Util.showToast(mContext,"Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),Util.TOAST_TYPE_ERROR);
+						//Util.showToast(mContext,"Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),Util.TOAST_TYPE_ERROR);
 //						Util.showToast("Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),mContext);
 					}
 				} catch (JSONException e) {
@@ -860,6 +874,18 @@ public class Util {
 		boolean isWiFi = activeNetwork.getType() == ConnectivityManager.TYPE_WIFI;
 		return isWiFi;
 	}
+	
+	public static boolean isNetworkAvailable(Context mContext)
+	{
+		ConnectivityManager cm = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+		if(cm == null)
+			return false;
+		NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+		if(networkInfo !=null && networkInfo.isAvailable())
+			return true;
+		return false;
+	}
+	
 	public static void saveObject(Object obj,String path) {		try {			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(path))); 			oos.writeObject(obj); 			oos.flush(); 			oos.close();		} catch (Exception ex) {			Log.v("Util", ex.getMessage());			ex.printStackTrace();		}	}	public static Object loadObject(String path) {		try {			File f = new File(path);			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(f));			Object o = ois.readObject();			return o;		} catch (Exception ex) {			Log.v("Util", ex.getMessage());			ex.printStackTrace();		}		return null;	}
 	
 	public static long dirSize(File dir) {

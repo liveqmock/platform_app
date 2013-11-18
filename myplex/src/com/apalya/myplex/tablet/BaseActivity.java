@@ -53,6 +53,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.apalya.myplex.BaseFragment;
+import com.apalya.myplex.LoginActivity;
 import com.apalya.myplex.MainBaseOptions;
 import com.apalya.myplex.R;
 import com.apalya.myplex.SearchActivity;
@@ -76,6 +77,7 @@ import com.apalya.myplex.utils.Blur;
 import com.apalya.myplex.utils.Blur.BlurResponse;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.LogOutUtil;
+import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.views.PinnedSectionListView;
 import com.facebook.Session;
@@ -400,6 +402,12 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		case NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION:
 			mCardExplorer = new CardExplorer();
 			fragment = mCardExplorer;
+			String username=SharedPrefUtils.getFromSharedPreference(mContext, getString(R.string.devusername));
+			if(username !=null && SharedPrefUtils.getIntFromSharedPreference(mContext, "CustomFav") !=1)
+			{
+				SharedPrefUtils.writeToSharedPref(mContext, "CustomFav", 1);
+				mCardExplorer.addCustomFavourites();
+			}
 			break;
 		case NavigationOptionsMenuAdapter.SEARCH_ACTION:
 			mSearchActivity = new SearchActivity();

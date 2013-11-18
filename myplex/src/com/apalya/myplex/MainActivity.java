@@ -80,6 +80,7 @@ import com.apalya.myplex.utils.MessagePost.MessagePostCallback;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.LastWatchedCardDetails;
 import com.apalya.myplex.utils.LogOutUtil;
+import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.views.PinnedSectionListView;
 import com.apalya.myplex.views.RatingDialog;
@@ -472,7 +473,6 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		super.onBackPressed();
 
 	}
-
 	public BaseFragment createFragment(int fragmentType) {
 		BaseFragment fragment;
 		switch (fragmentType) {
@@ -483,6 +483,12 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		case NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION:
 			mCardExplorer = new CardExplorer();
 			fragment = mCardExplorer;
+			String username=SharedPrefUtils.getFromSharedPreference(mContext, getString(R.string.devusername));
+			if(username !=null && SharedPrefUtils.getIntFromSharedPreference(mContext, "CustomFav") !=1)
+			{
+				SharedPrefUtils.writeToSharedPref(mContext, "CustomFav", 1);
+				mCardExplorer.addCustomFavourites();
+			}
 			break;
 		case NavigationOptionsMenuAdapter.SEARCH_ACTION:
 			mSearchActivity = new SearchActivity();

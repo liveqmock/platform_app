@@ -151,8 +151,12 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 			searchString.add(temp);
 		}
 		mSearchQuery = searchQuery;
-		mCacheManager.getCardDetails(searchString,
-				IndexHandler.OperationType.DONTSEARCHDB, MultiPaneActivity.this);
+		
+		IndexHandler.OperationType searchType = IndexHandler.OperationType.DONTSEARCHDB;
+		if(!Util.isNetworkAvailable(mContext))
+			searchType = IndexHandler.OperationType.FTSEARCH;
+		mCacheManager.getCardDetails(searchString, searchType, MultiPaneActivity.this);
+
 
 	}
 	

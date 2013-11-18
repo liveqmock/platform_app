@@ -85,6 +85,8 @@ public class CardVideoPlayer implements PlayerListener {
 	private Uri mVideoUri ;
 	private boolean mTrailerAvailable = false;
 	
+	private static final String TAG = "CardVideoPlayer";
+	
 
 	public void setFullScreenListener(PlayerFullScreen mListener){
 		this.mPlayerFullScreen = mListener;
@@ -150,6 +152,14 @@ public class CardVideoPlayer implements PlayerListener {
 		
 		mTrailerButton.setVisibility(mTrailerAvailable == true ? View.VISIBLE : View.GONE);
 		
+		int[] location = new int[2];
+		mTrailerButton.getLocationOnScreen(location);
+		if(location.length >0)
+		{
+			Log.i(TAG, "Toast pos, X:"+mTrailerButton.getBottom()+5+" Y:"+location[1]+10);
+			//Util.showToastAt(mContext, "Play Trailer", Util.TOAST_TYPE_INFO, Gravity.TOP|Gravity.LEFT,mTrailerButton.getBottom()+5, location[1]+10);
+		}
+
 		mTrailerButton.setOnClickListener(new OnClickListener() {
 					
 					@Override
@@ -304,7 +314,21 @@ public class CardVideoPlayer implements PlayerListener {
 				{
 					url=url.replace("widevine:", "http:");
 					closePlayer();
-					Util.startDownload(url, mData, mContext);
+					if(Util.getSpaceAvailable()>=1)
+					{
+						if(Util.isWifiEnabled(mContext))
+						{
+							Util.startDownload(url, mData, mContext);
+						}
+						else
+						{
+							Util.showToast(mContext, "Downloading is supported only on Wifi, please turn of wifi and try again.", Util.TOAST_TYPE_INFO);
+						}
+					}
+					else
+					{
+						Util.showToast(mContext, "Download failed due to insufficent memory, please free space up to 1GB to start download", Util.TOAST_TYPE_INFO);
+					}
 					return;
 				}				
 				else{
@@ -428,33 +452,60 @@ public class CardVideoPlayer implements PlayerListener {
 	        }
 			
 	        if(myplexapplication.mDownloadList != null){
+	        	if(mPlayerStatusListener != null){
+					mPlayerStatusListener.playerStatusUpdate("Download Details are available...");
+				}
 				CardDownloadData mDownloadData = myplexapplication.mDownloadList.mDownloadedList.get(mData._id);
 				if(mDownloadData!=null){
-					if(mDownloadData.mCompleted)
+					if(mDownloadData.mCompleted && Util.isFileExist(mData.generalInfo.title+".wvm"))
 					{
 						if(mDownloadData.mPercentage==0)
 						{
+							if(mPlayerStatusListener != null){
+								mPlayerStatusListener.playerStatusUpdate("Download failed and removing request and deleting the file");
+							}
 							closePlayer();
+							Util.removeDownload(mDownloadData.mDownloadId, mContext);
 							Util.showToast(mContext, "Download has failed, Please check if sufficent memory is available.",Util.TOAST_TYPE_ERROR);
 							
 						}
 						else{
+							if(mPlayerStatusListener != null){
+								mPlayerStatusListener.playerStatusUpdate("Download inprogess and file exists, starting player.....");
+							}
 							playVideoFile(mDownloadData);
 						}
 					}
 					else
 					{
-						playVideoFile(mDownloadData);
-						//closePlayer();
-						//Util.showToast(mContext, "Your download is in progress, Please check your status in Downloads section.",Util.TOAST_TYPE_ERROR);
+						if(Util.isFileExist(mData.generalInfo.title+".wvm"))
+						{
+							if(mPlayerStatusListener != null){
+								mPlayerStatusListener.playerStatusUpdate("Download Completed and file exists, starting player.....");
+							}
+							playVideoFile(mDownloadData);
+						}
+						else{
+							if(mPlayerStatusListener != null){
+								mPlayerStatusListener.playerStatusUpdate("Download Completed and file doesn't exists, starting player.....");
+							}
+							Util.removeDownload(mDownloadData.mDownloadId, mContext);
+							MediaUtil.getVideoUrl(mData._id,qualityType,streamingType,isESTPackPurchased);
+						}
 					}
 				}
 				else{
+					if(mPlayerStatusListener != null){
+						mPlayerStatusListener.playerStatusUpdate("Download Details for this content not available, so requesting url...");
+					}
 					MediaUtil.getVideoUrl(mData._id,qualityType,streamingType,isESTPackPurchased);
 				}
 			}
 	        else 
 	        {
+	        	if(mPlayerStatusListener != null){
+					mPlayerStatusListener.playerStatusUpdate("Download Details not available, so requesting url...");
+				}
 	        	MediaUtil.getVideoUrl(mData._id,qualityType,streamingType,isESTPackPurchased);	
 	        }
 	      }
@@ -462,7 +513,7 @@ public class CardVideoPlayer implements PlayerListener {
 private void playVideoFile(CardDownloadData mDownloadData){
 
 	drmLicenseType="lp";
-	String url="file://"+mDownloadData.mDownloadPath;
+	String url=mDownloadData.mDownloadPath;
 
 	if(mData.content !=null && mData.content.drmEnabled)
 	{
@@ -610,6 +661,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		mTrailerButton = (TextView)v.findViewById(R.id.cardmediasubitemtrailer_play);
 		mTrailerButton.setTypeface(FontUtil.ss_symbolicons_line);
 		mTrailerButton.setVisibility(mTrailerAvailable == true ? View.VISIBLE : View.GONE);
+		
 		mTrailerButton.setOnClickListener(new OnClickListener() {
 			
 			@Override

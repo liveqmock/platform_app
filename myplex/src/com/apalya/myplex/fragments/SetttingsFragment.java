@@ -19,9 +19,13 @@ import com.apalya.myplex.R;
 import com.apalya.myplex.SubscriptionView;
 import com.apalya.myplex.TwitterWebView;
 import com.apalya.myplex.adapters.SettingsAdapter;
+import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.SettingsData;
+import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.Util;
+import com.apalya.myplex.utils.MessagePost.MessagePostCallback;
 import com.apalya.myplex.views.PinnedSectionListView;
+import com.apalya.myplex.views.RatingDialog;
 
 public class SetttingsFragment extends BaseFragment {
 
@@ -52,12 +56,32 @@ public class SetttingsFragment extends BaseFragment {
 				SettingsData data = (SettingsData) v.getTag();
 				if(data.type == SettingsData.SECTION || data.mSettingName.contains("Download"))
 					return;
+				
+				if (data.mSettingName.equals(FEEDBACK)) {
+					CardData profileData=new CardData();
+					profileData._id="0";
+					RatingDialog dialog = new RatingDialog(mContext);
+					dialog.prepareFeedback();
+					dialog.showDialog(new MessagePostCallback() {
+						
+						@Override
+						public void sendMessage(boolean status) {
+							if(status){
+								Util.showToast(mContext, "Thanks for your feedback.",Util.TOAST_TYPE_INFO);
+								
+							}else{
+								Util.showToast(mContext, "Unable to post your review.",Util.TOAST_TYPE_ERROR);
+							}
+						}
+						
+					}, profileData);
+				}
+				else
+				{
 				Intent i = new Intent(mContext,SubscriptionView.class);
 				
 				Bundle b = new Bundle();
-				if (data.mSettingName.equals(FEEDBACK)) 
-						b.putString("url", "https://myplex.zendesk.com/account/dropboxes/20111493?x=1#/dropbox/tickets/new");
-				else if(data.mSettingName.equals(TANDC))
+				if(data.mSettingName.equals(TANDC))
 					b.putString("url", "http://static.myplex.tv/tnc_win8.html");
 				else if(data.mSettingName.equals(PRIVACYPOLIY))
 					b.putString("url", "http://static.myplex.tv/privacy_win8.html");
@@ -66,6 +90,7 @@ public class SetttingsFragment extends BaseFragment {
 				
 					i.putExtras(b);
 					startActivity(i);
+				}
 			}
 		});
 

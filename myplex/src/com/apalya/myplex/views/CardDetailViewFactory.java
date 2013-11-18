@@ -917,6 +917,14 @@ public class CardDetailViewFactory {
 							mRupeeCode = mContext.getResources().getString(R.string.price_rupeecode); 
 						}
 						packageButton.setText(mPriceStarts + mRupeeCode + " "+price);
+						if(price == 0)
+						{
+							packageButton.setText("Watch now for Free");
+							packageButton.setOnClickListener(null);
+						}
+						else
+							packageButton.setText(mPriceStarts + mRupeeCode + " "+price);
+
 					}else{
 						packageButton.setText("Free");
 						packageButton.setOnClickListener(null);

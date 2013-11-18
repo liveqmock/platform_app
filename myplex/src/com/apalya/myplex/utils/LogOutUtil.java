@@ -90,12 +90,10 @@ public class LogOutUtil {
 			twitterlogOut();
 			
 			Log.d("Main ACTIVITY", "@@@@@@@@@@@@@@ LOGOUT ACTIVITY 3@@@@@@@@@@@@@@@@@@@@@");
-			Map<String, String> params = new HashMap<String, String>();
-			params.put("profile","work");
-			params.put("clientKey",myplexapplication.getDevDetailsInstance().getClientKey());
-			signOutRequest(ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+ConsumerApi.USER_CONTEXT+ConsumerApi.SLASH+ConsumerApi.SIGN_OUT_ACTION, params);
-
+			
 		}
+		
+		logoutUser(logoutContext);
 		
 		myplexapplication.getUserProfileInstance().lastVisitedCardData.clear();
 		myplexapplication.getUserProfileInstance().joinedDate="NA";
@@ -119,6 +117,14 @@ public class LogOutUtil {
 
 		((Activity) logoutContext).finish();
 		Util.launchActivity(LoginActivity.class,((Activity) logoutContext) , null);
+	}
+	public static void logoutUser(Context cntx){
+		logoutContext=cntx;
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("profile","work");
+		params.put("clientKey",myplexapplication.getDevDetailsInstance().getClientKey());
+		signOutRequest(ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+ConsumerApi.USER_CONTEXT+ConsumerApi.SLASH+ConsumerApi.SIGN_OUT_ACTION, params);
+
 	}
 	public static void twitterlogOut(){
 		SharedPreferences prefs = logoutContext.getSharedPreferences("TWITTERTIME", 0);

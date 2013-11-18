@@ -46,6 +46,10 @@ public class RatingDialog {
 		mMessageHeader = mContext.getResources().getString(R.string.feedbackmessageheading);
 		mMessageHint = mContext.getResources().getString(R.string.feedbackmessagehint);
 	}
+	public void prepareRating(String header, String messageHeader, String messageHint)
+	{
+		mHeader = header; mMessageHeader = messageHeader; mMessageHint = messageHint;
+	}
 	public void showDialog(MessagePostCallback listener,final CardData data){
 		mListener= listener;
 		final CustomDialog dialog = new CustomDialog(mContext);

@@ -22,6 +22,7 @@ import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -72,6 +73,7 @@ import com.apalya.myplex.utils.PlayServicesUtils;
 import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.utils.Twitter11;
 import com.apalya.myplex.utils.Util;
+import com.apalya.myplex.utils.AlertDialogUtil;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookAuthorizationException;
 import com.facebook.FacebookOperationCanceledException;
@@ -94,7 +96,7 @@ import com.mixpanel.android.mpmetrics.MixpanelAPI;
 
 
 public class LoginActivity extends Activity implements OnClickListener, AccountUtils.AuthenticateCallback,Twitter11.TwitterAuthenticateCallback, GooglePlayServicesClient.ConnectionCallbacks,
-GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedListener {
+GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedListener,AlertDialogUtil.NoticeDialogListener {
 
 	private Button mFacebookButton,mGoogleLogin,mTwitterLogin;
 	private TextView mLetMeIn,mLoginText,mSignupText;
@@ -377,7 +379,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			mPlusClient.connect();
 
 		}*/
-		//CheckUserStatus();
+		
 
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -434,8 +436,10 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			}
 		});
 		
-		//Check if Keyboard is visible or not
-		//mRootLayout = findViewById(R.id.rootlayout);  
+		
+		
+		CheckUserStatus();
+		
 
 	}
 
@@ -718,7 +722,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			throw new RuntimeException("Could not encode hour of the day in JSON");
 		}
 
-		CheckUserStatus();
+		
 
 		/*if(isAuthTwitter())
 		{
@@ -1664,7 +1668,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			mUserInfo.firstVisitStatus=true;
 			Log.d(TAG, "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 			Map<String, String> params = new HashMap<String, String>();
-			params.put("serialNo", mDevInfo.getDeviceSNo());
+			params.put("serialNo", mDevInfo.getDeviceId());
 			params.put("os", mDevInfo.getDeviceOs());
 			params.put("osVersion", mDevInfo.getDeviceOsVer());
 			params.put("make",mDevInfo.getDeviceMake());
@@ -1817,6 +1821,20 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				}
 			}
 		};
+	}
+
+
+	@Override
+	public void onDialogOption2Click() {
+		// TODO Auto-generated method stub
+		//Util.showToast(this, "Positive Button Clicked", Util.TOAST_TYPE_INFO);
+	}
+
+
+	@Override
+	public void onDialogOption1Click() {
+		// TODO Auto-generated method stub
+		//Util.showToast(this, "Negative Button Clicked", Util.TOAST_TYPE_ERROR);
 	}
 	
 	

@@ -12,6 +12,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.apalya.myplex.cache.CacheHolder;
 import com.apalya.myplex.cache.InsertionResult;
+import com.apalya.myplex.data.BaseReponseData;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardResponseData;
 import com.apalya.myplex.data.myplexapplication;
@@ -51,7 +52,7 @@ public class FavouriteUtil {
 						}
 						return;
 					}
-					CardResponseData responseData = (CardResponseData) Util.fromJson(response, CardResponseData.class);
+					BaseReponseData responseData = (BaseReponseData) Util.fromJson(response, BaseReponseData.class);
 					if(responseData.status == null){
 						if(mListener != null){
 							mListener.response(false);

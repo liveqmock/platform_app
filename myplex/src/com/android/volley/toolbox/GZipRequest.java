@@ -70,32 +70,46 @@ public class GZipRequest extends Request<String> {
 			}
 	        String parsed = new String();
 	        try {
-	        	InputStream responseStream = new ByteArrayInputStream(response.data); 
-	        	final int BUF_SIZE_MAX = 20480;
-	        	byte[] buf = new byte[BUF_SIZE_MAX];
-	        	GZIPInputStream zis;
-	        	zis = new GZIPInputStream(responseStream, BUF_SIZE_MAX);
-	        	boolean stop = false;
-	        	int bytesRead = 0;
-				while (stop == false) {
-					int pos = 0;
-					do {
-						bytesRead = zis.read(buf, pos, (BUF_SIZE_MAX - pos));
-						if (bytesRead == -1) {
-							stop = true;
-							break;
-						} else {
-							pos += bytesRead;
-						}
-					} while (pos < BUF_SIZE_MAX);
-					parsed +=new String(buf, "UTF-8");
-				}
-				zis.close();
+	        	boolean gzipped = true;
+	        	if(response != null && response.headers != null && response.headers.size() >0)
+	        	{
+		        	String encoding = response.headers.get("Content-Encoding");
+		        	gzipped = encoding!=null && encoding.toLowerCase().contains("gzip");
+	        	}
+	        	
+	        	if(gzipped)
+	        	{
+		        	InputStream responseStream = new ByteArrayInputStream(response.data); 
+		        	final int BUF_SIZE_MAX = 20480;
+		        	byte[] buf = new byte[BUF_SIZE_MAX];
+		        	GZIPInputStream zis;
+		        	zis = new GZIPInputStream(responseStream, BUF_SIZE_MAX);
+		        	boolean stop = false;
+		        	int bytesRead = 0;
+					while (stop == false) {
+						int pos = 0;
+						do {
+							bytesRead = zis.read(buf, pos, (BUF_SIZE_MAX - pos));
+							if (bytesRead == -1) {
+								stop = true;
+								break;
+							} else {
+								pos += bytesRead;
+							}
+						} while (pos < BUF_SIZE_MAX);
+						parsed +=new String(buf, "UTF-8");
+					}
+					zis.close();
+	        	}
+	        	else
+	        	{
+	        		Log.e(TAG,"Response is not gzip");
+	        		parsed = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
+	        	}
 	        } catch (UnsupportedEncodingException e) {
 	            parsed = new String(response.data);
 	        }catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+	        	parsed = new String(response.data);
 			}
 	        if(mShowLogs){
 	        	Log.d(TAG,"Response :: " +parsed);

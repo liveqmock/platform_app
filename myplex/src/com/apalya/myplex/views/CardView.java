@@ -45,6 +45,7 @@ import com.apalya.myplex.data.CardDataHolder;
 import com.apalya.myplex.data.CardDataImagesItem;
 import com.apalya.myplex.data.CardDownloadData;
 import com.apalya.myplex.data.CardDownloadedDataList;
+import com.apalya.myplex.data.CardExplorerData;
 import com.apalya.myplex.data.CardImageView;
 import com.apalya.myplex.data.CardDataPackagePriceDetailsItem;
 import com.apalya.myplex.data.CardDataPackages;
@@ -245,6 +246,7 @@ public class CardView extends ScrollView {
 	private String mRupeeCode  = null;
 	private HashMap<String,String> ImageUrlMap = new HashMap<String, String>();
 	public void updateDownloadStatus(CardData data,CardDownloadData downloadData){
+		
 		CardDownloadData localDownloadData;
 		if(myplexapplication.mDownloadList == null){
 			return;
@@ -269,6 +271,7 @@ public class CardView extends ScrollView {
 			localDownloadData = downloadData;
 		}
 		dataHolder.mESTDownloadStatus.setVisibility(View.VISIBLE);
+		dataHolder.mESTDownloadStatus.setTextSize(16f);
 		if(!localDownloadData.mCompleted){
 			if(localDownloadData.mPercentage==0)
 			{
@@ -277,7 +280,9 @@ public class CardView extends ScrollView {
 			else
 			{
 				DecimalFormat dec = new DecimalFormat("0.00");
+				dataHolder.mESTDownloadStatus.setTextSize(10f);
 				dataHolder.mESTDownloadStatus.setText(dec.format(localDownloadData.mDownloadedBytes)+"MB / "+dec.format(localDownloadData.mDownloadTotalSize)+"MB   "+localDownloadData.mPercentage+" %");
+				
 			}
 			dataHolder.mESTDownloadBar.setVisibility(View.VISIBLE);
 			dataHolder.mESTDownloadBar.setProgress(localDownloadData.mPercentage);
@@ -444,7 +449,13 @@ public class CardView extends ScrollView {
 						if(mRupeeCode == null){
 							mRupeeCode = mContext.getResources().getString(R.string.price_rupeecode); 
 						}
-						dataHolder.mRentText.setText(mPriceStarts + mRupeeCode + " "+price);
+						if(price == 0)
+						{
+							dataHolder.mRentText.setText("Watch now for Free");
+							dataHolder.mRentLayout.setOnClickListener(null);
+						}
+						else
+							dataHolder.mRentText.setText(mPriceStarts + mRupeeCode + " "+price);
 					}else{
 						dataHolder.mRentText.setText("Free");
 						dataHolder.mRentLayout.setOnClickListener(null);

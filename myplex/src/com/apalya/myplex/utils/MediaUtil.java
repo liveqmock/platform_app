@@ -77,6 +77,7 @@ public class MediaUtil {
 				}
 				if(minResultSet.results == null){
 					sendResponse(false,null);
+					return;
 				}
 				String url="";
 				for(CardData data:minResultSet.results){

@@ -5,6 +5,8 @@ package com.apalya.myplex;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -49,9 +51,11 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.apalya.myplex.data.DeviceDetails;
 import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.utils.AlertDialogUtil;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FontUtil;
+import com.apalya.myplex.utils.LogOutUtil;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.utils.Util;
@@ -59,7 +63,7 @@ import com.crashlytics.android.Crashlytics;
 import com.flurry.android.FlurryAgent;
 
 
-public class SignUpActivity extends Activity{
+public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDialogListener{
 
 	private Button mSubmit;
 	private EditText mEmail,/*mPhone,*/mPassword;
@@ -77,20 +81,23 @@ public class SignUpActivity extends Activity{
 	private TranslateAnimation translateAnim;
 	private RelativeLayout backgroundScrollLayout;
 
+	private static final String PASSWORD_PATTERN = 
+			"((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%]).{6,18})";
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		if(getResources().getBoolean(R.bool.isTablet))
 			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
 		else
 			this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 		getActionBar().hide();
-		
+
 		setContentView(R.layout.signupscreen);
 
-		
+
 		mDevInfo=myplexapplication.getDevDetailsInstance();
 
 		prepareSlideNotifiation();
@@ -128,11 +135,11 @@ public class SignUpActivity extends Activity{
 					// TODO Auto-generated method stub
 					if(mPassword.getVisibility()==View.VISIBLE)
 					{
-						
+
 						mPassword.setVisibility(View.GONE);
 						line.setVisibility(View.GONE);
 						mFpwd.setText("Sign into myplex");
-						mSubmit.setText("Submit");
+						mSubmit.setText("Reset myplex password");
 					}
 					else
 					{
@@ -179,7 +186,7 @@ public class SignUpActivity extends Activity{
 					Map<String,String> attribs=new HashMap<String, String>();
 					attribs.put("status", "Selected");
 					Analytics.trackEvent(Analytics.loginSignIn,attribs);
-					
+
 					if(mPassword.getVisibility()!=View.GONE)
 					{
 						if(mEmail.getText().toString().length() > 0 &&  mPassword.getText().toString().length()>0)
@@ -279,7 +286,7 @@ public class SignUpActivity extends Activity{
 			mPassword.setTypeface(FontUtil.Roboto_Regular);
 			mSubmit = (Button) findViewById(R.id.signsubmit);
 			mSubmit.setTypeface(FontUtil.Roboto_Regular);
-			mSubmit.setText("Create Account");
+			mSubmit.setText("Join myplex");
 
 			mEmail.setOnFocusChangeListener(new OnFocusChangeListener() {
 
@@ -304,6 +311,8 @@ public class SignUpActivity extends Activity{
 				}
 			});
 
+
+
 			mSubmit.setOnClickListener(new OnClickListener() {
 
 				@Override
@@ -312,18 +321,22 @@ public class SignUpActivity extends Activity{
 					ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(findViewById(v.getId()), "alpha", 0.5f, 1f);
 					fadeAnim2.setDuration(800);
 					fadeAnim2.start();
-					
+
 					Map<String,String> attribs=new HashMap<String, String>();
 					attribs.put("Status", "Selected");
 					Analytics.trackEvent(Analytics.loginSignUp,attribs);
-					
+
 					//hideKeypad();
 					if(mEmail.getText().toString().length()>0 &&mPassword.getText().toString().length()>0) {
 
-						if(mEmail.getText().toString().contains("@") && mEmail.getText().toString().contains(".") || isValidPhoneNumber)
+						if(mEmail.getText().toString().contains("@") && mEmail.getText().toString().contains(".") && isPasswordStrong(mPassword.getText().toString()) || isValidPhoneNumber)
 						{
 							Map<String, String> params = new HashMap<String, String>();
-							params.put("email",mEmail.getText().toString());
+							String email=mEmail.getText().toString();
+							if(isValidPhoneNumber)
+								email=	mEmail.getText().toString()+"@apalya.myplex.tv";						
+
+							params.put("email",email);	
 							params.put("password", mPassword.getText().toString());
 							params.put("password2", mPassword.getText().toString());
 							params.put("profile", "work");
@@ -336,25 +349,30 @@ public class SignUpActivity extends Activity{
 						}
 						else
 						{
-
+							if(!mEmail.getText().toString().contains("@") && !mEmail.getText().toString().contains("."))
 							{
-								mEmail.setError("Enter Valid Email or Phone number");
+								mEmail.setError("Please Enter Valid Email or Phone number");
+								sendNotification("Please Enter Valid Email or Phone number");
 							}
-							sendNotification("Enter Valid details");
+							else if(!isPasswordStrong(mPassword.getText().toString())){
+								mPassword.setError("Password must contain at least \n 1 capital letter 1 number  1 special character \n min of 6 and max of 18 characters");
+								sendNotification("Your Password Must be atleast 6 characters in which 1 number 1 uppercase 1 symbol are required");
+							}else{
+								sendNotification("Entered details are not valid, please click on specific field to get error description");
+							}
+
 						}
 					}
 					else{
 						if(mEmail.getText().toString().length()==0 )
 						{
-							mEmail.setError("Email/Phone No. is required!");
-
+							mEmail.setError("Please Enter Valid Email/Phone No");
 						}
-
-						if(mPassword.getText().toString().length()==0)
+						else if(mPassword.getText().toString().length()==0)
 						{
-							mPassword.setError("Password is required");
+							mPassword.setError("Your Password Must be atleast 6 characters in which 1 number 1 uppercase 1 symbol are required");
 						}
-						sendNotification("Hey, Missed something, please check!!!");
+						sendNotification("Please do not leave the field(s) blank.");
 					}
 				}
 			});
@@ -383,11 +401,11 @@ public class SignUpActivity extends Activity{
 			@Override
 			public void onGlobalLayout() {
 				parentScrollView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
-				
+
 				//Util.showToast(Integer.toString(scrollWidth),LoginActivity.this);
 				if(getResources().getBoolean(R.bool.isTablet))
 				{
-					
+
 					scrollWidth=parentScrollView.getChildAt(0).getMeasuredWidth()-getWindowManager().getDefaultDisplay().getWidth();
 					LinearLayout backgroundLayout= (LinearLayout)findViewById(R.id.relativeLayout1);
 					backgroundLayout.clearAnimation();
@@ -419,6 +437,13 @@ public class SignUpActivity extends Activity{
 
 			}
 		});
+	}
+
+	public boolean isPasswordStrong(String pwd){
+		Pattern pattern = Pattern.compile(PASSWORD_PATTERN);
+		Matcher matcher = pattern.matcher(pwd);
+		return matcher.matches();
+
 	}
 
 	public void showSoftKeyboard(View view) {
@@ -464,14 +489,14 @@ public class SignUpActivity extends Activity{
 		Map<String,String> attribs=new HashMap<String, String>();
 		attribs.put("Duration", "");
 		Analytics.trackEvent(Analytics.loginSignUp,attribs,true);
-		
+
 		RequestQueue queue = MyVolley.getRequestQueue();
 
 		String url=ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+ConsumerApi.USER_CONTEXT+ConsumerApi.SLASH+contextPath;
 		StringRequest myReq = new StringRequest(Method.POST,
 				url,
 				RegisterUserSuccessListener(),
-				RegisterUserErrorListener()) {
+				userLoginErrorListener()) {
 
 			protected Map<String, String> getParams() throws com.android.volley.AuthFailureError {
 				Map<String, String> params = new HashMap<String, String>();
@@ -484,22 +509,7 @@ public class SignUpActivity extends Activity{
 		queue.add(myReq);
 	}
 
-	protected ErrorListener RegisterUserErrorListener() {
-		return new Response.ErrorListener() {
-			@Override
-			public void onErrorResponse(VolleyError error) {
-				dismissProgressBar();
-				Analytics.endTimedEvent(Analytics.loginSignUp);
-				Map<String,String> attribs=new HashMap<String, String>();
-				attribs.put("Status", "Failed");
-				attribs.put("Msg", error.toString());
-				Analytics.trackEvent(Analytics.loginSignUp,attribs);
-				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-				Log.d(TAG,"Error: "+error.toString());
-				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
-			}
-		};
-	}
+	
 	@Override
 	protected void onResume() {
 		// TODO Auto-generated method stub
@@ -543,7 +553,7 @@ public class SignUpActivity extends Activity{
 						myplexapplication.getUserProfileInstance().setName(mEmail.getText().toString());
 
 						myplexapplication.getUserProfileInstance().setUserEmail(mEmail.getText().toString());
-						
+
 						SharedPrefUtils.writeToSharedPref(SignUpActivity.this,
 								getString(R.string.userprofilename),mEmail.getText().toString());
 
@@ -551,7 +561,7 @@ public class SignUpActivity extends Activity{
 								getString(R.string.devusername), mEmail.getText().toString());
 						SharedPrefUtils.writeToSharedPref(SignUpActivity.this,
 								getString(R.string.devpassword), mPassword.getText().toString());
-						
+
 						Crashlytics.setUserEmail(mEmail.getText().toString());
 						String userIdSha1=Util.sha1Hash(mEmail.getText().toString());
 						FlurryAgent.setUserId(userIdSha1);
@@ -569,7 +579,14 @@ public class SignUpActivity extends Activity{
 						Analytics.trackEvent(Analytics.loginSignUp,attribs);
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
-						sendNotification("Err: "+jsonResponse.getString("code")+" "+jsonResponse.getString("message"));
+						//sendNotification("Err: "+jsonResponse.getString("code")+" "+jsonResponse.getString("message"));
+						
+						if(jsonResponse.getString("code").equalsIgnoreCase("401")){
+							LogOutUtil.logoutUser(SignUpActivity.this);
+							AlertDialogUtil.showAlert(SignUpActivity.this, "Account Creation successful, Continue with "+mEmail.getText().toString()+ "?","Register new account", "Login with myplex",  SignUpActivity.this);
+						}else if(jsonResponse.getString("code").equalsIgnoreCase("409")){
+							AlertDialogUtil.showAlert(SignUpActivity.this, "Your email is already registered with us, Continue with "+mEmail.getText().toString()+ "?","Register new account", "Login with myplex",  SignUpActivity.this);
+						}
 					}
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -597,14 +614,14 @@ public class SignUpActivity extends Activity{
 		queue.add(myReq);
 
 	}
-	
+
 
 	protected Listener<String> forgotPasswordSuccessListener() {
 		dismissProgressBar();
 		return new Response.Listener<String>() {
 			@Override
 			public void onResponse(String response) {
-				
+
 				Log.d(TAG,"Response: "+response);
 				try {	
 					Log.d(TAG, "########################################################");
@@ -618,7 +635,7 @@ public class SignUpActivity extends Activity{
 						Log.d(TAG, "########################################################");
 						Log.d(TAG, "---------------------------------------------------------");
 						Util.showToast(SignUpActivity.this, jsonResponse.getString("message"),Util.TOAST_TYPE_INFO);
-//						Util.showToast(jsonResponse.getString("message"), SignUpActivity.this);
+						//						Util.showToast(jsonResponse.getString("message"), SignUpActivity.this);
 					}
 					else
 					{
@@ -638,7 +655,7 @@ public class SignUpActivity extends Activity{
 		Map<String,String> attribs=new HashMap<String, String>();
 		attribs.put("Duration", "");
 		Analytics.trackEvent(Analytics.loginSignIn,attribs,true);
-		
+
 		String url=ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+ConsumerApi.USER_CONTEXT+ConsumerApi.SLASH+contextPath;
 		StringRequest myReq = new StringRequest(Method.POST,
 				url,
@@ -671,7 +688,7 @@ public class SignUpActivity extends Activity{
 				if(error.toString().indexOf("NoConnectionError")>0)
 				{
 					Util.showToast(SignUpActivity.this, getString(R.string.interneterr),Util.TOAST_TYPE_INFO);
-//					Util.showToast(getString(R.string.interneterr),SignUpActivity.this);
+					//					Util.showToast(getString(R.string.interneterr),SignUpActivity.this);
 					finish();
 					Util.launchMainActivity(SignUpActivity.this);
 				}
@@ -697,11 +714,11 @@ public class SignUpActivity extends Activity{
 
 					if(jsonResponse.getString("status").equalsIgnoreCase("SUCCESS"))
 					{
-				
+
 						Map<String,String> attribs=new HashMap<String, String>();
 						attribs.put("Status", "Success");
 						Analytics.trackEvent(Analytics.loginSignIn,attribs);
-						
+
 						Log.d(TAG, "status: "+jsonResponse.getString("status"));
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
@@ -713,12 +730,12 @@ public class SignUpActivity extends Activity{
 						myplexapplication.getUserProfileInstance().setUserEmail(mEmail.getText().toString());
 						SharedPrefUtils.writeToSharedPref(SignUpActivity.this,
 								getString(R.string.userprofilename),mEmail.getText().toString());
-						
+
 						SharedPrefUtils.writeToSharedPref(SignUpActivity.this,
 								getString(R.string.devusername), mEmail.getText().toString());
 						SharedPrefUtils.writeToSharedPref(SignUpActivity.this,
 								getString(R.string.devpassword), mPassword.getText().toString());
-						
+
 						Crashlytics.setUserEmail(mEmail.getText().toString());
 						String userIdSha1=Util.sha1Hash(mEmail.getText().toString());
 						FlurryAgent.setUserId(userIdSha1);
@@ -733,7 +750,7 @@ public class SignUpActivity extends Activity{
 						attribs.put("Status", "Failed");
 						attribs.put("Msg", jsonResponse.getString("code"));
 						Analytics.trackEvent(Analytics.loginSignIn,attribs);
-						
+
 						if(jsonResponse.getString("code").equalsIgnoreCase("401"))
 						{
 							String devId=SharedPrefUtils.getFromSharedPreference(SignUpActivity.this,
@@ -787,5 +804,17 @@ public class SignUpActivity extends Activity{
 	private void sendNotification(final String aMsg){
 		mSlideNotificationText.setText(aMsg);
 		showNotification();
+	}
+
+	@Override
+	public void onDialogOption2Click() {
+		// TODO Auto-generated method stub
+		Util.launchActivity(LoginActivity.class,SignUpActivity.this , null);
+	}
+
+	@Override
+	public void onDialogOption1Click() {
+		// TODO Auto-generated method stub
+		
 	}
 }
