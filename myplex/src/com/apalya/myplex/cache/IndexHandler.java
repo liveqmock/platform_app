@@ -200,12 +200,21 @@ public class IndexHandler {
 			mIndexReader = IndexReader.open(mDirectory);
 		else if(!mIndexReader.isCurrent())
 		{
+//			IndexReader changedReader = IndexReader.open(mDirectory);
 			IndexReader changedReader = IndexReader.openIfChanged(mIndexReader);
 			if(changedReader != null)
 			{
 				Log.i(TAG,"oldIndexReader"+"numDocs:"+mIndexReader.numDocs() +":: maxDocs:"+mIndexReader.maxDoc());
-				mIndexReader.close(); // close the old Reader.
-				mIndexReader = changedReader;//Assign new reader for further operations.
+				if(changedReader.numDocs() > mIndexReader.numDocs())
+				{
+					mIndexReader.close(); // close the old Reader.
+					mIndexReader = changedReader;//Assign new reader for further operations.
+				}
+				else
+				{
+					changedReader.close();
+					changedReader = null;
+				}
 				Log.i(TAG,"newIndexReader"+"numDocs:"+mIndexReader.numDocs() +":: maxDocs:"+mIndexReader.maxDoc());
 			}
 			else
