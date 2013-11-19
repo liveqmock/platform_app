@@ -107,16 +107,16 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	}
 
 	public void showProgressBar() {
-		if (mProgressDialog != null) {
-			mProgressDialog.dismiss();
-		}
-		mProgressDialog = ProgressDialog.show(getContext(), "", "Loading...",true, false);
+//		if (mProgressDialog != null) {
+//			mProgressDialog.dismiss();
+//		}
+//		mProgressDialog = ProgressDialog.show(getContext(), "", "Loading...",true, false);
 	}
 
 	public void dismissProgressBar() {
-		if (mProgressDialog != null) {
-			mProgressDialog.dismiss();
-		}
+//		if (mProgressDialog != null) {
+//			mProgressDialog.dismiss();
+//		}
 	}
 
 	public void updateText(final String str) {
@@ -348,7 +348,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				Analytics.endTimedEvent(Analytics.cardBrowseDuration);
 				try {
 //					Log.d(TAG,"server response "+response);
-					updateText("parsing results");
+//					updateText("parsing results");
 					CardResponseData minResultSet  =(CardResponseData) Util.fromJson(response, CardResponseData.class);
 					if(minResultSet.code != 200){
 						Util.showToast(getContext(), minResultSet.message,Util.TOAST_TYPE_ERROR);
@@ -474,7 +474,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			Log.e(TAG, "acitivty is NULL");
 			return;
 		}
-		updateText("preparing ui");
+//		updateText("preparing ui");
 		if(getResources() != null && getResources().getBoolean(R.bool.isTablet)){
 				startPolling(mData.mMasterEntries);
 				mTabletAdapter.setData(mData.mMasterEntries);

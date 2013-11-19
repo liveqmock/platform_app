@@ -755,6 +755,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			currentseekposition = 510;
 		}
 		if (mVideoView.isPlaying() && currentseekposition > 500) {
+			this.mPerBuffer = 0;
 			mVideoViewPlayer.deregisteronBufferingUpdate();
 			mProgressBarLayout.setVisibility(View.GONE);
 			mVideoViewPlayer.showMediaController();

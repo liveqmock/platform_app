@@ -62,12 +62,15 @@ import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.Blur;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FontUtil;
+import com.apalya.myplex.utils.MsisdnRetrivalEngine;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.SharedPrefUtils;
+import com.apalya.myplex.utils.SubcriptionEngine;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.utils.Blur.BlurResponse;
 import com.crashlytics.android.Crashlytics;
 import com.flurry.android.FlurryAgent;
+import com.flurry.android.monolithic.sdk.impl.ca;
 
 public class PackagePopUp {
 	private String TAG  = "PackagePopUp";
@@ -77,10 +80,14 @@ public class PackagePopUp {
 	private LayoutInflater mInflater;
 	private View mBackground;
 	private RelativeLayout mPopupBackground;
+	private SubcriptionEngine mSubscriptionEngine;
+	private MsisdnRetrivalEngine mMsisdnRetrivalEngine;
 	public PackagePopUp(Context cxt,View background){
 		this.mContext = cxt;
 		this.mBackground = background;
 		this.mInflater = LayoutInflater.from(mContext);
+		mSubscriptionEngine = new SubcriptionEngine(mContext);
+		mMsisdnRetrivalEngine = new MsisdnRetrivalEngine(mContext);
 		String email=myplexapplication.getUserProfileInstance().getUserEmail();
 		if(email.equalsIgnoreCase("NA") || email.equalsIgnoreCase(""))
 		{	
@@ -162,8 +169,6 @@ public class PackagePopUp {
 		@Override
 		public void onClick(final View v) {
 			
-			
-			
 			if(v.getTag() instanceof LinearLayout){
 				if(mLastPaymentModeLayout != null){
 					mLastPaymentModeLayout.removeAllViews();
@@ -195,6 +200,7 @@ public class PackagePopUp {
 						heading.setTypeface(FontUtil.Roboto_Medium);
 						mLastPaymentModeLayout.addView(heading);
 					}
+					
 					View paymentModeItem = mInflater.inflate(R.layout.paymentmodeitemlayout,null);
 					TextView paymentModeText = (TextView)paymentModeItem.findViewById(R.id.paymentmodetext);
 					paymentModeText.setTypeface(FontUtil.Roboto_Medium);
@@ -209,29 +215,13 @@ public class PackagePopUp {
 						@Override
 						public void onClick(View arg0) {
 							try {
-								if(arg0.getTag() instanceof CardDataPackages){
-									CardDataPackages packageitem = (CardDataPackages)arg0.getTag();
+								if (arg0.getTag() instanceof CardDataPackages) {
+									CardDataPackages packageitem = (CardDataPackages) arg0.getTag();
 									int id = arg0.getId();
-									CardDataPackagePriceDetailsItem priceItem = packageitem.priceDetails.get(id);
-									String requestUrl = ConsumerApi.getSusbcriptionRequesr(priceItem.paymentChannel, packageitem.packageId);
-									Log.e(TAG, "RequestURL = "+requestUrl);
-									Intent i = new Intent(mContext,SubscriptionView.class);
-									Bundle b = new Bundle();
-									b.putString("url", requestUrl);
-									i.putExtras(b);
-									FlurryAgent.onStartSession(mContext, "X6WWX57TJQM54CVZRB3K");
-									Map<String,String> params=new HashMap<String, String>();
-									params.put("PackageId",packageitem.packageId);
-									params.put("PackageName", packageitem.packageName);
-									params.put("PaymentChannel", priceItem.paymentChannel);
-									params.put("Action", "Purchase");
-									Analytics.trackEvent(Analytics.PackagesPurchase,params);
-									FlurryAgent.onEndSession(mContext);
-									((Activity) mContext).startActivityForResult(i, ConsumerApi.SUBSCRIPTIONREQUEST);
-									dismissFilterMenuPopupWindow();
+									mSubscriptionEngine.doSubscription(packageitem, id);
 								}
-							} catch (Exception e) {
-								// TODO: handle exception
+							}catch (Exception e) {
+									// TODO: handle exception
 							}
 						}
 					});

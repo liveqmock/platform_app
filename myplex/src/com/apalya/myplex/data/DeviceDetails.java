@@ -25,6 +25,9 @@ public class DeviceDetails {
 
 	public String getDeviceOs()
 	{
+		if(devOs == null){
+			devOs = new String();
+		}
 		return devOs;
 	}
 
@@ -35,6 +38,9 @@ public class DeviceDetails {
 
 	public String getDeviceOsVer()
 	{
+		if(devOsVersion == null){
+			devOsVersion = new String();
+		}
 		return devOsVersion;
 	}
 
@@ -45,6 +51,9 @@ public class DeviceDetails {
 
 	public String getDeviceMake()
 	{
+		if(devMake == null){
+			devMake = new String();
+		}
 		return devMake;
 	}
 
@@ -55,6 +64,9 @@ public class DeviceDetails {
 
 	public String getDeviceModel()
 	{
+		if(devModel == null){
+			devModel = new String();
+		}
 		return devModel;
 	}
 
@@ -65,6 +77,9 @@ public class DeviceDetails {
 
 	public String getDeviceRes()
 	{
+		if(devResolution == null){
+			devResolution = new String();
+		}
 		return devResolution;
 	}
 
@@ -75,6 +90,9 @@ public class DeviceDetails {
 
 	public String getDeviceSNo()
 	{
+		if(devSerialNumber == null){
+			devSerialNumber = new String();
+		}
 		return devSerialNumber;
 	}
 
@@ -85,6 +103,9 @@ public class DeviceDetails {
 
 	public String getDeviceId()
 	{
+		if(deviceId == null){
+			deviceId = new String();
+		}
 		return deviceId;
 	}
 
@@ -92,6 +113,9 @@ public class DeviceDetails {
 		devOperatorName=networkOperatorName;
 	}
 	public String getOperatorName() {
+		if(devOperatorName == null){
+			devOperatorName = new String();
+		}
 		return devOperatorName;
 	}
 
@@ -100,6 +124,9 @@ public class DeviceDetails {
 	}
 
 	public String getMccMnc() {
+		if(devMccMnc == null){
+			devMccMnc = new String();
+		}
 		return devMccMnc;
 	}
 
@@ -108,6 +135,9 @@ public class DeviceDetails {
 	}
 
 	public String getSimSNo() {
+		if(devSimSerialNo == null){
+			devSimSerialNo = new String();
+		}
 		return devSimSerialNo;
 	}
 
@@ -116,6 +146,9 @@ public class DeviceDetails {
 	}
 	
 	public String getImsiNo() {
+		if(devImsiNo == null){
+			devImsiNo = new String();
+		}
 		return devImsiNo;
 	}
 	

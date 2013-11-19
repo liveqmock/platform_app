@@ -154,7 +154,7 @@ public class ConsumerApi {
 		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + BILLING_TAG
 				+ SLASH + MODES_TAG + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY + AMPERSAND+ CONTENTID +contentID;
 	}
-	public static String getSusbcriptionRequesr(String paymentChannel,String packageId){
+	public static String getSusbcriptionRequest(String paymentChannel,String packageId){
 		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + BILLING_TAG
 				+ SLASH + SUBSCRIBE_TAG+ SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY + AMPERSAND+ PAYMENTCHANNEL +paymentChannel+ AMPERSAND +PACKAGEID+packageId;
 	}
