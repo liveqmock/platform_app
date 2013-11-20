@@ -255,7 +255,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				}
 				else
 				{
-					Util.showToast(LoginActivity.this, "Your device registration has been failed, Please check your internet connectivity and reopen the application.",Util.TOAST_TYPE_ERROR);
+					Util.showToast(LoginActivity.this, getString(R.string.loginconerr),Util.TOAST_TYPE_ERROR);
 //					Util.showToast("Your device registration has been failed, Please check your internet connectivity and reopen the app",  LoginActivity.this);
 				}
 
@@ -279,7 +279,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				}
 				else
 				{
-					Util.showToast(LoginActivity.this, "Your device registration has been failed, Please check your internet connectivity and reopen the application.",Util.TOAST_TYPE_ERROR);
+					Util.showToast(LoginActivity.this, getString(R.string.loginconerr),Util.TOAST_TYPE_ERROR);
 //					Util.showToast("Your device registration has been failed, Please check your internet connectivity and reopen the app",  LoginActivity.this);
 				}
 				
@@ -312,7 +312,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					Map<String,String> param2=new HashMap<String, String>();
 					param2.put("status", "Failure");
 					Analytics.trackEvent(Analytics.loginGuest,param2);
-					Util.showToast(LoginActivity.this, "Your device registration has been failed, Please check your internet connectivity and reopen the application.",Util.TOAST_TYPE_ERROR);
+					Util.showToast(LoginActivity.this, getString(R.string.loginconerr),Util.TOAST_TYPE_ERROR);
 //					Util.showToast("Your device registration has been failed, Please check your internet connectivity and reopen the app",  LoginActivity.this);
 				}
 				
@@ -1000,7 +1000,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			}
 			else
 			{
-				Util.showToast(LoginActivity.this, "Your device registration has been failed, Please check your internet connectivity and reopen the application.",Util.TOAST_TYPE_ERROR);
+				Util.showToast(LoginActivity.this, getString(R.string.loginconerr),Util.TOAST_TYPE_ERROR);
 //				Util.showToast("Your device registration has been failed, Please check your internet connectivity and reopen the app",  LoginActivity.this);
 			}
 
@@ -1026,7 +1026,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				}
 				else
 				{
-					Util.showToast(LoginActivity.this, "Your device registration has been failed, Please check your internet connectivity and reopen the application.",Util.TOAST_TYPE_ERROR);
+					Util.showToast(LoginActivity.this, getString(R.string.loginconerr),Util.TOAST_TYPE_ERROR);
 //					Util.showToast("Your device registration has been failed, Please check your internet connectivity and reopen the app",  LoginActivity.this);
 				}
 			}
@@ -1045,7 +1045,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			}
 			else
 			{
-				Util.showToast(LoginActivity.this, "Your device registration has been failed, Please check your internet connectivity and reopen the application.",Util.TOAST_TYPE_ERROR);
+				Util.showToast(LoginActivity.this, getString(R.string.loginconerr),Util.TOAST_TYPE_ERROR);
 //				Util.showToast("Your device registration has been failed, Please check your internet connectivity and reopen the app",  LoginActivity.this);
 			}
 		}

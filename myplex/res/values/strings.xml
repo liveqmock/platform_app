@@ -99,6 +99,7 @@
      <string name="osname">Android</string>
     <string name="interneterr">Hey, It seems your internet connection is not active, Please check</string>
     <string name="loginerr">Unable to process your request due to network. Use let me in option to browse the app</string>
+    <string name="loginconerr">Device registration failed, Check your internet connectivity.</string>
     <string name="clientsecret">ApalyaAndroid</string>
     <!-- URLS -->
     <!-- <string name="url">http://alpha.myplex.in:8866/user/v2/</string> -->

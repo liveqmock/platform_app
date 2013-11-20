@@ -69,6 +69,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 
 	// State maintained for proper onPause/OnResume behaviour.
 
+	private int mAutoStartCount = 0;
 	private int mPositionWhenPaused = -1;
 	private boolean mWasPlayingWhenPaused = false;
 	private boolean mControlResumed = false;
@@ -245,7 +246,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 		Log.d("PlayerScreen", "VideoViewPlayer openVideo Start");
 		// For streams that we expect to be slow to start up, show a
 		// progress spinner until playback starts.
-
+		mAutoStartCount = 0;
 		if (mUri == null || mVideoView == null) {
 			return;
 		}
@@ -481,6 +482,26 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 
 	public boolean onError(MediaPlayer player, int arg1, int arg2) {
 		Log.d("PlayerScreen", "VideoViewPlayer onError End");
+		mAutoStartCount++;
+		if(mAutoStartCount < 3){
+			int value = 0;
+			if(player != null){
+//				player.reset();
+				player.seekTo(mPositionWhenPaused);
+				player.start();
+			}
+			else{
+				value = 1;
+				mVideoView.seekTo(mPositionWhenPaused);
+				mVideoView.start();
+			}
+			if(mPlayerStatusListener != null){
+				mPlayerStatusListener.playerStatusUpdate("Retrying "+mAutoStartCount+" form position "+mPositionWhenPaused+" with error "+arg1+" status "+value);
+			}
+			Util.showToast(mContext, "Retrying "+mAutoStartCount, Util.TOAST_TYPE_INFO);
+			return true;
+		}
+		
 		if (mPlayerListener != null) {
 			boolean ret = mPlayerListener.onError(player, arg1, arg2);
 			mPlayerListener = null;
@@ -730,6 +751,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 	}
 	@Override
 	public boolean onInfo(MediaPlayer arg0, int arg1, int arg2) {
+		mPositionWhenPaused = mVideoView.getCurrentPosition();
 		if (mPlayerListener != null) {
 			boolean ret = mPlayerListener.onInfo(arg0, arg1, arg2);
 		}
