@@ -8,6 +8,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import android.app.Activity;
+import android.app.DownloadManager;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
@@ -457,7 +458,7 @@ public class CardVideoPlayer implements PlayerListener {
 				}
 				CardDownloadData mDownloadData = myplexapplication.mDownloadList.mDownloadedList.get(mData._id);
 				if(mDownloadData!=null){
-					if(mDownloadData.mCompleted && Util.isFileExist(mData.generalInfo.title+".wvm"))
+					if(mDownloadData.mCompleted && Util.isFileExist(mData._id+".wvm"))
 					{
 						if(mDownloadData.mPercentage==0)
 						{
@@ -478,7 +479,7 @@ public class CardVideoPlayer implements PlayerListener {
 					}
 					else
 					{
-						if(Util.isFileExist(mData.generalInfo.title+".wvm"))
+						if(Util.isFileExist(mData._id+".wvm"))
 						{
 							if(mPlayerStatusListener != null){
 								mPlayerStatusListener.playerStatusUpdate("Download Completed and file exists, starting player.....");
@@ -513,7 +514,8 @@ public class CardVideoPlayer implements PlayerListener {
 private void playVideoFile(CardDownloadData mDownloadData){
 
 	drmLicenseType="lp";
-	String url=mDownloadData.mDownloadPath;
+	String url="file:///sdcard/Android/data/com.apalya.myplex/files/"+mData._id+".wvm";
+	
 
 	if(mData.content !=null && mData.content.drmEnabled)
 	{
@@ -532,6 +534,11 @@ private void playVideoFile(CardDownloadData mDownloadData){
 	}
 	Uri uri ;
 	uri = Uri.parse(url);
+	if(mDownloadData.mCompleted)
+	{
+		DownloadManager manager = (DownloadManager) mContext.getSystemService(Context.DOWNLOAD_SERVICE);
+		uri=manager.getUriForDownloadedFile(mDownloadData.mDownloadId);
+	}
 	if(mPlayerStatusListener != null){
 		mPlayerStatusListener.playerStatusUpdate("Playing :: "+url);
 	}
