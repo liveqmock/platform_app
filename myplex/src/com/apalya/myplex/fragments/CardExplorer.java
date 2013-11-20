@@ -303,6 +303,22 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			fetchMinData();
 		}
 	}
+	private void fillEmptyData(){
+		mData.mMasterEntries.add(new CardData());
+		mData.mMasterEntries.add(new CardData());
+		mData.mMasterEntries.add(new CardData());
+		mData.mMasterEntries.add(new CardData());
+		mData.mMasterEntries.add(new CardData());
+		mData.mMasterEntries.add(new CardData());
+		mData.mMasterEntries.add(new CardData());
+		if(getResources().getBoolean(R.bool.isTablet)){
+			mTabletAdapter.setData(mData.mMasterEntries);
+		}else{
+			mCardView.addData(mData.mMasterEntries);
+			mCardView.show();
+			mCardView.sendViewReadyMsg(true);
+		}
+	}
 	private void fetchMinData() {
 		if(mData.requestType == CardExplorerData.REQUEST_SIMILARCONTENT){
 			return;
@@ -315,6 +331,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			requestUrl = ConsumerApi.getSearch(mData.searchQuery,ConsumerApi.LEVELDYNAMIC,mData.mStartIndex);
 			screenName="Search";
 		}else if(mData.requestType == CardExplorerData.REQUEST_RECOMMENDATION){
+//			fillEmptyData();
 			requestUrl = ConsumerApi.getRecommendation(ConsumerApi.LEVELDYNAMIC,mData.mStartIndex);
 			screenName="Search";
 		}else if(mData.requestType == CardExplorerData.REQUEST_FAVOURITE){
@@ -544,8 +561,10 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				Map<String,String> params=new HashMap<String, String>();
 				params.put("Status", status);
 				params.put("CardId", data._id);
-				params.put("CardType", data.generalInfo.type);
-				params.put("CardName", data.generalInfo.title);
+				if(data.generalInfo != null){
+					params.put("CardType", data.generalInfo.type);
+					params.put("CardName", data.generalInfo.title);
+				}
 				Analytics.trackEvent(Analytics.cardBrowseFavorite,params);
 				if(getResources().getBoolean(R.bool.isTablet)){
 					mTabletAdapter.notifyDataSetChanged();
@@ -566,8 +585,10 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		}
 		Map<String,String> params=new HashMap<String, String>();
 		params.put("CardId", data._id);
-		params.put("CardType", data.generalInfo.type);
-		params.put("CardName", data.generalInfo.title);
+		if(data.generalInfo != null){
+			params.put("CardType", data.generalInfo.type);
+			params.put("CardName", data.generalInfo.title);
+		}
 		Analytics.trackEvent(Analytics.cardBrowseSelect,params);
 		
 		mData.currentSelectedCard = index;
@@ -608,8 +629,10 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		// TODO Auto-generated method stub
 		Map<String,String> params=new HashMap<String, String>();
 		params.put("CardId", data._id);
-		params.put("CardType", data.generalInfo.type);
-		params.put("CardName", data.generalInfo.title);
+		if(data.generalInfo != null){
+			params.put("CardType", data.generalInfo.type);
+			params.put("CardName", data.generalInfo.title);
+		}
 		Analytics.trackEvent(Analytics.cardBrowseCancel,params);
 	}
 
@@ -620,8 +643,10 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		popup.showPackDialog(data, getActionBar().getCustomView());
 		Map<String,String> params=new HashMap<String, String>();
 		params.put("CardId", data._id);
-		params.put("CardType", data.generalInfo.type);
-		params.put("CardName", data.generalInfo.title);
+		if(data.generalInfo != null){
+			params.put("CardType", data.generalInfo.type);
+			params.put("CardName", data.generalInfo.title);
+		}
 		Analytics.trackEvent(Analytics.cardBrowsePurchase,params);
 	}
 
@@ -645,8 +670,10 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			
 			Map<String,String> params=new HashMap<String, String>();
 			params.put("CardId", mData.mMasterEntries.get(mData.currentSelectedCard)._id);
-			params.put("CardType", mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo.type);
-			params.put("CardName", mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo.title);
+			if(mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo != null){
+				params.put("CardType", mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo.type);
+				params.put("CardName", mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo.title);
+			}
 			Analytics.trackEvent(Analytics.cardBrowseSwipe,params);
 		}
 	}

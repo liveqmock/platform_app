@@ -19,6 +19,7 @@ import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardResponseData;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.ConsumerApi;
+import com.apalya.myplex.utils.HttpTimeOut;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -122,28 +123,9 @@ public class CacheManager {
 		GZipRequest myReg = new GZipRequest(url, onlineRequestSuccessListener(), onlineRequestErrorListener());
 //		myReg.printLogs(true);
 //		myReg.setShouldCache(true);
-		myReg.setRetryPolicy(new CacheRetry());
+		myReg.setRetryPolicy(new HttpTimeOut(10000));
 		queue.add(myReg);
 		Log.d(TAG,"issueOnlineRequest :"+url+" timeout "+myReg.getRetryPolicy().getCurrentTimeout());
-	}
-	private class CacheRetry implements RetryPolicy{
-
-		@Override
-		public int getCurrentTimeout() {
-			return 10000;
-		}
-
-		@Override
-		public int getCurrentRetryCount() {
-			return 0;
-		}
-
-		@Override
-		public void retry(VolleyError error) throws VolleyError {
-			// TODO Auto-generated method stub
-			
-		}
-		
 	}
 	private void addToCache(final CardResponseData minResultSet){
 		if(mAutoSave){

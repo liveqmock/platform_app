@@ -45,8 +45,7 @@
             android:id="@+id/card_title_fav_progress"
             android:layout_width="24dp"
             android:layout_height="24dp"
-            android:layout_alignLeft="@+id/card_title_fav"
-            android:layout_alignTop="@+id/card_title_fav"
+            android:layout_centerInParent="true"
             android:gravity="center_vertical" />
     </RelativeLayout>
 
@@ -70,7 +69,7 @@
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
             android:singleLine="true"
-            android:text="dsadsad"
+            android:text=""
             android:textColor="#343433"
             android:textSize="16sp" />
     </RelativeLayout>
@@ -118,7 +117,7 @@
             android:layout_centerInParent="true"
             android:gravity="center"
             android:singleLine="true"
-            android:text="fee"
+            android:text=""
             android:textColor="#6b6b6b"
             android:textSize="14sp" />
     </RelativeLayout>

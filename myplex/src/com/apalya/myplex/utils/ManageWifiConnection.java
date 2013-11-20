@@ -1,5 +1,8 @@
 package com.apalya.myplex.utils;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -72,13 +75,12 @@ public class ManageWifiConnection {
 			e.printStackTrace();
 			return false;
 		}
-		
 	}
 	private BroadcastReceiver mConnReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             try {
-            	
+            	Log.v(TAG,"BroadcastReceiver");
             	ConnectivityManager cm = (ConnectivityManager) mContext.getSystemService(mContext.CONNECTIVITY_SERVICE);
 				NetworkInfo currentNetworkInfo = cm.getActiveNetworkInfo();
 				if(currentNetworkInfo != null){
@@ -92,11 +94,49 @@ public class ManageWifiConnection {
 						}
 					}	
 				}
+				startTimeOut();
     		} catch (Exception e) {
     			e.printStackTrace();
     		}
         }
     };
+    private void startTimeOut(){
+    	stopTimeOut();
+    	Log.v(TAG,"startTimeOut");
+    	mTimeOutHandler.sendEmptyMessageDelayed(TIMEOUT,timeoutInterval);
+    }
+    private void stopTimeOut(){
+    	Log.v(TAG,"stopTimeOut");
+    	try {
+    		mTimeOutHandler.removeMessages(TIMEOUT);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+    }
+    private long timeoutInterval = 1000 *60; 
+    private Handler mTimeOutHandler = new Handler(Looper.getMainLooper()) {
+
+		@Override
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+				case TIMEOUT:{
+					Log.v(TAG,"mTimeOutHandler");
+					sendCallBack();
+					break;
+				}
+			}
+		}
+	};
+	private static final int TIMEOUT = 1;
+    private Timer mTimer = new Timer();
+    private TimerTask mTimeOutTask = new TimerTask() {
+		
+		@Override
+		public void run() {
+			Log.v(TAG,"TimerTask Run");
+			sendCallBack();
+		}
+	};
 	public void deRegisterReceivers() {
 		registered = false;
     	try {
@@ -115,6 +155,7 @@ public class ManageWifiConnection {
 	}
 	private void sendCallBack(){
 		Log.e(TAG, "sendCallBack");
+		stopTimeOut();
 		Handler h  = new Handler(Looper.getMainLooper());
 		h.post(new Runnable() {
 			

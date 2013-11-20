@@ -73,7 +73,7 @@
     <string name="feedbackmessagehint">Add a feedback</string>
     <string name="feedbackcancelbutton">Cancel</string>
     <string name="feedbackokbutton">OK</string>
-    
+    <string name="subscriptionconfirmationdialogtext">Do you want to proceed with the payment ?</string>
     <string name="playhint">Play</string>
     <string name="trailerhint">Play Trailer</string>
     
