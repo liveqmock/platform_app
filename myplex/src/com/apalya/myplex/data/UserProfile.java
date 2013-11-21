@@ -32,12 +32,8 @@ public class UserProfile implements Serializable{
 		
 		
 		userProfile="User Email: "+useremail+"\n\n"+
-				    "Phone: "+phonenumber+"\n\n"+
-					"Location: "+location+"\n\n"+
-				    "About: "+profileDesc+"\n\n"+
-					"Joined on:"+joinedDate+"\n\n"+
-				    "Last Visited: "+lastVisitedDate+"\n\n"+
-				    "Likes: "+likes+"\n\n";
+				    "Joined on:"+joinedDate+"\n\n"+
+				    "Last Visited: "+lastVisitedDate+"\n\n";
 		return userProfile;
 		
 	}

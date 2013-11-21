@@ -414,7 +414,9 @@ public class CardVideoPlayer implements PlayerListener {
 		{
 			if(!Util.isTokenValid(expiryTime))
 			{
+				closePlayer();
 				Util.showToast(mContext, "Your Subscription has been expired.",Util.TOAST_TYPE_ERROR);
+				return;
 			}
 			else
 			{
@@ -514,7 +516,7 @@ public class CardVideoPlayer implements PlayerListener {
 private void playVideoFile(CardDownloadData mDownloadData){
 
 	drmLicenseType="lp";
-	String url="file:///sdcard/Android/data/com.apalya.myplex/files/"+mData._id+".wvm";
+	String url="file://"+mDownloadData.mDownloadPath;
 	
 
 	if(mData.content !=null && mData.content.drmEnabled)

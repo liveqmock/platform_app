@@ -143,8 +143,16 @@ public class CardDetailViewFactory {
 		case CARDDETAIL_EXTRA_RELATED_MULTIMEDIA:
 			return createExtraMultiMediaView();
 		case CARDDETAIL_COMMENTS:
+			if(mData._id.equalsIgnoreCase("0"))
+			{
+			return null;	
+			}
 			return createCommentsView();
 		case CARDDETAIL_BRIEF_COMMENTS:
+			if(mData._id.equalsIgnoreCase("0"))
+			{
+			return null;	
+			}
 			return createCommentsView();
 		default:
 			break;
@@ -339,6 +347,9 @@ public class CardDetailViewFactory {
 //			}
 //		});
 		refreshSection();
+		
+		
+		
 		return v;
 	}
 	private ImageView mCommentRefresh;
