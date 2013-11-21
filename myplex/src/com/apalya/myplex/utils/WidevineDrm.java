@@ -4,12 +4,15 @@
 
 package com.apalya.myplex.utils;
 
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
 import java.util.EventListener;
 
 
 //import java.util.HashMap;
 import java.util.Set;
 
+import com.apalya.myplex.R;
 import com.apalya.myplex.views.CardVideoPlayer.PlayerStatusUpdate;
 
 import android.content.ContentValues;
@@ -172,7 +175,38 @@ public class WidevineDrm {
 
 	public int acquireRights(String assetUri) {
 
-		int rights = mDrmManager.acquireRights(getDrmInfoRequest(assetUri));
+		int rights = 0;
+		if(assetUri.contains("file:"))
+		{
+			int index=assetUri.lastIndexOf("/");
+			String name=assetUri.substring(index+1, assetUri.length());
+			assetUri=Util.downloadStoragePath+name;
+			try {
+	
+				FileInputStream fis = new FileInputStream(assetUri);
+	
+				FileDescriptor fd = fis.getFD();
+				DrmInfoRequest drmReq=getDrmInfoRequest(assetUri);
+				if (fd.valid()) {
+	
+					drmReq.put("FileDescriptorKey", fd.toString());
+				}
+	
+				rights=mDrmManager.acquireRights(drmReq);
+	
+				fis.close();
+	
+				}
+	
+				catch (java.io.IOException e) {
+	
+					logMessage("Unable to acquire rights for: " + assetUri);
+				}
+		}
+		else
+		{
+			rights = mDrmManager.acquireRights(getDrmInfoRequest(assetUri));
+		}
 		logMessage("\n DRM SERVER URI: "+Settings.DRM_SERVER_URI);
 		logMessage("\n DRM assetUri: "+assetUri);
 		logMessage("\n DRM DEVICE_ID: "+Settings.DEVICE_ID);
@@ -186,7 +220,16 @@ public class WidevineDrm {
 	public int checkRightsStatus(String assetUri) {
 
 		// Need to use acquireDrmInfo prior to calling checkRightsStatus
-		mDrmManager.acquireDrmInfo(getDrmInfoRequest(assetUri));
+		//mDrmManager.acquireDrmInfo(getDrmInfoRequest(assetUri));
+		
+		if(assetUri.contains("file:"))
+		{
+			int index=assetUri.lastIndexOf("/");
+			String name=assetUri.substring(index+1, assetUri.length());
+			assetUri=Util.downloadStoragePath+name;
+		}
+		
+		
 		int status = mDrmManager.checkRightsStatus(assetUri);
 		logMessage("checkRightsStatus  = " + status + "\n");
 
@@ -302,6 +345,7 @@ public class WidevineDrm {
 	}
 	private void logMessage(String message) {
 		sendMessage(message);
+		
 		//logBuffer.append(message);
 
 		/* if (logEventListener != null) {
@@ -314,6 +358,8 @@ public class WidevineDrm {
 			
 			@Override
 			public void run() {
+				if(mContext.getResources().getBoolean(R.bool.isTablet))
+					Util.showToast(mContext, str, Util.TOAST_TYPE_INFO);
 				if(mPlayerStatusListener != null){
 					mPlayerStatusListener.playerStatusUpdate(str);
 				}
