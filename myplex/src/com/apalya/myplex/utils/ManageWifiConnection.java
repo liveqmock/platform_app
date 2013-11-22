@@ -128,15 +128,6 @@ public class ManageWifiConnection {
 		}
 	};
 	private static final int TIMEOUT = 1;
-    private Timer mTimer = new Timer();
-    private TimerTask mTimeOutTask = new TimerTask() {
-		
-		@Override
-		public void run() {
-			Log.v(TAG,"TimerTask Run");
-			sendCallBack();
-		}
-	};
 	public void deRegisterReceivers() {
 		registered = false;
     	try {

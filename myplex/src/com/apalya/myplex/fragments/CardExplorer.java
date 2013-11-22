@@ -7,22 +7,33 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.animation.Animator.AnimatorListener;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.TranslateAnimation;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
@@ -53,6 +64,7 @@ import com.apalya.myplex.utils.AlertDialogUtil;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FavouriteUtil;
+import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.FavouriteUtil.FavouriteCallback;
 import com.apalya.myplex.utils.FetchDownloadProgress;
 import com.apalya.myplex.utils.FetchDownloadProgress.DownloadProgressStatus;
@@ -71,6 +83,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	private CacheManager mCacheManager = new CacheManager();
 	private CardTabletAdapater mTabletAdapter;
 	private View mRootView;
+	private RelativeLayout mNewArrivalLayout;
+	private TextView mNewArrivalTextView;
 	private ProgressDialog mProgressDialog = null;
 	public CardData mSelectedCard = null;
 	private String screenName;
@@ -146,7 +160,6 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	}
 	@Override
 	public void onStop() {
-	// TODO Auto-generated method stub
 		Log.d(TAG,"onStop");
 		if(mDownloadProgressManager != null){
 			mDownloadProgressManager.stopPolling();
@@ -169,15 +182,101 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			mStackFrame.setVisibility(View.INVISIBLE);
 		}
 	}
+	private OnClickListener mNewArrivalClickListener = new OnClickListener() {
+		
+		@Override
+		public void onClick(View arg0) {
+			if(getResources().getBoolean(R.bool.isTablet)){
+				
+			}else{
+				mCardView.moveTo(mOldDataListSize);
+			}
+			hideNewArrivals();			
+		}
+	};
+	private void showNewArrivals(){
+		mNewArrivalLayout.setVisibility(View.VISIBLE);
+		AnimatorSet set = new AnimatorSet();
+		set.play(ObjectAnimator.ofFloat(mNewArrivalLayout, View.TRANSLATION_Y, -(mNewArrivalLayout.getHeight()+getResources().getDimension(R.dimen.margin_gap_4)),150));
+		set.setDuration(1500);
+		set.setInterpolator(new DecelerateInterpolator());
+		set.addListener(new AnimatorListenerAdapter(){
+			public void onAnimationEnd(Animator animation) {
+				AnimatorSet set1 = new AnimatorSet();
+				set1.play(ObjectAnimator.ofFloat(mNewArrivalLayout, View.TRANSLATION_Y, 150,0));
+				set1.setDuration(1500);
+				set1.setInterpolator(new DecelerateInterpolator());
+				set1.addListener(new AnimatorListenerAdapter(){
+					public void onAnimationEnd(Animator animation) {
+						
+						startTimeOut();
+					}
+				});
+				set1.start();
+//				startTimeOut();
+			}
+		});
+		set.start();
+	}
+	private void hideNewArrivals(){
+		stopTimeOut();
+		AnimatorSet set = new AnimatorSet();
+		set.play(ObjectAnimator.ofFloat(mNewArrivalLayout, View.TRANSLATION_Y, 0,-(mNewArrivalLayout.getHeight()+getResources().getDimension(R.dimen.margin_gap_4))));
+		set.setDuration(1500);
+		set.setInterpolator(new DecelerateInterpolator());
+		set.addListener(new AnimatorListenerAdapter(){
+			public void onAnimationEnd(Animator animation) {
+//				mNewArrivalLayout.setVisibility(View.GONE);
+			}
+		});
+		set.start();
+	}
+	private void startTimeOut(){
+    	stopTimeOut();
+    	Log.v(TAG,"startTimeOut");
+    	mTimeOutHandler.sendEmptyMessageDelayed(TIMEOUT,timeoutInterval);
+    }
+    private void stopTimeOut(){
+    	Log.v(TAG,"stopTimeOut");
+    	try {
+    		mTimeOutHandler.removeMessages(TIMEOUT);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+    }
+	private long timeoutInterval = 1000 * 15; 
+	private Handler mTimeOutHandler = new Handler(Looper.getMainLooper()) {
+	
+			@Override
+			public void handleMessage(Message msg) {
+				switch (msg.what) {
+					case TIMEOUT:{
+					Log.v(TAG,"mTimeOutHandler");
+					hideNewArrivals();
+					break;
+				}
+			}
+		}
+	};
+	private static final int TIMEOUT = 1;
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		Log.d(TAG,"onCreateView");
 		System.gc();
+		mAddDataAdded = false;
 		if(isVisible()){
 			mMainActivity.addFilterData(new ArrayList<FilterMenudata>(), mFilterMenuClickListener);
 		}
 		mRootView = inflater.inflate(R.layout.cardbrowsing, container, false);
+		mNewArrivalLayout  = (RelativeLayout)mRootView.findViewById(R.id.new_arrival_layout);
+		mNewArrivalLayout.setOnClickListener(mNewArrivalClickListener);
+		mNewArrivalLayout.bringToFront();
+		mNewArrivalLayout.setVisibility(View.INVISIBLE);
+		mNewArrivalTextView  = (TextView)mRootView.findViewById(R.id.new_arrival_text);
+		mNewArrivalTextView.setTypeface(FontUtil.Roboto_Medium);
+		TextView newArrivalIcon = (TextView)mRootView.findViewById(R.id.new_arrival_icon);
+		newArrivalIcon.setTypeface(FontUtil.ss_symbolicons_line);
 		mCardView = (CardView) mRootView.findViewById(R.id.framelayout);
 		mGridView = (GridView)mRootView.findViewById(R.id.tabletview);
 		mStackFrame = (LinearLayout)mRootView.findViewById(R.id.cardstackframe);
@@ -209,6 +308,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		}
 		mMainActivity.setSearchBarVisibilty(View.VISIBLE);
 		delayedAction();
+		hideNewArrivals();
 		return mRootView;
 	}
 
@@ -303,23 +403,41 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			fetchMinData();
 		}
 	}
-	private void fillEmptyData(){
-		mData.mMasterEntries.add(new CardData());
-		mData.mMasterEntries.add(new CardData());
-		mData.mMasterEntries.add(new CardData());
-		mData.mMasterEntries.add(new CardData());
-		mData.mMasterEntries.add(new CardData());
-		mData.mMasterEntries.add(new CardData());
-		mData.mMasterEntries.add(new CardData());
-		if(getResources().getBoolean(R.bool.isTablet)){
-			mTabletAdapter.setData(mData.mMasterEntries);
-		}else{
-			mCardView.addData(mData.mMasterEntries);
-			mCardView.show();
-			mCardView.sendViewReadyMsg(true);
+	private boolean mOldDataAdded = false;
+	private int mOldDataListSize  = 0;
+	private boolean mAddDataAdded = false;
+	private void fillOldData(final List<CardData> lastSavedData){
+		Handler h = new Handler(Looper.getMainLooper());
+		h.post(new Runnable() {
+			
+			@Override
+			public void run() {
+				mOldDataAdded = true;
+				mOldDataListSize = lastSavedData.size();
+				
+				for(CardData data:lastSavedData){
+					mData.mEntries.put(data._id,data);
+					mData.mMasterEntries.add(data);
+				}
+				applyData();
+			}
+		});
+	}
+	private void prepareLastSessionData(){
+		CardExplorerData explorerData = myplexapplication.getCardExplorerData();
+		if(explorerData.requestType == CardExplorerData.REQUEST_RECOMMENDATION){
+			List<CardData> lastSavedData = (List<CardData>)Util.loadObject(myplexapplication.getApplicationConfig().lastViewedCardsPath);
+			if(lastSavedData != null){
+				Log.d("CardExplorer","last saved list size = "+lastSavedData.size());
+			}
+			if(lastSavedData != null && lastSavedData.size() > 0){
+				fillOldData(lastSavedData);
+			}
 		}
 	}
 	private void fetchMinData() {
+		mOldDataAdded = false;
+		mOldDataListSize = 0;
 		if(mData.requestType == CardExplorerData.REQUEST_SIMILARCONTENT){
 			return;
 		}
@@ -331,7 +449,10 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			requestUrl = ConsumerApi.getSearch(mData.searchQuery,ConsumerApi.LEVELDYNAMIC,mData.mStartIndex);
 			screenName="Search";
 		}else if(mData.requestType == CardExplorerData.REQUEST_RECOMMENDATION){
-//			fillEmptyData();
+			if(!mAddDataAdded){
+				mAddDataAdded = true;
+				prepareLastSessionData();
+			}
 			requestUrl = ConsumerApi.getRecommendation(ConsumerApi.LEVELDYNAMIC,mData.mStartIndex);
 			screenName="Search";
 		}else if(mData.requestType == CardExplorerData.REQUEST_FAVOURITE){
@@ -677,6 +798,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			Analytics.trackEvent(Analytics.cardBrowseSwipe,params);
 		}
 	}
+	
 
 	@Override
 	public void OnCacheResults(HashMap<String, CardData> object ,boolean issuedRequest) {
@@ -702,7 +824,10 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			showNoDataMessage(issuedRequest);
 		}
 		applyData();
-		
+		if(mOldDataAdded){
+			mOldDataAdded = false;
+			showNewArrivals();
+		}
 		if(mData.mStartIndex==10)
 		{
 			Map<String,String> params=new HashMap<String, String>();
@@ -773,6 +898,10 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			Analytics.trackEvent(Analytics.cardBrowseScreen,params);
 		showNoDataMessage(false);
 		applyData();		
+		if(mOldDataAdded){
+			mOldDataAdded = false;
+			showNewArrivals();
+		}
 	}
 
 	@Override
