@@ -385,7 +385,12 @@ public class MainActivity extends Activity implements MainBaseOptions {
 
 	private boolean closeApplication() {
 		Util.serializeData(MainActivity.this);
-		saveCurrentSessionData();
+		Thread t = new Thread() {
+			public void run() {
+				saveCurrentSessionData();
+			}
+		};
+		t.start();
 		if(myplexapplication.getUserProfileInstance().firstVisitStatus)
 		{
 			final boolean exitStatus=false;
@@ -507,7 +512,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		if(explorerData.requestType == CardExplorerData.REQUEST_RECOMMENDATION){
 			List<CardData> toStoreList = new ArrayList<CardData>();
 			int count = 0;
-			for(int i = explorerData.mMasterEntries.size()-1;i > 0;i--){
+			for(int i = explorerData.mMasterEntries.size()-1;i >= 0;i--){
 				if( count >= 10){
 					break;
 				}

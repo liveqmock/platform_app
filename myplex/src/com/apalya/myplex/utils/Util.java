@@ -887,7 +887,11 @@ public class Util {
 		return false;
 	}
 	
-	public static void saveObject(Object obj,String path) {		try {			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(path))); 			oos.writeObject(obj); 			oos.flush(); 			oos.close();		} catch (Exception ex) {			Log.v("Util", ex.getMessage());			ex.printStackTrace();		}	}	public static Object loadObject(String path) {		try {			File f = new File(path);			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(f));			Object o = ois.readObject();			return o;		} catch (Exception ex) {			Log.v("Util", ex.getMessage());			ex.printStackTrace();		}		return null;	}
+	public static void saveObject(Object obj,String path) {		try {			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(path))); 			oos.writeObject(obj); 			oos.flush(); 			oos.close();		} catch (Exception ex) {			if(ex != null){
+//				Log.v("Util", ex.getMessage());				ex.printStackTrace();			}
+		}	}	public static Object loadObject(String path) {		try {			File f = new File(path);			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(f));			Object o = ois.readObject();			return o;		} catch (Exception ex) {			if(ex != null){
+//				Log.v("Util", ex.getMessage());				ex.printStackTrace();			}
+		}		return null;	}
 	
 	public static long dirSize(File dir) {
 	    long result = 0;

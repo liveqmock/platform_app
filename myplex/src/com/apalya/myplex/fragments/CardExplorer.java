@@ -87,6 +87,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	private TextView mNewArrivalTextView;
 	private ProgressDialog mProgressDialog = null;
 	public CardData mSelectedCard = null;
+	private GZipRequest mVolleyRequest;
 	private String screenName;
 	private LinearLayout mStackFrame;
 	private HashMap<CardData,Integer> mDownloadTracker= new HashMap<CardData,Integer>();
@@ -161,10 +162,19 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	@Override
 	public void onStop() {
 		Log.d(TAG,"onStop");
+		closeSession();
 		if(mDownloadProgressManager != null){
 			mDownloadProgressManager.stopPolling();
 		}
 		super.onStop();
+	}
+	private void closeSession(){
+		if(mCacheManager != null){
+			mCacheManager.deRegistration();
+		}
+		if(mVolleyRequest != null){
+			mVolleyRequest.cancel();
+		}
 	}
 	private void showStackedFrame(){
 		if(getResources() != null && getResources().getBoolean(R.bool.isTablet)){
@@ -417,6 +427,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				
 				for(CardData data:lastSavedData){
 					mData.mEntries.put(data._id,data);
+					Log.d("CardExplorer","ID= "+data._id+ " olddata");
 					mData.mMasterEntries.add(data);
 				}
 				applyData();
@@ -424,16 +435,21 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		});
 	}
 	private void prepareLastSessionData(){
-		CardExplorerData explorerData = myplexapplication.getCardExplorerData();
-		if(explorerData.requestType == CardExplorerData.REQUEST_RECOMMENDATION){
-			List<CardData> lastSavedData = (List<CardData>)Util.loadObject(myplexapplication.getApplicationConfig().lastViewedCardsPath);
-			if(lastSavedData != null){
-				Log.d("CardExplorer","last saved list size = "+lastSavedData.size());
+		Thread t = new Thread() {
+			public void run() {
+				CardExplorerData explorerData = myplexapplication.getCardExplorerData();
+				if(explorerData.requestType == CardExplorerData.REQUEST_RECOMMENDATION){
+					List<CardData> lastSavedData = (List<CardData>)Util.loadObject(myplexapplication.getApplicationConfig().lastViewedCardsPath);
+					if(lastSavedData != null){
+						Log.d("CardExplorer","last saved list size = "+lastSavedData.size());
+					}
+					if(lastSavedData != null && lastSavedData.size() > 0){
+						fillOldData(lastSavedData);
+					}
+				}
 			}
-			if(lastSavedData != null && lastSavedData.size() > 0){
-				fillOldData(lastSavedData);
-			}
-		}
+		};
+		t.start();
 	}
 	private void fetchMinData() {
 		mOldDataAdded = false;
@@ -472,7 +488,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		attrib.put("Duration", "");
 		Analytics.trackEvent(Analytics.cardBrowseDuration,attrib,true);
 		requestUrl = requestUrl.replaceAll(" ", "%20");
-		GZipRequest mVolleyRequest = new GZipRequest(requestMethod, requestUrl, deviceMinSuccessListener(), responseErrorListener());
+		mVolleyRequest = new GZipRequest(requestMethod, requestUrl, deviceMinSuccessListener(), responseErrorListener());
 //		mVolleyRequest.printLogs(true);
 //		myReg.setShouldCache(true);
 		Log.d(TAG,"Min Request:"+requestUrl);
@@ -806,6 +822,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			showNoDataMessage(issuedRequest);
 			return;
 		}
+		boolean itemsAdded = false;
 		int count = 0;
 		Set<String> keySet = object.keySet();
 			
@@ -814,6 +831,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			if(mData.mEntries.get(key) == null){
 				mData.mEntries.put(key,object.get(key));
 				mData.mMasterEntries.add(object.get(key));
+				Log.d("CardExplorer","ID= "+key+ " new arrived");
+				itemsAdded = true;
 				if(count == 0){
 					mSelectedCard = object.get(key);
 					count++;
@@ -826,7 +845,9 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		applyData();
 		if(mOldDataAdded){
 			mOldDataAdded = false;
-			showNewArrivals();
+			if(itemsAdded){
+				showNewArrivals();
+			}
 		}
 		if(mData.mStartIndex==10)
 		{
@@ -870,12 +891,13 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	@Override
 	public void OnOnlineResults(List<CardData> dataList) {
 		if(dataList == null){return;}
-		
+		boolean itemsAdded = false;
 		for(CardData data:dataList){
 			
 //			mData.mEntries.add(data);
 			if(mData.mEntries.get(data._id) == null){
 				mData.mEntries.put(data._id,data);
+				itemsAdded = true;
 				mData.mMasterEntries.add(data);
 			}
 			
@@ -900,7 +922,9 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		applyData();		
 		if(mOldDataAdded){
 			mOldDataAdded = false;
-			showNewArrivals();
+			if(itemsAdded){
+				showNewArrivals();
+			}
 		}
 	}
 
