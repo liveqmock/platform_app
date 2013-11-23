@@ -152,7 +152,6 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		if(v != null){
 			mDescriptionContentLayout.addView(v);
 		}
-		
 		v  = mCardDetailViewFactory.CreateView(mCardData,CardDetailViewFactory.CARDDETAIL_BREIF_RELATED_MULTIMEDIA);
 		if(v != null){
 			addSpace();
@@ -163,7 +162,6 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 			addSpace();
 			mCommentsContentLayout.addView(v);	
 		}
-		
 	}
 
 

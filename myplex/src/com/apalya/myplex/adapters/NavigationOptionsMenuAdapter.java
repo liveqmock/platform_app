@@ -78,7 +78,16 @@ public class NavigationOptionsMenuAdapter extends BaseAdapter {
 		NavigationOptionsMenu menu = mMenuItemList.get(position);
 		v = mInflater.inflate(menu.mResourceLayoutId, null);
 		if (menu.mResourceLayoutId == R.layout.navigation_menuitemlarge) {
+			TextView noImageText = (TextView)v.findViewById(R.id.drawer_list_item_image_text);
+			noImageText.setTypeface(FontUtil.ss_symbolicons_line);
 			NetworkImageView image = (NetworkImageView) v.findViewById(R.id.drawer_list_item_image);
+			if(menu.mIconUrl == null || menu.mIconUrl.length() == 0){
+				noImageText.setVisibility(View.VISIBLE);
+				image.setVisibility(View.GONE);
+			}else{
+				noImageText.setVisibility(View.GONE);
+				image.setVisibility(View.VISIBLE);
+			}
 			TextView text = (TextView) v.findViewById(R.id.drawer_list_item_text);
 			text.setTypeface(FontUtil.Roboto_Light);
 			text.setText(menu.mLabel);
