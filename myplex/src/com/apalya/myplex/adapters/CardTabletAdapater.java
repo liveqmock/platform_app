@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import android.animation.Animator;
@@ -11,6 +12,8 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.Animator.AnimatorListener;
 import android.content.Context;
+import android.drm.DrmErrorEvent;
+import android.drm.DrmInfoEvent;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -38,11 +41,13 @@ import com.apalya.myplex.data.CardImageView;
 import com.apalya.myplex.data.CardViewHolder;
 import com.apalya.myplex.data.CardViewMeta;
 import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.CardImageLoader;
 import com.apalya.myplex.utils.FavouriteUtil;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
+import com.apalya.myplex.utils.WidevineDrm;
 
 public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 	private static final String TAG = "CardGoogleLayoutAdapater";
@@ -339,12 +344,97 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 				return;
 			}
 			int index = mDataList.indexOf(dataHolder.mDataObject);
+			
+			/*****************************DELTEING DOWNLOAD DATA************************************/
+			
+			if(myplexapplication.mDownloadList != null){
+				CardDownloadData mDownloadData = myplexapplication.mDownloadList.mDownloadedList.get(mDataList.get(index)._id);
+				if(mDownloadData!=null){
+					Util.removeDownload(mDownloadData.mDownloadId,mContext);
+					myplexapplication.mDownloadList.mDownloadedList.remove(mDataList.get(index)._id);
+					try {
+						Log.i(TAG, "prepareDrmManager ");
+						prepareDrmManager(mDownloadData.mDownloadPath);
+						Log.i(TAG, "removerights "+mDownloadData.mDownloadPath);
+						mDrmManagar.removeRights(mDownloadData.mDownloadPath);
+						Log.i(TAG, "removerights Sucess");
+					} catch (Exception e) {
+						Log.e(TAG, "Failed during remove rights");
+					}
+					Util.saveObject(myplexapplication.mDownloadList, myplexapplication.getApplicationConfig().downloadCardsPath);
+				}
+			}
+			/***************************************************************************************/
+			
 			mDataList.remove(index);
 			mNumberofItems = mDataList.size();
 			notifyDataSetChanged();
 		}
 	};
 
+private void prepareDrmManager(String url){
+		
+		mDrmManagar = new WidevineDrm(mContext);
+		
+		
+		mDrmManagar.logBuffer.append("Asset Uri: " + url + "\n");
+		mDrmManagar.logBuffer.append("Drm Server: " + WidevineDrm.Settings.DRM_SERVER_URI + "\n");
+		mDrmManagar.logBuffer.append("Device Id: " + WidevineDrm.Settings.DEVICE_ID + "\n");
+		mDrmManagar.logBuffer.append("Portal Name: " + WidevineDrm.Settings.PORTAL_NAME + "\n");
+		
+        // Set log update listener
+        WidevineDrm.WidevineDrmLogEventListener drmLogListener =
+            new WidevineDrm.WidevineDrmLogEventListener() {
+            public void logUpdated(int status,int value) {
+            	updateLogs(status,value);
+            }
+        };
+		
+        mDrmManagar.setLogListener(drmLogListener);
+        mDrmManagar.registerPortal(WidevineDrm.Settings.PORTAL_NAME);
+		}
+	
+	private WidevineDrm mDrmManagar;
+
+	protected void updateLogs(int status,int value) {
+			if(status==0 && value== DrmInfoEvent.TYPE_RIGHTS_INSTALLED)
+			{
+				Map<String,String> params=new HashMap<String, String>();
+				params.put("Status", "PlayerRightsAcqusition");
+				Analytics.trackEvent(Analytics.PlayerRightsAcqusition,params);
+				//Util.showToast(mContext,"RIGHTS INSTALLED",Util.TOAST_TYPE_INFO);
+			}
+			if(status==1 ){
+				String errMsg = "Error while playing";
+				switch (value) {
+				case DrmErrorEvent.TYPE_NO_INTERNET_CONNECTION:
+					errMsg="No Internet Connection";
+					break;
+				case DrmErrorEvent.TYPE_NOT_SUPPORTED:
+					errMsg="Device Not Supported";
+					break;
+				case DrmErrorEvent.TYPE_OUT_OF_MEMORY:
+					errMsg="Out of Memory";
+					break;
+				case DrmErrorEvent.TYPE_PROCESS_DRM_INFO_FAILED:
+					errMsg="Process DRM Info failed";
+					break;
+				case DrmErrorEvent.TYPE_REMOVE_ALL_RIGHTS_FAILED:
+					errMsg="Remove All Rights failed";
+					break;
+				case DrmErrorEvent.TYPE_RIGHTS_NOT_INSTALLED:
+					errMsg="Rights not installed";
+					break;
+				case DrmErrorEvent.TYPE_RIGHTS_RENEWAL_NOT_ALLOWED:
+					errMsg="Rights renewal not allowed";
+					break;
+				}
+				Util.showToast(mContext,errMsg,Util.TOAST_TYPE_INFO);
+				//drmManager.
+			}
+			if(mDrmManagar!=null)
+				mDrmManagar.unRegisterLogListener();
+	}
 	private CardItemClickListener mFavListener = new CardItemClickListener() {
 
 		@Override

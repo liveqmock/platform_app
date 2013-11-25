@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -333,7 +334,7 @@ public class IndexHandler {
 		private List<CardData> mCardIds = null;
 		private OperationType mSearchType;
 		private SearchResult mCallback = null;
-		private HashMap<String, CardData> mSearchResult = new HashMap<String, CardData>();
+		private LinkedHashMap<String, CardData> mSearchResult = new LinkedHashMap<String, CardData>();
 		
 		public BgSearchAsyncTask(List<CardData> cardIds, OperationType searchType, SearchResult callBack) {
 			this.mCardIds = cardIds;
