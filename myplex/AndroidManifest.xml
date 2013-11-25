@@ -61,7 +61,8 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateAlwaysVisible" >
         </activity>
-        <activity android:name=".SubscriptionView" >
+        <activity android:name=".SubscriptionView"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.apalya.myplex.MainActivity"
