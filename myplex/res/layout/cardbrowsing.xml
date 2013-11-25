@@ -5,6 +5,40 @@
     android:layout_height="match_parent"
     android:background="#e6e6e6" >
 
+    <RelativeLayout
+        android:id="@+id/new_arrival_layout"
+        android:layout_marginTop="4dp"
+        android:layout_width="wrap_content" android:layout_centerHorizontal="true"  android:background="@drawable/card_browsing_newarrivals"
+        android:layout_height="48dp" >
+        <TextView
+            android:id="@+id/new_arrival_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true" 
+            android:layout_marginRight="4dp" 
+            android:layout_marginLeft="6dp" 
+            android:layout_centerVertical="true"
+            android:text="@string/new_arrival_indicator"
+            android:textColor="#000000"
+            android:textSize="16sp" />
+        <TextView
+            android:id="@+id/new_arrival_text"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:paddingRight="6dp"
+            android:layout_toRightOf="@+id/new_arrival_icon"
+            android:ellipsize="marquee"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:gravity="center"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:singleLine="true"
+            android:text="new movies available"
+            android:textColor="#54B5E9"
+            android:textSize="16sp" />
+
+    </RelativeLayout>
+
     <LinearLayout
         android:id="@+id/cardstackframe"
         android:layout_width="match_parent"

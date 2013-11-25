@@ -384,6 +384,7 @@ public class Util {
 		
 		long lastDownloadId=-1L;
 		String aMovieName=aMovieData.generalInfo.title;
+		String aFileName=aMovieData._id;
 		
 		CardDownloadedDataList downloadlist =  null;
 		try {
@@ -398,7 +399,7 @@ public class Util {
 			DownloadManager manager = (DownloadManager) mContext.getSystemService(Context.DOWNLOAD_SERVICE);
 
 
-			//Uri uri=Uri.parse("http://commonsware.com/misc/test.mp4");
+			//Uri uri=Uri.parse("http://46.137.243.190/wvm/armag_prod2.wvm");
 			Uri uri=Uri.parse(aUrl);
 
 			/*Environment
@@ -414,7 +415,7 @@ public class Util {
 							.setTitle("myplex")
 							.setDescription(aMovieName)
 							.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN)
-							.setDestinationInExternalFilesDir(mContext, "", aMovieName+".wvm"));
+							.setDestinationInExternalFilesDir(mContext, "", aFileName+".wvm"));
 			
 			
 			if(lastDownloadId>0)
@@ -444,7 +445,7 @@ public class Util {
 		
 		CardDownloadData downloadData= new CardDownloadData();
 		downloadData.mDownloadId=lastDownloadId;
-		downloadData.mDownloadPath="file://"+downloadStoragePath+aMovieName+".wvm";
+		downloadData.mDownloadPath=downloadStoragePath+aFileName+".wvm";
 		//downloadData.mDownloadPath=mContext.getExternalFilesDir(null).getPath() +"/"+aMovieName+".wvm";
 		downloadlist.mDownloadedList.put(aMovieData._id, downloadData);
 		myplexapplication.mDownloadList=downloadlist;
@@ -886,7 +887,11 @@ public class Util {
 		return false;
 	}
 	
-	public static void saveObject(Object obj,String path) {		try {			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(path))); 			oos.writeObject(obj); 			oos.flush(); 			oos.close();		} catch (Exception ex) {			Log.v("Util", ex.getMessage());			ex.printStackTrace();		}	}	public static Object loadObject(String path) {		try {			File f = new File(path);			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(f));			Object o = ois.readObject();			return o;		} catch (Exception ex) {			Log.v("Util", ex.getMessage());			ex.printStackTrace();		}		return null;	}
+	public static void saveObject(Object obj,String path) {		try {			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(path))); 			oos.writeObject(obj); 			oos.flush(); 			oos.close();		} catch (Exception ex) {			if(ex != null){
+//				Log.v("Util", ex.getMessage());				ex.printStackTrace();			}
+		}	}	public static Object loadObject(String path) {		try {			File f = new File(path);			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(f));			Object o = ois.readObject();			return o;		} catch (Exception ex) {			if(ex != null){
+//				Log.v("Util", ex.getMessage());				ex.printStackTrace();			}
+		}		return null;	}
 	
 	public static long dirSize(File dir) {
 	    long result = 0;

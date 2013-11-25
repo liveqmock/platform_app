@@ -10,6 +10,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.Request.Method;
 import com.android.volley.toolbox.StringRequest;
+import com.apalya.myplex.R;
 import com.apalya.myplex.SubscriptionView;
 import com.apalya.myplex.cache.InsertionResult;
 import com.apalya.myplex.data.BaseReponseData;
@@ -21,14 +22,20 @@ import com.apalya.myplex.data.MsisdnData;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.FetchCardField.FetchComplete;
 import com.apalya.myplex.utils.MsisdnRetrivalEngine.MsisdnRetrivalEngineListener;
+import com.apalya.myplex.views.CustomDialog;
+import com.apalya.myplex.views.JazzyViewPager.TransitionEffect;
 import com.flurry.android.FlurryAgent;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 
 public class SubcriptionEngine {
 	public static final String TAG = "SubcriptionEngine";
@@ -38,6 +45,7 @@ public class SubcriptionEngine {
 	private MsisdnRetrivalEngine mMsisdnRetrivalEngine;
 	private CardDataPackagePriceDetailsItem mSelectedPriceItem;
 	private CardDataPackages mSelectedPackageItem;
+	private CustomDialog mAlbumDialog;
 	public SubcriptionEngine(Context context){
 		this.mContext = context;
 	}
@@ -56,8 +64,8 @@ public class SubcriptionEngine {
 				if(mSelectedPriceItem.webBased){
 					launchWebBasedSubscription();
 				}else{
-					if(mSelectedPriceItem.doubleConfirmation){
-						
+					if(!mSelectedPriceItem.doubleConfirmation){
+						showConfirmationDialog();
 					}else{
 						doOperatorBilling();
 					}
@@ -69,6 +77,29 @@ public class SubcriptionEngine {
 		} catch (Exception e) {
 		}
 	}
+	private void showConfirmationDialog(){
+		mAlbumDialog = new CustomDialog(mContext);
+		mAlbumDialog.setContentView(R.layout.subscriptionconfirmationdialog);
+		Button ok = (Button)mAlbumDialog.findViewById(R.id.subscription_ok_button);
+		Button cancel = (Button)mAlbumDialog.findViewById(R.id.subscription_cancel_button);
+		cancel.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				mAlbumDialog.dismiss();				
+			}
+		});
+		ok.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				mAlbumDialog.dismiss();	
+				doOperatorBilling();
+			}
+		});
+		mAlbumDialog.setCancelable(true);
+		mAlbumDialog.show(); 
+	}
 	private void doOperatorBilling(){
 		showProgressBar();
 		Log.e(TAG, "doOperatorBilling");
@@ -76,8 +107,9 @@ public class SubcriptionEngine {
 			
 			@Override
 			public void onMsisdnData(MsisdnData data) {
+				mMsisdnRetrivalEngine.deRegisterCallBacks();
 				if(data == null){
-					// error message
+					Util.showToast(mContext, "Subscription failed", Util.TOAST_TYPE_ERROR);
 					dismissProgressBar();
 					return;
 				}
@@ -104,6 +136,7 @@ public class SubcriptionEngine {
 		};
 		Log.e(TAG, "request: "+requestUrl);
 		myReg.setShouldCache(false);
+		myReg.setRetryPolicy(new HttpTimeOut(15000));
 		queue.add(myReg);
 	}
 	
@@ -122,6 +155,7 @@ public class SubcriptionEngine {
 					Log.e(TAG, "onlineRequestSuccessListener success");
 					postSubscriptionSuccess();	
 				}else{
+					Util.showToast(mContext, "Subscription failed", Util.TOAST_TYPE_ERROR);
 					dismissProgressBar();
 				}
 				
@@ -133,6 +167,7 @@ public class SubcriptionEngine {
 			@Override
 			public void onErrorResponse(VolleyError error) {
 				Log.e(TAG, "Subscriptionresponse "+error);
+				Util.showToast(mContext, "Subscription failed", Util.TOAST_TYPE_ERROR);
 				dismissProgressBar();
 			}
 		};

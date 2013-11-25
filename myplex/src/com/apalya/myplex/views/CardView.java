@@ -365,6 +365,9 @@ public class CardView extends ScrollView {
 		
 //		ImageUrlMap.put(""+position,null);
 		
+		if(data.generalInfo == null){
+			return;
+		}
 		if(data.generalInfo != null && data.generalInfo.title != null){
 			dataHolder.mTitle.setText(data.generalInfo.title);
 		}

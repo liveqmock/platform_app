@@ -1666,9 +1666,15 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		{
 
 			mUserInfo.firstVisitStatus=true;
+			
+			
+			
 			Log.d(TAG, "^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
 			Map<String, String> params = new HashMap<String, String>();
-			params.put("serialNo", mDevInfo.getDeviceId());
+			if(mDevInfo.getDeviceId()!=null && mDevInfo.getDeviceId().length()>0)
+				params.put("serialNo", mDevInfo.getDeviceId());
+			else
+				params.put("serialNo", mDevInfo.getDeviceSNo());
 			params.put("os", mDevInfo.getDeviceOs());
 			params.put("osVersion", mDevInfo.getDeviceOsVer());
 			params.put("make",mDevInfo.getDeviceMake());

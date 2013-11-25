@@ -219,6 +219,7 @@ public class PackagePopUp {
 									CardDataPackages packageitem = (CardDataPackages) arg0.getTag();
 									int id = arg0.getId();
 									mSubscriptionEngine.doSubscription(packageitem, id);
+//									dismissFilterMenuPopupWindow();
 								}
 							}catch (Exception e) {
 									// TODO: handle exception

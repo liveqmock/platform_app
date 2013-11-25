@@ -37,6 +37,9 @@ public class MsisdnRetrivalEngine {
 		this.mContext = context;
 		mNetworkManager = new ManageWifiConnection(mContext);
 	}
+	public void deRegisterCallBacks(){
+		this.mListener = null;
+	}
 	public void getMsisdnData(MsisdnRetrivalEngineListener listener){
 		Log.e(TAG, "getMsisdnData");
 		this.mListener = listener;

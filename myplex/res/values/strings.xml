@@ -63,6 +63,8 @@
     <string name="actionbar_filter">&#x25E2; </string>
     <string name="card_play_font">&#xE8B1;</string>
     <string name="card_trailer_font">&#xE8B0;</string>
+    <string name="new_arrival_indicator">&#x2691;</string>
+    <string name="profile_noimage">&#xE420;</string>
     <string name="ratingheading">Rate this Movie </string>
     <string name="ratingmessageheading">Add a movie review </string>
     <string name="ratingmessagehint">Add a review</string>
@@ -73,7 +75,7 @@
     <string name="feedbackmessagehint">Add a feedback</string>
     <string name="feedbackcancelbutton">Cancel</string>
     <string name="feedbackokbutton">OK</string>
-    
+    <string name="subscriptionconfirmationdialogtext">Do you want to proceed with the payment ?</string>
     <string name="playhint">Play</string>
     <string name="trailerhint">Play Trailer</string>
     
