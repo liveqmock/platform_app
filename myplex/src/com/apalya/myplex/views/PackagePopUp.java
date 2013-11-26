@@ -190,6 +190,7 @@ public class PackagePopUp {
 
 				deSelectViews();
 				v.setAlpha(1.0f);
+				
 				CardDataPackages packageitem = (CardDataPackages)subLayout.getTag();
 				if(packageitem == null){return;}
 				if(packageitem.priceDetails == null){return;}
@@ -202,15 +203,15 @@ public class PackagePopUp {
 					}
 					
 					View paymentModeItem = mInflater.inflate(R.layout.paymentmodeitemlayout,null);
-					TextView paymentModeText = (TextView)paymentModeItem.findViewById(R.id.paymentmodetext);
+					final RadioButton paymentModeText = (RadioButton)paymentModeItem.findViewById(R.id.paymentmodetext);
 					paymentModeText.setTypeface(FontUtil.Roboto_Medium);
 					paymentModeText.setText(priceItem.name);
 					mLastPaymentModeLayout.addView(paymentModeItem);
 					Util.showFeedback(paymentModeItem);
-					paymentModeItem.setId(count);
+					paymentModeText.setId(count);
 					count++;
-					paymentModeItem.setTag(packageitem);
-					paymentModeItem.setOnClickListener(new OnClickListener() {
+					paymentModeText.setTag(packageitem);
+					paymentModeText.setOnClickListener(new OnClickListener() {
 
 						@Override
 						public void onClick(View arg0) {
@@ -219,6 +220,7 @@ public class PackagePopUp {
 									CardDataPackages packageitem = (CardDataPackages) arg0.getTag();
 									int id = arg0.getId();
 									mSubscriptionEngine.doSubscription(packageitem, id);
+									paymentModeText.setChecked(false);
 //									dismissFilterMenuPopupWindow();
 								}
 							}catch (Exception e) {
