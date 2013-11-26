@@ -338,7 +338,7 @@ public class CardVideoPlayer implements PlayerListener {
 				
 				if(mData.content !=null && mData.content.drmEnabled)
 				{
-					String licenseData="clientkey:"+myplexapplication.getDevDetailsInstance().getClientKey()+",contentid:"+mData._id+",type:"+drmLicenseType+",profile:1";
+					String licenseData="clientkey:"+myplexapplication.getDevDetailsInstance().getClientKey()+",contentid:"+mData._id+",type:"+drmLicenseType+",profile:0";
 					
 					byte[] data;
 					try {
@@ -521,7 +521,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 
 	if(mData.content !=null && mData.content.drmEnabled)
 	{
-		String licenseData="clientkey:"+myplexapplication.getDevDetailsInstance().getClientKey()+",contentid:"+mData._id+",type:"+drmLicenseType+",profile:1";
+		String licenseData="clientkey:"+myplexapplication.getDevDetailsInstance().getClientKey()+",contentid:"+mData._id+",type:"+drmLicenseType+",profile:0";
 		
 		byte[] data;
 		try {

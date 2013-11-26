@@ -218,18 +218,15 @@ public class WidevineDrm {
 	}
 
 	public int checkRightsStatus(String assetUri) {
-
-		// Need to use acquireDrmInfo prior to calling checkRightsStatus
-		//mDrmManager.acquireDrmInfo(getDrmInfoRequest(assetUri));
-		
-		if(assetUri.contains("file:"))
-		{
-			int index=assetUri.lastIndexOf("/");
-			String name=assetUri.substring(index+1, assetUri.length());
-			assetUri=Util.downloadStoragePath+name;
+		if (assetUri.contains("file:")) {
+			int index = assetUri.lastIndexOf("/");
+			String name = assetUri.substring(index + 1, assetUri.length());
+			assetUri = Util.downloadStoragePath + name;
+		} else {
+			// Need to use acquireDrmInfo prior to calling checkRightsStatus
+			mDrmManager.acquireDrmInfo(getDrmInfoRequest(assetUri));
 		}
-		
-		
+
 		int status = mDrmManager.checkRightsStatus(assetUri);
 		logMessage("checkRightsStatus  = " + status + "\n");
 
