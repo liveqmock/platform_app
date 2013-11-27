@@ -504,7 +504,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 			if (label
 					.equalsIgnoreCase(NavigationOptionsMenuAdapter.FAVOURITE)) {
 				data.requestType = CardExplorerData.REQUEST_FAVOURITE;
-				setActionBarTitle("Favourites");
+				setActionBarTitle("My Favourites");
 			} else if (label
 					.equalsIgnoreCase(NavigationOptionsMenuAdapter.RECOMMENDED)) {
 				data.requestType = CardExplorerData.REQUEST_RECOMMENDATION;
@@ -529,7 +529,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 				setActionBarTitle("My Downloads");
 			}else if(label.equalsIgnoreCase(NavigationOptionsMenuAdapter.PURCHASES)){
 				data.requestType = CardExplorerData.REQUEST_PURCHASES;
-				setActionBarTitle("Subscribed");
+				setActionBarTitle("My Purchases");
 			}
 			if(this instanceof TabletCardDetails){
 				myplexapplication.mSelectedOption_Tablet = screenType;
