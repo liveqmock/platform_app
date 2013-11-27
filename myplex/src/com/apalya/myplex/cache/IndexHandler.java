@@ -380,6 +380,8 @@ public class IndexHandler {
 					if(card!=null && card._id !=null)
 					{
 						queryString += card._id;
+						if(mSearchType == OperationType.FTSEARCH)
+							queryString += "~";
 						queryString += " ";
 					}
 				}

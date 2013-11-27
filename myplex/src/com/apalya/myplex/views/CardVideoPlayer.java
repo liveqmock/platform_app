@@ -398,7 +398,7 @@ public class CardVideoPlayer implements PlayerListener {
 			myplexapplication.getUserProfileInstance().lastVisitedCardData.add(mData);
 
 		String expiryTime=null;
-		boolean allowPlaying=false;
+		boolean allowPlaying=true;
 		if(mData.currentUserData!=null)
         {    
 			for(CardDataPurchaseItem data:mData.currentUserData.purchase)
@@ -410,7 +410,8 @@ public class CardVideoPlayer implements PlayerListener {
                 expiryTime=data.validity;
             }
         }
-		if(expiryTime!=null)
+		//Following check is not needed for now since DRM
+/*		if(expiryTime!=null)
 		{
 			if(!Util.isTokenValid(expiryTime))
 			{
@@ -426,7 +427,7 @@ public class CardVideoPlayer implements PlayerListener {
 		else
 		{
 			allowPlaying=true;
-		}
+		}*/
         
 		if(allowPlaying)
 		{
