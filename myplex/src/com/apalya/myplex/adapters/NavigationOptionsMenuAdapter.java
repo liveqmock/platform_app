@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,7 +39,14 @@ public class NavigationOptionsMenuAdapter extends BaseAdapter {
 	public final static String LIVETV = "Live TV";
 	public final static String PURCHASES = "Purchased";
 	public final static String TVSHOWS = "TV Shows";
+	public final static String SETTINGS = "Settings";
+	public final static String LOGOUT = "Logout";
+	public final static String LOGO = "ApplicationLogo";
+	public final static String INVITEFRIENDS = "Invite Friends";
+			
 	public Context mContext;
+	private boolean isLoggedIn = true;
+	
 	public NavigationOptionsMenuAdapter(Context context){
 		this.mContext = context;
 		mInflater = LayoutInflater.from(mContext);
@@ -51,6 +59,12 @@ public class NavigationOptionsMenuAdapter extends BaseAdapter {
 		this.mMenuItemList = menuItemList;
 		notifyDataSetChanged();
 	}
+	
+	public void setLoginStatus(boolean loginStatus)
+	{
+		isLoggedIn = loginStatus;
+	}
+	
 	@Override
 	public Object getItem(int arg0) {
 		return mMenuItemList.get(arg0);
@@ -101,6 +115,8 @@ public class NavigationOptionsMenuAdapter extends BaseAdapter {
 			ImageView image = (ImageView) v.findViewById(R.id.drawer_list_item_image);
 			text.setText(menu.mLabel);
 			text.setTypeface(FontUtil.Roboto_Light);
+			if(menu.mScreenType == NOFOCUS_ACTION)
+				text.setTextColor(Color.parseColor("#888888"));
 			image.setImageResource(menu.mDefaultResId);
 		}
 		return v;
