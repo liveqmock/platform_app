@@ -687,7 +687,8 @@ public class MainActivity extends Activity implements MainBaseOptions {
 //		 getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#19384F")));
 //		 getActionBar().setStackedBackgroundDrawable(new ColorDrawable(Color.parseColor("#5519384F")));
 		// mCardView.setActionBarHeight(getActionBar().getHeight());
-		mCurrentFragment.setActionBarHeight(getActionBar().getHeight());
+		if( mCurrentFragment != null )
+			mCurrentFragment.setActionBarHeight(getActionBar().getHeight());
 		return super.onCreateOptionsMenu(menu);
 	}
 

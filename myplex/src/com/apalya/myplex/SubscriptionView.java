@@ -292,7 +292,7 @@ public class SubscriptionView extends Activity {
 	}
 	
 	public void showProgressBar(){
-		if(mProgressDialog != null){
+		if(mProgressDialog != null && mProgressDialog.isShowing()){
 			mProgressDialog.dismiss();
 		}
 		mProgressDialog = ProgressDialog.show(this,"", "Loading...", true,false);
