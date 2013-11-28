@@ -126,14 +126,14 @@
                 android:id="@+id/vsp1"
                 android:layout_width="10dp"
                 android:layout_height="wrap_content"
-                android:background="#D1D1D1" />
+                android:background="#D1D1D1" android:visibility="gone"/>
 
             <Button
                 android:id="@+id/twitter"
                 android:layout_width="wrap_content"
                 android:layout_height="48dp"
                 android:layout_weight="1.0"
-                android:background="@drawable/buttontwitter" />
+                android:background="@drawable/buttontwitter" android:visibility="gone"/>
         </LinearLayout>
 
         <ImageView
