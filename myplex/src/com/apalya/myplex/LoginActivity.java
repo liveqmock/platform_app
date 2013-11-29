@@ -579,13 +579,13 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 	}*/
 
 	public void showProgressBar(){
-		if(mProgressDialog != null){
+		if(mProgressDialog != null && mProgressDialog.isShowing()){
 			mProgressDialog.dismiss();
 		}
 		mProgressDialog = ProgressDialog.show(this,"", "Loading...", true,false);
 	}
 	public void dismissProgressBar(){
-		if(mProgressDialog != null){
+		if(mProgressDialog != null && mProgressDialog.isShowing()){
 			mProgressDialog.dismiss();
 		}
 	}

@@ -38,6 +38,7 @@ import com.apalya.myplex.data.ErrorManagerData;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.utils.WidevineDrm;
+import com.apalya.myplex.utils.WidevineDrm.Settings;
 import com.apalya.myplex.views.CardVideoPlayer;
 import com.apalya.myplex.views.CardVideoPlayer.PlayerFullScreen;
 import com.apalya.myplex.views.CardVideoPlayer.PlayerStatusUpdate;
@@ -834,10 +835,10 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 				Map<String,String> params=new HashMap<String, String>();
 				params.put("Status", "PlayerRightsAcqusition");
 				Analytics.trackEvent(Analytics.PlayerRightsAcqusition,params);
-				//Util.showToast(mContext,"RIGHTS INSTALLED",Util.TOAST_TYPE_INFO);
+				//Util.showToast(mContext,"RIGHTS INSTALLED",Util.TOAST_TYPE_INFO);				
 				startPlayer(true);
 			}
-			if(status==1 ){
+			if(status!=0 ){
 				iPlayerStarted=true;
 				String errMsg = "Error while playing";
 				switch (value) {
@@ -862,11 +863,17 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 				case DrmErrorEvent.TYPE_RIGHTS_RENEWAL_NOT_ALLOWED:
 					errMsg="Rights renewal not allowed";
 					break;
+					
 				}
-				Util.showToast(mContext,errMsg,Util.TOAST_TYPE_INFO);
+				Util.showToast(mContext,errMsg+" ("+status+")",Util.TOAST_TYPE_INFO);
 				startPlayer(false);
 				//drmManager.
 			}
+			
+			if(status == Settings.WIDEVINE_AUTH_FAILED){
+				//TODO Refresh purchase detail for content id.
+			}
+			
 			if(drmManager!=null)
 				drmManager.unRegisterLogListener();
 		

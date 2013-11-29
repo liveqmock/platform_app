@@ -205,6 +205,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		}
 	};
 	private void showNewArrivals(){
+		if(!isAdded())
+			return;
 		mNewArrivalLayout.setVisibility(View.VISIBLE);
 		AnimatorSet set = new AnimatorSet();
 		set.play(ObjectAnimator.ofFloat(mNewArrivalLayout, View.TRANSLATION_Y, -(mNewArrivalLayout.getHeight()+getResources().getDimension(R.dimen.margin_gap_4)),150));
@@ -230,6 +232,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	}
 	private void hideNewArrivals(){
 		stopTimeOut();
+		if(!isAdded())
+			return;
 		AnimatorSet set = new AnimatorSet();
 		set.play(ObjectAnimator.ofFloat(mNewArrivalLayout, View.TRANSLATION_Y, 0,-(mNewArrivalLayout.getHeight()+getResources().getDimension(R.dimen.margin_gap_4))));
 		set.setDuration(1500);
@@ -439,12 +443,17 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			public void run() {
 				CardExplorerData explorerData = myplexapplication.getCardExplorerData();
 				if(explorerData.requestType == CardExplorerData.REQUEST_RECOMMENDATION){
-					List<CardData> lastSavedData = (List<CardData>)Util.loadObject(myplexapplication.getApplicationConfig().lastViewedCardsPath);
-					if(lastSavedData != null){
-						Log.d("CardExplorer","last saved list size = "+lastSavedData.size());
-					}
-					if(lastSavedData != null && lastSavedData.size() > 0){
-						fillOldData(lastSavedData);
+					try {
+						List<CardData> lastSavedData = (List<CardData>)Util.loadObject(myplexapplication.getApplicationConfig().lastViewedCardsPath);
+						if(lastSavedData != null){
+							Log.d("CardExplorer","last saved list size = "+lastSavedData.size());
+						}
+						if(lastSavedData != null && lastSavedData.size() > 0){
+							fillOldData(lastSavedData);
+						}
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						Log.e(TAG, "prepareLastSessionData loadObject exception");
 					}
 				}
 			}

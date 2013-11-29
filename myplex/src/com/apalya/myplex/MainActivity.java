@@ -11,16 +11,12 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
-import android.animation.Animator.AnimatorListener;
 import android.app.ActionBar;
 import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.ActivityManager.MemoryInfo;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -33,31 +29,23 @@ import android.os.Looper;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.animation.Animation;
-import android.view.animation.Animation.AnimationListener;
-import android.view.animation.AnimationUtils;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
-import android.widget.PopupWindow.OnDismissListener;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.apalya.myplex.adapters.FliterMenuAdapter;
 import com.apalya.myplex.adapters.NavigationOptionsMenuAdapter;
 import com.apalya.myplex.data.CardData;
@@ -78,11 +66,9 @@ import com.apalya.myplex.utils.Blur.BlurResponse;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.MessagePost.MessagePostCallback;
 import com.apalya.myplex.utils.FontUtil;
-import com.apalya.myplex.utils.LastWatchedCardDetails;
 import com.apalya.myplex.utils.LogOutUtil;
 import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.utils.Util;
-import com.apalya.myplex.views.PinnedSectionListView;
 import com.apalya.myplex.views.RatingDialog;
 import com.facebook.Session;
 import com.flurry.android.FlurryAgent;
@@ -95,6 +81,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 	// private CharSequence mTitle;
 	public LayoutInflater mInflater;
 	public BaseFragment mCurrentFragment;
+	private boolean mIsUserLoggedIn = true ;
 	
 	public FrameLayout mContentLayout;
 	public Context mContext;
@@ -143,22 +130,37 @@ public class MainActivity extends Activity implements MainBaseOptions {
 	}
 	private List<NavigationOptionsMenu> mMenuItemList = new ArrayList<NavigationOptionsMenu>();
 	private void fillMenuItem() {
+		
+		String email = myplexapplication.getUserProfileInstance().getUserEmail();
+		if(email.equalsIgnoreCase("NA") || email.equalsIgnoreCase(""))
+		{
+			mIsUserLoggedIn = false;
+		}
+			
 		mMenuItemList.add(new NavigationOptionsMenu(myplexapplication.getUserProfileInstance().getName(),
 				R.drawable.menu_profile, myplexapplication.getUserProfileInstance().getProfilePic(),NavigationOptionsMenuAdapter.CARDDETAILS_ACTION,R.layout.navigation_menuitemlarge));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FAVOURITE,R.drawable.iconfav, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.PURCHASES,R.drawable.iconpurchases, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.DOWNLOADS,R.drawable.icondnload, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu("Settings",R.drawable.iconsettings, null, NavigationOptionsMenuAdapter.SETTINGS_ACTION,R.layout.navigation_menuitemsmall));
+		
+		int screenType = NavigationOptionsMenuAdapter.NOFOCUS_ACTION;
+		if(mIsUserLoggedIn)
+		{
+			screenType = NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION;
+		}
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FAVOURITE,R.drawable.iconfav, null, screenType,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.PURCHASES,R.drawable.iconpurchases, null,screenType,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.DOWNLOADS,R.drawable.icondnload, null, screenType,R.layout.navigation_menuitemsmall));
+		
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.SETTINGS,R.drawable.iconsettings, null, NavigationOptionsMenuAdapter.SETTINGS_ACTION,R.layout.navigation_menuitemsmall));
 		Session fbSession=Session.getActiveSession();
 		if(fbSession!=null && fbSession.isOpened())
-			mMenuItemList.add(new NavigationOptionsMenu("Invite Friends",R.drawable.iconfriends, null, NavigationOptionsMenuAdapter.INVITE_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu("Logout",R.drawable.iconlogout, null, NavigationOptionsMenuAdapter.LOGOUT_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu("ApplicationLogo",R.drawable.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
+			mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.INVITEFRIENDS,R.drawable.iconfriends, null, NavigationOptionsMenuAdapter.INVITE_ACTION,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGOUT,R.drawable.iconlogout, null, NavigationOptionsMenuAdapter.LOGOUT_ACTION,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGO,R.drawable.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.RECOMMENDED,R.drawable.iconhome, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.MOVIES,R.drawable.iconmovie, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LIVETV,R.drawable.iconlivetv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 //		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.TVSHOWS,R.drawable.icontv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		mNavigationAdapter.setMenuList(mMenuItemList);
+		mNavigationAdapter.setLoginStatus(mIsUserLoggedIn);
 	}
 
 
@@ -333,6 +335,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		
 		mTitleFilterSymbol = (TextView)v.findViewById(R.id.customactionbar_filter_text1);
 		changeVisibility(mTitleFilterSymbol,View.GONE);		
+		
 		mCustomActionBarSearch = (ImageView) v.findViewById(R.id.customactionbar_search_button);
 		mCustomActionBarSearch.setOnClickListener(new OnClickListener() {
 
@@ -377,7 +380,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position,
 				long id) {
-			selectItem(position);
+				selectItem(position);
 		}
 	}
 
@@ -593,7 +596,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 			data.reset();
 			
 			if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.FAVOURITE)){
-				setActionBarTitle("Favourites");
+				setActionBarTitle("My Favourites");
 				data.requestType = CardExplorerData.REQUEST_FAVOURITE;
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.RECOMMENDED)){
 				data.requestType = CardExplorerData.REQUEST_RECOMMENDATION;
@@ -615,7 +618,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 				setActionBarTitle("My Downloads");
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.PURCHASES)){
 				data.requestType = CardExplorerData.REQUEST_PURCHASES;
-				setActionBarTitle("Subscribed");
+				setActionBarTitle("My Purchases");
 			}
 			mCurrentFragment = mCardExplorer;
 			break;
@@ -684,7 +687,8 @@ public class MainActivity extends Activity implements MainBaseOptions {
 //		 getActionBar().setBackgroundDrawable(new ColorDrawable(Color.parseColor("#19384F")));
 //		 getActionBar().setStackedBackgroundDrawable(new ColorDrawable(Color.parseColor("#5519384F")));
 		// mCardView.setActionBarHeight(getActionBar().getHeight());
-		mCurrentFragment.setActionBarHeight(getActionBar().getHeight());
+		if( mCurrentFragment != null )
+			mCurrentFragment.setActionBarHeight(getActionBar().getHeight());
 		return super.onCreateOptionsMenu(menu);
 	}
 

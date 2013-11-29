@@ -50,7 +50,10 @@ public class WidevineDrm {
 	public static class Settings {
 		public static String WIDEVINE_MIME_TYPE = "video/wvm";
 		public static String DRM_SERVER_URI = ConsumerApi.getDrmProxy();
-		//public static String DRM_SERVER_URI = "http://122.248.233.48/widevine/cypherpc/cgi-bin/GetEMMs.cgi";
+		public static String WIDEVINE_KEY_ASSET_URI="WVAssetURIKey";
+		public static String WIDEVINE_KEY_LASTERROR="WVLastErrorKey";
+		public static final int WIDEVINE_AUTH_FAILED=401;
+//		public static String DRM_SERVER_URI = "http://122.248.233.48/widevine/cypherpc/cgi-bin/GetEMMs.cgi";
 		public static String DEVICE_ID = "device12345"; // use a unique device ID
 		public static String PORTAL_NAME = "sotalapalya";
 		//public static String OP_DATA="optdata";
@@ -101,34 +104,54 @@ public class WidevineDrm {
 
 		mDrmManager.setOnErrorListener(new DrmManagerClient.OnErrorListener() {
 			public void onError(DrmManagerClient client, DrmErrorEvent event) {
+				
+				DrmInfo localDrmInfo = (DrmInfo) event.getAttribute("drm_info_object");
+
+				if (localDrmInfo == null) {
+					// it seems the onError callback comes twice, ignore if DrmInfo not available.
+					logMessage("localDrmInfo null");
+					return ;
+				}
+				
+				int error_code;
+				
+				try {
+					error_code = parseErrorCode(event);
+				} catch (Throwable e) {
+					
+					error_code=-1;
+					logMessage("Falied to parse error code");
+				}
+				
+				
 				switch (event.getType()) {
 				case DrmErrorEvent.TYPE_NO_INTERNET_CONNECTION:
 					logMessage("No Internet Connection\n");
-					logMessage(1,DrmErrorEvent.TYPE_NO_INTERNET_CONNECTION);
+					logMessage(error_code,DrmErrorEvent.TYPE_NO_INTERNET_CONNECTION);
 					break;
 				case DrmErrorEvent.TYPE_NOT_SUPPORTED:
 					logMessage("Not Supported\n");
-					logMessage(1,DrmErrorEvent.TYPE_NOT_SUPPORTED);
+					logMessage(error_code,DrmErrorEvent.TYPE_NOT_SUPPORTED);
 					break;
 				case DrmErrorEvent.TYPE_OUT_OF_MEMORY:
 					logMessage("Out of Memory\n");
-					logMessage(1,DrmErrorEvent.TYPE_OUT_OF_MEMORY);
+					logMessage(error_code,DrmErrorEvent.TYPE_OUT_OF_MEMORY);
 					break;
 				case DrmErrorEvent.TYPE_PROCESS_DRM_INFO_FAILED:
 					logMessage("Process DRM Info failed\n");
-					logMessage(1,DrmErrorEvent.TYPE_PROCESS_DRM_INFO_FAILED);
+					logMessage(error_code,DrmErrorEvent.TYPE_PROCESS_DRM_INFO_FAILED);
 					break;
 				case DrmErrorEvent.TYPE_REMOVE_ALL_RIGHTS_FAILED:
 					logMessage("Remove All Rights failed\n");
-					logMessage(1,DrmErrorEvent.TYPE_REMOVE_ALL_RIGHTS_FAILED);
+					logMessage(error_code,DrmErrorEvent.TYPE_REMOVE_ALL_RIGHTS_FAILED);
 					break;
 				case DrmErrorEvent.TYPE_RIGHTS_NOT_INSTALLED:
 					logMessage("Rights not installed\n");
-					logMessage(1,DrmErrorEvent.TYPE_RIGHTS_NOT_INSTALLED);
+					logMessage(error_code,DrmErrorEvent.TYPE_RIGHTS_NOT_INSTALLED);
 					break;
 				case DrmErrorEvent.TYPE_RIGHTS_RENEWAL_NOT_ALLOWED:
 					logMessage("Rights renewal not allowed\n");
-					logMessage(1,DrmErrorEvent.TYPE_NO_INTERNET_CONNECTION);
+					logMessage(error_code,DrmErrorEvent.TYPE_NO_INTERNET_CONNECTION);
 					break;
 				}
 
@@ -226,10 +249,12 @@ public class WidevineDrm {
 			// Need to use acquireDrmInfo prior to calling checkRightsStatus
 			mDrmManager.acquireDrmInfo(getDrmInfoRequest(assetUri));
 		}
-
+		
 		int status = mDrmManager.checkRightsStatus(assetUri);
 		logMessage("checkRightsStatus  = " + status + "\n");
-
+		
+		showRights(assetUri);
+		
 		return status;
 	}
 
@@ -367,5 +392,69 @@ public class WidevineDrm {
 	private PlayerStatusUpdate mPlayerStatusListener;
 	public void setPlayerListener(PlayerStatusUpdate listener) {
 		this.mPlayerStatusListener = listener;
+	}
+	
+	private int parseErrorCode(DrmErrorEvent event) throws Throwable{
+
+		if (event == null) {
+			return -1;
+		}
+
+		DrmInfo localDrmInfo = (DrmInfo) event.getAttribute("drm_info_object");
+
+		if (localDrmInfo == null) {
+			logMessage("localDrmInfo null");
+			return -1;
+		}
+
+		logMessage("parseErrorCode:" + event.getMessage());
+
+//		for (Iterator iterator2 = localDrmInfo.keyIterator(); iterator2
+//				.hasNext();) {
+//			String type = (String) iterator2.next();
+//			logMessage(type + ":" + localDrmInfo.get(type));
+//
+//		}
+
+		if (localDrmInfo.get(Settings.WIDEVINE_KEY_ASSET_URI) != null) {
+
+			ContentValues localContentValues = mDrmManager.getConstraints(
+					(String) localDrmInfo.get(Settings.WIDEVINE_KEY_ASSET_URI),
+					DrmStore.Action.DEFAULT);
+
+			if (localContentValues == null) {
+				return -1;
+			}
+
+			String str = localContentValues.getAsString(Settings.WIDEVINE_KEY_LASTERROR);
+			
+			if(str == null){
+				return -1;
+			}			
+
+			
+			logMessage("WVLastErrorKey is " + str);
+
+			if (str.equalsIgnoreCase("ok")) {
+				return 200;
+			}
+
+			
+			String[] parts = str.split("=");
+
+			if (parts == null || parts.length != 2) {
+				logMessage("Error code missing" + str);
+				return -1;
+			}
+			
+			int code = Integer.parseInt(parts[1].trim());
+
+			logMessage("Error code is " + code);
+			
+			return code;
+		
+		}
+
+		return -1;
 	}
 }

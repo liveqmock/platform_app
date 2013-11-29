@@ -96,7 +96,7 @@
 
             <Button
                 android:id="@+id/google"
-	            android:layout_width="332dp"
+	            android:layout_width="wrap_content"
 	            android:layout_height="46dp"
                 android:layout_weight="1.0"
                 android:background="@drawable/buttongoogle" />
