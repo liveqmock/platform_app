@@ -93,18 +93,22 @@ public class CacheManager {
 		}
 		List<CardData> modifiedDataList = new ArrayList<CardData>();
 		for(CardData data:mDynamicDetailList){
-			CardData resultData = resultMap.get(data._id);
-			if(resultData == null ){continue;}
-			Log.d(TAG,"updating dynamic data for "+data._id);
-			resultData.userReviews = data.userReviews;
-			resultData.currentUserData = data.currentUserData;
-			resultData.criticReviews = data.criticReviews;
-			resultData._expiresAt = data._expiresAt;
-			if(data.comments != null){
-				Log.d(TAG,"number of comments for  "+data._id+" "+data.comments.numComments);	
+			if(data.currentUserData != null)
+			{
+				CardData resultData = resultMap.get(data._id);
+				if(resultData == null ){continue;}
+				Log.d(TAG,"updating dynamic data for "+data._id);
+				
+				resultData.userReviews = data.userReviews;
+				resultData.currentUserData = data.currentUserData;
+				resultData.criticReviews = data.criticReviews;
+				resultData._expiresAt = data._expiresAt;
+				if(data.comments != null){
+					Log.d(TAG,"number of comments for  "+data._id+" "+data.comments.numComments);	
+				}
+				resultData.comments = data.comments;
+				modifiedDataList.add(resultData);
 			}
-			resultData.comments = data.comments;
-			modifiedDataList.add(resultData);
 		}
 		if(modifiedDataList.size() > 0){
 			myplexapplication.getCacheHolder().UpdataDataAsync(modifiedDataList, new InsertionResult() {
