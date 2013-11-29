@@ -112,7 +112,7 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		mMainActivity.setSearchBarVisibilty(View.VISIBLE);
 //		prepareContent();
 		if(mCardData.generalInfo != null){
-			mMainActivity.setActionBarTitle(mCardData.generalInfo.title);
+			mMainActivity.setActionBarTitle(mCardData.generalInfo.title.toLowerCase());
 		}
 		prepareContent();
 		return rootView;

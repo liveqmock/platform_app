@@ -308,7 +308,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 					mCurrentFragment.searchButtonClicked();
 				} else {
 					SearchActivity fragment = new SearchActivity();
-					setActionBarTitle("Search");
+					setActionBarTitle("search");
 					bringFragment(fragment);
 				}
 			}
@@ -473,7 +473,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 			return;
 		}
 		case NavigationOptionsMenuAdapter.SETTINGS_ACTION:{
-			setActionBarTitle("Settings");
+			setActionBarTitle("settings");
 			if(this instanceof TabletCardDetails){
 				myplexapplication.mSelectedOption_Tablet = screenType;
 				startActivity(new Intent(this,MultiPaneActivity.class));
@@ -519,21 +519,21 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 			if (label
 					.equalsIgnoreCase(NavigationOptionsMenuAdapter.FAVOURITE)) {
 				data.requestType = CardExplorerData.REQUEST_FAVOURITE;
-				setActionBarTitle("My Favourites");
+				setActionBarTitle("my favourites");
 			} else if (label
 					.equalsIgnoreCase(NavigationOptionsMenuAdapter.RECOMMENDED)) {
 				data.requestType = CardExplorerData.REQUEST_RECOMMENDATION;
-				setActionBarTitle("Recommended");
+				setActionBarTitle("recommended");
 			} else if (label
 					.equalsIgnoreCase(NavigationOptionsMenuAdapter.MOVIES)) {
 				data.requestType = CardExplorerData.REQUEST_BROWSE;
 				data.searchQuery = "movie";
-				setActionBarTitle("Movies");
+				setActionBarTitle("movies");
 			} else if (label
 					.equalsIgnoreCase(NavigationOptionsMenuAdapter.LIVETV)) {
 				data.requestType = CardExplorerData.REQUEST_BROWSE;
 				data.searchQuery = "live";
-				setActionBarTitle("Live TV");
+				setActionBarTitle("live TV");
 			} else if (label
 					.equalsIgnoreCase(NavigationOptionsMenuAdapter.TVSHOWS)) {
 				data.requestType = CardExplorerData.REQUEST_BROWSE;
@@ -541,10 +541,10 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 				setActionBarTitle("TV Shows");
 			}else if(label.equalsIgnoreCase(NavigationOptionsMenuAdapter.DOWNLOADS)){
 				data.requestType = CardExplorerData.REQUEST_DOWNLOADS;
-				setActionBarTitle("My Downloads");
+				setActionBarTitle("my downloads");
 			}else if(label.equalsIgnoreCase(NavigationOptionsMenuAdapter.PURCHASES)){
 				data.requestType = CardExplorerData.REQUEST_PURCHASES;
-				setActionBarTitle("My Purchases");
+				setActionBarTitle("my purchases");
 			}
 			if(this instanceof TabletCardDetails){
 				myplexapplication.mSelectedOption_Tablet = screenType;

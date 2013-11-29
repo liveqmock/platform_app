@@ -66,12 +66,12 @@
             android:focusableInTouchMode="true"
             android:gravity="center"
             android:marqueeRepeatLimit="marquee_forever"
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp"
+            android:paddingLeft="@dimen/margin_gap_4"
+            android:paddingRight="@dimen/margin_gap_4"
             android:singleLine="true"
             android:text=""
             android:textColor="#343433"
-            android:textSize="16sp" />
+            android:textSize="@dimen/textsize_16" />
     </RelativeLayout>
 
     <com.apalya.myplex.data.CardImageView

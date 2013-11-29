@@ -215,8 +215,8 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 							}
 							else
 							{
-								mEmail.setError( "Enter Valid Email or phone number!" );
-								sendNotification("Hey, you might have entered wrong mail id!");	
+								mEmail.setError(getString(R.string.wrongemailhint));
+								sendNotification(getString(R.string.wrongemail));	
 							}
 
 						}
@@ -224,13 +224,13 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 						{
 							if( mEmail.getText().toString().length() == 0 )
 							{
-								mEmail.setError( "Username is required!" );
+								mEmail.setError(getString(R.string.usernamehint));
 							}
 							if( mPassword.getText().toString().length() == 0 )
 							{
-								mPassword.setError( "Password is required!" );
+								mPassword.setError(getString(R.string.passwordhint));
 							}
-							sendNotification("Username and password are required");
+							sendNotification(getString(R.string.wrongcredentials));
 						}
 					}
 					else
@@ -257,8 +257,8 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 						}
 						else
 						{
-							mEmail.setError( "Enter Valid Email or phone number!" );
-							sendNotification("Hey, you might have entered wrong mail id!");	
+							mEmail.setError(getString(R.string.wrongemailhint));
+							sendNotification(getString(R.string.wrongemail));	
 						}
 					}
 				}

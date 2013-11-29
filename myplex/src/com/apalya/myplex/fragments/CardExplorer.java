@@ -540,18 +540,18 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		dismissProgressBar();
 		if(mData.mMasterEntries.size() == 0){
 			
-			String msg="No Results Found, Continue using...";
+			String msg="seems like there's nothing here.";
 			if(mData.requestType == CardExplorerData.REQUEST_FAVOURITE){
-				msg="No Favourites... \nUse <heart> symbol on any card to add some titles here.";
+				msg="no favourites yet... \nUse "+ "<heart>"/*getString(R.string.card_heart)*/ +" on any card to add some titles here.";
 			}else if(mData.requestType == CardExplorerData.REQUEST_PURCHASES){
-				msg="No purchased content … \nLet's change that!";
+				msg=getString(R.string.purchaseserror);
 			}else if(mData.requestType == CardExplorerData.REQUEST_SEARCH){
-				msg="Unable to find results … \nTry one of our suggested search terms?";
+				msg=getString(R.string.searcherror);
 			}else if(mData.requestType == CardExplorerData.REQUEST_DOWNLOADS){
-				msg="No Downloads yet… \nLet's start one, can watch it while downloading itself";
+				msg=getString(R.string.downloadserror);
 			}
 			
-			AlertDialogUtil.showAlert(mContext, msg, "Cancel", "Discover trending content?", this);
+			AlertDialogUtil.showAlert(mContext, msg, "cancel", "discover trending content?", this);
 			
 			//Util.showToast(getContext(),"No data found,Please try again.",Util.TOAST_TYPE_INFO);
 //			Toast.makeText(getContext(), "No data found,Please try again.", Toast.LENGTH_SHORT).show();

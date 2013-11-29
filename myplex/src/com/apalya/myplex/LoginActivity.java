@@ -1110,7 +1110,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					Log.d(TAG, error.toString());
 
 				}
-				sendNotification(error.toString());
+				sendNotification(getString(R.string.interneterr));
 				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 			}
 		};

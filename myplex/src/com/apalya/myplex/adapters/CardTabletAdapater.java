@@ -229,7 +229,7 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 //		ImageUrlMap.put(""+position,null);
 		
 		if(data.generalInfo != null && data.generalInfo.title != null){
-			dataHolder.mTitle.setText(data.generalInfo.title);
+			dataHolder.mTitle.setText(data.generalInfo.title.toLowerCase());
 		}
 		
 
@@ -295,11 +295,11 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 		//17 chars
 		float price = 10000f;
 		if(data.packages == null){
-			dataHolder.mRentText.setText("Free");
+			dataHolder.mRentText.setText(mContext.getString(R.string.cardstatusfree));
 			dataHolder.mRentLayout.setOnClickListener(null);
 		}else{
 			if(data.currentUserData != null && data.currentUserData.purchase != null && data.currentUserData.purchase.size() != 0){
-				dataHolder.mRentText.setText("Watch now");
+				dataHolder.mRentText.setText(mContext.getString(R.string.cardstatuspaid));
 				dataHolder.mRentLayout.setOnClickListener(null);
 			}else{
 				for(CardDataPackages packageitem:data.packages){
@@ -314,13 +314,13 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 						}
 						if(price == 0)
 						{
-							dataHolder.mRentText.setText("Watch now for Free");
+							dataHolder.mRentText.setText(mContext.getString(R.string.cardstatustempfree));
 							dataHolder.mRentLayout.setOnClickListener(null);
 						}
 						else
 							dataHolder.mRentText.setText(mPriceStarts + mRupeeCode + " "+price);
 					}else{
-						dataHolder.mRentText.setText("Free");
+						dataHolder.mRentText.setText(mContext.getString(R.string.cardstatusfree));
 						dataHolder.mRentLayout.setOnClickListener(null);
 					}
 				}	
