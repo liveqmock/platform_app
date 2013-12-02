@@ -150,7 +150,7 @@ public class CardDetails extends BaseFragment implements
 		mMainActivity.setSearchBarVisibilty(View.VISIBLE);
 		// prepareContent();
 		if (mCardData.generalInfo != null) {
-			mMainActivity.setActionBarTitle(mCardData.generalInfo.title);
+			mMainActivity.setActionBarTitle(mCardData.generalInfo.title.toLowerCase());
 		}
 		prepareContent();
 		mFavButton.setOnClickListener(new OnClickListener() {

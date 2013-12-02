@@ -422,11 +422,11 @@ public class CardDetailViewFactory {
 		TextView groupname = (TextView)child.findViewById(R.id.carddetailmultimedia_groupname);
 		if(mData._id.equalsIgnoreCase("0"))
 		{
-			groupname.setText("Last Watched Content");
+			groupname.setText(mContext.getString(R.string.lastwatchedcontent));
 		}
 		else
 		{
-			groupname.setText("Similar Content");	
+			groupname.setText(mContext.getString(R.string.similarcontent));	
 		}
 		
 		groupname.setTypeface(FontUtil.Roboto_Medium);
@@ -740,7 +740,7 @@ public class CardDetailViewFactory {
 		mDetails  = v;
 		TextView movieName = (TextView)v.findViewById(R.id.carddetaildesc_movename);
 		if(mData.generalInfo.title != null){
-			movieName.setText(mData.generalInfo.title);	
+			movieName.setText(mData.generalInfo.title.toLowerCase());	
 		}
 		movieName.setTypeface(FontUtil.Roboto_Light);
 		TextView parentalRating = (TextView)v.findViewById(R.id.carddetaildesc_parentalRating);
@@ -838,7 +838,7 @@ public class CardDetailViewFactory {
 		mDetails = v;
 		TextView movieName = (TextView)v.findViewById(R.id.carddetailbreifdescription_movename);
 		if(mData.generalInfo.title != null){
-			movieName.setText(mData.generalInfo.title);	
+			movieName.setText(mData.generalInfo.title.toLowerCase());	
 		}
 		movieName.setTypeface(FontUtil.Roboto_Light);
 		TextView parentalRating = (TextView)v.findViewById(R.id.carddetailbriefdescription_parentalRating);
@@ -910,11 +910,11 @@ public class CardDetailViewFactory {
 		packageButton.setTypeface(FontUtil.Roboto_Medium);
 		float price = 10000f;
 		if(mData.packages == null){
-			packageButton.setText("Free");
+			packageButton.setText(mContext.getString(R.string.cardstatusfree));
 			packageButton.setOnClickListener(null);
 		}else{
 			if(mData.currentUserData != null && mData.currentUserData.purchase != null && mData.currentUserData.purchase.size() != 0){
-				packageButton.setText("Watch now");
+				packageButton.setText(mContext.getString(R.string.cardstatuspaid));
 				packageButton.setOnClickListener(null);
 			}else{
 				for(CardDataPackages packageitem:mData.packages){
@@ -930,14 +930,14 @@ public class CardDetailViewFactory {
 						packageButton.setText(mPriceStarts + mRupeeCode + " "+price);
 						if(price == 0)
 						{
-							packageButton.setText("Watch now for Free");
+							packageButton.setText(mContext.getString(R.string.cardstatustempfree));
 							packageButton.setOnClickListener(null);
 						}
 						else
 							packageButton.setText(mPriceStarts + mRupeeCode + " "+price);
 
 					}else{
-						packageButton.setText("Free");
+						packageButton.setText(mContext.getString(R.string.cardstatusfree));
 						packageButton.setOnClickListener(null);
 					}
 					

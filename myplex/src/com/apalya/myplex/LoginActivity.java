@@ -1110,7 +1110,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					Log.d(TAG, error.toString());
 
 				}
-				sendNotification(error.toString());
+				sendNotification(getString(R.string.interneterr));
 				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 			}
 		};
@@ -1141,15 +1141,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 						Log.d(TAG, "########################################################");
 						Log.d(TAG, "---------------------------------------------------------");
 						
-						SharedPrefUtils.writeToSharedPref(LoginActivity.this,
-								getString(R.string.devusername), mUserInfo.getUserEmail());
-						
-						Crashlytics.setUserEmail(mUserInfo.getUserEmail());
 
-						String userIdSha1=Util.sha1Hash(mUserInfo.getUserEmail());
-						FlurryAgent.setUserId(userIdSha1);
-						Crashlytics.setUserName(userIdSha1);
-						Crashlytics.setUserIdentifier(userIdSha1);
 						
 						finish();
 						Util.launchMainActivity(LoginActivity.this);
@@ -1367,13 +1359,19 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				AccountUtils.setPlusProfileId(this, person.getId());
 				mUserInfo.setGoogleId(person.getId());
 				mUserInfo.setName(person.getName().getGivenName());
+				mUserInfo.setUserEmail(mPlusClient.getAccountName());
 				mUserInfo.setProfilePic("https://plus.google.com/s2/photos/profile/"+person.getId()+"?sz=480");
-				SharedPrefUtils.writeToSharedPref(LoginActivity.this,
-						getString(R.string.userprofilename), person.getName().getGivenName());
-				SharedPrefUtils.writeToSharedPref(LoginActivity.this,
-						getString(R.string.userpic), "https://plus.google.com/s2/photos/profile/"+person.getId()+"?sz=480");
+				SharedPrefUtils.writeToSharedPref(LoginActivity.this, getString(R.string.userprofilename), person.getName().getGivenName());
+				SharedPrefUtils.writeToSharedPref(LoginActivity.this, getString(R.string.userpic), "https://plus.google.com/s2/photos/profile/"+person.getId()+"?sz=480");
+				SharedPrefUtils.writeToSharedPref(LoginActivity.this, getString(R.string.devusername), mUserInfo.getUserEmail());
+				
+				
+				Crashlytics.setUserEmail(mUserInfo.getUserEmail());
+				String userIdSha1=Util.sha1Hash(mUserInfo.getUserEmail());
+				FlurryAgent.setUserId(userIdSha1);
+				Crashlytics.setUserName(userIdSha1);
+				Crashlytics.setUserIdentifier(userIdSha1);
 				tryAuthenticate();
-
 			}
 		} else {
 			Log.e(TAG, "Got " + connectionResult.getErrorCode() + ". Could not load plus profile.");

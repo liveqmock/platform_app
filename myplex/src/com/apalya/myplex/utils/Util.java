@@ -383,7 +383,7 @@ public class Util {
 	{
 		
 		long lastDownloadId=-1L;
-		String aMovieName=aMovieData.generalInfo.title;
+		String aMovieName=aMovieData.generalInfo.title.toLowerCase();
 		String aFileName=aMovieData._id;
 		
 		CardDownloadedDataList downloadlist =  null;

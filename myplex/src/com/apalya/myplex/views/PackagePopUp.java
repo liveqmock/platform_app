@@ -201,8 +201,12 @@ public class PackagePopUp {
 						heading.setTypeface(FontUtil.Roboto_Medium);
 						mLastPaymentModeLayout.addView(heading);
 					}
-					
+					if(priceItem.paymentChannel.equalsIgnoreCase("INAPP"))
+					{
+						continue;
+					}
 					View paymentModeItem = mInflater.inflate(R.layout.paymentmodeitemlayout,null);
+					
 					final RadioButton paymentModeText = (RadioButton)paymentModeItem.findViewById(R.id.paymentmodetext);
 					paymentModeText.setTypeface(FontUtil.Roboto_Medium);
 					paymentModeText.setText(priceItem.name);
@@ -296,7 +300,7 @@ public class PackagePopUp {
 		TextView title = (TextView)v.findViewById(R.id.purchasepopup_contentname);
 		title.setTypeface(FontUtil.Roboto_Light);
 		if(data.generalInfo != null){
-			title.setText(data.generalInfo.title);
+			title.setText(data.generalInfo.title.toLowerCase());
 		}
 		RatingBar rating = (RatingBar)v.findViewById(R.id.purchasepopup_setRating);
 		if(data.userReviews != null){
