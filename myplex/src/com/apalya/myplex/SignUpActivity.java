@@ -694,7 +694,19 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 				}
 				else
 				{
-					sendNotification(error.toString());	
+					String msg=error.toString();
+					if(error.networkResponse != null && error.networkResponse.data != null)
+					{						
+						try {
+							JSONObject jsonResponse= new JSONObject(new String(error.networkResponse.data));
+							msg=jsonResponse.getString("message");
+						} catch (JSONException e) {
+							
+						}
+						
+					}
+					
+					sendNotification(msg);	
 				}
 				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 			}

@@ -11,6 +11,7 @@ public class ConsumerApi {
 	public static final String FAVORITELIST_ACTION = "contentList/favorites";
 	public static final String PURCHASEDLIST_ACTION = "contentList/purchased";
 	public static final String FAVORITE_ACTION  = "favorite";
+	public static final String DOWNLOAD_COMPLETE  = "downloaded";	
 	public static final String RECOMMENDATIONS_ACTION = "recommendations";
 	public static final String SIGN_OUT_ACTION = "signOut";
 	public static final String CONTENTDETAILS_ACTION = "contentDetail";
@@ -157,6 +158,11 @@ public class ConsumerApi {
 	public static String getSusbcriptionRequest(String paymentChannel,String packageId){
 		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + BILLING_TAG
 				+ SLASH + SUBSCRIBE_TAG+ SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY + AMPERSAND+ PAYMENTCHANNEL +paymentChannel+ AMPERSAND +PACKAGEID+packageId;
+	}
+	
+	public static String getDownloadNotifyUrl(String contentId) {
+		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + CONTENT_TAG +SLASH + contentId +SLASH
+				+ DOWNLOAD_COMPLETE + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY;
 	}
 	
 	public static String getDrmProxy()
