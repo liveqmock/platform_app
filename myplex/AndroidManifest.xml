@@ -85,6 +85,15 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar" >
         </activity>
 
+        <receiver android:name="com.apalya.myplex.receivers.DownloadManagerReceiver">
+  			<intent-filter>
+    			 <action android:name="android.intent.action.DOWNLOAD_COMPLETE"></action>
+     			 
+  			</intent-filter>
+		</receiver>
+
+        <service android:name="com.apalya.myplex.receivers.DownloadServiceReceiver"></service>
+        
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/fbapp_id" />
