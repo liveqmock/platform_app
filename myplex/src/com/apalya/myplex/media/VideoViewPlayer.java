@@ -34,7 +34,9 @@ import android.view.View.OnTouchListener;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
+import com.apalya.myplex.data.ApplicationSettings;
 import com.apalya.myplex.data.ErrorManagerData;
+import com.apalya.myplex.exception.DRMException;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.utils.WidevineDrm;
@@ -42,6 +44,7 @@ import com.apalya.myplex.utils.WidevineDrm.Settings;
 import com.apalya.myplex.views.CardVideoPlayer;
 import com.apalya.myplex.views.CardVideoPlayer.PlayerFullScreen;
 import com.apalya.myplex.views.CardVideoPlayer.PlayerStatusUpdate;
+import com.crashlytics.android.Crashlytics;
 import com.flurry.android.monolithic.sdk.impl.mc;
 public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.OnInfoListener,
 		MediaPlayer.OnCompletionListener, OnPreparedListener,
@@ -765,6 +768,11 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 			int status=drmManager.acquireRights(url);
 			if(status!=0)
 			{
+				if(ApplicationSettings.ENABLE_LOG_DRM_ERRORS)
+				{
+					Crashlytics.logException(new DRMException("acquireRights failed, status:"+status + " \n url:"+url));
+				}
+				
 				Util.showToast(mContext, "Acquire Rights Failed", Util.TOAST_TYPE_INFO);
 				//closeSession();
 				if(mPlayerListener!=null)
