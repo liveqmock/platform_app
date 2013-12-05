@@ -57,6 +57,7 @@ import com.apalya.myplex.data.CardDataCertifiedRatingsItem;
 import com.apalya.myplex.data.CardDataPackagePriceDetailsItem;
 import com.apalya.myplex.data.CardDataPackages;
 import com.apalya.myplex.data.CardDataPromotionDetailsItem;
+import com.apalya.myplex.data.MsisdnData;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.Blur;
@@ -200,6 +201,11 @@ public class PackagePopUp {
 						TextView heading = (TextView)mInflater.inflate(R.layout.pricepopmodeheading,null);
 						heading.setTypeface(FontUtil.Roboto_Medium);
 						mLastPaymentModeLayout.addView(heading);
+					}
+					MsisdnData msisdnData = (MsisdnData) Util.loadObject(myplexapplication.getApplicationConfig().msisdnPath); 
+					if(msisdnData != null && priceItem.paymentChannel.equalsIgnoreCase("OP") && (priceItem.name.equalsIgnoreCase(msisdnData.operator) || priceItem.name.contains(msisdnData.operator)))
+					{
+						continue;
 					}
 					if(priceItem.paymentChannel.equalsIgnoreCase("INAPP"))
 					{

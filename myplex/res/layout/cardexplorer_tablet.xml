@@ -30,7 +30,7 @@
                 android:layout_height="48dp"
                 android:drawableLeft="@drawable/iconsearchgrey"
                 android:gravity="center_vertical"
-                android:text="@string/searchhint"
+                android:text="@string/search_hint"
                 android:textSize="@dimen/textsize_14"
                 android:background="#FFFFFF" />
 

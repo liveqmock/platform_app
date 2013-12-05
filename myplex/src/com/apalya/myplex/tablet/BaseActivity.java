@@ -45,6 +45,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.SearchView;
 import android.widget.PopupWindow.OnDismissListener;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -295,6 +296,10 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		
 		mTitleFilterSymbol = (TextView)v.findViewById(R.id.customactionbar_filter_text1);
 		changeVisibility(mTitleFilterSymbol,View.GONE);		
+		
+		SearchView mSearchView = (SearchView)v.findViewById(R.id.customsearchview);
+		mSearchView.setVisibility(View.INVISIBLE);
+		
 		mCustomActionBarSearch = (ImageView) v.findViewById(R.id.customactionbar_search_button);
 		mCustomActionBarSearch.setOnClickListener(new OnClickListener() {
 
@@ -316,6 +321,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		Util.showFeedbackOnSame(mCustomActionBarSearch);
 		mCustomActionBarProgressBar = (ProgressBar) v
 				.findViewById(R.id.customactionbar_progressBar);
+		
 	}
 	@Override
 	public void enableFilterAction(boolean value){
@@ -763,6 +769,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 			} else{
 				mCustomActionBarSearch.setVisibility(visibility);
 			}
+			mCustomActionBarSearch.setVisibility(View.GONE);
 		}
 	}
 	@Override

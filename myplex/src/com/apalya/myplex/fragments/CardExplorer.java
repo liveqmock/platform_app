@@ -471,7 +471,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		int requestMethod = Method.GET;
 		String requestUrl = new String();
 		if(mData.requestType == CardExplorerData.REQUEST_SEARCH){
-			requestUrl = ConsumerApi.getSearch(mData.searchQuery,ConsumerApi.LEVELDYNAMIC,mData.mStartIndex);
+			requestUrl = ConsumerApi.getSearch(mData.searchQuery,ConsumerApi.LEVELDYNAMIC,mData.mStartIndex,"movie");
 			screenName="Search";
 		}else if(mData.requestType == CardExplorerData.REQUEST_RECOMMENDATION){
 			if(!mAddDataAdded){
@@ -479,7 +479,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				prepareLastSessionData();
 			}
 			requestUrl = ConsumerApi.getRecommendation(ConsumerApi.LEVELDYNAMIC,mData.mStartIndex);
-			screenName="Search";
+			screenName="Recommendation";
 		}else if(mData.requestType == CardExplorerData.REQUEST_FAVOURITE){
 			screenName="Favourite";
 			requestUrl = ConsumerApi.getFavourites(ConsumerApi.LEVELDYNAMIC,mData.mStartIndex);
@@ -490,6 +490,15 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		}else if(mData.requestType == CardExplorerData.REQUEST_BROWSE){
 			screenName="Browse" + mData.searchQuery;
 			requestUrl = ConsumerApi.getBrowse(mData.searchQuery,ConsumerApi.LEVELDYNAMIC, mData.mStartIndex);
+		}else if(mData.requestType == CardExplorerData.REQUEST_INLINESEARCH)
+		{
+			screenName = "Inlinesearch";
+			List<CardData> datatoSearch = new ArrayList<CardData>();
+			CardData data = new CardData();
+			data._id = mData.searchQuery;
+			datatoSearch.add(data);
+			mCacheManager.getCardDetails(datatoSearch,IndexHandler.OperationType.IDSEARCH,CardExplorer.this);
+			return;
 		}
 		
 		Map<String,String> attrib=new HashMap<String, String>();
@@ -976,8 +985,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		dataBundle.reset();
 		dataBundle.requestType = CardExplorerData.REQUEST_RECOMMENDATION;
 		
-		BaseFragment fragment = mMainActivity
-				.createFragment(NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION);
+		BaseFragment fragment = mMainActivity.createFragment(NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION);
 		mMainActivity.setActionBarTitle("myplex");
 		mMainActivity.bringFragment(fragment);
 		

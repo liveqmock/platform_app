@@ -16,12 +16,14 @@ public class CardExplorerData implements Serializable{
 	public static final int REQUEST_DOWNLOADS = 5;
 	public static final int REQUEST_PURCHASES = 6;
 	public static final int REQUEST_BROWSE = 7;
+	public static final int REQUEST_INLINESEARCH = 8;
 	public String requestUrl = new String();
 	public int currentSelectedCard = 0;
 	public  HashMap<String,CardData> mEntries = new HashMap<String,CardData>();
 	public ArrayList<CardData> mMasterEntries = new ArrayList<CardData>();
 	public int mStartIndex = 1;
 	public String searchQuery = new String(); 
+	public String searchScope = new String();
 	public int requestType = REQUEST_RECOMMENDATION;
 	public boolean continueWithExisting = false;
 	public CardData cardDataToSubscribe = null;
@@ -29,6 +31,7 @@ public class CardExplorerData implements Serializable{
 		cardDataToSubscribe = null;
 		requestType = REQUEST_SEARCH;
 		searchQuery = new String();
+		searchScope = new String();
 		currentSelectedCard = 0;
 		mStartIndex = 1;
 		mEntries = new HashMap<String,CardData>();

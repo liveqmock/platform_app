@@ -35,6 +35,7 @@ public class NavigationOptionsMenuAdapter extends BaseAdapter {
 	public final static String DOWNLOADS = "Downloads";
 	public final static String FAVOURITE = "Favourite";
 	public final static String RECOMMENDED = "Recommended";
+	public final static String DISCOVER = "Discover";
 	public final static String MOVIES = "Movies";
 	public final static String LIVETV = "Live TV";
 	public final static String PURCHASES = "Purchased";

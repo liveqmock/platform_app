@@ -24,7 +24,7 @@
             android:layout_toLeftOf="@+id/clearSearchresults"
             android:layout_toRightOf="@+id/searchlens"
             android:background="#FFFFFF"
-            android:hint="@string/searchhint"
+            android:hint="@string/search_hint"
             android:imeOptions="actionDone"
             android:inputType="text"
             android:textSize="@dimen/textsize_14" />

@@ -490,6 +490,7 @@ private void prepareDrmManager(String url){
 			int visibleItemCount, int totalItemCount) {
 		if (mCardActionListener != null) {
 			if (mNumberofItems > mLoadMoreLastCalledNumberofItems && firstVisibleItem > mNumberofItems / 2) {
+				Log.d(TAG, "LoadMore called, Checking if " +mNumberofItems+ ">"+mLoadMoreLastCalledNumberofItems + " &&"+firstVisibleItem+">"+mNumberofItems/2);
 				mCardActionListener.loadmore(mNumberofItems);
 				mLoadMoreLastCalledNumberofItems = mNumberofItems;
 			}

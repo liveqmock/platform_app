@@ -77,9 +77,7 @@
     <issue id="NamespaceTypo" severity="ignore" />
     <issue id="NestedScrolling" severity="ignore" />
     <issue id="NestedWeights" severity="ignore" />
-    <issue id="NewApi" severity="ignore">
-        <ignore path="src/com/apalya/myplex/MainActivity.java" />
-    </issue>
+    <issue id="NewApi" severity="ignore" />
     <issue id="NotSibling" severity="ignore" />
     <issue id="ObsoleteLayoutParam" severity="ignore" />
     <issue id="OldTargetApi" severity="ignore" />
