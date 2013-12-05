@@ -64,7 +64,7 @@
             android:paddingRight="12dp"
             android:layout_centerVertical="true"
             android:singleLine="true"
-            android:text="Full Details"
+            android:text="@string/moredetails"
             android:textColor="#54B5E9"
             android:textSize="@dimen/textsize_14" />
     </RelativeLayout>

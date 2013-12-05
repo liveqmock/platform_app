@@ -10,12 +10,12 @@
     <string name="send_request">Send Request</string>
     <string name="share">share</string>
     <string name="logout">logout</string>
-    <string name="email">email:</string>
+    <string name="email">e-mail:</string>
     <string name="title">myplex</string>
     <string name="required">required</string>
     <string name="password">password:</string>
-    <string name="facebook">sign In with facebook</string>
-    <string name="google">sign In with google+</string>
+    <string name="facebook">sign in with facebook</string>
+    <string name="google">sign in with google+</string>
     <string name="letme">browse as guest</string>
     <string name="progress_message">loading &#8230;</string>
     <string name="or">or</string>
@@ -26,13 +26,13 @@
     <string name="msgUpdate">receive SMS updates</string>
     <string name="mailUpdate">receive mail updates</string>
     <string name="signup">join myplex</string>
-    <string name="submit">continue to Myplex</string>
+    <string name="submit">continue to myplex</string>
     <string name="hinttextemail">"e-mail address"</string>
     <string name="hinttextphone">10 digit mobile number</string>
     <string name="hinttextpwd">password</string>
     <string name="hinttextname">display name</string>
     <string name="forgetPwd">forgot password? let\'s fix it here</string>
-    <string name="userCancelled">user has cancelled the request</string>
+    <string name="userCancelled">user has canceled the request</string>
     <string name="send_to">share via</string>
     <string name="carddetailcommentsection_editcomment">add a comment</string>
     <string name="carddetailcommentsection_editreview">add a review</string>
@@ -55,12 +55,12 @@
     <string name="card_play">&#x25B6;</string>
     <string name="card_pause">&#xE8A0;</string>
     <string name="card_duration">&#x1F4F9;</string>
-    <string name="price_rupeecode">&#x20B9; </string>
-    <string name="rating_low">&#x2639; </string>
-    <string name="rating_high">&#x263B; </string>
-    <string name="toast_warning">&#x26A0; </string>
-    <string name="toast_info">&#x2139; </string>
-    <string name="actionbar_filter">&#x25E2; </string>
+    <string name="price_rupeecode">&#x20B9;</string>
+    <string name="rating_low">&#x2639;</string>
+    <string name="rating_high">&#x263B;</string>
+    <string name="toast_warning">&#x26A0;</string>
+    <string name="toast_info">&#x2139;</string>
+    <string name="actionbar_filter">&#x25E2;</string>
     <string name="card_play_font">&#xE8B1;</string>
     <string name="card_trailer_font">&#xE8B0;</string>
     <string name="new_arrival_indicator">&#x2691;</string>
@@ -71,13 +71,15 @@
     <string name="commentpopupheading">add a comment</string>
     <string name="commentpopuphint">add a comment</string>
     <string name="feedbackheading">rate myplex </string>
-    <string name="feedbackmessageheading">please share your experience </string>
+    <string name="feedbackmessageheading">share your experience </string>
     <string name="feedbackmessagehint">feedback on myplex</string>
     <string name="feedbackcancelbutton">cancel</string>
     <string name="feedbackokbutton">ok</string>
     <string name="subscriptionconfirmationdialogtext">proceed with the payment?</string>
     <string name="playhint">play</string>
     <string name="trailerhint">play trailer</string>
+    
+    <string name="moredetails">more details</string>
     
     <string name="cardstatusfree">free</string>
     <string name="cardstatustempfree">watch now for free</string>
