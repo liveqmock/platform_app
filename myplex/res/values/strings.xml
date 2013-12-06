@@ -93,6 +93,20 @@
     <string name="userprofilename">profilename</string>
     <string name="userpic">userpicurl</string>
     
+    <!--Navigation drawer icons-->
+    <string name="iconfav">&#x2665;</string>
+    <string name="iconpurchases">&#xE550;</string>
+    <string name="icondnload">&#xE811;</string>
+    <string name="icondiscover">&#xE671;</string>
+    <string name="iconsettings">&#x2699;</string>
+    <string name="iconfriends">&#xE972;</string>
+    <string name="iconlogout">&#x23CF;</string>
+    <string name="iconrate"></string>
+    <string name="iconhome">&#x2302;</string>
+    <string name="iconmovie">&#xE8B1;</string>
+    <string name="iconlivetv">&#xE8C0;</string>
+    <!--Navigation drawer icons-->
+    
     <string-array name="hometabletanim">
         <item>Bottom-In</item>
         <item>Right-In</item>
