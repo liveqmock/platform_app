@@ -29,6 +29,7 @@ import android.os.Looper;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -193,19 +194,19 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		{
 			screenType = NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION;
 		}
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FAVOURITE,R.drawable.iconfav, null, screenType,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.PURCHASES,R.drawable.iconpurchases, null,screenType,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.DOWNLOADS,R.drawable.icondnload, null, screenType,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FAVOURITE,R.string.iconfav, null, screenType,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.PURCHASES,R.string.iconpurchases, null,screenType,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.DOWNLOADS,R.string.icondnload, null, screenType,R.layout.navigation_menuitemsmall));
 		
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.SETTINGS,R.drawable.iconsettings, null, NavigationOptionsMenuAdapter.SETTINGS_ACTION,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.SETTINGS,R.string.iconsettings, null, NavigationOptionsMenuAdapter.SETTINGS_ACTION,R.layout.navigation_menuitemsmall));
 		Session fbSession=Session.getActiveSession();
 		if(fbSession!=null && fbSession.isOpened())
-			mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.INVITEFRIENDS,R.drawable.iconfriends, null, NavigationOptionsMenuAdapter.INVITE_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGOUT,R.drawable.iconlogout, null, NavigationOptionsMenuAdapter.LOGOUT_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGO,R.drawable.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.RECOMMENDED,R.drawable.iconhome, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.MOVIES,R.drawable.iconmovie, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LIVETV,R.drawable.iconlivetv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+			mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.INVITEFRIENDS,R.string.iconfriends, null, NavigationOptionsMenuAdapter.INVITE_ACTION,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGOUT,R.string.iconlogout, null, NavigationOptionsMenuAdapter.LOGOUT_ACTION,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGO,R.string.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.RECOMMENDED,R.string.iconhome, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.MOVIES,R.string.iconmovie, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LIVETV,R.string.iconlivetv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 //		 mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.TVSHOWS,R.drawable.icontv,null,NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 	}
 	@Override
@@ -525,32 +526,37 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 			if (label
 					.equalsIgnoreCase(NavigationOptionsMenuAdapter.FAVOURITE)) {
 				data.requestType = CardExplorerData.REQUEST_FAVOURITE;
-				setActionBarTitle("my favourites");
+				setActionBarTitle("my "+NavigationOptionsMenuAdapter.FAVOURITE);
 			} else if (label
 					.equalsIgnoreCase(NavigationOptionsMenuAdapter.RECOMMENDED)) {
 				data.requestType = CardExplorerData.REQUEST_RECOMMENDATION;
-				setActionBarTitle("recommended");
+				setActionBarTitle("myplex");
 			} else if (label
 					.equalsIgnoreCase(NavigationOptionsMenuAdapter.MOVIES)) {
 				data.requestType = CardExplorerData.REQUEST_BROWSE;
 				data.searchQuery = "movie";
-				setActionBarTitle("movies");
+				setActionBarTitle(NavigationOptionsMenuAdapter.MOVIES);
 			} else if (label
 					.equalsIgnoreCase(NavigationOptionsMenuAdapter.LIVETV)) {
 				data.requestType = CardExplorerData.REQUEST_BROWSE;
 				data.searchQuery = "live";
-				setActionBarTitle("live TV");
+				setActionBarTitle(NavigationOptionsMenuAdapter.LIVETV);
 			} else if (label
 					.equalsIgnoreCase(NavigationOptionsMenuAdapter.TVSHOWS)) {
 				data.requestType = CardExplorerData.REQUEST_BROWSE;
 				data.searchQuery = "tvshows";
-				setActionBarTitle("TV Shows");
+				setActionBarTitle(NavigationOptionsMenuAdapter.TVSHOWS);
 			}else if(label.equalsIgnoreCase(NavigationOptionsMenuAdapter.DOWNLOADS)){
 				data.requestType = CardExplorerData.REQUEST_DOWNLOADS;
-				setActionBarTitle("my downloads");
+				setActionBarTitle("my "+NavigationOptionsMenuAdapter.DOWNLOADS);
 			}else if(label.equalsIgnoreCase(NavigationOptionsMenuAdapter.PURCHASES)){
 				data.requestType = CardExplorerData.REQUEST_PURCHASES;
-				setActionBarTitle("my purchases");
+				setActionBarTitle("my "+NavigationOptionsMenuAdapter.PURCHASES);
+			}
+			else
+			{
+				setActionBarTitle("myplex");
+				Log.e("", label);
 			}
 			if(this instanceof TabletCardDetails){
 				myplexapplication.mSelectedOption_Tablet = screenType;

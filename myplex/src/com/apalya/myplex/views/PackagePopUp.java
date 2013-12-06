@@ -262,7 +262,9 @@ public class PackagePopUp {
 		View v = mInflater.inflate(R.layout.purchasepackitem, null);
 		LinearLayout promotionalLayout = (LinearLayout)v.findViewById(R.id.purchasepackItem1_offer);
 		if(packageitem.promotionDetails == null ){ promotionalLayout.setVisibility(View.INVISIBLE);}
-		if(packageitem.promotionDetails.size() == 0){ promotionalLayout.setVisibility(View.INVISIBLE);}
+		if(packageitem.promotionDetails == null || packageitem.promotionDetails.size() == 0){ 
+			promotionalLayout.setVisibility(View.INVISIBLE);
+			}
 		else{
 			CardDataPromotionDetailsItem  promotionItem = packageitem.promotionDetails.get(0); 
 			if(promotionItem.amount != null){
