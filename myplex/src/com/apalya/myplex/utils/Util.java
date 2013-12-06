@@ -126,7 +126,7 @@ public class Util {
 			}
 			message.setText(msg);
 			toast.setView(v);
-			toast.setDuration(Toast.LENGTH_SHORT);
+			toast.setDuration(Toast.LENGTH_LONG);
 			toast.show();
 		} catch (Exception e) {
 			// TODO: handle exception

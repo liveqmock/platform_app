@@ -59,7 +59,7 @@
     <string name="rating_low">&#x2639;</string>
     <string name="rating_high">&#x263B;</string>
     <string name="toast_warning">&#x26A0;</string>
-    <string name="toast_info">&#x2139;</string>
+    <string name="toast_info">&#x26A0;</string>
     <string name="actionbar_filter">&#x25E2;</string>
     <string name="card_play_font">&#xE8B1;</string>
     <string name="card_trailer_font">&#xE8B0;</string>
