@@ -62,6 +62,7 @@
             android:windowSoftInputMode="stateAlwaysVisible" >
         </activity>
         <activity android:name=".SubscriptionView"
+            android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait" >
         </activity>
         <activity
