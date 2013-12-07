@@ -20,7 +20,7 @@ public class MediaUtil {
 	private static String TAG ="MediaUtil";
 	
 	public interface MediaUtilEventListener{
-		public void urlReceived(boolean aStatus,String url);
+		public void urlReceived(boolean aStatus,String url, String message);
 	}
 	public static MediaUtilEventListener urlEventListener;
 	private static String sQualityType;
@@ -45,14 +45,14 @@ public class MediaUtil {
 		queue.add(myReq);
 		Log.d(TAG, aVideoUrl);
 	}
-	private static void sendResponse(boolean status,String url){
+	private static void sendResponse(boolean status,String url, String message){
 		if (urlEventListener != null) {
 			if(url != null){
 				if(url.contains(".wvm")){
 					url = url.replace("http:", "widevine:");	
 				}
 			}
-			urlEventListener.urlReceived(status,url);
+			urlEventListener.urlReceived(status,url, message);
 		}
 	}
 	private static Response.Listener<String> getVideoUrlSuccessListener() {
@@ -76,17 +76,28 @@ public class MediaUtil {
 					e.printStackTrace();
 				}
 				if(minResultSet.results == null){
-					sendResponse(false,null);
+					sendResponse(false,null, null);
 					return;
 				}
+				
 				String url="";
 				for(CardData data:minResultSet.results){
-					if(data.videos == null || data.videos.values == null || data.videos.values.size() == 0){sendResponse(false,null);}
+					if(data.videos == null || data.videos.values == null || data.videos.values.size() == 0)
+					{
+						if(!data.videos.status.equalsIgnoreCase("SUCCESS")){
+							sendResponse(false,null, data.videos.message);
+							return;
+						}
+						
+						sendResponse(false,null, null);
+					}				
+					
+					
 					for(CardDataVideosItem video:data.videos.values){
 						//if(sDownloadStatus)
 						{
 							if(video.profile != null && video.profile.equalsIgnoreCase(sQualityType) && video.link != null && video.type.equalsIgnoreCase(ConsumerApi.STREAMDOWNLOAD)){
-								sendResponse(true,video.link);
+								sendResponse(true,video.link,null);
 								return;
 							}
 						}
@@ -110,10 +121,10 @@ public class MediaUtil {
 				}
 				if(url.length()>0)
 				{
-					sendResponse(true, url);
+					sendResponse(true, url, null);
 					return;
 				}
-				sendResponse(false,null);
+				sendResponse(false,null, null);
 			}
 		};
 	}
@@ -122,7 +133,7 @@ public class MediaUtil {
 			@Override
 			public void onErrorResponse(VolleyError error) {
 				if (urlEventListener != null) {
-					urlEventListener.urlReceived(false,null);
+					urlEventListener.urlReceived(false,null, null);
 				}
 			}
 		};

@@ -725,7 +725,6 @@ public class CardDetailViewFactory {
 		}
 		View v = mInflator.inflate(R.layout.carddetailstudiodesc, null);
 		TextView title = (TextView)v.findViewById(R.id.carddetaildesc_studiotitle);
-		title.setText("Myplex Description");
 		title.setTypeface(FontUtil.Roboto_Light);
 		mMyPlexDescription = title;
 		TextView text = (TextView)v.findViewById(R.id.carddetaildesc_studiodescription);

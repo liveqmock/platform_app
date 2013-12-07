@@ -64,7 +64,7 @@ public class SubcriptionEngine {
 				if(mSelectedPriceItem.webBased){
 					launchWebBasedSubscription();
 				}else{
-					if(!mSelectedPriceItem.doubleConfirmation){
+					if(mSelectedPriceItem.doubleConfirmation){
 						showConfirmationDialog();
 					}else{
 						doOperatorBilling();

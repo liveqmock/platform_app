@@ -16,6 +16,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Display;
@@ -287,10 +288,18 @@ public class CardVideoPlayer implements PlayerListener {
 		MediaUtil.setUrlEventListener(new MediaUtilEventListener() {
 
 			@Override
-			public void urlReceived(boolean aStatus, String url) {
+			public void urlReceived(boolean aStatus, String url, String message) {
 				if (!aStatus) {
 					closePlayer();
-					Util.showToast(mContext, "Failed in fetching the url.",Util.TOAST_TYPE_ERROR);
+					
+					String msg ="Failed in fetching the url.";
+					
+					if(!TextUtils.isEmpty(message)){
+						msg = message;
+					}
+					
+					Util.showToast(mContext, msg,Util.TOAST_TYPE_ERROR);					
+					
 					if(mPlayerStatusListener != null){
 						mPlayerStatusListener.playerStatusUpdate("Failed in fetching the url.");
 					}
@@ -590,7 +599,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
         MediaUtil.setUrlEventListener(new MediaUtilEventListener() {
 			
 			@Override
-			public void urlReceived(boolean aStatus, String url) {
+			public void urlReceived(boolean aStatus, String url, String message) {
 				if (!aStatus) {
 					closePlayer();
 					Util.showToast(mContext, "Failed in fetching the url.",Util.TOAST_TYPE_ERROR);

@@ -57,6 +57,7 @@ import com.apalya.myplex.data.CardDataCertifiedRatingsItem;
 import com.apalya.myplex.data.CardDataPackagePriceDetailsItem;
 import com.apalya.myplex.data.CardDataPackages;
 import com.apalya.myplex.data.CardDataPromotionDetailsItem;
+import com.apalya.myplex.data.MsisdnData;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.Blur;
@@ -201,6 +202,11 @@ public class PackagePopUp {
 						heading.setTypeface(FontUtil.Roboto_Medium);
 						mLastPaymentModeLayout.addView(heading);
 					}
+					MsisdnData msisdnData = (MsisdnData) Util.loadObject(myplexapplication.getApplicationConfig().msisdnPath); 
+					if(msisdnData != null && priceItem.paymentChannel.equalsIgnoreCase("OP") && (priceItem.name.equalsIgnoreCase(msisdnData.operator) || priceItem.name.contains(msisdnData.operator)))
+					{
+						continue;
+					}
 					if(priceItem.paymentChannel.equalsIgnoreCase("INAPP"))
 					{
 						continue;
@@ -256,7 +262,9 @@ public class PackagePopUp {
 		View v = mInflater.inflate(R.layout.purchasepackitem, null);
 		LinearLayout promotionalLayout = (LinearLayout)v.findViewById(R.id.purchasepackItem1_offer);
 		if(packageitem.promotionDetails == null ){ promotionalLayout.setVisibility(View.INVISIBLE);}
-		if(packageitem.promotionDetails.size() == 0){ promotionalLayout.setVisibility(View.INVISIBLE);}
+		if(packageitem.promotionDetails == null || packageitem.promotionDetails.size() == 0){ 
+			promotionalLayout.setVisibility(View.INVISIBLE);
+			}
 		else{
 			CardDataPromotionDetailsItem  promotionItem = packageitem.promotionDetails.get(0); 
 			if(promotionItem.amount != null){

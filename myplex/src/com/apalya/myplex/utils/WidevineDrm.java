@@ -13,7 +13,10 @@ import java.util.EventListener;
 import java.util.Set;
 
 import com.apalya.myplex.R;
+import com.apalya.myplex.data.ApplicationSettings;
+import com.apalya.myplex.exception.DRMException;
 import com.apalya.myplex.views.CardVideoPlayer.PlayerStatusUpdate;
+import com.crashlytics.android.Crashlytics;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -438,7 +441,14 @@ public class WidevineDrm {
 			if (str.equalsIgnoreCase("ok")) {
 				return 200;
 			}
+			
+			if(ApplicationSettings.ENABLE_LOG_DRM_ERRORS)
+			{
 
+				String message = "acquireRights failed, code:"+str + " url:"+localDrmInfo.get(Settings.WIDEVINE_KEY_ASSET_URI);
+			
+				Crashlytics.logException(new DRMException(message));
+			}
 			
 			String[] parts = str.split("=");
 

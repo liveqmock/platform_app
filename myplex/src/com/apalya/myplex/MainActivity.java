@@ -1,7 +1,10 @@
 package com.apalya.myplex;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -13,6 +16,7 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.SearchManager;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
@@ -29,6 +33,7 @@ import android.os.Looper;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -42,12 +47,20 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
+import android.widget.SearchView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
+import android.widget.SearchView.OnCloseListener;
+import android.widget.SearchView.OnQueryTextListener;
 import android.widget.TextView;
+
+import com.android.volley.VolleyError;
+import com.apalya.myplex.adapters.CacheManagerCallback;
 import com.apalya.myplex.adapters.FliterMenuAdapter;
 import com.apalya.myplex.adapters.NavigationOptionsMenuAdapter;
+import com.apalya.myplex.cache.CacheManager;
+import com.apalya.myplex.cache.IndexHandler;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDataGenralInfo;
 import com.apalya.myplex.data.CardDataImages;
@@ -59,12 +72,14 @@ import com.apalya.myplex.data.NavigationOptionsMenu;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.fragments.CardDetails;
 import com.apalya.myplex.fragments.CardExplorer;
+import com.apalya.myplex.fragments.SearchSuggestions;
 import com.apalya.myplex.fragments.SetttingsFragment;
 import com.apalya.myplex.menu.FilterMenuProvider;
 import com.apalya.myplex.utils.Blur;
 import com.apalya.myplex.utils.Blur.BlurResponse;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.MessagePost.MessagePostCallback;
+import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.LogOutUtil;
 import com.apalya.myplex.utils.SharedPrefUtils;
@@ -73,7 +88,8 @@ import com.apalya.myplex.views.RatingDialog;
 import com.facebook.Session;
 import com.flurry.android.FlurryAgent;
 
-public class MainActivity extends Activity implements MainBaseOptions {
+public class MainActivity extends Activity implements MainBaseOptions, SearchView.OnQueryTextListener, CacheManagerCallback {
+	private SearchView mSearchView;
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
 	private ActionBarDrawerToggle mDrawerToggle;
@@ -82,6 +98,8 @@ public class MainActivity extends Activity implements MainBaseOptions {
 	public LayoutInflater mInflater;
 	public BaseFragment mCurrentFragment;
 	private boolean mIsUserLoggedIn = true ;
+	public static final String TAG = "MainActivity";
+	private CacheManager mCacheManager = new CacheManager();
 	
 	public FrameLayout mContentLayout;
 	public Context mContext;
@@ -145,19 +163,19 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		{
 			screenType = NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION;
 		}
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FAVOURITE,R.drawable.iconfav, null, screenType,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.PURCHASES,R.drawable.iconpurchases, null,screenType,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.DOWNLOADS,R.drawable.icondnload, null, screenType,R.layout.navigation_menuitemsmall));
-		
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.SETTINGS,R.drawable.iconsettings, null, NavigationOptionsMenuAdapter.SETTINGS_ACTION,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FAVOURITE,R.string.iconfav, null, screenType,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.PURCHASES,R.string.iconpurchases, null,screenType,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.DOWNLOADS,R.string.icondnload, null, screenType,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.DISCOVER,R.string.icondiscover, null, NavigationOptionsMenuAdapter.SEARCH_ACTION,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.SETTINGS,R.string.iconsettings, null, NavigationOptionsMenuAdapter.SETTINGS_ACTION,R.layout.navigation_menuitemsmall));
 		Session fbSession=Session.getActiveSession();
 		if(fbSession!=null && fbSession.isOpened())
-			mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.INVITEFRIENDS,R.drawable.iconfriends, null, NavigationOptionsMenuAdapter.INVITE_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGOUT,R.drawable.iconlogout, null, NavigationOptionsMenuAdapter.LOGOUT_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGO,R.drawable.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.RECOMMENDED,R.drawable.iconhome, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.MOVIES,R.drawable.iconmovie, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LIVETV,R.drawable.iconlivetv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+			mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.INVITEFRIENDS,R.string.iconfriends, null, NavigationOptionsMenuAdapter.INVITE_ACTION,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGOUT,R.string.iconlogout, null, NavigationOptionsMenuAdapter.LOGOUT_ACTION,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGO,R.string.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.RECOMMENDED,R.string.iconhome, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.MOVIES,R.string.iconmovie, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LIVETV,R.string.iconlivetv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 //		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.TVSHOWS,R.drawable.icontv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		mNavigationAdapter.setMenuList(mMenuItemList);
 		mNavigationAdapter.setLoginStatus(mIsUserLoggedIn);
@@ -240,10 +258,10 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		if (savedInstanceState == null) {
 			Session fbSession=Session.getActiveSession();
 			if(fbSession!=null && fbSession.isOpened()){
-				selectItem(8);
+				selectItem(9);
 			}
 			else{
-				selectItem(7);
+				selectItem(8);
 			}
 		}
 		
@@ -336,6 +354,18 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		mTitleFilterSymbol = (TextView)v.findViewById(R.id.customactionbar_filter_text1);
 		changeVisibility(mTitleFilterSymbol,View.GONE);		
 		
+		mSearchView = (SearchView)v.findViewById(R.id.customsearchview);
+		setupSearchView(mSearchView);
+		
+		ImageView searchBack = (ImageView)v.findViewById(R.id.customactionbar_back);
+		searchBack.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				HideSearchView();
+			}
+		});
+		
 		mCustomActionBarSearch = (ImageView) v.findViewById(R.id.customactionbar_search_button);
 		mCustomActionBarSearch.setOnClickListener(new OnClickListener() {
 
@@ -345,7 +375,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 					mCurrentFragment.searchButtonClicked();
 				} else {
 					SearchActivity fragment = new SearchActivity();
-					setActionBarTitle("Search");
+					setActionBarTitle("search");
 					bringFragment(fragment);
 				}
 			}
@@ -450,9 +480,26 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		finish();
 	}
 
+	public boolean HideSearchView()
+	{
+		try {
+			mSearchView.setQuery("", false);
+			if(mSearchView !=null && !mSearchView.isIconified())
+			{
+				mSearchView.setIconified(true);
+				return true;
+			}
+		} catch (Exception e) {
+			
+		}
+		return false;
+	}
+	
 	@Override
 	public void onBackPressed() {
 		try {
+			if(HideSearchView())
+				return;
 			showActionBar();
 			setSearchBarVisibilty(View.VISIBLE);
 			BaseFragment fragment = mFragmentStack.peek();
@@ -532,6 +579,8 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		if (fragment == null) {
 			return;
 		}
+		HideSearchView();
+		HideSearchView();
 		mCurrentFragment = fragment;
 		enableFilterAction(false);
 		pushFragment();
@@ -546,7 +595,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		saveCurrentSessionData();
 		changeVisibility(mTitleFilterSymbol, View.GONE);
 		NavigationOptionsMenu menu = mMenuItemList.get(position);
-		
+		setSearchviewHint("search movies");
 		switch (menu.mScreenType) {
 		case NavigationOptionsMenuAdapter.INVITE_ACTION:{
 			Util.InviteFriends(MainActivity.this);
@@ -596,7 +645,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 			data.reset();
 			
 			if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.FAVOURITE)){
-				setActionBarTitle("My Favourites");
+				setActionBarTitle("my "+NavigationOptionsMenuAdapter.FAVOURITE);
 				data.requestType = CardExplorerData.REQUEST_FAVOURITE;
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.RECOMMENDED)){
 				data.requestType = CardExplorerData.REQUEST_RECOMMENDATION;
@@ -604,30 +653,45 @@ public class MainActivity extends Activity implements MainBaseOptions {
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.MOVIES)){
 				data.requestType = CardExplorerData.REQUEST_BROWSE;
 				data.searchQuery ="movie";
-				setActionBarTitle("Movies");
+				setActionBarTitle(NavigationOptionsMenuAdapter.MOVIES);
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.LIVETV)){
 				data.requestType = CardExplorerData.REQUEST_BROWSE;
 				data.searchQuery ="live";
-				setActionBarTitle("Live TV");
+				setActionBarTitle(NavigationOptionsMenuAdapter.LIVETV);
+				setSearchviewHint("search live tv");
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.TVSHOWS)){
 				data.requestType = CardExplorerData.REQUEST_BROWSE;
 				data.searchQuery ="tvshows";
-				setActionBarTitle("TV Shows");
+				setActionBarTitle(NavigationOptionsMenuAdapter.TVSHOWS);
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.DOWNLOADS)){
 				data.requestType = CardExplorerData.REQUEST_DOWNLOADS;
-				setActionBarTitle("My Downloads");
+				setActionBarTitle("my "+NavigationOptionsMenuAdapter.DOWNLOADS);
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.PURCHASES)){
 				data.requestType = CardExplorerData.REQUEST_PURCHASES;
-				setActionBarTitle("My Purchases");
+				setActionBarTitle("my "+NavigationOptionsMenuAdapter.PURCHASES);
+			}
+			else
+			{
+				setActionBarTitle("myplex");
+				Log.e(TAG, menu.mLabel);
 			}
 			mCurrentFragment = mCardExplorer;
+			break;
+		}
+		case NavigationOptionsMenuAdapter.SEARCH_ACTION:
+		{
+			mSearchActivity = (SearchActivity) createFragment(NavigationOptionsMenuAdapter.SEARCH_ACTION);
+			mCurrentFragment = mSearchActivity;
+			saveActionBarTitle();
+			setActionBarTitle("discover");
 			break;
 		}
 		case NavigationOptionsMenuAdapter.SETTINGS_ACTION:
 		{
 			mSettingsScreen = (SetttingsFragment) createFragment(NavigationOptionsMenuAdapter.SETTINGS_ACTION);
 			mCurrentFragment = mSettingsScreen;
-			setActionBarTitle("Settings");
+			saveActionBarTitle();
+			setActionBarTitle("settings");
 			break;
 		}
 		default: {
@@ -660,7 +724,33 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		transaction.addToBackStack(null);
 		transaction.commit();
 	}
-
+	
+	private void overlayFragment(BaseFragment fragment) {
+		if(fragment == null)
+			return;
+		fragment.setActionBar(getActionBar());
+		fragment.setMainActivity(this);
+		FragmentManager fragmentManager = getFragmentManager();
+		FragmentTransaction transaction = fragmentManager.beginTransaction();
+		transaction.add(R.id.content_frame, fragment);
+		transaction.addToBackStack(null);
+		transaction.commit();
+	}
+	
+	private void removeFragment(BaseFragment fragment)
+	{
+		Log.i(TAG, "remove" + fragment);
+		FragmentManager fragmentManager = getFragmentManager();
+		FragmentTransaction transaction = fragmentManager.beginTransaction();
+		transaction.remove(fragment);
+		transaction.commit();
+		mSearchSuggestionFrag = null;
+		
+		fragment = mFragmentStack.peek();
+		Log.i(TAG, "peeking" + fragment);
+		bringFragment(fragment);
+	}
+	
 	@Override
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
@@ -868,6 +958,7 @@ public class MainActivity extends Activity implements MainBaseOptions {
 			}
 			else
 				mCustomActionBarSearch.setVisibility(visibility);
+			mCustomActionBarSearch.setVisibility(View.GONE);
 		}
 	}
 	@Override
@@ -891,5 +982,173 @@ public class MainActivity extends Activity implements MainBaseOptions {
 		if(requestCode == ConsumerApi.SUBSCRIPTIONREQUEST){
 			
 		}
+	}
+
+	@Override
+	public boolean onQueryTextChange(String newText) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean onQueryTextSubmit(String query) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	private void setupSearchView(final SearchView searchView) {
+
+        if (isAlwaysExpanded()) {
+        	searchView.setIconifiedByDefault(false);
+        } 
+        searchView.setOnQueryTextListener(this);
+        try {
+			int id = searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        searchView.setOnSearchClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				Log.i(TAG,"onClick");
+//				changeVisibility(mCustomActionBarTitleLayout,View.GONE);
+				if (mDrawerLayout!=null && mNavigationDrawerOpened) {
+					mDrawerLayout.closeDrawer(mDrawerList);
+					mNavigationDrawerOpened = false;
+				}
+				findViewById(R.id.customactionbar_drawer).setVisibility(View.INVISIBLE);
+				findViewById(R.id.customactionbar_filter).setVisibility(View.INVISIBLE);
+				findViewById(R.id.customactionbar_back).setVisibility(View.VISIBLE);
+				mSearchSuggestionFrag = new SearchSuggestions(mContext);
+				overlayFragment(mSearchSuggestionFrag);
+			}
+		});
+        
+        searchView.setOnCloseListener(new OnCloseListener() {
+			
+			@Override
+			public boolean onClose() {
+				Log.i(TAG,"onClose");
+				if(mSearchView !=null && !mSearchView.isIconified())
+				{
+					findViewById(R.id.customactionbar_drawer).setVisibility(View.VISIBLE);
+					findViewById(R.id.customactionbar_filter).setVisibility(View.VISIBLE);
+					findViewById(R.id.customactionbar_back).setVisibility(View.INVISIBLE);
+
+//					changeVisibility(mCustomActionBarTitleLayout,View.VISIBLE);
+//					mSearchView.setIconified(true);
+					if(mSearchSuggestionFrag !=null)
+					{
+						removeFragment(mSearchSuggestionFrag);
+					}
+				}
+
+				return false;
+			}
+		});
+        
+        searchView.setOnQueryTextListener(new OnQueryTextListener() {
+			
+			@Override
+			public boolean onQueryTextSubmit(String query) {
+				Log.i(TAG, query);
+				HideSearchView();
+				doSearch(query);
+				return true;
+			}
+			
+			@Override
+			public boolean onQueryTextChange(String newText) {
+				if(mSearchSuggestionFrag!=null && newText.length() >0)
+					mSearchSuggestionFrag.setQuery(newText);
+				return false;
+			}
+		});
+    }
+	
+	private void setSearchviewHint(String hint)
+	{
+		if(mSearchView !=null)
+			mSearchView.setQueryHint(hint);
+	}
+    
+    protected boolean isAlwaysExpanded() {
+        return false;
+    }
+    
+    private void doSearch(String query)
+    {
+		showActionBarProgressBar();
+
+		String searchQuery = new String();
+		final List<CardData> searchString = new ArrayList<CardData>();
+			CardData temp = new CardData();
+			// temp._id = data.getButtonId() != null ? data.getButtonId() :
+			// data.getButtonName();
+			temp._id = query;
+			searchString.add(temp);
+			searchQuery = query;
+			
+			Map<String,String> params=new HashMap<String, String>();
+			params.put("tagsSelected", searchQuery);
+			Analytics.trackEvent(Analytics.SearchQuery,params);
+		mSearchQuery = searchQuery;
+		setActionBarTitle(query);
+		IndexHandler.OperationType searchType = IndexHandler.OperationType.DONTSEARCHDB;
+		if(!Util.isNetworkAvailable(mContext))
+			searchType = IndexHandler.OperationType.FTSEARCH;
+		mCacheManager.getCardDetails(searchString, searchType, MainActivity.this);
+	
+    }
+
+    private String mSearchQuery = new String();
+	private SearchSuggestions mSearchSuggestionFrag;
+    
+	@Override
+	public void OnCacheResults(HashMap<String, CardData> obj,
+			boolean issuedRequest) {
+
+		if (obj == null) {
+			return;
+		}
+
+		CardExplorerData dataBundle = myplexapplication.getCardExplorerData();
+
+		dataBundle.reset();
+		dataBundle.searchQuery = mSearchQuery;
+		dataBundle.requestType = CardExplorerData.REQUEST_SEARCH;
+
+		addFilterData(new ArrayList<FilterMenudata>(), null);
+
+		Set<String> keySet = obj.keySet();
+		for (String key : keySet) {
+			CardData data = obj.get(key);
+			// dataBundle.mEntries.add(data);
+			// if(dataBundle.mEntries.get(key) == null){
+			dataBundle.mEntries.put(key, data);
+			dataBundle.mMasterEntries.add(data);
+			// }
+			if (data.generalInfo != null)
+				Log.i(TAG, "adding " + data._id + ":" + data.generalInfo.title
+						+ " from Cache");
+		}
+		mCacheManager.unRegisterCallback();
+		hideActionBarProgressBar();
+		BaseFragment fragment = createFragment(NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION);
+		bringFragment(fragment);
+		
+	}
+
+	@Override
+	public void OnOnlineResults(List<CardData> dataList) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void OnOnlineError(VolleyError error) {
+		hideActionBarProgressBar();
 	}
 }

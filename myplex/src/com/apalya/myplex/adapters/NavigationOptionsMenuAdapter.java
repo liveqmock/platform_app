@@ -32,17 +32,18 @@ public class NavigationOptionsMenuAdapter extends BaseAdapter {
 	public final static int INVITE_ACTION = 6;
 	public final static int DOWNLOAD_ACTION = 7;
 	public final static int SETTINGS_ACTION = 90;
-	public final static String DOWNLOADS = "Downloads";
-	public final static String FAVOURITE = "Favourite";
-	public final static String RECOMMENDED = "Recommended";
-	public final static String MOVIES = "Movies";
-	public final static String LIVETV = "Live TV";
-	public final static String PURCHASES = "Purchased";
-	public final static String TVSHOWS = "TV Shows";
-	public final static String SETTINGS = "Settings";
-	public final static String LOGOUT = "Logout";
+	public final static String DOWNLOADS = "downloads";
+	public final static String FAVOURITE = "favourites";
+	public final static String RECOMMENDED = "home";
+	public final static String DISCOVER = "discover";
+	public final static String MOVIES = "movies";
+	public final static String LIVETV = "live TV";
+	public final static String PURCHASES = "purchases";
+	public final static String TVSHOWS = "TV shows";
+	public final static String SETTINGS = "settings";
+	public final static String LOGOUT = "logout";
 	public final static String LOGO = "ApplicationLogo";
-	public final static String INVITEFRIENDS = "Invite Friends";
+	public final static String INVITEFRIENDS = "invite friends";
 			
 	public Context mContext;
 	private boolean isLoggedIn = true;
@@ -112,12 +113,16 @@ public class NavigationOptionsMenuAdapter extends BaseAdapter {
 				image.setScaleType(ScaleType.CENTER_CROP);
 		} else if (menu.mResourceLayoutId == R.layout.navigation_menuitemsmall) {
 			TextView text = (TextView) v.findViewById(R.id.drawer_list_item_text);
-			ImageView image = (ImageView) v.findViewById(R.id.drawer_list_item_image);
+//			ImageView image = (ImageView) v.findViewById(R.id.drawer_list_item_image);
+			TextView image = (TextView) v.findViewById(R.id.drawer_list_item_image);
+			image.setText(menu.mDefaultResId);
+			image.setTypeface(FontUtil.ss_symbolicons_line);
+			
 			text.setText(menu.mLabel);
 			text.setTypeface(FontUtil.Roboto_Light);
 			if(menu.mScreenType == NOFOCUS_ACTION)
 				text.setTextColor(Color.parseColor("#888888"));
-			image.setImageResource(menu.mDefaultResId);
+//			image.setImageResource(menu.mDefaultResId);
 		}
 		return v;
 	}

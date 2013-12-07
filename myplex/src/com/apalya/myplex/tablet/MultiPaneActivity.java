@@ -25,6 +25,7 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.ViewGroup.MarginLayoutParams;
 import android.view.animation.Animation;
@@ -186,6 +187,10 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 				});
 				mDrawerlayout.startAnimation(slideDown);
 				findViewById(R.id.searchlayoutinclude).setVisibility(View.VISIBLE);
+				PinnedSectionListView listview = (PinnedSectionListView)findViewById(R.id.list_view);
+				ViewGroup.MarginLayoutParams mlp = (ViewGroup.MarginLayoutParams) listview .getLayoutParams();
+				mlp.setMargins(0, 0, 0, 40);
+				listview.setLayoutParams(mlp);
 				
 			}
 		});
@@ -573,7 +578,10 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 		if (mSearchbleTags.size() == 0)
 			setSearchBarVisibilty(View.INVISIBLE);
 		else
-			setSearchBarVisibilty(View.VISIBLE);
+		{
+			searchButtonClicked();
+			setSearchBarVisibilty(View.INVISIBLE);
+		}
 	}
 	
 	private void ClearSearchTags() {

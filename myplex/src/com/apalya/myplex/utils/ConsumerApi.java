@@ -5,6 +5,7 @@ import com.apalya.myplex.data.myplexapplication;
 public class ConsumerApi {
 	public static String DOMAIN = "api.myplex.com";
 	public static final String SEARCH_ACTION = "search";
+	public static final String INLINESEARCH_ACTION = "inlineSearch";
 	public static final String CONTENTLIST = "contentList";
 	public static final String TAG_ACTION = "tags";
 	public static final String CONTENT_TAG = "content";
@@ -80,15 +81,24 @@ public class ConsumerApi {
 	//public static String DEBUGCLIENTKEY = "dcb11454ccdafdd4706c7186d37abd2ff96cd02dc998d1111d16d4778a797f85";//"c86f79514ec7976bd20de36f1c6f15900d8e09f699818024283bad1bf0609650";
 	public static String DEBUGCLIENTKEY = myplexapplication.getDevDetailsInstance().getClientKey();
 	
-	public static String getSearch(String queryStr, String level,int startIndex) {
+	public static String getSearch(String queryStr, String level,int startIndex, String searchType) {
 		if(queryStr == null||(queryStr != null && queryStr.length() ==0)){
 			queryStr = "*";
 		}
 		queryStr.replace(" ", "%20");
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH
 				+ SEARCH_ACTION + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY
-				+  AMPERSAND + QUERY + queryStr + AMPERSAND + STARTINDEX
+				+  AMPERSAND + QUERY + queryStr +  AMPERSAND + BROWSETYPE + searchType 
+				+ AMPERSAND + STARTINDEX
 				+ startIndex + AMPERSAND + LEVEL 
+				+ level + AMPERSAND+COUNT;
+	}
+	
+	public static String getInlineSearch(String queryStr, String level){
+		queryStr.replace(" ", "%20");
+		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH
+				+ INLINESEARCH_ACTION + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY
+				+  AMPERSAND + QUERY + queryStr + AMPERSAND + LEVEL 
 				+ level + AMPERSAND+COUNT;
 	}
 	
@@ -103,7 +113,7 @@ public class ConsumerApi {
 	public static String getRecommendation(String level,int startIndex) {
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH
 				+ RECOMMENDATIONS_ACTION + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY
-				+  AMPERSAND + STARTINDEX
+				+  AMPERSAND + BROWSETYPE + "movie" +  AMPERSAND + STARTINDEX
 				+ startIndex + AMPERSAND + LEVEL
 				+ level + AMPERSAND+COUNT;
 	}

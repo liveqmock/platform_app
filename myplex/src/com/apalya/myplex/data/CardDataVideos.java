@@ -12,6 +12,8 @@ public class CardDataVideos implements Serializable{
 	 */
 	private static final long serialVersionUID = -4394934829056419470L;
 	public List<CardDataVideosItem> values = new ArrayList<CardDataVideosItem>();
+	public String status;
+	public String message;
 	public CardDataVideos(){
 		
 	}

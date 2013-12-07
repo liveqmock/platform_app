@@ -19,6 +19,7 @@ import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -586,6 +587,9 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 							AlertDialogUtil.showAlert(SignUpActivity.this, "Account Creation successful, Continue with "+mEmail.getText().toString()+ "?","Register new account", "Login with myplex",  SignUpActivity.this);
 						}else if(jsonResponse.getString("code").equalsIgnoreCase("409")){
 							AlertDialogUtil.showAlert(SignUpActivity.this, "Your email is already registered with us, Continue with "+mEmail.getText().toString()+ "?","Register new account", "Login with myplex",  SignUpActivity.this);
+						}else {		
+							if(!TextUtils.isEmpty(jsonResponse.getString("message")))
+								sendNotification(jsonResponse.getString("message"));
 						}
 					}
 				} catch (JSONException e) {
