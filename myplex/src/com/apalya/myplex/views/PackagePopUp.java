@@ -160,6 +160,11 @@ public class PackagePopUp {
 		if(data.packages == null){return;}
 		for(CardDataPackages packageitem:data.packages){
 			if(packageitem.priceDetails != null && packageitem.priceDetails.size() > 0){
+				if(packageitem.priceDetails.size() == 1 && packageitem.priceDetails.get(0)!=null && packageitem.priceDetails.get(0).paymentChannel.equalsIgnoreCase("INAPP"))
+				{
+					Log.d(TAG, "not filling inapp item");
+					continue;
+				}
 				createPackItem(packageitem.priceDetails.get(0),packageitem,parentlayout);
 			}
 		}
@@ -202,9 +207,10 @@ public class PackagePopUp {
 						heading.setTypeface(FontUtil.Roboto_Medium);
 						mLastPaymentModeLayout.addView(heading);
 					}
-					MsisdnData msisdnData = (MsisdnData) Util.loadObject(myplexapplication.getApplicationConfig().msisdnPath); 
-					if(msisdnData != null && priceItem.paymentChannel.equalsIgnoreCase("OP") && (priceItem.name.equalsIgnoreCase(msisdnData.operator) || priceItem.name.contains(msisdnData.operator)))
+					MsisdnData msisdnData = (MsisdnData) Util.loadObject(myplexapplication.getApplicationConfig().msisdnPath);
+					if(msisdnData != null && priceItem.paymentChannel.equalsIgnoreCase("OP") && (!priceItem.name.equalsIgnoreCase(msisdnData.operator)))
 					{
+						Log.i(TAG, priceItem.name+ "==" +msisdnData.operator);
 						continue;
 					}
 					if(priceItem.paymentChannel.equalsIgnoreCase("INAPP"))

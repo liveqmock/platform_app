@@ -236,6 +236,7 @@ public class SearchActivity extends BaseFragment implements
 			Analytics.trackEvent(Analytics.SearchQuery,params);
 		}
 		mSearchQuery = searchQuery;
+		mMainActivity.setActionBarTitle(searchQuery);
 		IndexHandler.OperationType searchType = IndexHandler.OperationType.DONTSEARCHDB;
 		if(!Util.isNetworkAvailable(mContext))
 			searchType = IndexHandler.OperationType.FTSEARCH;

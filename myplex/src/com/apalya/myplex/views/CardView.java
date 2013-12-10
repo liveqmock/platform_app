@@ -398,7 +398,7 @@ public class CardView extends ScrollView {
 		dataHolder.mFavourite.setVisibility(View.VISIBLE);
 		if(data.currentUserData != null && data.currentUserData.favorite){
 			dataHolder.mFavourite.setText(R.string.card_filledheart);
-			dataHolder.mFavourite.setTextColor(Color.parseColor("#58b4e5"));
+			dataHolder.mFavourite.setTextColor(Color.parseColor("#54B5E9"));
 		}else{
 			dataHolder.mFavourite.setText(R.string.card_filledheart);
 			dataHolder.mFavourite.setTextColor(Color.parseColor("#000000"));

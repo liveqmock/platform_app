@@ -49,7 +49,7 @@
     <string name="navigationmenu_settings">settings</string>
     <string name="card_delete">&#x2421;</string>
     <string name="card_heart">&#xE1A2;</string>
-    <string name="card_filledheart">&#x2665;</string>
+    <string name="card_filledheart">&#x002B;</string>
     <string name="card_comment">&#xE390;</string>
     <string name="card_people">&#xE972;</string>
     <string name="card_play">&#x25B6;</string>
@@ -94,11 +94,11 @@
     <string name="userpic">userpicurl</string>
     
     <!--Navigation drawer icons-->
-    <string name="iconfav">&#x2665;</string>
+    <string name="iconfav">&#x002B;</string>
     <string name="iconpurchases">&#xE550;</string>
     <string name="icondnload">&#xE811;</string>
     <string name="icondiscover">&#xE671;</string>
-    <string name="iconsettings">&#x2699;</string>
+    <string name="iconsettings">&#xF033;</string>
     <string name="iconfriends">&#xE972;</string>
     <string name="iconlogout">&#x23CF;</string>
     <string name="iconrate"></string>

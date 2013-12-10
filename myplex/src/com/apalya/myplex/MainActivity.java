@@ -535,12 +535,12 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 		case NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION:
 			mCardExplorer = new CardExplorer();
 			fragment = mCardExplorer;
-			String username=SharedPrefUtils.getFromSharedPreference(mContext, getString(R.string.devusername));
+/*			String username=SharedPrefUtils.getFromSharedPreference(mContext, getString(R.string.devusername));
 			if(username !=null && SharedPrefUtils.getIntFromSharedPreference(mContext, "CustomFav") !=1)
 			{
 				SharedPrefUtils.writeToSharedPref(mContext, "CustomFav", 1);
 				mCardExplorer.addCustomFavourites();
-			}
+			}*/
 			break;
 		case NavigationOptionsMenuAdapter.SEARCH_ACTION:
 			mSearchActivity = new SearchActivity();

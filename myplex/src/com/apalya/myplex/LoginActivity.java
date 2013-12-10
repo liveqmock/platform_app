@@ -1358,7 +1358,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			if (person != null) {
 				AccountUtils.setPlusProfileId(this, person.getId());
 				mUserInfo.setGoogleId(person.getId());
-				mUserInfo.setName(person.getName().getGivenName());
+				mUserInfo.setName(person.getName().getFormatted());
 				mUserInfo.setUserEmail(mPlusClient.getAccountName());
 				mUserInfo.setProfilePic("https://plus.google.com/s2/photos/profile/"+person.getId()+"?sz=480");
 				SharedPrefUtils.writeToSharedPref(LoginActivity.this, getString(R.string.userprofilename), person.getName().getGivenName());

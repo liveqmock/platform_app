@@ -34,6 +34,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
@@ -326,7 +327,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		return mRootView;
 	}
 
-	public void addCustomFavourites()
+	/*public void addCustomFavourites()
 	{
 		CardData addfav = new CardData();
 		addfav._id = "257";
@@ -348,7 +349,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		addfav.generalInfo.title = "Hitch";
 		addfav.generalInfo.type = "favourite";
 		favouriteAction(addfav,FavouriteUtil.FAVOURITEUTIL_ADD);
-	}
+	}*/
 	
 	public void delayedAction() {
 		Handler h = new Handler(Looper.getMainLooper());
@@ -695,7 +696,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		};
 	}
 	@Override
-	public void favouriteAction(final CardData data,int type){
+	public void favouriteAction(final CardData data,final int type){
 		FavouriteUtil favUtil = new FavouriteUtil();
 		
 		//long id=Util.startDownload("", "", getContext());
@@ -707,9 +708,14 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				String status="";
 				if(value){
 					status="Not Favourite";
+					if(type == FavouriteUtil.FAVOURITEUTIL_ADD)
+						Util.showToast(getContext(), data.generalInfo.title+" set as favourite",Toast.LENGTH_SHORT);
+					else
+						Util.showToast(getContext(), data.generalInfo.title+" removed from favourites",Toast.LENGTH_SHORT);
 //					Toast.makeText(getContext(), "Chan", Toast.LENGTH_SHORT).show();
 				}else{
 					status="Favourite";
+//					Util.showToast(getContext(), data.generalInfo.title+"set as favourite",Toast.LENGTH_SHORT);
 //					Toast.makeText(getContext(), "Add as Favourite", Toast.LENGTH_SHORT).show();
 				}
 				

@@ -489,8 +489,8 @@ private void prepareDrmManager(String url){
 	public void onScroll(AbsListView view, int firstVisibleItem,
 			int visibleItemCount, int totalItemCount) {
 		if (mCardActionListener != null) {
-			if (mNumberofItems > mLoadMoreLastCalledNumberofItems && firstVisibleItem > mNumberofItems / 2) {
-				Log.d(TAG, "LoadMore called, Checking if " +mNumberofItems+ ">"+mLoadMoreLastCalledNumberofItems + " &&"+firstVisibleItem+">"+mNumberofItems/2);
+			if (mNumberofItems > mLoadMoreLastCalledNumberofItems && firstVisibleItem > mNumberofItems / 3) {
+				Log.d(TAG, "LoadMore called, Checking if " +mNumberofItems+ ">"+mLoadMoreLastCalledNumberofItems + " &&"+firstVisibleItem+">"+mNumberofItems/3);
 				mCardActionListener.loadmore(mNumberofItems);
 				mLoadMoreLastCalledNumberofItems = mNumberofItems;
 			}
