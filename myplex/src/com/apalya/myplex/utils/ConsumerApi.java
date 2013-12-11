@@ -16,6 +16,7 @@ public class ConsumerApi {
 	public static final String RECOMMENDATIONS_ACTION = "recommendations";
 	public static final String SIGN_OUT_ACTION = "signOut";
 	public static final String CONTENTDETAILS_ACTION = "contentDetail";
+	public static final String SIMILARCONTENT = "similar";
 	public static final String COMMENT_TAG= "comment";
 	public static final String RATING_TAG= "rating";
 	public static final String SUBSCRIBE_TAG= "subscribe";
@@ -179,5 +180,12 @@ public class ConsumerApi {
 	{
 		return HTTPSCHEME+DOMAIN+SLASH+"licenseproxy/v2/license";
 		//return "https://api-beta.myplex.in/licenseproxy/v2/license"
+	}
+	
+	public static String getSimilarContent(String contentID, String level)
+	{
+		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH + SIMILARCONTENT
+				+ SLASH + contentID + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY  + AMPERSAND
+		        + LEVEL + level + AMPERSAND+COUNT;
 	}
 }

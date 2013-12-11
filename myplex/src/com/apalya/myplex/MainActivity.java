@@ -163,19 +163,25 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 		{
 			screenType = NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION;
 		}
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.RECOMMENDED,R.string.iconhome, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.MOVIES,R.string.iconmovie, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LIVETV,R.string.iconlivetv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGO,R.string.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
+
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FAVOURITE,R.string.iconfav, null, screenType,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.PURCHASES,R.string.iconpurchases, null,screenType,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.DOWNLOADS,R.string.icondnload, null, screenType,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.DISCOVER,R.string.icondiscover, null, NavigationOptionsMenuAdapter.SEARCH_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.SETTINGS,R.string.iconsettings, null, NavigationOptionsMenuAdapter.SETTINGS_ACTION,R.layout.navigation_menuitemsmall));
+		
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGO,R.string.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
+		
+		
 		Session fbSession=Session.getActiveSession();
 		if(fbSession!=null && fbSession.isOpened())
 			mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.INVITEFRIENDS,R.string.iconfriends, null, NavigationOptionsMenuAdapter.INVITE_ACTION,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.SETTINGS,R.string.iconsettings, null, NavigationOptionsMenuAdapter.SETTINGS_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGOUT,R.string.iconlogout, null, NavigationOptionsMenuAdapter.LOGOUT_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGO,R.string.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.RECOMMENDED,R.string.iconhome, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.MOVIES,R.string.iconmovie, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LIVETV,R.string.iconlivetv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 //		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.TVSHOWS,R.drawable.icontv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		mNavigationAdapter.setMenuList(mMenuItemList);
 		mNavigationAdapter.setLoginStatus(mIsUserLoggedIn);
@@ -255,7 +261,8 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 		};
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
 
-		if (savedInstanceState == null) {
+		selectItem(1);
+/*		if (savedInstanceState == null) {
 			Session fbSession=Session.getActiveSession();
 			if(fbSession!=null && fbSession.isOpened()){
 				selectItem(9);
@@ -263,7 +270,7 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 			else{
 				selectItem(8);
 			}
-		}
+		}*/
 		
 		Util.deserializeData(MainActivity.this);
 	}
@@ -498,6 +505,11 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 	@Override
 	public void onBackPressed() {
 		try {
+			if (mDrawerLayout!=null && mNavigationDrawerOpened) {
+				mDrawerLayout.closeDrawer(mDrawerList);
+				mNavigationDrawerOpened = false;
+				return;
+			}
 			if(HideSearchView())
 				return;
 			showActionBar();
@@ -653,10 +665,12 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.MOVIES)){
 				data.requestType = CardExplorerData.REQUEST_BROWSE;
 				data.searchQuery ="movie";
+				data.searchScope = "movie";
 				setActionBarTitle(NavigationOptionsMenuAdapter.MOVIES);
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.LIVETV)){
 				data.requestType = CardExplorerData.REQUEST_BROWSE;
 				data.searchQuery ="live";
+				data.searchScope = "live";
 				setActionBarTitle(NavigationOptionsMenuAdapter.LIVETV);
 				setSearchviewHint("search live tv");
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.TVSHOWS)){
@@ -1002,12 +1016,6 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
         	searchView.setIconifiedByDefault(false);
         } 
         searchView.setOnQueryTextListener(this);
-        try {
-			int id = searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
         searchView.setOnSearchClickListener(new OnClickListener() {
 			
 			@Override

@@ -294,7 +294,7 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 		Util.showFeedback(dataHolder.mFavLayout);
 		//17 chars
 		float price = 10000f;
-		if(data.packages == null){
+		if(data.packages == null|| data.packages.size() == 0){
 			dataHolder.mRentText.setText(mContext.getString(R.string.cardstatusfree));
 			dataHolder.mRentLayout.setOnClickListener(null);
 		}else{

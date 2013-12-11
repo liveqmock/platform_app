@@ -81,7 +81,7 @@
     
     <string name="moredetails">more details</string>
     
-    <string name="cardstatusfree">free</string>
+    <string name="cardstatusfree">coming soon</string>
     <string name="cardstatustempfree">watch now for free</string>
     <string name="cardstatuspaid">watch now</string>
     
@@ -114,7 +114,8 @@
         <item>Scale</item>
         <item>Alpha-In</item>
     </string-array>
-    	<string name="search_hint">search&#8230;</string>
+    	<string name="search_hint">select one of the keywords or \ntouch here to enter keyword &#8230;</string>
+    	<string name="search_hint_small">search &#8230;</string>
     <string name="tag1">1</string>
 	<string name="tag2">2</string>
 

@@ -237,6 +237,7 @@ public class SearchActivity extends BaseFragment implements
 		}
 		mSearchQuery = searchQuery;
 		mMainActivity.setActionBarTitle(searchQuery);
+		mMainActivity.saveActionBarTitle();
 		IndexHandler.OperationType searchType = IndexHandler.OperationType.DONTSEARCHDB;
 		if(!Util.isNetworkAvailable(mContext))
 			searchType = IndexHandler.OperationType.FTSEARCH;

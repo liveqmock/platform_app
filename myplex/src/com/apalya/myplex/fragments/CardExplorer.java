@@ -413,7 +413,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	}
 	@Override
 	public void loadmore(int value) {
-		if(mData.requestType != CardExplorerData.REQUEST_DOWNLOADS && mData.requestType != CardExplorerData.REQUEST_SIMILARCONTENT){
+		if(mData.requestType != CardExplorerData.REQUEST_DOWNLOADS /*&& mData.requestType != CardExplorerData.REQUEST_SIMILARCONTENT*/){
 			mData.mStartIndex++;
 			fetchMinData();
 		}
@@ -464,15 +464,24 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	private void fetchMinData() {
 		mOldDataAdded = false;
 		mOldDataListSize = 0;
-		if(mData.requestType == CardExplorerData.REQUEST_SIMILARCONTENT){
+/*		if(mData.requestType == CardExplorerData.REQUEST_SIMILARCONTENT){
 			return;
-		}
+		}*/
 		mMainActivity.showActionBarProgressBar();
 		RequestQueue queue = MyVolley.getRequestQueue();
 		int requestMethod = Method.GET;
 		String requestUrl = new String();
 		if(mData.requestType == CardExplorerData.REQUEST_SEARCH){
-			requestUrl = ConsumerApi.getSearch(mData.searchQuery,ConsumerApi.LEVELDYNAMIC,mData.mStartIndex,"movie");
+			String searchScope;
+			if(mData.searchScope == null || mData.searchScope.length() > 0)
+			{
+				Log.i(TAG,"Seachscope: "+ mData.searchScope);
+				searchScope = mData.searchScope;
+			}
+			else
+				searchScope = "movie";
+			
+				requestUrl = ConsumerApi.getSearch(mData.searchQuery,ConsumerApi.LEVELDYNAMIC,mData.mStartIndex,searchScope);
 			screenName="Search";
 		}else if(mData.requestType == CardExplorerData.REQUEST_RECOMMENDATION){
 			if(!mAddDataAdded){
@@ -501,6 +510,11 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			mCacheManager.getCardDetails(datatoSearch,IndexHandler.OperationType.IDSEARCH,CardExplorer.this);
 			return;
 		}
+		else if(mData.requestType == CardExplorerData.REQUEST_SIMILARCONTENT)
+		{
+			screenName="similarcontent for" +mData.searchQuery;
+			requestUrl = ConsumerApi.getSimilarContent(mData.searchQuery,ConsumerApi.LEVELDYNAMIC);
+		}
 		
 		Map<String,String> attrib=new HashMap<String, String>();
 		attrib.put("Category", screenName);
@@ -527,12 +541,24 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 						Util.showToast(getContext(), minResultSet.message,Util.TOAST_TYPE_ERROR);
 //						Toast.makeText(getContext(), minResultSet.message, Toast.LENGTH_SHORT).show();
 					}
-					if(minResultSet.results != null){
-						Log.d(TAG,"Number of Result for the MIN request:"+minResultSet.results.size());
+					/*if(mData.requestType == CardExplorerData.REQUEST_SIMILARCONTENT)
+					{
+						if(minResultSet.similarContent ==  null){showNoDataMessage(false);return;}
+						if(minResultSet.similarContent.values == null || minResultSet.similarContent.values.size() == 0){showNoDataMessage(false);return;}
+						if(minResultSet.similarContent != null){
+							Log.d(TAG,"Number of results for similar request:"+minResultSet.similarContent.values.size());
+						}
+						mCacheManager.getCardDetails(minResultSet.similarContent.values,IndexHandler.OperationType.IDSEARCH,CardExplorer.this);
 					}
-					if(minResultSet.results ==  null){showNoDataMessage(false);return;}
-					if(minResultSet.results.size() ==  0){showNoDataMessage(false);return;}
-					mCacheManager.getCardDetails(minResultSet.results,IndexHandler.OperationType.IDSEARCH,CardExplorer.this);
+					else*/
+					{
+						if(minResultSet.results != null){
+							Log.d(TAG,"Number of Result for the MIN request:"+minResultSet.results.size());
+						}
+						if(minResultSet.results ==  null){showNoDataMessage(false);return;}
+						if(minResultSet.results.size() ==  0){showNoDataMessage(false);return;}
+						mCacheManager.getCardDetails(minResultSet.results,IndexHandler.OperationType.IDSEARCH,CardExplorer.this);
+					}
 				} catch (JsonParseException e) {
 					showNoDataMessage(false);
 					e.printStackTrace();
@@ -596,12 +622,12 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			if (v.getTag() instanceof FilterMenudata) {
 				String label = ((FilterMenudata) v.getTag()).label;
 				if (label != null && label.equalsIgnoreCase("All")) {
-					
+					mMainActivity.setActionBarTitle("All");
 					Map<String,String> params=new HashMap<String, String>();
 					params.put("FilterType", label);
 					params.put("NumOfCards", String.valueOf(mData.mMasterEntries.size()));
 					Analytics.trackEvent(Analytics.cardBrowseFilter,params);
-					
+					mMainActivity.setActionBarTitle(label);
 					sort(mData.mMasterEntries);
 					return;
 				}
