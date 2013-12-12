@@ -521,12 +521,11 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			requestUrl = ConsumerApi.getSimilarContent(mData.searchQuery,ConsumerApi.LEVELDYNAMIC);
 		}
 		
-		Map<String,String> attrib=new HashMap<String, String>();
+		
 		/*attrib.put("Category", screenName);
 		attrib.put("Duration", "");
 		Analytics.trackEvent(Analytics.cardBrowseDuration,attrib,true);*/
-		attrib.put(Analytics.BROWSE_TYPE_PROPERTY, screenName);
-		Analytics.trackEvent(Analytics.EVENT_BROWSE,attrib);
+		
 		
 		requestUrl = requestUrl.replaceAll(" ", "%20");
 		mVolleyRequest = new GZipRequest(requestMethod, requestUrl, deviceMinSuccessListener(), responseErrorListener());
@@ -910,7 +909,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			}
 			//doesnot have data how control comes her. whether through filter|search etc
 			//params.put(Analytics.BROWSE_TYPE_PROPERTY,Analytics.BROWSE_CARDACTION_TYPES.Swipe.toString());
-			Analytics.trackEvent(Analytics.EVENT_BROWSE,params);
+			//Analytics.trackEvent(Analytics.EVENT_BROWSE,params);
 		}
 	}
 	
