@@ -245,7 +245,7 @@ public class CardVideoPlayer implements PlayerListener {
 		@Override
 		public void onClick(View v) {
 			
-			Util.showAdultToast(mContext.getString(R.string.adultwarning), mData, mContext);
+			
 			
 			Map<String,String> params=new HashMap<String, String>();
 			/*params.put("CardId", mData._id);
@@ -393,6 +393,7 @@ public class CardVideoPlayer implements PlayerListener {
 						e.printStackTrace();
 					}	
 				}
+				Util.showAdultToast(mContext.getString(R.string.adultwarning), mData, mContext);
 				Uri uri ;
 //				uri = Uri.parse("rtsp://46.249.213.87:554/playlists/bollywood-action_qcif.hpl.3gp");
 //				uri = Uri.parse("http://59.162.166.211:8080/player/3G_H264_320x240_600kbps.3gp");
