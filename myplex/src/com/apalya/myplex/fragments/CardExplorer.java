@@ -631,24 +631,13 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				if (label != null && label.equalsIgnoreCase("All")) {
 					mMainActivity.setActionBarTitle("All");
 					Map<String,String> params=new HashMap<String, String>();
-					/*
-					params.put("FilterType", label);
-					params.put("NumOfCards", String.valueOf(mData.mMasterEntries.size()));
-<<<<<<< Updated upstream
-					Analytics.trackEvent(Analytics.cardBrowseFilter,params);
-					mMainActivity.setActionBarTitle(label);
-=======
-					Analytics.trackEvent(Analytics.cardBrowseFilter,params);*/
-					
 					params.put(Analytics.SEARCH_TYPE_PROPERTY, Analytics.SEARCH_TYPES.Filter.toString());
 					params.put(Analytics.SEARCH_FILTER_TYPE_PROPERTY,label);
 					Analytics.trackEvent(Analytics.EVENT_SEARCH,params);
-					
-
 					sort(mData.mMasterEntries);
 					return;
 				}
-				mMainActivity.setActionBarTitle(label);
+				
 				ArrayList<CardData> localData = new ArrayList<CardData>();
 				for (CardData data : mData.mMasterEntries) {
 					boolean itemPresent = false;
@@ -664,10 +653,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 						localData.add(data);
 					}
 				}
+				mMainActivity.setActionBarTitle(label/*+" ("+localData.size()+"+)"*/);
 				Map<String,String> params=new HashMap<String, String>();
-				/*params.put("FilterType", label);
-				params.put("NumOfCards", String.valueOf(localData.size()));
-				Analytics.trackEvent(Analytics.cardBrowseFilter,params);*/
 				params.put(Analytics.SEARCH_TYPE_PROPERTY, Analytics.SEARCH_TYPES.Filter.toString());
 				params.put(Analytics.SEARCH_NUMBER_FOUND_PROPERTY, String.valueOf(localData.size()));
 				params.put(Analytics.SEARCH_FILTER_TYPE_PROPERTY,label);

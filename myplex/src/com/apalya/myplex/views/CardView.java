@@ -475,6 +475,8 @@ public class CardView extends ScrollView {
 	}
 	public void show() {
 //		Log.e(TAG, "updateCardsPosition show =");
+		mCardsLayout.removeAllViews();
+		mCardsLayout.refresh();
 		mCardsLayout.updateCardsPosition(getScrollY());
 	}
 	
