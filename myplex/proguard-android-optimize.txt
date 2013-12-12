@@ -108,6 +108,7 @@
 -dontwarn  com.google.**
 -dontwarn sun.**
 -dontwarn com.sun.**
+-dontwarn com.mixpanel.**
 
 -assumenosideeffects class android.util.Log {
     public static *** d(...);
