@@ -175,9 +175,15 @@ public class CardVideoPlayer implements PlayerListener {
 									if(mmItem.content !=null && mmItem.content.categoryName !=null && mmItem.content.categoryName.equalsIgnoreCase("trailer") && mmItem.generalInfo !=null && mmItem.generalInfo._id !=null)
 									{
 										Map<String,String> params=new HashMap<String, String>();
+										/*
 										params.put("CardId", mmItem.generalInfo._id);
 										params.put("CardCategory", mmItem.content.categoryName);
-										Analytics.trackEvent(Analytics.PlayerPlaySelect,params);
+										Analytics.trackEvent(Analytics.PlayerPlaySelect,params);*/
+										//???
+										params.put(Analytics.CONTENT_ID_PROPERTY, mmItem.generalInfo._id);
+										params.put(Analytics.CONTENT_NAME_PROPERTY, mmItem.content.categoryName);
+										params.put(Analytics.CONTENT_TYPE_PROPERTY,Analytics.CONTENT_ACTION_TYPES.PlayTrailer.toString());
+										Analytics.trackEvent(Analytics.EVENT_PLAY,params);
 										FetchTrailerUrl(mmItem.generalInfo._id);
 										mVideoViewParent.setOnClickListener(null);
 										break;
@@ -240,11 +246,15 @@ public class CardVideoPlayer implements PlayerListener {
 		public void onClick(View v) {
 			
 			Map<String,String> params=new HashMap<String, String>();
-			params.put("CardId", mData._id);
+			/*params.put("CardId", mData._id);
 			params.put("CardType", mData.generalInfo.type);
 			params.put("CardName", mData.generalInfo.title);
-			Analytics.trackEvent(Analytics.PlayerPlaySelect,params);
+			Analytics.trackEvent(Analytics.PlayerPlaySelect,params);*/
 			
+			params.put(Analytics.CONTENT_ID_PROPERTY, mData._id);
+			params.put(Analytics.CONTENT_NAME_PROPERTY, mData.generalInfo.title);
+			params.put(Analytics.CONTENT_TYPE_PROPERTY,Analytics.CONTENT_ACTION_TYPES.movie.toString());
+			Analytics.trackEvent(Analytics.EVENT_PLAY,params);
 			FetchUrl();
 			mVideoViewParent.setOnClickListener(null);
 			// TODO Auto-generated method stub
@@ -272,10 +282,15 @@ public class CardVideoPlayer implements PlayerListener {
 		}
 		
 		Map<String,String> params=new HashMap<String, String>();
-		params.put("CardId", mData._id);
+		/*params.put("CardId", mData._id);
 		params.put("CardType", mData.generalInfo.type);
 		params.put("CardName", mData.generalInfo.title);
-		Analytics.trackEvent(Analytics.PlayerPlayComplete,params);
+		Analytics.trackEvent(Analytics.PlayerPlayComplete,params);*/
+		
+		params.put(Analytics.CONTENT_ID_PROPERTY, mData._id);
+		params.put(Analytics.CONTENT_NAME_PROPERTY, mData.generalInfo.title);
+		params.put(Analytics.CONTENT_TYPE_PROPERTY,mData.generalInfo.type);
+		Analytics.trackEvent(Analytics.EVENT_PLAY,params);
 		
 	}
 
@@ -717,9 +732,13 @@ private void playVideoFile(CardDownloadData mDownloadData){
 							if(mmItem.content !=null && mmItem.content.categoryName !=null && mmItem.content.categoryName.equalsIgnoreCase("trailer") && mmItem.generalInfo !=null && mmItem.generalInfo._id !=null)
 							{
 								Map<String,String> params=new HashMap<String, String>();
-								params.put("CardId", mmItem.generalInfo._id);
+								/*params.put("CardId", mmItem.generalInfo._id);
 								params.put("CardCategory", mmItem.content.categoryName);
-								Analytics.trackEvent(Analytics.PlayerPlaySelect,params);
+								Analytics.trackEvent(Analytics.PlayerPlaySelect,params);*/
+								params.put(Analytics.CONTENT_ID_PROPERTY, mmItem.generalInfo._id);
+								params.put(Analytics.CONTENT_NAME_PROPERTY, mmItem.generalInfo.title);
+								params.put(Analytics.CONTENT_TYPE_PROPERTY,mmItem.content.categoryName);
+								Analytics.trackEvent(Analytics.EVENT_PLAY,params);
 								FetchTrailerUrl(mmItem.generalInfo._id);
 								mVideoViewParent.setOnClickListener(null);
 								break;

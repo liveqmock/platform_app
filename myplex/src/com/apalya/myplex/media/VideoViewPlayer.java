@@ -129,10 +129,10 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 				if (msg != null) {
 					sendMessageDelayed(msg, INTERVAL_BUFFERING_PER_UPDATE);
 				}
-				
+				//???
 				Map<String,String> params=new HashMap<String, String>();
 				params.put("Buffering", "start");
-				Analytics.trackEvent(Analytics.PlayerBuffering,params);
+				//Analytics.trackEvent(Analytics.PlayerBuffering,params);
 				
 				break;
 			}
@@ -295,18 +295,18 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 
 		if (mProgressBar == null) {
 			return;
-		}
+		} 
 
 		if (visibility) {
 			mProgressBar.setVisibility(View.VISIBLE);
 			Map<String,String> params=new HashMap<String, String>();
 			params.put("Buffering", "start");
-			Analytics.trackEvent(Analytics.PlayerBuffering,params,true);
+			//Analytics.trackEvent(Analytics.PlayerBuffering,params,true);
 			return;
 		}
 
 		mProgressBar.setVisibility(View.GONE);
-		Analytics.endTimedEvent(Analytics.PlayerBuffering);
+		//Analytics.endTimedEvent(Analytics.PlayerBuffering);
 
 	}
 
@@ -357,13 +357,19 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 	/**
 	 * call this method on Activity onPause
 	 */
-
+	
 	public void onPause() {
 		Log.d("PlayerScreen", "VideoViewPlayer onPause Start");
 		
+		/*
 		Map<String,String> params=new HashMap<String, String>();
 		params.put("status", "pause");
 		Analytics.trackEvent(Analytics.PlayerPlaySelect,params);
+		*/
+		//???
+		Map<String,String> params = new HashMap<String, String>();
+		params.put(Analytics.PLAY_CONTENT_STATUS_PROPERTY,Analytics.PLAY_CONTENT_STATUS_TYPES.Pause.toString());
+		Analytics.trackEvent(Analytics.EVENT_PLAY,params);
 		
 		if(mVideoView == null){
 			return;
@@ -429,10 +435,15 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 
 	public void onResume() {
 		Log.d("PlayerScreen", "VideoViewPlayer onResume Start");
-		
+		/*
 		Map<String,String> params=new HashMap<String, String>();
 		params.put("status", "resume");
 		Analytics.trackEvent(Analytics.PlayerPlaySelect,params);
+		 */	
+		//???
+		Map<String,String> params = new HashMap<String, String>();
+		params.put(Analytics.PLAY_CONTENT_STATUS_PROPERTY,Analytics.PLAY_CONTENT_STATUS_TYPES.Resume.toString());
+		Analytics.trackEvent(Analytics.EVENT_PLAY,params);
 		
 		if(mVideoView == null){
 			return;
@@ -609,9 +620,15 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 	public void onSeekComplete(MediaPlayer mp) {
 		Log.d("PlayerScreen", "VideoViewPlayer onSeekComplete");
 		
+		/*
 		Map<String,String> params=new HashMap<String, String>();
 		params.put("status", "seek");
 		Analytics.trackEvent(Analytics.PlayerPlaySelect,params);
+*/		
+		//???
+		Map<String,String> params = new HashMap<String, String>();
+		params.put(Analytics.PLAY_CONTENT_STATUS_PROPERTY,Analytics.PLAY_CONTENT_STATUS_TYPES.SeekComplete.toString());
+		Analytics.trackEvent(Analytics.EVENT_PLAY,params);
 		
 		if (mPlayerListener != null) {
 			mPlayerListener.onSeekComplete(mp);
@@ -668,9 +685,10 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 				showProgressBar(false);
 				mCurrentState = STATE_PREPARED;
 				
+				//???
 				Map<String,String> params=new HashMap<String, String>();
 				params.put("Buffering", "stop");
-				Analytics.trackEvent(Analytics.PlayerBuffering,params);
+				//Analytics.trackEvent(Analytics.PlayerBuffering,params);
 			}
 //			if (perBuffer > 100) {
 //				showProgressBar(false);
@@ -840,10 +858,15 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 			if(status==0 && value== DrmInfoEvent.TYPE_RIGHTS_INSTALLED)
 			{
 				iPlayerStarted=true;
+				/*
 				Map<String,String> params=new HashMap<String, String>();
 				params.put("Status", "PlayerRightsAcqusition");
 				Analytics.trackEvent(Analytics.PlayerRightsAcqusition,params);
-				//Util.showToast(mContext,"RIGHTS INSTALLED",Util.TOAST_TYPE_INFO);				
+*/				//Util.showToast(mContext,"RIGHTS INSTALLED",Util.TOAST_TYPE_INFO);	
+				//???
+				Map<String,String> params=new HashMap<String, String>();
+				params.put(Analytics.PLAY_CONTENT_STATUS_PROPERTY,Analytics.PLAY_CONTENT_STATUS_TYPES.PlayerRightsAcquisition.toString());
+				Analytics.trackEvent(Analytics.EVENT_PLAY,params);
 				startPlayer(true);
 			}
 			if(status!=0 ){

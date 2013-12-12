@@ -195,22 +195,34 @@ public class CardDetails extends BaseFragment implements
 			public void onClick(View v) {
 
 				Map<String, String> params = new HashMap<String, String>();
+				/*
 				params.put("CardId", mCardData._id);
 				params.put("CardType", mCardData.generalInfo.type);
 				params.put("CardName", mCardData.generalInfo.title);
 				params.put("Action", "Submit");
 				Analytics.trackEvent(Analytics.cardDetailsShare, params);
-
+				 */
+				//???
+				params.put(Analytics.CONTENT_ID_PROPERTY, mCardData._id);
+				params.put(Analytics.CONTENT_TYPE_PROPERTY, mCardData.generalInfo.type);
+				params.put(Analytics.CONTENT_NAME_PROPERTY, mCardData.generalInfo.title);
+				Analytics.trackEvent(Analytics.EVENT_BROWSE, params);				
+				
 				// TODO Auto-generated method stub
 				Util.shareData(getContext(), 3, "", mCardData.generalInfo.title);
 			}
 		});
 
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("CardId", mCardData._id);
+		/*params.put("CardId", mCardData._id);
 		params.put("CardType", mCardData.generalInfo.type);
 		params.put("CardName", mCardData.generalInfo.title);
-		Analytics.trackEvent(Analytics.cardDetailsScreen, params);
+		Analytics.trackEvent(Analytics.cardDetailsScreen, params);*/
+		params.put(Analytics.CONTENT_ID_PROPERTY, mCardData._id);
+		params.put(Analytics.CONTENT_TYPE_PROPERTY, mCardData.generalInfo.type);
+		params.put(Analytics.CONTENT_NAME_PROPERTY, mCardData.generalInfo.title);
+		//params.put(Analytics.BROWSE_TYPE_PROPERTY,Analytics.BROWSE_TYPES.Filter.toString());
+		Analytics.trackEvent(Analytics.EVENT_BROWSE, params);
 
 		return rootView;
 	}
@@ -641,11 +653,15 @@ public class CardDetails extends BaseFragment implements
 				CardDetailViewFactory.CARDDETAIL_COMMENTS);
 		if (v != null) {
 			Map<String, String> params = new HashMap<String, String>();
-			params.put("CardId", mCardData._id);
+			/*params.put("CardId", mCardData._id);
 			params.put("CardType", mCardData.generalInfo.type);
 			params.put("CardName", mCardData.generalInfo.title);
 			params.put("Status", "Expand");
-			Analytics.trackEvent(Analytics.cardDetailsComment, params);
+			Analytics.trackEvent(Analytics.cardDetailsComment, params);*/
+			params.put(Analytics.CONTENT_ID_PROPERTY, mCardData._id);
+			params.put(Analytics.CONTENT_NAME_PROPERTY,mCardData.generalInfo.title);
+			params.put(Analytics.CONTENT_TYPE_PROPERTY,mCardData.generalInfo.type);
+			Analytics.trackEvent(Analytics.EVENT_PLAY,params);
 			addSpace();
 			mCommentsContentLayout.addView(v);
 		}

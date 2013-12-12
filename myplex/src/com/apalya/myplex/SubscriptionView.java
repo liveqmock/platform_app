@@ -102,13 +102,19 @@ public class SubscriptionView extends Activity {
 					CardData subscribedData = myplexapplication.getCardExplorerData().cardDataToSubscribe;
 					subscribedData.currentUserData =  data.results.get(0).currentUserData;
 					
-					
+					/*
 					Map<String,String> params=new HashMap<String, String>();
 					params.put("CardId",subscribedData._id);
 					params.put("CardName", subscribedData.generalInfo.title);
 					params.put("Status", "Purchase Success");
 					Analytics.trackEvent(Analytics.PackagesPurchase,params);
-					
+					*/	
+					//???
+					Map<String,String> params=new HashMap<String, String>();
+					params.put(Analytics.CONTENT_ID_PROPERTY, subscribedData._id);
+					params.put(Analytics.CONTENT_NAME_PROPERTY, subscribedData.generalInfo.title);
+					params.put(Analytics.PAY_STATUS_PROPERTY, Analytics.PAY_CONTENT_STATUS_TYPES.Success.toString());
+					Analytics.trackEvent(Analytics.EVENT_PAY,params);
 					
 					List<CardData> dataToSave = new ArrayList<CardData>();
 					dataToSave.add(subscribedData);

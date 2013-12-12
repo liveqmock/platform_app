@@ -78,6 +78,7 @@
     <string name="subscriptionconfirmationdialogtext">proceed with the payment?</string>
     <string name="playhint">play</string>
     <string name="trailerhint">play trailer</string>
+    <string name="mixpanelAPI">true</string>
     
     <string name="moredetails">more details</string>
     
