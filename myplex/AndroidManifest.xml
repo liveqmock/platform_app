@@ -18,9 +18,13 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
-    
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>    
+	<uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+	<uses-permission android:name="android.permission.WAKE_LOCK" />
 
+	 <permission android:name="com.apalya.myplex.permission.C2D_MESSAGE" android:protectionLevel="signature" />
+    <uses-permission android:name="com.apalya.myplex.permission.C2D_MESSAGE" />
+    
     <application
         android:name="com.apalya.myplex.data.myplexapplication"
         android:allowBackup="true"
@@ -99,6 +103,14 @@
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/fbapp_id" />
 
+        <receiver android:name="com.mixpanel.android.mpmetrics.GCMReceiver"
+              android:permission="com.google.android.c2dm.permission.SEND" >
+        <intent-filter>
+            <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+            <category android:name="com.apalya.myplex" />
+        </intent-filter>
+    </receiver>
         
     </application>
 

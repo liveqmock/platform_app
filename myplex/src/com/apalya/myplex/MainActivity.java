@@ -494,6 +494,7 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 			if(mSearchView !=null && !mSearchView.isIconified())
 			{
 				mSearchView.setIconified(true);
+				//AddAnalytics
 				return true;
 			}
 		} catch (Exception e) {
@@ -1069,6 +1070,7 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 			
 			@Override
 			public boolean onQueryTextChange(String newText) {
+				//Addanalytics just record textchanges
 				if(mSearchSuggestionFrag!=null && newText.length() >0)
 					mSearchSuggestionFrag.setQuery(newText);
 				return false;
@@ -1100,8 +1102,12 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 			searchQuery = query;
 			
 			Map<String,String> params=new HashMap<String, String>();
-			params.put("tagsSelected", searchQuery);
-			Analytics.trackEvent(Analytics.SearchQuery,params);
+			params.put(Analytics.SEARCH_TYPE_PROPERTY,Analytics.SEARCH_TYPES.Discover.toString());
+			params.put(Analytics.SEARCH_QUERY_PROPERTY,searchQuery);
+			//params.put("tagsSelected", searchQuery);
+			//Analytics.trackEvent(Analytics.SearchQuery,params);
+			
+			Analytics.trackEvent(Analytics.EVENT_SEARCH,params);
 		mSearchQuery = searchQuery;
 		setActionBarTitle(query);
 		IndexHandler.OperationType searchType = IndexHandler.OperationType.DONTSEARCHDB;

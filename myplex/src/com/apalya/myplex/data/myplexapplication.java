@@ -29,7 +29,7 @@ public class myplexapplication extends Application {
 	 *
 	 *   Paste it below (where you see "YOUR API TOKEN")
 	 */
-	public static final String MIXPANEL_API_TOKEN = "83c5fe7d8e900e7d1c4f67f84ce41d5a";
+	public static final String MIXPANEL_API_TOKEN = "20541460115650ad4e07ab10de528e81";
 
 	/*
 	 * In order for your app to receive push notifications, you will need to enable
@@ -54,7 +54,7 @@ public class myplexapplication extends Application {
 	 * declare the permissions and receiver capabilities you'll need to get your push notifications working.
 	 * You can take a look at this application's AndroidManifest.xml file for an example of what is needed.
 	 */
-	public static final String ANDROID_PUSH_SENDER_ID = "317019093395";
+	public static final String ANDROID_PUSH_SENDER_ID = "976964091787";
 
 	@Override
 	public void onCreate() {

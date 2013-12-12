@@ -190,11 +190,16 @@ public class SubcriptionEngine {
 				
 				
 				Map<String,String> params=new HashMap<String, String>();
-				params.put("CardId",subscribedData._id);
+				/*params.put("CardId",subscribedData._id);
 				params.put("CardName", subscribedData.generalInfo.title);
 				params.put("Status", "Purchase Success");
-				Analytics.trackEvent(Analytics.PackagesPurchase,params);
+				Analytics.trackEvent(Analytics.PackagesPurchase,params);*/
 				
+				params.put(Analytics.CONTENT_ID_PROPERTY, subscribedData._id);
+				params.put(Analytics.CONTENT_NAME_PROPERTY, subscribedData.generalInfo.title);
+				params.put(Analytics.PAY_COMMERCIAL_TYPE_PROPERTY, Analytics.PAY_COMMERCIAL_TYPES.Buy.toString());
+				params.put(Analytics.PAY_STATUS_PROPERTY, Analytics.PAY_CONTENT_STATUS_TYPES.Success.toString());				
+				Analytics.trackEvent(Analytics.EVENT_PAY,params);
 				
 				List<CardData> dataToSave = new ArrayList<CardData>();
 				dataToSave.add(subscribedData);
@@ -202,7 +207,7 @@ public class SubcriptionEngine {
 					
 					@Override
 					public void updateComplete(Boolean updateStatus) {
-						Util.showToast(mContext, "Subscription Info updated",Util.TOAST_TYPE_INFO);
+						Util.showToast(mContext, "refresh your screen to see purchases",Util.TOAST_TYPE_INFO);
 //						Toast.makeText(SubscriptionView.this, "Subscription Info updated", Toast.LENGTH_SHORT).show();
 					}
 				});					
@@ -222,11 +227,19 @@ public class SubcriptionEngine {
 	private void sendFlurryMessage(){
 		FlurryAgent.onStartSession(mContext, "X6WWX57TJQM54CVZRB3K");
 		Map<String,String> params=new HashMap<String, String>();
+		/*
 		params.put("PackageId",mSelectedPackageItem.packageId);
 		params.put("PackageName", mSelectedPackageItem.packageName);
 		params.put("PaymentChannel", mSelectedPriceItem.paymentChannel);
 		params.put("Action", "Purchase");
-		Analytics.trackEvent(Analytics.PackagesPurchase,params);
+		*/
+		
+		params.put(Analytics.PAY_PACKAGE_ID,mSelectedPackageItem.packageId);
+		params.put(Analytics.PAY_PACKAGE_NAME, mSelectedPackageItem.packageName);
+		params.put(Analytics.PAY_PACKAGE_CHANNEL, mSelectedPriceItem.paymentChannel);
+		params.put(Analytics.PAY_STATUS_PROPERTY, Analytics.PAY_COMMERCIAL_TYPES.Buy.toString());
+		Analytics.trackEvent(Analytics.PAY_PACKAGE_PURCHASE_STATUS,params);
+		
 		FlurryAgent.onEndSession(mContext);
 	}
 	public void showProgressBar() {

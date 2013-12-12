@@ -25,6 +25,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -154,8 +155,10 @@ public class PackagePopUp {
 		LinearLayout susblayout = (LinearLayout) v.findViewById(R.id.purchasepopup_packslayout);
 		addBlur();
 		addPack(data,susblayout);
+		Util.showAdultToast(mContext.getString(R.string.adultwarning),data,mContext);
 		showPopup(v,anchorView);
 	}
+	
 	private void addPack(CardData data,LinearLayout parentlayout) {
 		if(data.packages == null){return;}
 		for(CardDataPackages packageitem:data.packages){
@@ -174,17 +177,19 @@ public class PackagePopUp {
 
 		@Override
 		public void onClick(final View v) {
-			
+
 			if(v.getTag() instanceof LinearLayout){
 				if(mLastPaymentModeLayout != null){
 					mLastPaymentModeLayout.removeAllViews();
 				}
 				LinearLayout subLayout = (LinearLayout)v.getTag();if(subLayout == null){return;}
-
+				subLayout.setOrientation(LinearLayout.VERTICAL);
 				mLastPaymentModeLayout = new LinearLayout(mContext);
 				LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,LinearLayout.LayoutParams.WRAP_CONTENT);
-				params.leftMargin = ((int)mContext.getResources().getDimension(R.dimen.margin_gap_12));
+				params.leftMargin = ((int)mContext.getResources().getDimension(R.dimen.margin_gap_36));
+				params.topMargin = ((int)mContext.getResources().getDimension(R.dimen.margin_gap_8));
 				mLastPaymentModeLayout.setLayoutParams(params);
+				mLastPaymentModeLayout.setGravity(Gravity.CENTER_HORIZONTAL);
 				mLastPaymentModeLayout.setOrientation(LinearLayout.VERTICAL);
 
 				LayoutTransition transition = new LayoutTransition();
@@ -232,12 +237,20 @@ public class PackagePopUp {
 						@Override
 						public void onClick(View arg0) {
 							try {
+								
+								String email = myplexapplication.getUserProfileInstance().getUserEmail();
+								if(email.equalsIgnoreCase("NA") || email.equalsIgnoreCase(""))
+								{
+									Util.showToast(mContext, "please login to subcribe", Util.TOAST_TYPE_INFO);
+									return;
+								}
+								
 								if (arg0.getTag() instanceof CardDataPackages) {
 									CardDataPackages packageitem = (CardDataPackages) arg0.getTag();
 									int id = arg0.getId();
 									mSubscriptionEngine.doSubscription(packageitem, id);
 									paymentModeText.setChecked(false);
-//									dismissFilterMenuPopupWindow();
+									dismissFilterMenuPopupWindow();
 								}
 							}catch (Exception e) {
 									// TODO: handle exception
@@ -348,7 +361,7 @@ public class PackagePopUp {
 
 		Map<String,String> attribs=new HashMap<String, String>();
 		attribs.put("Duration", "");
-		Analytics.trackEvent(Analytics.loginSignUp,attribs,true);
+		//Analytics.trackEvent(Analytics.loginSignUp,attribs,true);
 		
 		RequestQueue queue = MyVolley.getRequestQueue();
 
@@ -373,7 +386,7 @@ public class PackagePopUp {
 			@Override
 			public void onResponse(String response) {
 				
-				Analytics.endTimedEvent(Analytics.loginSignUp);
+				//Analytics.endTimedEvent(Analytics.loginSignUp);
 				
 				Log.d(TAG,"Response: "+response);
 				try {	
@@ -384,7 +397,7 @@ public class PackagePopUp {
 					{
 						Map<String,String> attribs=new HashMap<String, String>();
 						attribs.put("Status", "Success");
-						Analytics.trackEvent(Analytics.loginSignUp,attribs);
+						//Analytics.trackEvent(Analytics.loginSignUp,attribs);
 						Log.d(TAG, "status: "+jsonResponse.getString("status"));
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
@@ -413,7 +426,7 @@ public class PackagePopUp {
 						Map<String,String> attribs=new HashMap<String, String>();
 						attribs.put("Status", "Failed");
 						attribs.put("Msg", jsonResponse.getString("code"));
-						Analytics.trackEvent(Analytics.loginSignUp,attribs);
+						//Analytics.trackEvent(Analytics.loginSignUp,attribs);
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
 						
@@ -428,11 +441,11 @@ public class PackagePopUp {
 		return new Response.ErrorListener() {
 			@Override
 			public void onErrorResponse(VolleyError error) {
-				Analytics.endTimedEvent(Analytics.loginSignUp);
+				//Analytics.endTimedEvent(Analytics.loginSignUp);
 				Map<String,String> attribs=new HashMap<String, String>();
 				attribs.put("Status", "Failed");
 				attribs.put("Msg", error.toString());
-				Analytics.trackEvent(Analytics.loginSignUp,attribs);
+				//Analytics.trackEvent(Analytics.loginSignUp,attribs);
 				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 				Log.d(TAG,"Error: "+error.toString());
 				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");

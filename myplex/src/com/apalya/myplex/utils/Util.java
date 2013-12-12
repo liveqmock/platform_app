@@ -61,6 +61,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Patterns;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -952,6 +953,41 @@ public class Util {
 		{
 			//Util.showToast("Invalid");
 			return false;
+		}
+
+	}
+
+	public static void showAdultToast(String msg, CardData data, Context context) {
+		if (context == null || data == null || data.content == null
+				|| data.content.certifiedRatings == null
+				|| data.content.certifiedRatings.values == null
+				|| data.content.certifiedRatings.values.isEmpty()
+				|| data.content.certifiedRatings.values.get(0).rating == null) {
+			return;
+		}
+		if (data.content.certifiedRatings.values.get(0).rating
+				.equalsIgnoreCase("A") 
+				|| data.content.certifiedRatings.values.get(0).rating
+						.equalsIgnoreCase("R")) {
+			try {
+				Toast toast = new Toast(context);
+				LayoutInflater inflate = LayoutInflater.from(context);
+				View v = inflate.inflate(R.layout.toastlayout, null);
+				TextView header = (TextView) v.findViewById(R.id.toast_type);
+				header.setTypeface(FontUtil.ss_symbolicons_line);
+				TextView message = (TextView) v.findViewById(R.id.toast_text);
+				message.setTypeface(FontUtil.Roboto_Medium);
+				header.setText(R.string.toast_warning);
+				message.setTextColor(Color.parseColor("#FF0000"));
+//				v.setBackgroundColor(Color.parseColor("#FFFFFF"));
+				message.setText(msg);
+				toast.setGravity(Gravity.TOP, 0, 100);
+				toast.setView(v);
+				toast.setDuration(Toast.LENGTH_LONG);
+				toast.show();
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
 		}
 
 	}

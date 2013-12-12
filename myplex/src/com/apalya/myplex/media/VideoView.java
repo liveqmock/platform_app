@@ -616,6 +616,12 @@ public class VideoView extends SurfaceView implements MediaPlayerControl {
     public boolean canSeekForward() {
         return mCanSeekForward;
     }
+
+
+	public int getAudioSessionId() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
 }
 
 
