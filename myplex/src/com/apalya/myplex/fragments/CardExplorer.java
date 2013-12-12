@@ -578,7 +578,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			
 			String msg="seems like there's nothing here.";
 			if(mData.requestType == CardExplorerData.REQUEST_FAVOURITE){
-				msg="no favourites yet... \nUse "+ "<heart>"/*getString(R.string.card_heart)*/ +" on any card to add some titles here.";
+				msg="no favourites yet... \nUse "+ "+ symbol"/*getString(R.string.card_heart)*/ +" on any card to add some titles here.";
 			}else if(mData.requestType == CardExplorerData.REQUEST_PURCHASES){
 				msg=getString(R.string.purchaseserror);
 			}else if(mData.requestType == CardExplorerData.REQUEST_SEARCH){
@@ -856,7 +856,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			mCardView.moveTo(mData.currentSelectedCard);
 			
 			Map<String,String> params=new HashMap<String, String>();
-			params.put("CardId", mData.mMasterEntries.get(mData.currentSelectedCard)._id);
+			if(mData.currentSelectedCard <= mData.mMasterEntries.size())
+				params.put("CardId", mData.mMasterEntries.get(mData.currentSelectedCard)._id);
 			if(mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo != null){
 				params.put("CardType", mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo.type);
 				params.put("CardName", mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo.title);

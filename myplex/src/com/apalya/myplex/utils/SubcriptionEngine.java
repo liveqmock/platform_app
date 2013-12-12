@@ -202,7 +202,7 @@ public class SubcriptionEngine {
 					
 					@Override
 					public void updateComplete(Boolean updateStatus) {
-						Util.showToast(mContext, "Subscription Info updated",Util.TOAST_TYPE_INFO);
+						Util.showToast(mContext, "refresh your screen to see purchases",Util.TOAST_TYPE_INFO);
 //						Toast.makeText(SubscriptionView.this, "Subscription Info updated", Toast.LENGTH_SHORT).show();
 					}
 				});					
