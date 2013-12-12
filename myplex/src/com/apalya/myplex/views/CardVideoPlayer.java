@@ -245,6 +245,8 @@ public class CardVideoPlayer implements PlayerListener {
 		@Override
 		public void onClick(View v) {
 			
+			Util.showAdultToast(mContext.getString(R.string.adultwarning), mData, mContext);
+			
 			Map<String,String> params=new HashMap<String, String>();
 			/*params.put("CardId", mData._id);
 			params.put("CardType", mData.generalInfo.type);

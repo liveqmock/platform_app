@@ -902,12 +902,6 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			mCardView.moveTo(mData.currentSelectedCard);
 			
 			Map<String,String> params=new HashMap<String, String>();
-			/*params.put("CardId", mData.mMasterEntries.get(mData.currentSelectedCard)._id);
-			if(mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo != null){
-				params.put("CardType", mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo.type);
-				params.put("CardName", mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo.title);
-			}
-			Analytics.trackEvent(Analytics.cardBrowseSwipe,params);*/
 			if(mData.currentSelectedCard <= mData.mMasterEntries.size())
 				params.put(Analytics.CONTENT_ID_PROPERTY, mData.mMasterEntries.get(mData.currentSelectedCard)._id);
 			if(mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo != null){

@@ -82,11 +82,11 @@ public class SetttingsFragment extends BaseFragment {
 				
 				Bundle b = new Bundle();
 				if(data.mSettingName.equals(TANDC))
-					b.putString("url", "http://static.myplex.tv/tnc_win8.html");
+					b.putString("url", "http://help.myplex.com/terms-of-use/");
 				else if(data.mSettingName.equals(PRIVACYPOLIY))
-					b.putString("url", "http://static.myplex.tv/privacy_win8.html");
+					b.putString("url", "http://help.myplex.com/privacy-policy/");
 				else if(data.mSettingName.equals(HELP))
-					b.putString("url", "http://www.apalya.com/about-us/");
+					b.putString("url", "http://help.myplex.com/");
 				
 					i.putExtras(b);
 					startActivity(i);
