@@ -642,7 +642,15 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			public void urlReceived(boolean aStatus, String url, String message, String statusCode ) {
 				if (!aStatus) {
 					closePlayer();
-					Util.showToast(mContext, "Failed in fetching the url.",Util.TOAST_TYPE_ERROR);
+					
+					String msg ="Failed in fetching the url.";
+					
+					if(!TextUtils.isEmpty(message)){
+						msg = message;
+					}
+					
+					Util.showToast(mContext, msg,Util.TOAST_TYPE_ERROR);	
+					
 					if(mPlayerStatusListener != null){
 						mPlayerStatusListener.playerStatusUpdate("Failed in fetching the url.");
 					}
