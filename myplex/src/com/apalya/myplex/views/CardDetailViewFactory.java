@@ -194,7 +194,7 @@ public class CardDetailViewFactory {
 				
 				Map<String,String> params=new HashMap<String, String>();
 				params.put("Action", "Submit");
-				Analytics.trackEvent(Analytics.cardDetailsComment,params);
+				//Analytics.trackEvent(Analytics.cardDetailsComment,params);
 			}
 		}else if(type == COMMENTSECTION_REVIEW){
 			if(card.userReviews == null){return ;}
@@ -218,7 +218,7 @@ public class CardDetailViewFactory {
 				
 				Map<String,String> params=new HashMap<String, String>();
 				params.put("Action", "Submit");
-				Analytics.trackEvent(Analytics.cardDetailsReview,params);
+				//Analytics.trackEvent(Analytics.cardDetailsReview,params);
 			}
 		}
 	}

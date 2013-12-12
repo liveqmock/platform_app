@@ -540,7 +540,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		return new Response.Listener<String>() {
 			@Override
 			public void onResponse(String response) {
-				Analytics.endTimedEvent(Analytics.cardBrowseDuration);
+				//Analytics.endTimedEvent(Analytics.cardBrowseDuration);
 				try {
 //					Log.d(TAG,"server response "+response);
 //					updateText("parsing results");
@@ -586,7 +586,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			
 			String msg="seems like there's nothing here.";
 			if(mData.requestType == CardExplorerData.REQUEST_FAVOURITE){
-				msg="no favourites yet... \nUse "+ "<heart>"/*getString(R.string.card_heart)*/ +" on any card to add some titles here.";
+				msg="no favourites yet... \nUse "+ "+ symbol"/*getString(R.string.card_heart)*/ +" on any card to add some titles here.";
 			}else if(mData.requestType == CardExplorerData.REQUEST_PURCHASES){
 				msg=getString(R.string.purchaseserror);
 			}else if(mData.requestType == CardExplorerData.REQUEST_SEARCH){
@@ -732,7 +732,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		return new Response.ErrorListener() {
 			@Override
 			public void onErrorResponse(VolleyError error) {
-				Analytics.endTimedEvent(Analytics.cardBrowseDuration);
+				//Analytics.endTimedEvent(Analytics.cardBrowseDuration);
 				//Analytics.endTimedEvent(Analytics.cardBrowseScreen);
 				Log.d(TAG,"Error from server "+error.networkResponse);
 				if(mData.mMasterEntries == null || mData.mMasterEntries.size() == 0){
@@ -858,7 +858,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			params.put("CardType", data.generalInfo.type);
 			params.put("CardName", data.generalInfo.title);
 		}
-		Analytics.trackEvent(Analytics.cardBrowseCancel,params);
+		//Analytics.trackEvent(Analytics.cardBrowseCancel,params);
 	}
 
 	@Override
@@ -908,8 +908,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				params.put("CardName", mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo.title);
 			}
 			Analytics.trackEvent(Analytics.cardBrowseSwipe,params);*/
-			
-			params.put(Analytics.CONTENT_ID_PROPERTY, mData.mMasterEntries.get(mData.currentSelectedCard)._id);
+			if(mData.currentSelectedCard <= mData.mMasterEntries.size())
+				params.put(Analytics.CONTENT_ID_PROPERTY, mData.mMasterEntries.get(mData.currentSelectedCard)._id);
 			if(mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo != null){
 				params.put(Analytics.CONTENT_TYPE_PROPERTY, mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo.type);
 				params.put(Analytics.CONTENT_NAME_PROPERTY, mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo.title);
@@ -970,7 +970,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				params.put("Network", "Mobile");
 			}
 			
-			Analytics.trackEvent(Analytics.cardBrowseScreen,params);
+			//Analytics.trackEvent(Analytics.cardBrowseScreen,params);
 		}
 		else
 		{
@@ -989,7 +989,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				params.put("Network", "Mobile");
 			}
 			
-			Analytics.trackEvent(Analytics.cardBrowseScreen,params);
+			//Analytics.trackEvent(Analytics.cardBrowseScreen,params);
 		}
 	}
 
@@ -1022,7 +1022,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				params.put("Network", "Mobile");
 			}
 			
-			Analytics.trackEvent(Analytics.cardBrowseScreen,params);
+			//Analytics.trackEvent(Analytics.cardBrowseScreen,params);
 		showNoDataMessage(false);
 		applyData();		
 		if(mOldDataAdded){

@@ -185,8 +185,9 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 					fadeAnim2.start();
 
 					Map<String,String> attribs=new HashMap<String, String>();
-					attribs.put("status", "Selected");
-					//Analytics.trackEvent(Analytics.loginSignIn,attribs);
+					attribs.put(Analytics.SIGNUP_STATUS_PROPERTY, Analytics.EVENT_CLICK);
+					Analytics.trackEvent(Analytics.EVENT_SIGNUP, attribs);
+					
 
 					if(mPassword.getVisibility()!=View.GONE)
 					{
@@ -324,8 +325,9 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 					fadeAnim2.start();
 					//???
 					Map<String,String> attribs=new HashMap<String, String>();
-					attribs.put("Status", "Selected");
-					Analytics.trackEvent(Analytics.loginSignUp,attribs);
+					attribs.put(Analytics.SIGNUP_STATUS_PROPERTY, Analytics.EVENT_CLICK);
+					//Analytics.trackEvent(Analytics.loginSignUp,attribs);
+					Analytics.trackEvent(Analytics.EVENT_SIGNUP, attribs);	
 
 					//hideKeypad();
 					if(mEmail.getText().toString().length()>0 &&mPassword.getText().toString().length()>0) {
@@ -489,8 +491,9 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 		
 		//???
 		Map<String,String> attribs=new HashMap<String, String>();
-		attribs.put("Duration", "");
-		Analytics.trackEvent(Analytics.loginSignUp,attribs,true);
+		//attribs.put("Duration", "");
+		//Analytics.trackEvent(Analytics.loginSignUp,attribs,true);
+		Analytics.trackEvent(Analytics.EVENT_SIGNUP, attribs);	
 
 		RequestQueue queue = MyVolley.getRequestQueue();
 
@@ -534,7 +537,7 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 			@Override
 			public void onResponse(String response) {
 				dismissProgressBar();
-				Analytics.endTimedEvent(Analytics.loginSignUp);
+				//Analytics.endTimedEvent(Analytics.loginSignUp);
 				
 				Log.d(TAG,"Response: "+response);
 				try {	
@@ -704,9 +707,9 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 				Log.d(TAG,"Error: "+error.toString());
 				//Analytics.endTimedEvent(Analytics.loginSignIn);
 				Map<String,String> attribs=new HashMap<String, String>();
-				attribs.put("Status", "Failed");
+				attribs.put(Analytics.LOGIN_STATUS_PROPERTY, Analytics.LOGIN_STATUS_TYPES.Failure.toString());
 				attribs.put("Msg", error.toString());
-				Analytics.trackEvent(Analytics.loginSignIn,attribs);
+				Analytics.trackEvent(Analytics.EVENT_LOGIN,attribs);
 				if(error.toString().indexOf("NoConnectionError")>0)
 				{
 					Util.showToast(SignUpActivity.this, getString(R.string.interneterr),Util.TOAST_TYPE_INFO);
@@ -752,7 +755,7 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 						Map<String,String> attribs=new HashMap<String, String>();
 						//attribs.put("Status", "Success");
 						attribs.put(Analytics.LOGIN_STATUS_PROPERTY, Analytics.LOGIN_STATUS_TYPES.Success.toString());
-						Analytics.trackEvent(Analytics.loginSignIn,attribs);
+						Analytics.trackEvent(Analytics.EVENT_LOGIN,attribs);
 
 						Log.d(TAG, "status: "+jsonResponse.getString("status"));
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
@@ -784,8 +787,10 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 						Map<String,String> attribs=new HashMap<String, String>();
 						attribs.put(Analytics.LOGIN_STATUS_PROPERTY, Analytics.LOGIN_STATUS_TYPES.Failure.toString());
 						//attribs.put("Status", "Failed");
-						attribs.put("Msg", jsonResponse.getString("code"));
-						Analytics.trackEvent(Analytics.loginSignIn,attribs);
+						//attribs.put("Msg", jsonResponse.getString("code"));
+						attribs.put(Analytics.LOGIN_STATUS_MESSAGE_PROPERTY, jsonResponse.getString("code"));
+						//Analytics.trackEvent(Analytics.loginSignIn,attribs);
+						Analytics.trackEvent(Analytics.EVENT_LOGIN,attribs);
 
 						if(jsonResponse.getString("code").equalsIgnoreCase("401"))
 						{

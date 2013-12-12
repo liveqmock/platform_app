@@ -348,7 +348,7 @@ public class PackagePopUp {
 
 		Map<String,String> attribs=new HashMap<String, String>();
 		attribs.put("Duration", "");
-		Analytics.trackEvent(Analytics.loginSignUp,attribs,true);
+		//Analytics.trackEvent(Analytics.loginSignUp,attribs,true);
 		
 		RequestQueue queue = MyVolley.getRequestQueue();
 
@@ -373,7 +373,7 @@ public class PackagePopUp {
 			@Override
 			public void onResponse(String response) {
 				
-				Analytics.endTimedEvent(Analytics.loginSignUp);
+				//Analytics.endTimedEvent(Analytics.loginSignUp);
 				
 				Log.d(TAG,"Response: "+response);
 				try {	
@@ -384,7 +384,7 @@ public class PackagePopUp {
 					{
 						Map<String,String> attribs=new HashMap<String, String>();
 						attribs.put("Status", "Success");
-						Analytics.trackEvent(Analytics.loginSignUp,attribs);
+						//Analytics.trackEvent(Analytics.loginSignUp,attribs);
 						Log.d(TAG, "status: "+jsonResponse.getString("status"));
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
@@ -413,7 +413,7 @@ public class PackagePopUp {
 						Map<String,String> attribs=new HashMap<String, String>();
 						attribs.put("Status", "Failed");
 						attribs.put("Msg", jsonResponse.getString("code"));
-						Analytics.trackEvent(Analytics.loginSignUp,attribs);
+						//Analytics.trackEvent(Analytics.loginSignUp,attribs);
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
 						
@@ -428,11 +428,11 @@ public class PackagePopUp {
 		return new Response.ErrorListener() {
 			@Override
 			public void onErrorResponse(VolleyError error) {
-				Analytics.endTimedEvent(Analytics.loginSignUp);
+				//Analytics.endTimedEvent(Analytics.loginSignUp);
 				Map<String,String> attribs=new HashMap<String, String>();
 				attribs.put("Status", "Failed");
 				attribs.put("Msg", error.toString());
-				Analytics.trackEvent(Analytics.loginSignUp,attribs);
+				//Analytics.trackEvent(Analytics.loginSignUp,attribs);
 				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 				Log.d(TAG,"Error: "+error.toString());
 				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");

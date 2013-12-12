@@ -182,7 +182,7 @@ public class CardVideoPlayer implements PlayerListener {
 										//???
 										params.put(Analytics.CONTENT_ID_PROPERTY, mmItem.generalInfo._id);
 										params.put(Analytics.CONTENT_NAME_PROPERTY, mmItem.content.categoryName);
-										params.put(Analytics.CONTENT_TYPE_PROPERTY,Analytics.CONTENT_ACTION_TYPES.PlayTrailer.toString());
+										params.put(Analytics.CONTENT_CATEGORY_PROPERTY,Analytics.CONTENT_ACTION_TYPES.PlayTrailer.toString());
 										Analytics.trackEvent(Analytics.EVENT_PLAY,params);
 										FetchTrailerUrl(mmItem.generalInfo._id);
 										mVideoViewParent.setOnClickListener(null);
@@ -737,7 +737,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 								Analytics.trackEvent(Analytics.PlayerPlaySelect,params);*/
 								params.put(Analytics.CONTENT_ID_PROPERTY, mmItem.generalInfo._id);
 								params.put(Analytics.CONTENT_NAME_PROPERTY, mmItem.generalInfo.title);
-								params.put(Analytics.CONTENT_TYPE_PROPERTY,mmItem.content.categoryName);
+								params.put(Analytics.CONTENT_CATEGORY_PROPERTY,mmItem.content.categoryName);
 								Analytics.trackEvent(Analytics.EVENT_PLAY,params);
 								FetchTrailerUrl(mmItem.generalInfo._id);
 								mVideoViewParent.setOnClickListener(null);

@@ -54,7 +54,7 @@ public class myplexapplication extends Application {
 	 * declare the permissions and receiver capabilities you'll need to get your push notifications working.
 	 * You can take a look at this application's AndroidManifest.xml file for an example of what is needed.
 	 */
-	public static final String ANDROID_PUSH_SENDER_ID = "317019093395";
+	public static final String ANDROID_PUSH_SENDER_ID = "976964091787";
 
 	@Override
 	public void onCreate() {

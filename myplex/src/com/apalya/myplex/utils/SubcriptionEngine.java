@@ -227,11 +227,19 @@ public class SubcriptionEngine {
 	private void sendFlurryMessage(){
 		FlurryAgent.onStartSession(mContext, "X6WWX57TJQM54CVZRB3K");
 		Map<String,String> params=new HashMap<String, String>();
+		/*
 		params.put("PackageId",mSelectedPackageItem.packageId);
 		params.put("PackageName", mSelectedPackageItem.packageName);
 		params.put("PaymentChannel", mSelectedPriceItem.paymentChannel);
 		params.put("Action", "Purchase");
-		Analytics.trackEvent(Analytics.PackagesPurchase,params);
+		*/
+		
+		params.put(Analytics.PAY_PACKAGE_ID,mSelectedPackageItem.packageId);
+		params.put(Analytics.PAY_PACKAGE_NAME, mSelectedPackageItem.packageName);
+		params.put(Analytics.PAY_PACKAGE_CHANNEL, mSelectedPriceItem.paymentChannel);
+		params.put(Analytics.PAY_STATUS_PROPERTY, Analytics.PAY_COMMERCIAL_TYPES.Buy.toString());
+		Analytics.trackEvent(Analytics.PAY_PACKAGE_PURCHASE_STATUS,params);
+		
 		FlurryAgent.onEndSession(mContext);
 	}
 	public void showProgressBar() {

@@ -79,6 +79,7 @@
     <string name="playhint">play</string>
     <string name="trailerhint">play trailer</string>
     <string name="mixpanelAPI">true</string>
+    <string name="adultwarning">18+ and above only</string>
     
     <string name="moredetails">more details</string>
     

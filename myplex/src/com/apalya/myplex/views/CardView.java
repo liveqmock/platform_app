@@ -751,7 +751,7 @@ public class CardView extends ScrollView {
 			{
 				Map<String,String> params=new HashMap<String, String>();
 				params.put("Status", "PlayerRightsAcqusition");
-				Analytics.trackEvent(Analytics.PlayerRightsAcqusition,params);
+			//	Analytics.trackEvent(Analytics.PlayerRightsAcqusition,params);
 				//Util.showToast(mContext,"RIGHTS INSTALLED",Util.TOAST_TYPE_INFO);
 			}
 			if(status==1 ){

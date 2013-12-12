@@ -866,12 +866,16 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 				//???
 				Map<String,String> params=new HashMap<String, String>();
 				params.put(Analytics.PLAY_CONTENT_STATUS_PROPERTY,Analytics.PLAY_CONTENT_STATUS_TYPES.PlayerRightsAcquisition.toString());
+				params.put(Analytics.PLAY_CONTENT_STATUS_PROPERTY,Analytics.PLAY_CONTENT_STATUS_TYPES.Playing.toString());
 				Analytics.trackEvent(Analytics.EVENT_PLAY,params);
 				startPlayer(true);
 			}
 			if(status!=0 ){
 				iPlayerStarted=true;
 				String errMsg = "Error while playing";
+				Map<String,String> params=new HashMap<String, String>();
+				params.put(Analytics.PLAY_CONTENT_STATUS_PROPERTY,Analytics.PLAY_CONTENT_STATUS_TYPES.Error.toString());
+				
 				switch (value) {
 				case DrmErrorEvent.TYPE_NO_INTERNET_CONNECTION:
 					errMsg="No Internet Connection";
@@ -894,8 +898,9 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 				case DrmErrorEvent.TYPE_RIGHTS_RENEWAL_NOT_ALLOWED:
 					errMsg="Rights renewal not allowed";
 					break;
-					
-				}
+			}
+				params.put(Analytics.PLAY_CONTENT_ERROR_PROPERTY,errMsg);
+				Analytics.trackEvent(Analytics.EVENT_PLAY,params);
 				Util.showToast(mContext,errMsg+" ("+status+")",Util.TOAST_TYPE_INFO);
 				startPlayer(false);
 				//drmManager.
@@ -903,6 +908,10 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 			
 			if(status == Settings.WIDEVINE_AUTH_FAILED){
 				//TODO Refresh purchase detail for content id.
+				Map<String,String> params=new HashMap<String, String>();
+				params.put(Analytics.PLAY_CONTENT_STATUS_PROPERTY,Analytics.PLAY_CONTENT_STATUS_TYPES.Error.toString());
+				params.put(Analytics.PLAY_CONTENT_ERROR_PROPERTY,Analytics.PLAY_CONTENT_WIDEVINE_ERROR);
+				Analytics.trackEvent(Analytics.EVENT_PLAY,params);
 			}
 			
 			if(drmManager!=null)

@@ -339,11 +339,14 @@ public class CardDetails extends BaseFragment implements
 		if (v.getTag() instanceof CardDetailMediaListData) {
 
 			Map<String, String> params = new HashMap<String, String>();
-			params.put("CardId", mCardData._id);
+			/*params.put("CardId", mCardData._id);
 			params.put("CardType", mCardData.generalInfo.type);
-			params.put("CardName", mCardData.generalInfo.title);
-			params.put("Status", "Expand");
-			Analytics.trackEvent(Analytics.cardDetailsMultimedia, params);
+			params.put("CardName", mCardData.generalInfo.title);*/
+			params.put(Analytics.CONTENT_ID_PROPERTY, mCardData._id);
+			params.put(Analytics.CONTENT_TYPE_PROPERTY, mCardData.generalInfo.type);
+			params.put(Analytics.CONTENT_NAME_PROPERTY, mCardData.generalInfo.title);
+			params.put(Analytics.CONTENT_CARD_STATUS, Analytics.CONTENT_CARD_OPENED);
+			Analytics.trackEvent(Analytics.CONTENT_DETAILS_PROPERTY, params);
 
 			CardDetailMediaListData mainData = (CardDetailMediaListData) v
 					.getTag();
@@ -636,11 +639,16 @@ public class CardDetails extends BaseFragment implements
 				CardDetailViewFactory.CARDDETAIL_FULL_DESCRIPTION);
 		if (v != null) {
 			Map<String, String> params = new HashMap<String, String>();
-			params.put("CardId", mCardData._id);
+			/*params.put("CardId", mCardData._id);
 			params.put("CardType", mCardData.generalInfo.type);
 			params.put("CardName", mCardData.generalInfo.title);
-			params.put("Status", "Expand");
-			Analytics.trackEvent(Analytics.cardDetailsDescription, params);
+			params.put("Status", "Expand");*/
+			
+			params.put(Analytics.CONTENT_ID_PROPERTY, mCardData._id);
+			params.put(Analytics.CONTENT_TYPE_PROPERTY, mCardData.generalInfo.type);
+			params.put(Analytics.CONTENT_NAME_PROPERTY, mCardData.generalInfo.title);
+			params.put(Analytics.CONTENT_CARD_STATUS, Analytics.CONTENT_CARD_OPENED);
+			Analytics.trackEvent(Analytics.EVENT_CONTENT, params);
 			mDescriptionContentLayout.addView(v);
 		}
 		// prepareFilterData();
@@ -658,10 +666,10 @@ public class CardDetails extends BaseFragment implements
 			params.put("CardName", mCardData.generalInfo.title);
 			params.put("Status", "Expand");
 			Analytics.trackEvent(Analytics.cardDetailsComment, params);*/
-			params.put(Analytics.CONTENT_ID_PROPERTY, mCardData._id);
+		/*	params.put(Analytics.CONTENT_ID_PROPERTY, mCardData._id);
 			params.put(Analytics.CONTENT_NAME_PROPERTY,mCardData.generalInfo.title);
 			params.put(Analytics.CONTENT_TYPE_PROPERTY,mCardData.generalInfo.type);
-			Analytics.trackEvent(Analytics.EVENT_PLAY,params);
+			Analytics.trackEvent(Analytics.EVENT_PLAY,params);*/
 			addSpace();
 			mCommentsContentLayout.addView(v);
 		}
@@ -675,12 +683,12 @@ public class CardDetails extends BaseFragment implements
 		if (v != null) {
 			addSpace();
 			mCommentsContentLayout.addView(v);
-			Map<String, String> params = new HashMap<String, String>();
+			/*Map<String, String> params = new HashMap<String, String>();
 			params.put("CardId", mCardData._id);
 			params.put("CardType", mCardData.generalInfo.type);
 			params.put("CardName", mCardData.generalInfo.title);
 			params.put("Status", "Contract");
-			Analytics.trackEvent(Analytics.cardDetailsComment, params);
+			Analytics.trackEvent(Analytics.cardDetailsComment, params);*/
 		}
 	}
 
@@ -692,12 +700,12 @@ public class CardDetails extends BaseFragment implements
 				CardDetailViewFactory.CARDDETAIL_BRIEF_DESCRIPTION);
 		if (v != null) {
 			mDescriptionContentLayout.addView(v);
-			Map<String, String> params = new HashMap<String, String>();
+			/*Map<String, String> params = new HashMap<String, String>();
 			params.put("CardId", mCardData._id);
 			params.put("CardType", mCardData.generalInfo.type);
 			params.put("CardName", mCardData.generalInfo.title);
 			params.put("Status", "Contract");
-			Analytics.trackEvent(Analytics.cardDetailsDescription, params);
+			Analytics.trackEvent(Analytics.cardDetailsDescription, params);*/
 		}
 		// prepareFilterData();
 	}

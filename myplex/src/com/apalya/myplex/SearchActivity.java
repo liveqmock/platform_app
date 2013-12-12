@@ -161,7 +161,7 @@ public class SearchActivity extends BaseFragment implements
 		//???
 		Map<String,String> params=new HashMap<String, String>();
 		params.put("status", "Shown");
-		Analytics.trackEvent(Analytics.SearchScreenShown,params);
+		//Analytics.trackEvent(Analytics.SearchScreenShown,params);
 		
 
 		return rootView;
@@ -239,7 +239,7 @@ public class SearchActivity extends BaseFragment implements
 			
 			Map<String,String> params=new HashMap<String, String>();
 			params.put("tagsSelected", searchQuery);
-			Analytics.trackEvent(Analytics.SearchQuery,params);
+			Analytics.trackEvent(Analytics.SEARCH_QUERY_PROPERTY,params);
 		}
 		mSearchQuery = searchQuery;
 		mMainActivity.setActionBarTitle(searchQuery);
@@ -267,7 +267,7 @@ public class SearchActivity extends BaseFragment implements
 			params.put("tagRemoved", tagData.getButtonName());
 			mSearchbleTags.remove(tagData);
 		}
-		Analytics.trackEvent(Analytics.SearchQuery,params);
+		Analytics.trackEvent(Analytics.SEARCH_QUERY_PROPERTY,params);
 //		if (mSearchbleTags.size() == 0)
 //			mMainActivity.setSearchBarVisibilty(View.INVISIBLE);
 //		else
@@ -279,7 +279,7 @@ public class SearchActivity extends BaseFragment implements
 			mSearchbleTags.clear();
 		Map<String,String> params=new HashMap<String, String>();
 		params.put("tagCleared", "true");
-		Analytics.trackEvent(Analytics.SearchQuery,params);
+		Analytics.trackEvent(Analytics.SEARCH_QUERY_PROPERTY,params);
 	}
 
 	public List<ButtonData> GetSearchTags() {
@@ -304,7 +304,7 @@ public class SearchActivity extends BaseFragment implements
 		
 		Map<String,String> params=new HashMap<String, String>();
 		params.put("Duration", "");
-		Analytics.trackEvent(Analytics.SearchScreenShown,params,true);
+		Analytics.trackEvent(Analytics.SEARCH_SCREEN_PROPERTY,params,true);
 		
 	}
 
@@ -312,7 +312,7 @@ public class SearchActivity extends BaseFragment implements
 		return new Response.Listener<JSONObject>() {
 			@Override
 			public void onResponse(JSONObject response) {
-				Analytics.endTimedEvent(Analytics.SearchScreenShown);
+				Analytics.endTimedEvent(Analytics.SEARCH_SCREEN_PROPERTY);
 				ParseJonsResponse(response);
 				mMainActivity.hideActionBarProgressBar();
 				dismissProgressBar();
@@ -511,7 +511,7 @@ public class SearchActivity extends BaseFragment implements
 		return new Response.ErrorListener() {
 			@Override
 			public void onErrorResponse(VolleyError error) {
-				Analytics.endTimedEvent(Analytics.SearchScreenShown);
+				//Analytics.endTimedEvent(Analytics.SearchScreenShown);
 				TextView empty = (TextView) rootView.findViewById(R.id.empty);
 				empty.setTypeface(FontUtil.Roboto_Light);
 				empty.setVisibility(View.VISIBLE);
