@@ -20,6 +20,8 @@
         <EditText
             android:id="@+id/inputSearch"
             android:layout_width="fill_parent"
+            android:maxWidth="300dp"
+            android:maxLines="2"
             android:layout_height="fill_parent"
             android:layout_toLeftOf="@+id/clearSearchresults"
             android:layout_toRightOf="@+id/searchlens"
@@ -51,7 +53,10 @@
         android:layout_height="wrap_content"
 		demoapp:horizontalSpacing="@dimen/margin_gap_4"
 		demoapp:verticalSpacing="@dimen/margin_gap_4"
-        android:layout_margin="10dp" >
+		android:layout_marginTop="@dimen/margin_gap_2"
+        android:layout_marginLeft="@dimen/margin_gap_8" 
+        android:layout_marginRight="@dimen/margin_gap_8"
+        android:layout_marginBottom="@dimen/margin_gap_8">
     </com.apalya.myplex.views.FlowLayout>
 
     <!-- Editext for Search -->

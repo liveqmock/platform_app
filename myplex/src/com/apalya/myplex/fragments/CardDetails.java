@@ -740,9 +740,10 @@ public class CardDetails extends BaseFragment implements
 		CardExplorerData data = myplexapplication.getCardExplorerData();
 		data.reset();
 		data.requestType = CardExplorerData.REQUEST_SIMILARCONTENT;
-		data.mMasterEntries = (ArrayList<CardData>) mCardData.similarContent.values;
+		data.searchQuery = mCardData._id;
+		//data.mMasterEntries = (ArrayList<CardData>) mCardData.similarContent.values;
 		mMainActivity.bringFragment(fragment);
-		mMainActivity.setActionBarTitle("Similar Content");
+		mMainActivity.setActionBarTitle("similar content");
 
 	}
 

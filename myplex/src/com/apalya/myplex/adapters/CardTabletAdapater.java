@@ -294,7 +294,7 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 		Util.showFeedback(dataHolder.mFavLayout);
 		//17 chars
 		float price = 10000f;
-		if(data.packages == null){
+		if(data.packages == null|| data.packages.size() == 0){
 			dataHolder.mRentText.setText(mContext.getString(R.string.cardstatusfree));
 			dataHolder.mRentLayout.setOnClickListener(null);
 		}else{
@@ -489,8 +489,8 @@ private void prepareDrmManager(String url){
 	public void onScroll(AbsListView view, int firstVisibleItem,
 			int visibleItemCount, int totalItemCount) {
 		if (mCardActionListener != null) {
-			if (mNumberofItems > mLoadMoreLastCalledNumberofItems && firstVisibleItem > mNumberofItems / 2) {
-				Log.d(TAG, "LoadMore called, Checking if " +mNumberofItems+ ">"+mLoadMoreLastCalledNumberofItems + " &&"+firstVisibleItem+">"+mNumberofItems/2);
+			if (mNumberofItems > mLoadMoreLastCalledNumberofItems && firstVisibleItem > mNumberofItems / 3) {
+				Log.d(TAG, "LoadMore called, Checking if " +mNumberofItems+ ">"+mLoadMoreLastCalledNumberofItems + " &&"+firstVisibleItem+">"+mNumberofItems/3);
 				mCardActionListener.loadmore(mNumberofItems);
 				mLoadMoreLastCalledNumberofItems = mNumberofItems;
 			}

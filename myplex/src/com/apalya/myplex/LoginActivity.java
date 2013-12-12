@@ -800,12 +800,12 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 						mUserInfo.setLoginStatus(true);
 						mUserInfo.setProfilePic("https://graph.facebook.com/"+fbUserId+"/picture?width=480&height=320");
 						
-						SharedPrefUtils.writeToSharedPref(LoginActivity.this,
-								getString(R.string.devusername), user.getProperty("email").toString());
-						SharedPrefUtils.writeToSharedPref(LoginActivity.this,
-								getString(R.string.userprofilename), user.getName());
-						SharedPrefUtils.writeToSharedPref(LoginActivity.this,
-								getString(R.string.userpic), "https://graph.facebook.com/"+fbUserId+"/picture?width=480&height=320");
+//						SharedPrefUtils.writeToSharedPref(LoginActivity.this,
+//								getString(R.string.devusername), user.getProperty("email").toString());
+//						SharedPrefUtils.writeToSharedPref(LoginActivity.this,
+//								getString(R.string.userprofilename), user.getName());
+//						SharedPrefUtils.writeToSharedPref(LoginActivity.this,
+//								getString(R.string.userpic), "https://graph.facebook.com/"+fbUserId+"/picture?width=480&height=320");
 						
 						Crashlytics.setUserEmail(user.getProperty("email").toString());
 
@@ -890,6 +890,12 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				Analytics.trackEvent(Analytics.loginFacebook,params);
 				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 				Log.d(TAG,"Error: "+error.toString());
+				
+				if(error.networkResponse != null && error.networkResponse.data != null)
+				{						
+					Log.d(TAG,"Error body: "+new String(error.networkResponse.data)); 
+				}
+				
 				if(error.toString().indexOf("NoConnectionError")>0)
 				{
 					sendNotification(getString(R.string.loginerr));
@@ -916,6 +922,23 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					JSONObject jsonResponse= new JSONObject(response);
 					if(jsonResponse.getString("status").equalsIgnoreCase("SUCCESS"))
 					{
+						
+						SharedPrefUtils.writeToSharedPref(LoginActivity.this,
+								getString(R.string.devusername), mUserInfo.getUserEmail());
+						
+						if(mUserInfo.getName() != null)
+						{
+							SharedPrefUtils.writeToSharedPref(LoginActivity.this,
+								getString(R.string.userprofilename), mUserInfo.getName());
+						}
+						
+						if(fbUserId != null)
+						{
+							SharedPrefUtils.writeToSharedPref(LoginActivity.this,
+								getString(R.string.userpic), "https://graph.facebook.com/"+fbUserId+"/picture?width=480&height=320");
+		
+						}
+						
 						Map<String,String> attribs=new HashMap<String, String>();
 						attribs.put("Status", "Success");
 						Analytics.trackEvent(Analytics.loginFacebook,attribs);
@@ -930,6 +953,11 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					}
 					else
 					{
+						if(mUserInfo != null){
+							mUserInfo.setUserEmail("NA");
+							mUserInfo.setGoogleId(null);
+							mUserInfo.setName("NA");
+						}
 						Map<String,String> attribs=new HashMap<String, String>();
 						attribs.put("Status", "Failure");
 						attribs.put("Msg", jsonResponse.getString("code"));
@@ -950,6 +978,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 							Log.d(TAG, "code: "+jsonResponse.getString("code"));
 							Log.d(TAG, "message: "+jsonResponse.getString("message"));
 
+							sendNotification(jsonResponse.getString("code")+" : "+jsonResponse.getString("message"));
 							if(Session.getActiveSession()!=null)
 								Session.getActiveSession().close();
 						}
@@ -1131,6 +1160,17 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 					if(jsonResponse.getString("status").equalsIgnoreCase("SUCCESS"))
 					{
+						Log.d(TAG, "########################################################");
+						if(mUserInfo.getName() != null){
+							SharedPrefUtils.writeToSharedPref(LoginActivity.this, getString(R.string.userprofilename), mUserInfo.getName());
+						}
+						
+						if(mUserInfo.getGoogleId() != null)
+						{
+							SharedPrefUtils.writeToSharedPref(LoginActivity.this, getString(R.string.userpic), "https://plus.google.com/s2/photos/profile/"+mUserInfo.getGoogleId()+"?sz=480");
+						}
+						SharedPrefUtils.writeToSharedPref(LoginActivity.this, getString(R.string.devusername), mUserInfo.getUserEmail());
+						
 						Map<String,String> attribs=new HashMap<String, String>();
 						attribs.put("Status", "Success");
 						
@@ -1148,6 +1188,11 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					}
 					else
 					{
+						if(mUserInfo != null){
+							mUserInfo.setUserEmail("NA");
+							mUserInfo.setGoogleId(null);
+							mUserInfo.setName("NA");
+						}
 						Map<String,String> attribs=new HashMap<String, String>();
 						attribs.put("Status", "Failure");
 						attribs.put("Msg", jsonResponse.getString("code"));
@@ -1358,12 +1403,18 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			if (person != null) {
 				AccountUtils.setPlusProfileId(this, person.getId());
 				mUserInfo.setGoogleId(person.getId());
-				mUserInfo.setName(person.getName().getGivenName());
+				
+				if(person.getName().getFormatted() != null){
+					mUserInfo.setName(person.getName().getFormatted());
+				}else if (person.getName().getGivenName() != null){
+					mUserInfo.setName(person.getName().getGivenName());
+				}
+				
 				mUserInfo.setUserEmail(mPlusClient.getAccountName());
 				mUserInfo.setProfilePic("https://plus.google.com/s2/photos/profile/"+person.getId()+"?sz=480");
-				SharedPrefUtils.writeToSharedPref(LoginActivity.this, getString(R.string.userprofilename), person.getName().getGivenName());
-				SharedPrefUtils.writeToSharedPref(LoginActivity.this, getString(R.string.userpic), "https://plus.google.com/s2/photos/profile/"+person.getId()+"?sz=480");
-				SharedPrefUtils.writeToSharedPref(LoginActivity.this, getString(R.string.devusername), mUserInfo.getUserEmail());
+//				SharedPrefUtils.writeToSharedPref(LoginActivity.this, getString(R.string.userprofilename), person.getName().getGivenName());
+//				SharedPrefUtils.writeToSharedPref(LoginActivity.this, getString(R.string.userpic), "https://plus.google.com/s2/photos/profile/"+person.getId()+"?sz=480");
+//				SharedPrefUtils.writeToSharedPref(LoginActivity.this, getString(R.string.devusername), mUserInfo.getUserEmail());
 				
 				
 				Crashlytics.setUserEmail(mUserInfo.getUserEmail());
@@ -1672,7 +1723,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			if(mDevInfo.getDeviceId()!=null && mDevInfo.getDeviceId().length()>0)
 				params.put("serialNo", mDevInfo.getDeviceId());
 			else
-				params.put("serialNo", mDevInfo.getDeviceSNo());
+				params.put("serialNo", mDevInfo.getDeviceSNo());			
 			params.put("os", mDevInfo.getDeviceOs());
 			params.put("osVersion", mDevInfo.getDeviceOsVer());
 			params.put("make",mDevInfo.getDeviceMake());

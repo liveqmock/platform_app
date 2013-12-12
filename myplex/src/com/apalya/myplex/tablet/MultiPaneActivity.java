@@ -395,7 +395,7 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 		} catch (JSONException e) {
 			if(e == null){return;}
 			Log.e("response Exception", e.getMessage());
-			Util.showToast(mContext,"e.getMessage(",Util.TOAST_TYPE_ERROR);
+			Util.showToast(mContext,e.getMessage(),Util.TOAST_TYPE_ERROR);
 //				dismissProgressBar();
 		}
 	}

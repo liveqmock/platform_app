@@ -398,7 +398,7 @@ public class CardView extends ScrollView {
 		dataHolder.mFavourite.setVisibility(View.VISIBLE);
 		if(data.currentUserData != null && data.currentUserData.favorite){
 			dataHolder.mFavourite.setText(R.string.card_filledheart);
-			dataHolder.mFavourite.setTextColor(Color.parseColor("#58b4e5"));
+			dataHolder.mFavourite.setTextColor(Color.parseColor("#54B5E9"));
 		}else{
 			dataHolder.mFavourite.setText(R.string.card_filledheart);
 			dataHolder.mFavourite.setTextColor(Color.parseColor("#000000"));
@@ -439,7 +439,7 @@ public class CardView extends ScrollView {
 		Util.showFeedback(dataHolder.mFavLayout);
 		//17 chars
 		float price = 10000f;
-		if(data.packages == null){
+		if(data.packages == null || data.packages.size() == 0){
 			dataHolder.mRentText.setText(mContext.getString(R.string.cardstatusfree));
 			dataHolder.mRentLayout.setOnClickListener(null);
 		}else{

@@ -20,7 +20,7 @@ public class MediaUtil {
 	private static String TAG ="MediaUtil";
 	
 	public interface MediaUtilEventListener{
-		public void urlReceived(boolean aStatus,String url, String message);
+		public void urlReceived(boolean aStatus,String url, String message , String statusCode);
 	}
 	public static MediaUtilEventListener urlEventListener;
 	private static String sQualityType;
@@ -45,14 +45,14 @@ public class MediaUtil {
 		queue.add(myReq);
 		Log.d(TAG, aVideoUrl);
 	}
-	private static void sendResponse(boolean status,String url, String message){
+	private static void sendResponse(boolean status,String url, String message, String statusCode){
 		if (urlEventListener != null) {
 			if(url != null){
 				if(url.contains(".wvm")){
 					url = url.replace("http:", "widevine:");	
 				}
 			}
-			urlEventListener.urlReceived(status,url, message);
+			urlEventListener.urlReceived(status,url, message,statusCode);
 		}
 	}
 	private static Response.Listener<String> getVideoUrlSuccessListener() {
@@ -76,7 +76,7 @@ public class MediaUtil {
 					e.printStackTrace();
 				}
 				if(minResultSet.results == null){
-					sendResponse(false,null, null);
+					sendResponse(false,null, null,null);
 					return;
 				}
 				
@@ -84,12 +84,13 @@ public class MediaUtil {
 				for(CardData data:minResultSet.results){
 					if(data.videos == null || data.videos.values == null || data.videos.values.size() == 0)
 					{
-						if(!data.videos.status.equalsIgnoreCase("SUCCESS")){
-							sendResponse(false,null, data.videos.message);
+						if(data.videos != null && data.videos.status != null && !data.videos.status.equalsIgnoreCase("SUCCESS")){
+							
+							sendResponse(false,null, data.videos.message,data.videos.status);
 							return;
 						}
 						
-						sendResponse(false,null, null);
+						sendResponse(false,null, null,null);
 					}				
 					
 					
@@ -97,7 +98,7 @@ public class MediaUtil {
 						//if(sDownloadStatus)
 						{
 							if(video.profile != null && video.profile.equalsIgnoreCase(sQualityType) && video.link != null && video.type.equalsIgnoreCase(ConsumerApi.STREAMDOWNLOAD)){
-								sendResponse(true,video.link,null);
+								sendResponse(true,video.link,null,null);
 								return;
 							}
 						}
@@ -121,10 +122,10 @@ public class MediaUtil {
 				}
 				if(url.length()>0)
 				{
-					sendResponse(true, url, null);
+					sendResponse(true, url, null,null);
 					return;
 				}
-				sendResponse(false,null, null);
+				sendResponse(false,null, null,null);
 			}
 		};
 	}
@@ -133,7 +134,7 @@ public class MediaUtil {
 			@Override
 			public void onErrorResponse(VolleyError error) {
 				if (urlEventListener != null) {
-					urlEventListener.urlReceived(false,null, null);
+					urlEventListener.urlReceived(false,null, null,null);
 				}
 			}
 		};

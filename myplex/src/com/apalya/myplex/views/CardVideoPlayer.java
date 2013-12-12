@@ -279,7 +279,15 @@ public class CardVideoPlayer implements PlayerListener {
 		
 	}
 
-	public void FetchUrl() {
+	public void FetchUrl() {		
+		
+//		
+//		if(mData._id == null || !AllowedContentIdList.isAllowed(mData._id) ){
+//		
+//			Util.showToast(mContext, "Your country is not allowed for this content.",Util.TOAST_TYPE_ERROR);
+//			return;
+//		}
+		
 		mPlayButton.setVisibility(View.INVISIBLE);
 		mTrailerButton.setVisibility(View.INVISIBLE);
 		mProgressBarLayout.setVisibility(View.VISIBLE);
@@ -288,7 +296,7 @@ public class CardVideoPlayer implements PlayerListener {
 		MediaUtil.setUrlEventListener(new MediaUtilEventListener() {
 
 			@Override
-			public void urlReceived(boolean aStatus, String url, String message) {
+			public void urlReceived(boolean aStatus, String url, String message, String statusCode) {
 				if (!aStatus) {
 					closePlayer();
 					
@@ -298,7 +306,15 @@ public class CardVideoPlayer implements PlayerListener {
 						msg = message;
 					}
 					
-					Util.showToast(mContext, msg,Util.TOAST_TYPE_ERROR);					
+					Util.showToast(mContext, msg,Util.TOAST_TYPE_ERROR);		
+					
+					if(statusCode != null && statusCode.equalsIgnoreCase("ERR_USER_NOT_SUBSCRIBED")){
+						
+						PackagePopUp popup = new PackagePopUp(mContext,(View)mParentLayout.getParent());
+						myplexapplication.getCardExplorerData().cardDataToSubscribe =  mData;
+						popup.showPackDialog(mData, ((Activity)mContext).getActionBar().getCustomView());	
+						
+					}
 					
 					if(mPlayerStatusListener != null){
 						mPlayerStatusListener.playerStatusUpdate("Failed in fetching the url.");
@@ -580,6 +596,13 @@ private void playVideoFile(CardDownloadData mDownloadData){
 }
 	private void FetchTrailerUrl(String contentId)
 	{
+		
+//		if(mData._id == null || !AllowedContentIdList.isAllowed(mData._id) ){
+//			
+//			Util.showToast(mContext, "Your country is not allowed for this content.",Util.TOAST_TYPE_ERROR);
+//			return;
+//		}
+		
 		mPlayButton.setVisibility(View.INVISIBLE);
 		mTrailerButton.setVisibility(View.INVISIBLE);
 		mProgressBarLayout.setVisibility(View.VISIBLE);
@@ -599,7 +622,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
         MediaUtil.setUrlEventListener(new MediaUtilEventListener() {
 			
 			@Override
-			public void urlReceived(boolean aStatus, String url, String message) {
+			public void urlReceived(boolean aStatus, String url, String message, String statusCode ) {
 				if (!aStatus) {
 					closePlayer();
 					Util.showToast(mContext, "Failed in fetching the url.",Util.TOAST_TYPE_ERROR);

@@ -1,0 +1,117 @@
+# This is a configuration file for ProGuard.
+# http://proguard.sourceforge.net/index.html#manual/usage.html
+
+# Optimizations: If you don't want to optimize, use the
+# proguard-android.txt configuration file instead of this one, which
+# turns off the optimization flags.  Adding optimization introduces
+# certain risks, since for example not all optimizations performed by
+# ProGuard works on all versions of Dalvik.  The following flags turn
+# off various optimizations known to have issues, but the list may not
+# be complete or up to date. (The "arithmetic" optimization can be
+# used if you are only targeting Android 2.0 or later.)  Make sure you
+# test thoroughly if you go this route.
+#-optimizations !code/simplification/arithmetic,!code/simplification/cast,!field/*,!class/merging/*
+-optimizationpasses 1
+-allowaccessmodification
+-dontpreverify
+-optimizations !code/simplification/arithmetic,!field/*,!class/merging/*
+
+# The remainder of this file is identical to the non-optimized version
+# of the Proguard configuration file (except that the other file has
+# flags to turn off optimization).
+
+-dontusemixedcaseclassnames
+-dontskipnonpubliclibraryclasses
+-verbose
+
+-keepattributes *Annotation*
+-keep public class com.google.vending.licensing.ILicensingService
+-keep public class com.android.vending.licensing.ILicensingService
+
+# For native methods, see http://proguard.sourceforge.net/manual/examples.html#native
+-keepclasseswithmembernames class * {
+    native <methods>;
+}
+
+# keep setters in Views so that animations can still work.
+# see http://proguard.sourceforge.net/manual/examples.html#beans
+-keepclassmembers public class * extends android.view.View {
+   void set*(***);
+   *** get*();
+}
+
+# We want to keep methods in Activity that could be used in the XML attribute onClick
+-keepclassmembers class * extends android.app.Activity {
+   public void *(android.view.View);
+}
+
+# For enumeration classes, see http://proguard.sourceforge.net/manual/examples.html#enumerations
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+
+-keep class * implements android.os.Parcelable {
+  public static final android.os.Parcelable$Creator *;
+}
+
+-keepclassmembers class **.R$* {
+    public static <fields>;
+}
+
+# The support library contains references to newer platform versions.
+# Don't warn about those in case this app is linking against an older
+# platform version.  We know about them, and they are safe.
+
+-printmapping mapping.txt 
+
+-keepattributes *Annotation*,EnclosingMethod,Signature
+
+-keepattributes SourceFile,LineNumberTable
+
+-dontwarn android.support.**
+
+
+-keep class com.flurry.** { *; }
+-dontwarn com.flurry.**
+
+-keep class com.crashlytics.android.** { *; }
+-keep class com.fasterxml.jackson.annotation.** { *; }
+-keep class com.fasterxml.jackson.core.** { *; }
+-keep class com.fasterxml.jackson.databind.** { *; }
+-keep class org.apache.** { *; }
+-keep class com.mixpanel.android.** { *; }
+-keep class com.nineoldandroids.** { *; }
+-keep class twitter4j.** { *; }
+-keep class android.support.** { *; }
+-keep public class com.android.vending.licensing.ILicensingService
+-dontwarn twitter4j.**
+
+-keep class com.apalya.myplex.data.** { *; }
+-keep class com.android.volley.** { *; }
+-keep class com.android.volley.toolbox.** { *; }
+-keep class com.facebook.** { *; }
+-keep class javax.** { *; }
+-keep class com.google.** { *; }
+-dontskipnonpubliclibraryclassmembers
+-dontwarn com.flurry.**
+
+-dontwarn com.fasterxml.**
+-dontwarn org.apache.**
+-dontwarn org.apache.**
+-dontwarn org.slf4j.**
+-dontwarn org.json.*
+-dontwarn org.simpleframework.**
+-dontwarn twitter4j.**
+-dontwarn  javax.**
+-dontwarn  java.**
+-dontwarn  com.google.**
+-dontwarn sun.**
+-dontwarn com.sun.**
+
+-assumenosideeffects class android.util.Log {
+    public static *** d(...);
+    public static *** v(...);
+    public static *** i(...);
+    public static *** e(...);
+}

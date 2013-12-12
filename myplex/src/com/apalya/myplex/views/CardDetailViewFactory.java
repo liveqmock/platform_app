@@ -908,7 +908,7 @@ public class CardDetailViewFactory {
 		Util.showFeedbackOnSame(packageButton);
 		packageButton.setTypeface(FontUtil.Roboto_Medium);
 		float price = 10000f;
-		if(mData.packages == null){
+		if(mData.packages == null || mData.packages.size() == 0){
 			packageButton.setText(mContext.getString(R.string.cardstatusfree));
 			packageButton.setOnClickListener(null);
 		}else{
