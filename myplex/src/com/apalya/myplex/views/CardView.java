@@ -439,7 +439,13 @@ public class CardView extends ScrollView {
 		Util.showFeedback(dataHolder.mFavLayout);
 		//17 chars
 		float price = 10000f;
-		if(data.packages == null || data.packages.size() == 0){
+		if(myplexapplication.getCardExplorerData().requestType == CardExplorerData.REQUEST_PURCHASES)
+		{
+			dataHolder.mRentText.setText(mContext.getString(R.string.cardstatuspaid));
+			dataHolder.mRentLayout.setOnClickListener(null);
+			Log.i("CacheManager", "in purchases");
+		}
+		else if(data.packages == null || data.packages.size() == 0){
 			dataHolder.mRentText.setText(mContext.getString(R.string.cardstatusfree));
 			dataHolder.mRentLayout.setOnClickListener(null);
 		}else{
