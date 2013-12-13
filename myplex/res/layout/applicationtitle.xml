@@ -97,7 +97,7 @@
         android:layout_centerVertical="true"
         android:layout_margin="5dp"
         android:contentDescription="@string/hello_world"
-        android:src="@drawable/iconsearch"
+        android:src="@drawable/social_send_now"
         android:visibility="gone" />
 
     <SearchView

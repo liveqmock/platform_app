@@ -147,7 +147,8 @@ public class CardDetails extends BaseFragment implements
 		mCardDetailViewFactory = new CardDetailViewFactory(getContext());
 		mCardDetailViewFactory.setParent(rootView);
 		mCardDetailViewFactory.setOnCardDetailExpandListener(this);
-		mMainActivity.setSearchBarVisibilty(View.VISIBLE);
+		mMainActivity.setSearchBarVisibilty(View.INVISIBLE);
+		mMainActivity.setSearchViewVisibilty(View.VISIBLE);
 		// prepareContent();
 		if (mCardData.generalInfo != null) {
 			mMainActivity.setActionBarTitle(mCardData.generalInfo.title.toLowerCase());
@@ -250,8 +251,11 @@ public class CardDetails extends BaseFragment implements
 	public void onResume() {
 		super.onResume();
 		updatePlayerLogVisiblity();
-		if (myplexapplication.getCardExplorerData().cardDataToSubscribe != null) {
-			mCardData = myplexapplication.getCardExplorerData().cardDataToSubscribe;
+		if (myplexapplication.getCardExplorerData().cardDataToSubscribe != null && mCardData != null && mCardData._id != null) {
+			if(myplexapplication.getCardExplorerData().cardDataToSubscribe._id.equalsIgnoreCase(mCardData._id))
+			{
+				mCardData = myplexapplication.getCardExplorerData().cardDataToSubscribe;
+			}
 		}
 		if (mCardDetailViewFactory != null) {
 			mCardDetailViewFactory.UpdateSubscriptionStatus();

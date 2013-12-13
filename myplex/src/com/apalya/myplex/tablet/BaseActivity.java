@@ -806,4 +806,9 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 	public void searchButtonClicked() {
 		// TODO Auto-generated method stub
 	}
+	@Override
+	public void setSearchViewVisibilty(int visibility) {
+		// TODO Auto-generated method stub
+		
+	}
 }

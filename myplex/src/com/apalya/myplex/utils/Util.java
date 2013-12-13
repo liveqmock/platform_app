@@ -979,7 +979,7 @@ public class Util {
 				message.setTypeface(FontUtil.Roboto_Medium);
 				header.setText(R.string.toast_warning);
 				message.setTextColor(Color.parseColor("#FF0000"));
-//				v.setBackgroundColor(Color.parseColor("#FFFFFF"));
+				v.setBackgroundColor(Color.parseColor("#FFFFFF"));
 				message.setText(msg);
 				toast.setGravity(Gravity.TOP, 0, 100);
 				toast.setView(v);

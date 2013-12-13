@@ -326,7 +326,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		if(!mContext.getResources().getBoolean(R.bool.isTablet)){
 			mMainActivity.setOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		}
-		mMainActivity.setSearchBarVisibilty(View.VISIBLE);
+		mMainActivity.setSearchBarVisibilty(View.INVISIBLE);
+		mMainActivity.setSearchViewVisibilty(View.VISIBLE);
 		delayedAction();
 		hideNewArrivals();
 		return mRootView;
@@ -488,6 +489,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			
 				requestUrl = ConsumerApi.getSearch(mData.searchQuery,ConsumerApi.LEVELDYNAMIC,mData.mStartIndex,searchScope);
 			screenName="Search";
+			mMainActivity.setActionBarTitle(mData.searchQuery.toLowerCase());
 		}else if(mData.requestType == CardExplorerData.REQUEST_RECOMMENDATION){
 			if(!mAddDataAdded){
 				mAddDataAdded = true;
@@ -521,12 +523,11 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			requestUrl = ConsumerApi.getSimilarContent(mData.searchQuery,ConsumerApi.LEVELDYNAMIC);
 		}
 		
-		Map<String,String> attrib=new HashMap<String, String>();
+		
 		/*attrib.put("Category", screenName);
 		attrib.put("Duration", "");
 		Analytics.trackEvent(Analytics.cardBrowseDuration,attrib,true);*/
-		attrib.put(Analytics.BROWSE_TYPE_PROPERTY, screenName);
-		Analytics.trackEvent(Analytics.EVENT_BROWSE,attrib);
+		
 		
 		requestUrl = requestUrl.replaceAll(" ", "%20");
 		mVolleyRequest = new GZipRequest(requestMethod, requestUrl, deviceMinSuccessListener(), responseErrorListener());
@@ -632,24 +633,13 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				if (label != null && label.equalsIgnoreCase("All")) {
 					mMainActivity.setActionBarTitle("All");
 					Map<String,String> params=new HashMap<String, String>();
-					/*
-					params.put("FilterType", label);
-					params.put("NumOfCards", String.valueOf(mData.mMasterEntries.size()));
-<<<<<<< Updated upstream
-					Analytics.trackEvent(Analytics.cardBrowseFilter,params);
-					mMainActivity.setActionBarTitle(label);
-=======
-					Analytics.trackEvent(Analytics.cardBrowseFilter,params);*/
-					
 					params.put(Analytics.SEARCH_TYPE_PROPERTY, Analytics.SEARCH_TYPES.Filter.toString());
 					params.put(Analytics.SEARCH_FILTER_TYPE_PROPERTY,label);
 					Analytics.trackEvent(Analytics.EVENT_SEARCH,params);
-					
-
 					sort(mData.mMasterEntries);
 					return;
 				}
-				mMainActivity.setActionBarTitle(label);
+				
 				ArrayList<CardData> localData = new ArrayList<CardData>();
 				for (CardData data : mData.mMasterEntries) {
 					boolean itemPresent = false;
@@ -665,10 +655,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 						localData.add(data);
 					}
 				}
+				mMainActivity.setActionBarTitle(label/*+" ("+localData.size()+"+)"*/);
 				Map<String,String> params=new HashMap<String, String>();
-				/*params.put("FilterType", label);
-				params.put("NumOfCards", String.valueOf(localData.size()));
-				Analytics.trackEvent(Analytics.cardBrowseFilter,params);*/
 				params.put(Analytics.SEARCH_TYPE_PROPERTY, Analytics.SEARCH_TYPES.Filter.toString());
 				params.put(Analytics.SEARCH_NUMBER_FOUND_PROPERTY, String.valueOf(localData.size()));
 				params.put(Analytics.SEARCH_FILTER_TYPE_PROPERTY,label);
@@ -710,18 +698,19 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	}
 
 	private void showErrorDialog() {
-		String msg="No Results Found, Continue using...";
+		
+		String msg="seems like there's nothing here.";
 		if(mData.requestType == CardExplorerData.REQUEST_FAVOURITE){
-			msg="No Favourites... \nUse <heart> symbol on any card to add some titles here.";
+			msg="no favourites yet... \nUse "+ "+ symbol"/*getString(R.string.card_heart)*/ +" on any card to add some titles here.";
 		}else if(mData.requestType == CardExplorerData.REQUEST_PURCHASES){
-			msg="No purchased content … \nLet's change that!";
+			msg=getString(R.string.purchaseserror);
 		}else if(mData.requestType == CardExplorerData.REQUEST_SEARCH){
-			msg="Unable to find results … \nTry one of our suggested search terms?";
+			msg=getString(R.string.searcherror);
 		}else if(mData.requestType == CardExplorerData.REQUEST_DOWNLOADS){
-			msg="No Downloads yet… \nLet's start one, can watch it while downloading itself";
+			msg=getString(R.string.downloadserror);
 		}
 		
-		AlertDialogUtil.showAlert(mContext, msg, "Cancel", "Discover trending content?", this);
+		AlertDialogUtil.showAlert(mContext, msg, "cancel", "discover trending content?", this);
 		//Util.showToast(getContext(), "No Response from server", Util.TOAST_TYPE_INFO);
 //		AlertDialog.Builder b = new AlertDialog.Builder(getContext());
 //		b.setMessage("No Response from server");
@@ -910,7 +899,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			}
 			//doesnot have data how control comes her. whether through filter|search etc
 			//params.put(Analytics.BROWSE_TYPE_PROPERTY,Analytics.BROWSE_CARDACTION_TYPES.Swipe.toString());
-			Analytics.trackEvent(Analytics.EVENT_BROWSE,params);
+			//Analytics.trackEvent(Analytics.EVENT_BROWSE,params);
 		}
 	}
 	

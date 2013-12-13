@@ -245,7 +245,7 @@ public class CardVideoPlayer implements PlayerListener {
 		@Override
 		public void onClick(View v) {
 			
-			Util.showAdultToast(mContext.getString(R.string.adultwarning), mData, mContext);
+			
 			
 			Map<String,String> params=new HashMap<String, String>();
 			/*params.put("CardId", mData._id);
@@ -393,6 +393,7 @@ public class CardVideoPlayer implements PlayerListener {
 						e.printStackTrace();
 					}	
 				}
+				Util.showAdultToast(mContext.getString(R.string.adultwarning), mData, mContext);
 				Uri uri ;
 //				uri = Uri.parse("rtsp://46.249.213.87:554/playlists/bollywood-action_qcif.hpl.3gp");
 //				uri = Uri.parse("http://59.162.166.211:8080/player/3G_H264_320x240_600kbps.3gp");
@@ -642,7 +643,15 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			public void urlReceived(boolean aStatus, String url, String message, String statusCode ) {
 				if (!aStatus) {
 					closePlayer();
-					Util.showToast(mContext, "Failed in fetching the url.",Util.TOAST_TYPE_ERROR);
+					
+					String msg ="Failed in fetching the url.";
+					
+					if(!TextUtils.isEmpty(message)){
+						msg = message;
+					}
+					
+					Util.showToast(mContext, msg,Util.TOAST_TYPE_ERROR);	
+					
 					if(mPlayerStatusListener != null){
 						mPlayerStatusListener.playerStatusUpdate("Failed in fetching the url.");
 					}
