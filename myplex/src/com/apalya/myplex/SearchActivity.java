@@ -94,6 +94,7 @@ public class SearchActivity extends BaseFragment implements
 		Util.showFeedback(mSearchLens);
 		mSearchInput.setTypeface(FontUtil.Roboto_Regular);
 		mMainActivity.setSearchBarVisibilty(View.INVISIBLE);
+		mMainActivity.setSearchViewVisibilty(View.INVISIBLE);
 		mSearchInput.setOnEditorActionListener(new OnEditorActionListener() {
 
 			@Override
@@ -173,43 +174,7 @@ public class SearchActivity extends BaseFragment implements
 		
 		@Override
 		public void onClick(View v) {
-
-			if (mSearchbleTags == null || mSearchbleTags.size() <= 0)
-			{
-				Util.showToast(mContext, "Select search tags or enter text for search ",Util.TOAST_TYPE_INFO);
-//				Toast.makeText(mContext,  "Select search tags or enter text for search ",  Toast.LENGTH_LONG).show();
-				return;
-			}
-			mMainActivity.showActionBarProgressBar();
-
-			String searchQuery = new String();
-			final List<CardData> searchString = new ArrayList<CardData>();
-			for (ButtonData data : mSearchbleTags) {
-				CardData temp = new CardData();
-				// temp._id = data.getButtonId() != null ? data.getButtonId() :
-				// data.getButtonName();
-				temp._id = data.getButtonName();
-				if (searchQuery.length() > 0) {
-					searchQuery += ",";
-				}
-				searchQuery += data.getButtonName();
-				searchString.add(temp);
-				
-				/*Map<String,String> params=new HashMap<String, String>();
-				params.put("tagsSelected", searchQuery);
-				Analytics.trackEvent(Analytics.SearchQuery,params);*/
-				
-				//??? dropdwon/discover
-				Map<String,String> params=new HashMap<String, String>();
-				params.put(Analytics.SEARCH_TYPE_PROPERTY, Analytics.SEARCH_TYPES.DropDown.toString());
-				Analytics.trackEvent(Analytics.EVENT_SEARCH, params);
-			}
-			mSearchQuery = searchQuery;
-			IndexHandler.OperationType searchType = IndexHandler.OperationType.DONTSEARCHDB;
-			if(!Util.isNetworkAvailable(mContext))
-				searchType = IndexHandler.OperationType.FTSEARCH;
-			mCacheManager.getCardDetails(searchString, searchType, SearchActivity.this);
-
+			searchButtonClicked();
 		}
 	};
 	@Override
@@ -243,7 +208,6 @@ public class SearchActivity extends BaseFragment implements
 		}
 		mSearchQuery = searchQuery;
 		mMainActivity.setActionBarTitle(searchQuery);
-		mMainActivity.saveActionBarTitle();
 		IndexHandler.OperationType searchType = IndexHandler.OperationType.DONTSEARCHDB;
 		if(!Util.isNetworkAvailable(mContext))
 			searchType = IndexHandler.OperationType.FTSEARCH;
@@ -268,10 +232,10 @@ public class SearchActivity extends BaseFragment implements
 			mSearchbleTags.remove(tagData);
 		}
 		Analytics.trackEvent(Analytics.SEARCH_QUERY_PROPERTY,params);
-//		if (mSearchbleTags.size() == 0)
-//			mMainActivity.setSearchBarVisibilty(View.INVISIBLE);
-//		else
-//			mMainActivity.setSearchBarVisibilty(View.VISIBLE);
+		if (mSearchbleTags.size() == 0)
+			mMainActivity.setSearchBarVisibilty(View.INVISIBLE);
+		else
+			mMainActivity.setSearchBarVisibilty(View.VISIBLE);
 	}
 
 	private void ClearSearchTags() {
@@ -401,7 +365,7 @@ public class SearchActivity extends BaseFragment implements
 				searchFilter.add(new FilterMenudata(FilterMenudata.ITEM,
 						categoryName, 0));
 			}
-			if (isVisible()) {
+			if (isVisible() && searchFilter.size() >1) {
 				mMainActivity.addFilterData(searchFilter,
 						mFilterMenuClickListener);
 			}

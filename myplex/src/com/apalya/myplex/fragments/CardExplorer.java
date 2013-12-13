@@ -326,7 +326,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		if(!mContext.getResources().getBoolean(R.bool.isTablet)){
 			mMainActivity.setOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		}
-		mMainActivity.setSearchBarVisibilty(View.VISIBLE);
+		mMainActivity.setSearchBarVisibilty(View.INVISIBLE);
+		mMainActivity.setSearchViewVisibilty(View.VISIBLE);
 		delayedAction();
 		hideNewArrivals();
 		return mRootView;
@@ -488,6 +489,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			
 				requestUrl = ConsumerApi.getSearch(mData.searchQuery,ConsumerApi.LEVELDYNAMIC,mData.mStartIndex,searchScope);
 			screenName="Search";
+			mMainActivity.setActionBarTitle(mData.searchQuery.toLowerCase());
 		}else if(mData.requestType == CardExplorerData.REQUEST_RECOMMENDATION){
 			if(!mAddDataAdded){
 				mAddDataAdded = true;
@@ -696,18 +698,19 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	}
 
 	private void showErrorDialog() {
-		String msg="No Results Found, Continue using...";
+		
+		String msg="seems like there's nothing here.";
 		if(mData.requestType == CardExplorerData.REQUEST_FAVOURITE){
-			msg="No Favourites... \nUse <heart> symbol on any card to add some titles here.";
+			msg="no favourites yet... \nUse "+ "+ symbol"/*getString(R.string.card_heart)*/ +" on any card to add some titles here.";
 		}else if(mData.requestType == CardExplorerData.REQUEST_PURCHASES){
-			msg="No purchased content … \nLet's change that!";
+			msg=getString(R.string.purchaseserror);
 		}else if(mData.requestType == CardExplorerData.REQUEST_SEARCH){
-			msg="Unable to find results … \nTry one of our suggested search terms?";
+			msg=getString(R.string.searcherror);
 		}else if(mData.requestType == CardExplorerData.REQUEST_DOWNLOADS){
-			msg="No Downloads yet… \nLet's start one, can watch it while downloading itself";
+			msg=getString(R.string.downloadserror);
 		}
 		
-		AlertDialogUtil.showAlert(mContext, msg, "Cancel", "Discover trending content?", this);
+		AlertDialogUtil.showAlert(mContext, msg, "cancel", "discover trending content?", this);
 		//Util.showToast(getContext(), "No Response from server", Util.TOAST_TYPE_INFO);
 //		AlertDialog.Builder b = new AlertDialog.Builder(getContext());
 //		b.setMessage("No Response from server");

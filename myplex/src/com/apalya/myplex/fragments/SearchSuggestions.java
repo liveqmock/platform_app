@@ -151,6 +151,7 @@ public class SearchSuggestions extends BaseFragment {
 							dataBundle.requestType = CardExplorerData.REQUEST_INLINESEARCH;
 							BaseFragment fragment = mMainActivity.createFragment(NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION);
 							mMainActivity.bringFragment(fragment);
+							mMainActivity.setActionBarTitle(searchResults.get(position).generalInfo.title.toLowerCase());
 						}
 						
 					}

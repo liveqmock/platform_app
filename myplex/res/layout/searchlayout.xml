@@ -15,7 +15,8 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:contentDescription="@string/hello_world"
-            android:src="@drawable/iconsearchgrey" />
+            android:src="@drawable/iconsearchgrey"
+            android:visibility="invisible" />
 
         <EditText
             android:id="@+id/inputSearch"
