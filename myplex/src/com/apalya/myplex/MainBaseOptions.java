@@ -41,4 +41,6 @@ public interface MainBaseOptions {
 	public void saveActionBarTitle();
 
 	public void searchButtonClicked();
+
+	public void setSearchViewVisibilty(int visibility);
 }

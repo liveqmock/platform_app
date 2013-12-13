@@ -514,7 +514,8 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 			if(HideSearchView())
 				return;
 			showActionBar();
-			setSearchBarVisibilty(View.VISIBLE);
+			setSearchBarVisibilty(View.INVISIBLE);
+			setSearchViewVisibilty(View.VISIBLE);
 			BaseFragment fragment = mFragmentStack.peek();
 			if (fragment instanceof CardExplorer) {
 				
@@ -698,7 +699,7 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 			mSearchActivity = (SearchActivity) createFragment(NavigationOptionsMenuAdapter.SEARCH_ACTION);
 			mCurrentFragment = mSearchActivity;
 			saveActionBarTitle();
-			setActionBarTitle("discover");
+			setActionBarTitle(NavigationOptionsMenuAdapter.DISCOVER);
 			break;
 		}
 		case NavigationOptionsMenuAdapter.SETTINGS_ACTION:
@@ -706,7 +707,7 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 			mSettingsScreen = (SetttingsFragment) createFragment(NavigationOptionsMenuAdapter.SETTINGS_ACTION);
 			mCurrentFragment = mSettingsScreen;
 			saveActionBarTitle();
-			setActionBarTitle("settings");
+			setActionBarTitle(NavigationOptionsMenuAdapter.SETTINGS);
 			break;
 		}
 		default: {
@@ -973,7 +974,14 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 			}
 			else
 				mCustomActionBarSearch.setVisibility(visibility);
-			mCustomActionBarSearch.setVisibility(View.GONE);
+//			mCustomActionBarSearch.setVisibility(View.GONE);
+		}
+	}
+	
+	@Override
+	public void setSearchViewVisibilty(int visibility) {
+		if (mSearchView != null) {
+				mSearchView.setVisibility(visibility);
 		}
 	}
 	@Override

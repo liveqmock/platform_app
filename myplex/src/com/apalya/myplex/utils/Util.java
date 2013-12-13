@@ -558,7 +558,7 @@ public class Util {
 		Intent sendIntent = new Intent();
 		sendIntent.setAction(Intent.ACTION_SEND);
 		//sendIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
-		String msg="Watching "+aTitle+" on myplex \n check it out on http://portal.myplex.in/ \n https://play.google.com/store/apps/details?id=tv.myplex.android";
+		String msg="Watching "+aTitle+" on myplex \n check it out on http://www.myplex.com/ \n https://play.google.com/store/apps/details?id=com.apalya.myplex";
 		sendIntent.putExtra(Intent.EXTRA_TEXT, msg);
 		if(aType==1)
 		{
@@ -979,7 +979,7 @@ public class Util {
 				message.setTypeface(FontUtil.Roboto_Medium);
 				header.setText(R.string.toast_warning);
 				message.setTextColor(Color.parseColor("#FF0000"));
-//				v.setBackgroundColor(Color.parseColor("#FFFFFF"));
+				v.setBackgroundColor(Color.parseColor("#FFFFFF"));
 				message.setText(msg);
 				toast.setGravity(Gravity.TOP, 0, 100);
 				toast.setView(v);

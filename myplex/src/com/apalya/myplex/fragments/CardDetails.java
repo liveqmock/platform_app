@@ -147,7 +147,8 @@ public class CardDetails extends BaseFragment implements
 		mCardDetailViewFactory = new CardDetailViewFactory(getContext());
 		mCardDetailViewFactory.setParent(rootView);
 		mCardDetailViewFactory.setOnCardDetailExpandListener(this);
-		mMainActivity.setSearchBarVisibilty(View.VISIBLE);
+		mMainActivity.setSearchBarVisibilty(View.INVISIBLE);
+		mMainActivity.setSearchViewVisibilty(View.VISIBLE);
 		// prepareContent();
 		if (mCardData.generalInfo != null) {
 			mMainActivity.setActionBarTitle(mCardData.generalInfo.title.toLowerCase());

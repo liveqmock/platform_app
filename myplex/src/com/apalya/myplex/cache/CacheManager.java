@@ -99,8 +99,17 @@ public class CacheManager {
 				if(resultData == null ){continue;}
 				Log.d(TAG,"updating dynamic data for "+data._id);
 				
-				resultData.userReviews = data.userReviews;
+
+				if(resultData.currentUserData.purchase !=null && !resultData.currentUserData.purchase.isEmpty() && Util.isTokenValid(resultData.currentUserData.purchase.get(0).validity))
+				{
+					Log.i(TAG, "Cache data is valid");
+					if(data.currentUserData.purchase !=null)
+						data.currentUserData.purchase = resultData.currentUserData.purchase;
+				}
+				data.currentUserData.favorite = resultData.currentUserData.favorite;
+				
 				resultData.currentUserData = data.currentUserData;
+				resultData.userReviews = data.userReviews;
 				resultData.criticReviews = data.criticReviews;
 				resultData._expiresAt = data._expiresAt;
 				if(data.comments != null){
