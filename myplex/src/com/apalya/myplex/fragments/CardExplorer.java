@@ -124,6 +124,9 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		mData = myplexapplication.getCardExplorerData();
+		Map<String,String> params=new HashMap<String, String>();
+		params.put(Analytics.BROWSE_TYPE_PROPERTY, Analytics.BROWSE_TYPES.Cards.toString());
+		Analytics.trackEvent(Analytics.EVENT_BROWSE,params);
 		Log.d(TAG,"onCreate");
 	}
 
@@ -803,7 +806,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			params.put(Analytics.CONTENT_TYPE_PROPERTY, data.generalInfo.type);
 			params.put(Analytics.CONTENT_NAME_PROPERTY, data.generalInfo.title);
 		}
-		Analytics.trackEvent(Analytics.EVENT_BROWSE,params);
+		//Analytics.trackEvent(Analytics.EVENT_BROWSE,params);
 		
 		mData.currentSelectedCard = index;
 		mSelectedCard = data;
