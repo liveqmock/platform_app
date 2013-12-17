@@ -253,7 +253,7 @@ public class PackagePopUp {
 									dismissFilterMenuPopupWindow();
 								}
 							}catch (Exception e) {
-									// TODO: handle exception
+									Log.e(TAG, e.toString());
 							}
 						}
 					});
