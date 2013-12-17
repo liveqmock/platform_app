@@ -19,6 +19,7 @@ import com.apalya.myplex.R;
 import com.apalya.myplex.SubscriptionView;
 import com.apalya.myplex.TwitterWebView;
 import com.apalya.myplex.adapters.SettingsAdapter;
+import com.apalya.myplex.data.ApplicationSettings;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.SettingsData;
 import com.apalya.myplex.data.myplexapplication;
@@ -100,7 +101,9 @@ public class SetttingsFragment extends BaseFragment {
 	private void PreapreSettingsData() {
 		mSettingsList.add(new SettingsData(SettingsData.SECTION, "App Settings", 0,SettingsData.VIEWTYPE_NORMAL));
 		mSettingsList.add(new SettingsData(SettingsData.ITEM, "Download only on Wifi", 0,SettingsData.VIEWTYPE_TOGGLEBUTTON));
-		mSettingsList.add(new SettingsData(SettingsData.ITEM, "Show player logs", 0,SettingsData.VIEWTYPE_TOGGLEBUTTON));
+		if(ApplicationSettings.ENABLE_SHOW_PLAYER_LOGS_SETTINGS){
+			mSettingsList.add(new SettingsData(SettingsData.ITEM, "Show player logs", 0,SettingsData.VIEWTYPE_TOGGLEBUTTON));
+		}
 		mSettingsList.add(new SettingsData(SettingsData.SECTION, "myplex", 0,SettingsData.VIEWTYPE_NORMAL));
 		mSettingsList.add(new SettingsData(SettingsData.ITEM, FEEDBACK, 0,SettingsData.VIEWTYPE_NORMAL));
 		mSettingsList.add(new SettingsData(SettingsData.ITEM, TANDC, 0,SettingsData.VIEWTYPE_NORMAL));

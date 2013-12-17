@@ -58,7 +58,7 @@ public class LogOutUtil {
 		mProgressDialog = ProgressDialog.show(logoutContext,"", "Loading...", true,false);
 	}
 	public static void dismissProgressBar(){
-		if(mProgressDialog != null){
+		if(mProgressDialog != null && mProgressDialog.isShowing() ){
 			mProgressDialog.dismiss();
 		}
 	}
@@ -117,6 +117,7 @@ public class LogOutUtil {
 
 		((Activity) logoutContext).finish();
 		Util.launchActivity(LoginActivity.class,((Activity) logoutContext) , null);
+		dismissProgressBar();		
 	}
 	public static void logoutUser(Context cntx){
 		logoutContext=cntx;
@@ -142,7 +143,7 @@ public class LogOutUtil {
 		return new Response.ErrorListener() {
 			@Override
 			public void onErrorResponse(VolleyError error) {
-				dismissProgressBar();
+				//dismissProgressBar();
 				Log.d(TAG, "@@@@@@@@@@@@@@ BASE ACTIVITY @@@@@@@@@@@@@@@@@@@@@");
 				Log.d(TAG,"Error: "+error.toString());
 				Util.showToast(logoutContext,"Code: "+error.toString(),Util.TOAST_TYPE_ERROR);
@@ -157,7 +158,7 @@ public class LogOutUtil {
 			public void onResponse(String response) {
 				Log.d(TAG,"Response: "+response);
 				Log.d(TAG, "*****************BASE ACTIVITY************************");
-				dismissProgressBar();
+				//dismissProgressBar();
 				JSONObject jsonResponse;
 				try {
 					jsonResponse = new JSONObject(response);

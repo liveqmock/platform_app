@@ -14,6 +14,7 @@ import java.util.Set;
 
 import com.apalya.myplex.R;
 import com.apalya.myplex.data.ApplicationSettings;
+import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.exception.DRMException;
 import com.apalya.myplex.views.CardVideoPlayer.PlayerStatusUpdate;
 import com.crashlytics.android.Crashlytics;
@@ -383,7 +384,7 @@ public class WidevineDrm {
 			
 			@Override
 			public void run() {
-				if(mContext.getResources().getBoolean(R.bool.isTablet))
+				if(mContext.getResources().getBoolean(R.bool.isTablet) && myplexapplication.getApplicationSettings().showPlayerLogs)
 					Util.showToast(mContext, str, Util.TOAST_TYPE_INFO);
 				if(mPlayerStatusListener != null){
 					mPlayerStatusListener.playerStatusUpdate(str);

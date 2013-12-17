@@ -313,7 +313,7 @@ public class CardVideoPlayer implements PlayerListener {
 		MediaUtil.setUrlEventListener(new MediaUtilEventListener() {
 
 			@Override
-			public void urlReceived(boolean aStatus, String url, String message, String statusCode) {
+			public void urlReceived(boolean aStatus, String url, String message, String statusCode) {				
 				if (!aStatus) {
 					closePlayer();
 					
@@ -396,7 +396,7 @@ public class CardVideoPlayer implements PlayerListener {
 				Util.showAdultToast(mContext.getString(R.string.adultwarning), mData, mContext);
 				Uri uri ;
 //				uri = Uri.parse("rtsp://46.249.213.87:554/playlists/bollywood-action_qcif.hpl.3gp");
-//				uri = Uri.parse("http://59.162.166.211:8080/player/3G_H264_320x240_600kbps.3gp");
+//				uri = Uri.parse("http://59.162.166.211:8080/player/3G_H264_320x240_600kbps.3gp");				
 //				uri = Uri.parse("http://122.248.233.48/wvm/100_ff_5.wvm");
 				uri = Uri.parse(url);
 				// Toast.makeText(getContext(), "URL:"+url,
@@ -998,6 +998,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			derviedHeight = myplexapplication.getApplicationConfig().screenWidth - statusBarHeight;
 		}
 		if(mContext.getResources().getBoolean(R.bool.isTablet)){
+			derviedHeight = myplexapplication.getApplicationConfig().screenHeight - statusBarHeight;
 			LinearLayout.LayoutParams layoutparams = new LinearLayout.LayoutParams(derviedWidth,derviedHeight);
 			mParentLayout.setLayoutParams(layoutparams);
 		}
