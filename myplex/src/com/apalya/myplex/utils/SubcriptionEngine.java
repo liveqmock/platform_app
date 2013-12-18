@@ -85,7 +85,9 @@ public class SubcriptionEngine {
 		TextView textView = (TextView)mAlbumDialog.findViewById(R.id.subscription_confirmationtextview);
 		//subscription_confirmationtextview
 		String msg = (String) textView.getText();
-		msg = msg +" "+ mSelectedPriceItem.name +" Network pack for "+ " Rs." + mSelectedPriceItem.price +" only valid for "+mSelectedPackageItem.duration+" days"; 
+		CardData subscribedData = myplexapplication.getCardExplorerData().cardDataToSubscribe;
+		String contentName = subscribedData.generalInfo.title;
+		msg = msg +" "+ mSelectedPackageItem.contentType + " "  +contentName + " pack for "+ "Rs." + mSelectedPriceItem.price;
 		textView.setText(msg);
 		Button ok = (Button)mAlbumDialog.findViewById(R.id.subscription_ok_button);
 		Button cancel = (Button)mAlbumDialog.findViewById(R.id.subscription_cancel_button);
