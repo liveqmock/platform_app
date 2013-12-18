@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -145,7 +146,7 @@ public class SubcriptionEngine {
 		};
 		Log.e(TAG, "request: "+requestUrl);
 		myReg.setShouldCache(false);
-		myReg.setRetryPolicy(new HttpTimeOut(15000));
+		myReg.setRetryPolicy(new DefaultRetryPolicy(15 * 1000, 1, 1.0f));
 		queue.add(myReg);
 	}
 	
