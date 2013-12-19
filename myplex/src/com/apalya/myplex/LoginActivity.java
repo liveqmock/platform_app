@@ -1126,8 +1126,16 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 	private void googleLoginRequest(String contextPath,
 			final Map<String, String> bodyParams) {
-		if(mProgressDialog!=null)
-			mProgressDialog.setMessage("Logging in, Please wait...");
+		if(mProgressDialog!=null){
+			runOnUiThread(new Runnable() {
+				
+				@Override
+				public void run() {
+					mProgressDialog.setMessage("Logging in, Please wait...");
+					
+				}
+			});
+		}
 		RequestQueue queue = MyVolley.getRequestQueue();
 		// showToast("GOOGLE LOGIN REQ");
 		String url=ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+ConsumerApi.USER_CONTEXT+ConsumerApi.SLASH+contextPath;

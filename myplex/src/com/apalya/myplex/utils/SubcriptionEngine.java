@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -36,6 +37,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.TextView;
 
 public class SubcriptionEngine {
 	public static final String TAG = "SubcriptionEngine";
@@ -75,11 +77,19 @@ public class SubcriptionEngine {
 				launchWebBasedSubscription();
 			}
 		} catch (Exception e) {
+			Log.e(TAG, e.toString());
 		}
 	}
 	private void showConfirmationDialog(){
 		mAlbumDialog = new CustomDialog(mContext);
 		mAlbumDialog.setContentView(R.layout.subscriptionconfirmationdialog);
+		TextView textView = (TextView)mAlbumDialog.findViewById(R.id.subscription_confirmationtextview);
+		//subscription_confirmationtextview
+		String msg = (String) textView.getText();
+		CardData subscribedData = myplexapplication.getCardExplorerData().cardDataToSubscribe;
+		String contentName = subscribedData.generalInfo.title;
+		msg = msg +" "+ mSelectedPackageItem.contentType + " "  +contentName + " pack for "+ "Rs." + mSelectedPriceItem.price;
+		textView.setText(msg);
 		Button ok = (Button)mAlbumDialog.findViewById(R.id.subscription_ok_button);
 		Button cancel = (Button)mAlbumDialog.findViewById(R.id.subscription_cancel_button);
 		cancel.setOnClickListener(new OnClickListener() {
@@ -136,7 +146,7 @@ public class SubcriptionEngine {
 		};
 		Log.e(TAG, "request: "+requestUrl);
 		myReg.setShouldCache(false);
-		myReg.setRetryPolicy(new HttpTimeOut(15000));
+		myReg.setRetryPolicy(new DefaultRetryPolicy(15 * 1000, 1, 1.0f));
 		queue.add(myReg);
 	}
 	

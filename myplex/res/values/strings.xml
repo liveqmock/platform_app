@@ -75,7 +75,7 @@
     <string name="feedbackmessagehint">feedback on myplex</string>
     <string name="feedbackcancelbutton">cancel</string>
     <string name="feedbackokbutton">ok</string>
-    <string name="subscriptionconfirmationdialogtext">proceed with the payment?</string>
+    <string name="subscriptionconfirmationdialogtext">Do you want to buy</string>
     <string name="playhint">play</string>
     <string name="trailerhint">play trailer</string>
     <string name="adultwarning">18+ only </string>
