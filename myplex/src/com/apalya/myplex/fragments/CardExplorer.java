@@ -473,7 +473,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	private void fetchMinData() {
 		mOldDataAdded = false;
 		mOldDataListSize = 0;
-/*		if(mData.requestType == CardExplorerData.REQUEST_SIMILARCONTENT){
+		/*if(mData.requestType == CardExplorerData.REQUEST_SIMILARCONTENT){
 			return;
 		}*/
 		mMainActivity.showActionBarProgressBar();
@@ -523,7 +523,12 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		else if(mData.requestType == CardExplorerData.REQUEST_SIMILARCONTENT)
 		{
 			screenName="similarcontent for" +mData.searchQuery;
+			Log.d(TAG,"query"+mData.searchQuery);
+			if(mData.searchQuery.equals("0")){
+				return;
+			}
 			requestUrl = ConsumerApi.getSimilarContent(mData.searchQuery,ConsumerApi.LEVELDYNAMIC);
+			
 		}
 		
 		
