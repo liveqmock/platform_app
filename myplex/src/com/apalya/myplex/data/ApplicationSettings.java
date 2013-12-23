@@ -7,5 +7,5 @@ public class ApplicationSettings {
 	public static final boolean ENABLE_LOG_DRM_ERRORS=true;
 	public static final boolean ENABLE_MIXPANEL_API = true;
 	// Enable below flag to display player log option in settings menu.
-	public static final boolean ENABLE_SHOW_PLAYER_LOGS_SETTINGS = true;
+	public static boolean ENABLE_SHOW_PLAYER_LOGS_SETTINGS = false;
 }

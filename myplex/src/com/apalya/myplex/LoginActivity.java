@@ -1078,6 +1078,9 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 							param1.put(Analytics.LOGIN_GOOGLE,Analytics.LOGIN_CLICK);
 							//Analytics.trackEvent(Analytics.loginGoogle,param1,true);
 							Analytics.trackEvent(Analytics.EVENT_LOGIN_SOCIAL,param1);
+							if(mPlusClient.isConnected()){
+								mPlusClient.clearDefaultAccount();
+							}
 							mPlusClient.connect();
 						}
 					}
