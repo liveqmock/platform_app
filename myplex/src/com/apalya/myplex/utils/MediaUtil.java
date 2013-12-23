@@ -109,7 +109,7 @@ public class MediaUtil {
 									&& video.link != null
 									&& video.format != null
 									&& (video.format.equalsIgnoreCase(ConsumerApi.STREAMINGFORMATHTTP) ||
-											video.format.equalsIgnoreCase(ConsumerApi.STREAMINGFORMATRTSP))
+											video.format.equalsIgnoreCase(ConsumerApi.STREAMINGFORMATHLS))
 									&& video.type !=null
 									&& video.type.equalsIgnoreCase(sStreamingType)) {
 								Log.i(TAG, video.link);
@@ -134,6 +134,10 @@ public class MediaUtil {
 			@Override
 			public void onErrorResponse(VolleyError error) {
 				if (urlEventListener != null) {
+					if(error.networkResponse != null && error.networkResponse.data != null){
+						String errorMsg = new String(error.networkResponse.data);
+						Log.d(TAG, errorMsg);
+					}
 					urlEventListener.urlReceived(false,null, null,null);
 				}
 			}

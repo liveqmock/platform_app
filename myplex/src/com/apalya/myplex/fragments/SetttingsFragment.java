@@ -38,16 +38,16 @@ public class SetttingsFragment extends BaseFragment {
 	private String TANDC = "Terms & Conditions";
 	private String PRIVACYPOLIY ="Privacy Policy";
 	private String HELP = "Help";
+	private int debug_mode_counter=0;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		mRootView = inflater.inflate(R.layout.settingslayout, container, false);
 		mSettingsListView = (PinnedSectionListView) mRootView
-				.findViewById(R.id.settings_list);
-		mSettingsList = new ArrayList<SettingsData>();
+				.findViewById(R.id.settings_list);		
 		PreapreSettingsData();
-		
+		debug_mode_counter=0;
 		mSettingsListView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
@@ -55,6 +55,21 @@ public class SetttingsFragment extends BaseFragment {
 					long arg3) {
 
 				SettingsData data = (SettingsData) v.getTag();
+				if(data.type == SettingsData.SECTION && data.mSettingName.equalsIgnoreCase("App Settings")){	
+				
+					if(debug_mode_counter == 5 ){
+						
+						ApplicationSettings.ENABLE_SHOW_PLAYER_LOGS_SETTINGS = true;
+						PreapreSettingsData();
+						mListAdapter.notifyDataSetChanged();
+						return;
+					}
+					
+					debug_mode_counter ++;
+					return;
+				}
+	
+						
 				if(data.type == SettingsData.SECTION || data.mSettingName.contains("Download"))
 					return;
 				
@@ -99,6 +114,7 @@ public class SetttingsFragment extends BaseFragment {
 	}
 
 	private void PreapreSettingsData() {
+		mSettingsList = new ArrayList<SettingsData>();		
 		mSettingsList.add(new SettingsData(SettingsData.SECTION, "App Settings", 0,SettingsData.VIEWTYPE_NORMAL));
 		mSettingsList.add(new SettingsData(SettingsData.ITEM, "Download only on Wifi", 0,SettingsData.VIEWTYPE_TOGGLEBUTTON));
 		if(ApplicationSettings.ENABLE_SHOW_PLAYER_LOGS_SETTINGS){
