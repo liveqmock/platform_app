@@ -402,6 +402,8 @@ public class CardVideoPlayer implements PlayerListener {
 						e.printStackTrace();
 					}	
 				}
+				if(!lastWatchedStatus)
+					myplexapplication.getUserProfileInstance().lastVisitedCardData.add(mData);
 				Util.showAdultToast(mContext.getString(R.string.adultwarning), mData, mContext);
 				Uri uri ;
 //				uri = Uri.parse("rtsp://46.249.213.87:554/playlists/bollywood-action_qcif.hpl.3gp");
