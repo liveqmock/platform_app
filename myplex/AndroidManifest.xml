@@ -24,6 +24,7 @@
 
 	 <permission android:name="com.apalya.myplex.permission.C2D_MESSAGE" android:protectionLevel="signature" />
     <uses-permission android:name="com.apalya.myplex.permission.C2D_MESSAGE" />
+   
     
     <application
         android:name="com.apalya.myplex.data.myplexapplication"

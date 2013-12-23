@@ -769,7 +769,14 @@ public class CardDetails extends BaseFragment implements
 		data.reset();
 		data.requestType = CardExplorerData.REQUEST_SIMILARCONTENT;
 		data.searchQuery = mCardData._id;
-		//data.mMasterEntries = (ArrayList<CardData>) mCardData.similarContent.values;
+		// This line is responsible for fetching last viewed item
+//		data.mMasterEntries = (ArrayList<CardData>) mCardData.similarContent.values;
+		//o means it is last watched
+		if(mCardData._id.equals("0")){
+			data.mMasterEntries = (ArrayList<CardData>) mCardData.similarContent.values;
+		}/*`else{
+			data.mMasterEntries = (ArrayList<CardData>) mCardData.similarContent.values;
+		}*/
 		mMainActivity.bringFragment(fragment);
 		mMainActivity.setActionBarTitle("similar content");
 

@@ -240,11 +240,17 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		mLoginText.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-
+				mLoginText.setEnabled(false);
+				mLoginText.postDelayed(new Runnable() {					
+					@Override
+					public void run() 
+					{
+						mLoginText.setEnabled(true);
+					}
+				}, 3000);
 				ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(mLoginText, "alpha", 0.5f, 1f);
 				fadeAnim2.setDuration(300);
-				fadeAnim2.start();
-				
+				fadeAnim2.start();				
 				
 				if(mDevInfo.getClientKey()!=null)
 				{
@@ -294,6 +300,13 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		mLetMeIn.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				mLetMeIn.setEnabled(false);
+				mLetMeIn.postDelayed(new Runnable() {					
+					@Override
+					public void run() {
+						mLetMeIn.setEnabled(true);
+					}
+				}, 3000);
 				ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(mLetMeIn, "alpha", 0.5f, 1f);
 				fadeAnim2.setDuration(300);
 				fadeAnim2.start();
@@ -1034,7 +1047,14 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		fadeAnim2.start();
 
 		if (view.getId() == R.id.fb){
-
+			mFacebookButton.setEnabled(false);
+			mFacebookButton.postDelayed(new Runnable() {					
+				@Override
+				public void run() 
+				{
+					mFacebookButton.setEnabled(true);
+				}
+			}, 3000);
 			if(mDevInfo.getClientKey()!=null)
 			{
 				
@@ -1066,6 +1086,13 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 			//if(!AccountUtils.isAuthenticated(LoginActivity.this))
 			{
+				mGoogleLogin.setEnabled(false);
+				mGoogleLogin.postDelayed(new Runnable() {					
+					@Override
+					public void run() {
+						mGoogleLogin.setEnabled(true);
+					}
+				}, 3000);
 				if(mDevInfo.getClientKey()!=null)
 				{
 					// Verifies the proper version of Google Play Services exists on the device.
@@ -1078,6 +1105,9 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 							param1.put(Analytics.LOGIN_GOOGLE,Analytics.LOGIN_CLICK);
 							//Analytics.trackEvent(Analytics.loginGoogle,param1,true);
 							Analytics.trackEvent(Analytics.EVENT_LOGIN_SOCIAL,param1);
+							if(mPlusClient.isConnected()){
+								mPlusClient.clearDefaultAccount();
+							}
 							mPlusClient.connect();
 						}
 					}

@@ -178,8 +178,18 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 			mSubmit.setOnClickListener(new OnClickListener() {
 
 				@Override
-				public void onClick(View v) {
-
+				public void onClick(View v) {		
+					
+					mSubmit.setEnabled(false);
+					mSubmit.setClickable(false);
+					mSubmit.postDelayed(new Runnable() {						
+						@Override
+						public void run() {
+							mSubmit.setEnabled(true);
+							mSubmit.setClickable(true);
+						}
+					}, 3000);
+					
 					ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(mSubmit, "alpha", 0.5f, 1f);
 					fadeAnim2.setDuration(800);
 					fadeAnim2.start();
@@ -319,6 +329,16 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 
 				@Override
 				public void onClick(View v) {
+					
+					mSubmit.setEnabled(false);
+					mSubmit.setClickable(false);
+					mSubmit.postDelayed(new Runnable() {						
+						@Override
+						public void run() {
+							mSubmit.setEnabled(true);
+							mSubmit.setClickable(true);
+						}
+					}, 3000);
 
 					ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(findViewById(v.getId()), "alpha", 0.5f, 1f);
 					fadeAnim2.setDuration(800);

@@ -12,8 +12,10 @@ import android.app.DownloadManager;
 import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
+import android.location.Location;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
@@ -25,15 +27,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
-import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.apalya.myplex.MainActivity;
 import com.apalya.myplex.MainBaseOptions;
 import com.apalya.myplex.R;
 import com.apalya.myplex.data.CardData;
@@ -41,21 +40,22 @@ import com.apalya.myplex.data.CardDataImagesItem;
 import com.apalya.myplex.data.CardDataPurchaseItem;
 import com.apalya.myplex.data.CardDataRelatedMultimediaItem;
 import com.apalya.myplex.data.CardDownloadData;
-import com.apalya.myplex.data.CardDownloadedDataList;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.media.PlayerListener;
 import com.apalya.myplex.media.VideoViewExtn;
 import com.apalya.myplex.media.VideoViewPlayer;
 import com.apalya.myplex.media.VideoViewPlayer.StreamType;
+import com.apalya.myplex.utils.Analytics;
+import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MediaUtil;
 import com.apalya.myplex.utils.MediaUtil.MediaUtilEventListener;
-import com.apalya.myplex.utils.WidevineDrm.Settings;
-import com.apalya.myplex.utils.Analytics;
-import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
-import com.apalya.myplex.utils.WidevineDrm;
+import com.apalya.myplex.utils.WidevineDrm.Settings;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient;
+import com.google.android.gms.location.LocationClient;
 
 public class CardVideoPlayer implements PlayerListener {
 	private Context mContext;
@@ -88,6 +88,8 @@ public class CardVideoPlayer implements PlayerListener {
 	private boolean mTrailerAvailable = false;
 	
 	private static final String TAG = "CardVideoPlayer";
+//	private Location location;
+//	private LocationClient locationClient;
 	
 
 	public void setFullScreenListener(PlayerFullScreen mListener){
@@ -107,6 +109,8 @@ public class CardVideoPlayer implements PlayerListener {
 		this.mContext = context;
 		this.mData = data;
 		
+//		locationClient =  new LocationClient(mContext,new ConnectionCallbacks(),new ConnectionFailedCallBack());
+//		locationClient.connect();	
 		
 		if(mData !=null && mData.relatedMultimedia !=null &&
 				mData.relatedMultimedia.values !=null
@@ -263,6 +267,7 @@ public class CardVideoPlayer implements PlayerListener {
 
 		}
 	};
+	private boolean lastWatchedStatus = false;
 
 	public void closePlayer() {
 		mPlayerState = PLAYER_STOPPED; 
@@ -304,6 +309,10 @@ public class CardVideoPlayer implements PlayerListener {
 //			Util.showToast(mContext, "Your country is not allowed for this content.",Util.TOAST_TYPE_ERROR);
 //			return;
 //		}
+		
+//		location = locationClient.getLastLocation();
+//		if(location!=null)
+//			Log.d("amlan",location.getLatitude()+":"+location.getLongitude());
 		
 		mPlayButton.setVisibility(View.INVISIBLE);
 		mTrailerButton.setVisibility(View.INVISIBLE);
@@ -393,6 +402,8 @@ public class CardVideoPlayer implements PlayerListener {
 						e.printStackTrace();
 					}	
 				}
+				if(!lastWatchedStatus)
+					myplexapplication.getUserProfileInstance().lastVisitedCardData.add(mData);
 				Util.showAdultToast(mContext.getString(R.string.adultwarning), mData, mContext);
 				Uri uri ;
 //				uri = Uri.parse("rtsp://46.249.213.87:554/playlists/bollywood-action_qcif.hpl.3gp");
@@ -429,7 +440,7 @@ public class CardVideoPlayer implements PlayerListener {
 			}
 		});
 
-		boolean lastWatchedStatus=false;
+//		/*boolean*/ lastWatchedStatus=false;
 		for(CardData data:myplexapplication.getUserProfileInstance().lastVisitedCardData)
 		{
 			if(data._id.equalsIgnoreCase(mData._id))
@@ -437,8 +448,8 @@ public class CardVideoPlayer implements PlayerListener {
 				lastWatchedStatus=true;
 			}
 		}
-		if(!lastWatchedStatus)
-			myplexapplication.getUserProfileInstance().lastVisitedCardData.add(mData);
+		/*if(!lastWatchedStatus)
+			myplexapplication.getUserProfileInstance().lastVisitedCardData.add(mData);*/
 
 		String expiryTime=null;
 		boolean allowPlaying=true;
@@ -557,6 +568,18 @@ public class CardVideoPlayer implements PlayerListener {
 	        }
 	      }
 	}
+	class ConnectionCallbacks implements GooglePlayServicesClient.ConnectionCallbacks {		
+		@Override
+		public void onDisconnected() {
+		}		
+		@Override
+		public void onConnected(Bundle arg0) {}
+	};
+	class ConnectionFailedCallBack implements GooglePlayServicesClient.OnConnectionFailedListener{
+		@Override
+		public void onConnectionFailed(ConnectionResult arg0) {			
+		}	
+	}
 private void playVideoFile(CardDownloadData mDownloadData){
 
 	drmLicenseType="lp";
@@ -620,6 +643,13 @@ private void playVideoFile(CardDownloadData mDownloadData){
 //			Util.showToast(mContext, "Your country is not allowed for this content.",Util.TOAST_TYPE_ERROR);
 //			return;
 //		}
+		for(CardData data:myplexapplication.getUserProfileInstance().lastVisitedCardData)
+		{
+			if(data._id.equalsIgnoreCase(mData._id))
+			{
+				lastWatchedStatus=true;
+			}
+		}
 		
 		mPlayButton.setVisibility(View.INVISIBLE);
 		mTrailerButton.setVisibility(View.INVISIBLE);
@@ -665,6 +695,8 @@ private void playVideoFile(CardDownloadData mDownloadData){
 					Util.showToast(mContext, "No url to play.",Util.TOAST_TYPE_ERROR);
 					return;
 				}
+				if(!lastWatchedStatus)
+					myplexapplication.getUserProfileInstance().lastVisitedCardData.add(mData);
 				Uri uri ;
 //				uri = Uri.parse("rtsp://46.249.213.87:554/playlists/bollywood-action_qcif.hpl.3gp");
 //				uri = Uri.parse("http://59.162.166.211:8080/player/3G_H264_320x240_600kbps.3gp");
@@ -920,6 +952,8 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			mPlayerStatusListener.playerStatusUpdate("Play complete :: ");
 		}
 		closePlayer();
+		
+//		locationClient.disconnect();
 	}
 	@Override
 	public void onDrmError(){
