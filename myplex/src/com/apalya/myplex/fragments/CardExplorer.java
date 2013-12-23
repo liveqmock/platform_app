@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +33,7 @@ import android.widget.AbsListView;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -605,11 +607,11 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			}
 			
 			AlertDialogUtil.showAlert(mContext, msg, "cancel", "discover trending content?", this);
-			
 			//Util.showToast(getContext(),"No data found,Please try again.",Util.TOAST_TYPE_INFO);
 //			Toast.makeText(getContext(), "No data found,Please try again.", Toast.LENGTH_SHORT).show();
 		}
 	}
+	
 	private void prepareFilterData() {
 		List<FilterMenudata> filteroptions = new ArrayList<FilterMenudata>();
 		List<String> tempList = new ArrayList<String>();
@@ -1071,7 +1073,16 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 
 	@Override
 	public void onDialogOption1Click() {
-		// TODO Auto-generated method stub
+		try{
+			//View mRootView = inflater.inflate(R.layout.cardbrowsing, container, false);
+			DrawerLayout  mDrawerLayout = (DrawerLayout)  getActivity().findViewById(R.id.drawer_layout);
+ 			ListView mDrawerList = (ListView) getActivity().findViewById(R.id.left_drawer);
+ 			mDrawerLayout.openDrawer(mDrawerList);
+		}catch(Exception e)
+		{
+			e.printStackTrace();
+			Log.e(TAG, e.toString());
+		}
 		
 	}
 }
