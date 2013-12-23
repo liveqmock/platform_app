@@ -27,15 +27,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
-import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.apalya.myplex.MainActivity;
 import com.apalya.myplex.MainBaseOptions;
 import com.apalya.myplex.R;
 import com.apalya.myplex.data.CardData;
@@ -43,24 +40,21 @@ import com.apalya.myplex.data.CardDataImagesItem;
 import com.apalya.myplex.data.CardDataPurchaseItem;
 import com.apalya.myplex.data.CardDataRelatedMultimediaItem;
 import com.apalya.myplex.data.CardDownloadData;
-import com.apalya.myplex.data.CardDownloadedDataList;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.media.PlayerListener;
 import com.apalya.myplex.media.VideoViewExtn;
 import com.apalya.myplex.media.VideoViewPlayer;
 import com.apalya.myplex.media.VideoViewPlayer.StreamType;
+import com.apalya.myplex.utils.Analytics;
+import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MediaUtil;
 import com.apalya.myplex.utils.MediaUtil.MediaUtilEventListener;
-import com.apalya.myplex.utils.WidevineDrm.Settings;
-import com.apalya.myplex.utils.Analytics;
-import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
-import com.apalya.myplex.utils.WidevineDrm;
+import com.apalya.myplex.utils.WidevineDrm.Settings;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
-import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.location.LocationClient;
 
 public class CardVideoPlayer implements PlayerListener {
@@ -94,8 +88,8 @@ public class CardVideoPlayer implements PlayerListener {
 	private boolean mTrailerAvailable = false;
 	
 	private static final String TAG = "CardVideoPlayer";
-	private Location location;
-	private LocationClient locationClient;
+//	private Location location;
+//	private LocationClient locationClient;
 	
 
 	public void setFullScreenListener(PlayerFullScreen mListener){
@@ -115,8 +109,8 @@ public class CardVideoPlayer implements PlayerListener {
 		this.mContext = context;
 		this.mData = data;
 		
-		locationClient =  new LocationClient(mContext,new ConnectionCallbacks(),new ConnectionFailedCallBack());
-		locationClient.connect();	
+//		locationClient =  new LocationClient(mContext,new ConnectionCallbacks(),new ConnectionFailedCallBack());
+//		locationClient.connect();	
 		
 		if(mData !=null && mData.relatedMultimedia !=null &&
 				mData.relatedMultimedia.values !=null
@@ -316,9 +310,9 @@ public class CardVideoPlayer implements PlayerListener {
 //			return;
 //		}
 		
-		location = locationClient.getLastLocation();
-		if(location!=null)
-			Log.d("amlan",location.getLatitude()+":"+location.getLongitude());
+//		location = locationClient.getLastLocation();
+//		if(location!=null)
+//			Log.d("amlan",location.getLatitude()+":"+location.getLongitude());
 		
 		mPlayButton.setVisibility(View.INVISIBLE);
 		mTrailerButton.setVisibility(View.INVISIBLE);
@@ -957,7 +951,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		}
 		closePlayer();
 		
-		locationClient.disconnect();
+//		locationClient.disconnect();
 	}
 	@Override
 	public void onDrmError(){
