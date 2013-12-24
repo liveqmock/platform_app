@@ -527,6 +527,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			screenName="similarcontent for" +mData.searchQuery;
 			Log.d(TAG,"query"+mData.searchQuery);
 			if(mData.searchQuery.equals("0")){
+				mMainActivity.hideActionBarProgressBar();
+				mMainActivity.setActionBarTitle("last watched");
 				return;
 			}
 			requestUrl = ConsumerApi.getSimilarContent(mData.searchQuery,ConsumerApi.LEVELDYNAMIC);
@@ -544,7 +546,11 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 //		mVolleyRequest.printLogs(true);
 //		myReg.setShouldCache(true);
 		Log.d(TAG,"Min Request:"+requestUrl);
-		queue.add(mVolleyRequest);
+		if(requestUrl.equals("0") || (requestUrl.length()==0)){
+			mMainActivity.hideActionBarProgressBar();
+		}else{
+			queue.add(mVolleyRequest);
+		}
 	}
 	
 	private Response.Listener<String> deviceMinSuccessListener() {
