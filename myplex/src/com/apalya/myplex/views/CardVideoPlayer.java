@@ -548,7 +548,7 @@ public class CardVideoPlayer implements PlayerListener {
 								mPlayerStatusListener.playerStatusUpdate("Download Completed and file doesn't exists, starting player.....");
 							}
 							Util.removeDownload(mDownloadData.mDownloadId, mContext);
-							MediaUtil.getVideoUrl(mData._id,qualityType,streamingType,isESTPackPurchased);
+							MediaUtil.getVideoUrl(mData._id,qualityType,streamingType,isESTPackPurchased,ConsumerApi.STREAMINGFORMATHLS);
 						}
 					}
 				}
@@ -556,7 +556,7 @@ public class CardVideoPlayer implements PlayerListener {
 					if(mPlayerStatusListener != null){
 						mPlayerStatusListener.playerStatusUpdate("Download Details for this content not available, so requesting url...");
 					}
-					MediaUtil.getVideoUrl(mData._id,qualityType,streamingType,isESTPackPurchased);
+					MediaUtil.getVideoUrl(mData._id,qualityType,streamingType,isESTPackPurchased,ConsumerApi.STREAMINGFORMATHLS);
 				}
 			}
 	        else 
@@ -564,7 +564,7 @@ public class CardVideoPlayer implements PlayerListener {
 	        	if(mPlayerStatusListener != null){
 					mPlayerStatusListener.playerStatusUpdate("Download Details not available, so requesting url...");
 				}
-	        	MediaUtil.getVideoUrl(mData._id,qualityType,streamingType,isESTPackPurchased);	
+	        	MediaUtil.getVideoUrl(mData._id,qualityType,streamingType,isESTPackPurchased,ConsumerApi.STREAMINGFORMATHLS);	
 	        }
 	      }
 	}
@@ -730,7 +730,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 				});
 			}
 		});
-        MediaUtil.getVideoUrl(contentId,qualityType,streamingType,isESTPackPurchased);
+        MediaUtil.getVideoUrl(contentId,qualityType,streamingType,isESTPackPurchased,ConsumerApi.STREAMINGFORMATRTSP);
 	}
 
 	public View CreateTabletPlayerView(View parentLayout) {

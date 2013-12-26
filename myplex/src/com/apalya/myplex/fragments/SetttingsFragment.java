@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import android.content.Intent;
+import android.drm.DrmUtils;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +25,7 @@ import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.SettingsData;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.Util;
+import com.apalya.myplex.utils.WidevineDrm;
 import com.apalya.myplex.utils.MessagePost.MessagePostCallback;
 import com.apalya.myplex.views.PinnedSectionListView;
 import com.apalya.myplex.views.RatingDialog;
@@ -38,6 +40,10 @@ public class SetttingsFragment extends BaseFragment {
 	private String TANDC = "Terms & Conditions";
 	private String PRIVACYPOLIY ="Privacy Policy";
 	private String HELP = "Help";
+	public static final String DRM_STATUS_STRING="WVDRM Status";
+	public static final String DRM_LEVAL_STRING="WVDRM StatusKey";
+	public static final String ROOT_STATUS_STRING="Root Status";
+	
 	private int debug_mode_counter=0;
 
 	@Override
@@ -119,6 +125,12 @@ public class SetttingsFragment extends BaseFragment {
 		mSettingsList.add(new SettingsData(SettingsData.ITEM, "Download only on Wifi", 0,SettingsData.VIEWTYPE_TOGGLEBUTTON));
 		if(ApplicationSettings.ENABLE_SHOW_PLAYER_LOGS_SETTINGS){
 			mSettingsList.add(new SettingsData(SettingsData.ITEM, "Show player logs", 0,SettingsData.VIEWTYPE_TOGGLEBUTTON));
+			WidevineDrm widevineDRM= new WidevineDrm(mContext);
+			String drmStatus= widevineDRM.isProvisionedDevice()?" (Available)":" (Not Available)";
+			mSettingsList.add(new SettingsData(SettingsData.ITEM, DRM_STATUS_STRING +drmStatus , 0,SettingsData.VIEWTYPE_NORMAL));
+//			mSettingsList.add(new SettingsData(SettingsData.ITEM, DRM_LEVAL_STRING + " : "+widevineDRM.getWVLeval() , 0,SettingsData.VIEWTYPE_NORMAL));
+//			mSettingsList.add(new SettingsData(SettingsData.ITEM, ROOT_STATUS_STRING, 0,SettingsData.VIEWTYPE_NORMAL));
+			
 		}
 		mSettingsList.add(new SettingsData(SettingsData.SECTION, "myplex", 0,SettingsData.VIEWTYPE_NORMAL));
 		mSettingsList.add(new SettingsData(SettingsData.ITEM, FEEDBACK, 0,SettingsData.VIEWTYPE_NORMAL));

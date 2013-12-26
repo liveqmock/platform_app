@@ -43,7 +43,7 @@ public class WidevineDrm {
 	private final static long DEVICE_IS_PROVISIONED = 0;
 	private final static long DEVICE_IS_NOT_PROVISIONED = 1;
 	private final static long DEVICE_IS_PROVISIONED_SD_ONLY = 2;
-	private long mWVDrmInfoRequestStatusKey = DEVICE_IS_PROVISIONED;
+	private long mWVDrmInfoRequestStatusKey = -1;
 
 	public StringBuffer logBuffer = new StringBuffer();
 
@@ -178,8 +178,15 @@ public class WidevineDrm {
 	}
 	
 	public boolean isProvisionedDevice() {
+		if(mWVDrmInfoRequestStatusKey == -1){
+			registerPortal(WidevineDrm.Settings.PORTAL_NAME);
+		}
 		return ((mWVDrmInfoRequestStatusKey == DEVICE_IS_PROVISIONED) ||
 				(mWVDrmInfoRequestStatusKey == DEVICE_IS_PROVISIONED_SD_ONLY));
+	}
+	
+	public long getWVLeval() {
+		return mWVDrmInfoRequestStatusKey;
 	}
 
 	public void registerPortal(String portal) {

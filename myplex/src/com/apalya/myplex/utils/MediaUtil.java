@@ -2,6 +2,7 @@ package com.apalya.myplex.utils;
 
 import java.io.IOException;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.android.volley.RequestQueue;
@@ -26,12 +27,16 @@ public class MediaUtil {
 	private static String sQualityType;
 	private static boolean sDownloadStatus;
 	private static String sStreamingType;
+	private static String sStreamFormat=ConsumerApi.STREAMINGFORMATHLS;
 
-	public static void getVideoUrl(String aContentId,String bitRate,String streamingType, boolean isESTPackPurchased){
+	public static void getVideoUrl(String aContentId,String bitRate,String streamingType, boolean isESTPackPurchased, String streamFormat){
 		sQualityType=bitRate;
 		sDownloadStatus=isESTPackPurchased;
 		sStreamingType = streamingType;
 		String url=ConsumerApi.getVideosDetail(aContentId);
+		if(!TextUtils.isEmpty(streamFormat)){
+			sStreamFormat=streamFormat;
+		}
 		getContentUrlReq(url);
 	}
 	private static void getContentUrlReq(String aVideoUrl) {
@@ -109,7 +114,7 @@ public class MediaUtil {
 									&& video.link != null
 									&& video.format != null
 									&& (video.format.equalsIgnoreCase(ConsumerApi.STREAMINGFORMATHTTP) ||
-											video.format.equalsIgnoreCase(ConsumerApi.STREAMINGFORMATHLS))
+											video.format.equalsIgnoreCase(sStreamFormat))
 									&& video.type !=null
 									&& video.type.equalsIgnoreCase(sStreamingType)) {
 								Log.i(TAG, video.link);
