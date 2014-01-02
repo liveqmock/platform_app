@@ -29,7 +29,7 @@ public class myplexapplication extends Application {
 	 *
 	 *   Paste it below (where you see "YOUR API TOKEN")
 	 */
-	public static final String MIXPANEL_API_TOKEN = "1c663d8de79a40b4c89b242d828fc475";
+	public static final String MIXPANEL_API_TOKEN = "20541460115650ad4e07ab10de528e81";
 
 	/*
 	 * In order for your app to receive push notifications, you will need to enable
