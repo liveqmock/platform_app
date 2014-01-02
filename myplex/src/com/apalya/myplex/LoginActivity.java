@@ -814,6 +814,20 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 						com.facebook.Response response) {
 					if(user!=null)
 					{
+						if(user.getProperty("email") == null ){
+							Session session = Session.getActiveSession();
+							
+							if(session != null ){
+								System.out.println("LoginActivity.onClickLogin()");
+								session.closeAndClearTokenInformation();
+								session = new Session(LoginActivity.this);
+								Session.setActiveSession(session);
+								Util.showToast(LoginActivity.this, "Login failed",Util.TOAST_TYPE_ERROR);
+								dismissProgressBar();
+							}
+							return;
+						}
+						
 						fbUserId=user.getId();
 						mUserInfo.setName(user.getName());
 						mUserInfo.setUserEmail(user.getProperty("email").toString());
@@ -859,6 +873,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 						}
 						else
 						{
+							dismissProgressBar();
 							Util.showToast(LoginActivity.this, response.getError().getErrorMessage(),Util.TOAST_TYPE_ERROR);
 //							Util.showToast(response.getError().getErrorMessage(), LoginActivity.this);
 						}
@@ -1031,6 +1046,12 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 	private void onClickLogin() {
 		Session session = Session.getActiveSession();
+		
+		if(session != null && session.isClosed()){			
+			session = new Session(this);
+			Session.setActiveSession(session);
+		}
+		
 		if (!session.isOpened() && !session.isClosed()) {
 			session.openForRead(new Session.OpenRequest(this)
 			.setPermissions(Arrays.asList("basic_info","email","read_friendlists","user_about_me","friends_about_me","user_hometown"))

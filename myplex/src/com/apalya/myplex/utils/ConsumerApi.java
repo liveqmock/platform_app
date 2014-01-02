@@ -188,4 +188,10 @@ public class ConsumerApi {
 				+ SLASH + contentID + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY  + AMPERSAND
 		        + LEVEL + level + AMPERSAND+COUNT;
 	}
+	
+	public static String getUnregisterDevice()
+	{
+		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + "unregisterDevice"
+				+ SLASH ;
+	}
 }

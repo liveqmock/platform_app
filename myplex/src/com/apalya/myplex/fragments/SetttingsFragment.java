@@ -24,6 +24,7 @@ import com.apalya.myplex.data.ApplicationSettings;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.SettingsData;
 import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.utils.DeviceRegUtil;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.utils.WidevineDrm;
 import com.apalya.myplex.utils.MessagePost.MessagePostCallback;
@@ -43,6 +44,7 @@ public class SetttingsFragment extends BaseFragment {
 	public static final String DRM_STATUS_STRING="WVDRM Status";
 	public static final String DRM_LEVAL_STRING="WVDRM StatusKey";
 	public static final String ROOT_STATUS_STRING="Root Status";
+	public static final String DERIGISTER_DEVICE="DeRegister Device";
 	
 	private int debug_mode_counter=0;
 
@@ -72,6 +74,19 @@ public class SetttingsFragment extends BaseFragment {
 					}
 					
 					debug_mode_counter ++;
+					return;
+				}
+				
+				if(data.type == SettingsData.ITEM && data.mSettingName.equalsIgnoreCase(DERIGISTER_DEVICE)){	
+					
+					DeviceRegUtil deviceRegUtil = new DeviceRegUtil(mContext);
+					deviceRegUtil.unregister();
+					return;
+				}
+				
+				if (data.type == SettingsData.ITEM
+						&& data.mSettingName
+								.contains(DRM_STATUS_STRING)) {					
 					return;
 				}
 	
@@ -130,6 +145,7 @@ public class SetttingsFragment extends BaseFragment {
 			mSettingsList.add(new SettingsData(SettingsData.ITEM, DRM_STATUS_STRING +drmStatus , 0,SettingsData.VIEWTYPE_NORMAL));
 //			mSettingsList.add(new SettingsData(SettingsData.ITEM, DRM_LEVAL_STRING + " : "+widevineDRM.getWVLeval() , 0,SettingsData.VIEWTYPE_NORMAL));
 //			mSettingsList.add(new SettingsData(SettingsData.ITEM, ROOT_STATUS_STRING, 0,SettingsData.VIEWTYPE_NORMAL));
+			mSettingsList.add(new SettingsData(SettingsData.ITEM, DERIGISTER_DEVICE , 0,SettingsData.VIEWTYPE_NORMAL));
 			
 		}
 		mSettingsList.add(new SettingsData(SettingsData.SECTION, "myplex", 0,SettingsData.VIEWTYPE_NORMAL));
