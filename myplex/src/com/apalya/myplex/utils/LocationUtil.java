@@ -68,7 +68,9 @@ public class LocationUtil
 	 * @return the String as params  and <b>""(Empty String or in case of )</b> if location service is not enabled. 
 	 */
 	public String  getAddressParams(){
-		
+		if(!isLocationEnabled(context)){
+			return params;
+		}
 		getLocation();
 		if(location!=null){
 			try {
@@ -85,8 +87,10 @@ public class LocationUtil
 	}
 	private  Location getLocation() 
 	{
-		if(client.isConnected())
-			location = client.getLastLocation();
+		if(client!=null){
+			if(client.isConnected())
+				location = client.getLastLocation();
+		}
 		return location;
 	}
 	
