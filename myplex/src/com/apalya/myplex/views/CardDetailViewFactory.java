@@ -161,11 +161,11 @@ public class CardDetailViewFactory {
 	}
 
 	public void scrollReachedEnd(){
-		if(!mContext.getResources().getBoolean(R.bool.isTablet)){
+		/*if(!mContext.getResources().getBoolean(R.bool.isTablet)){
 			if(!mRefreshInProgress){
 				refreshSection();
 			}
-		}
+		}*/
 	}
 	public static final int  COMMENTSECTION_COMMENTS = 101;
 	public static final int COMMENTSECTION_REVIEW = 102;
@@ -484,8 +484,9 @@ public class CardDetailViewFactory {
 //		expand.setOnClickListener(mOnMultiMediaExpand);
 //		Util.showFeedback(expand);
 		LinearLayout contentLayout = (LinearLayout)v.findViewById(R.id.carddetailmedia_contentlayout);
-		
-		View simillarView  = createSimillarContent();
+		// This line is making unnessary HTTP request so no need to create a http request.
+//		View simillarView  = createSimillarContent();
+		View simillarView  = createDummySimilarContent(); 
 		if(simillarView != null){
 			contentLayout.addView(simillarView);
 			mMultimedia = simillarView;
@@ -511,7 +512,44 @@ public class CardDetailViewFactory {
 		if(itemsAdded){
 			return v;
 		}
-		return null;
+		return v;
+	}
+	private View createDummySimilarContent() 
+	{
+		View similarContentDummyView = mInflator.inflate(R.layout.carddetails_fullmultimediaitem, null);
+		
+		TextView groupname = (TextView)similarContentDummyView.findViewById(R.id.carddetailmultimedia_groupname);
+		groupname.setText(mContext.getString(R.string.similarcontent));		
+		groupname.setTypeface(FontUtil.Roboto_Medium);
+		
+		TextView secondaryname = (TextView)similarContentDummyView.findViewById(R.id.carddetailmultimedia_secondaryname);
+		secondaryname.setTypeface(FontUtil.Roboto_Medium);
+		ImageView similarImage  = (ImageView)similarContentDummyView.findViewById(R.id.carddetailmultimedia_stackview);
+		String link  = mData.images.values.get(0).link;		
+		if(link!=null){
+			CircleImageLoader imageLoader = new CircleImageLoader();
+			imageLoader.loadImage(mContext, similarImage, link);
+		}
+		if(mData._id.equalsIgnoreCase("0"))
+		{
+			groupname.setText(mContext.getString(R.string.lastwatchedcontent));
+		}
+		else
+		{
+			groupname.setText(mContext.getString(R.string.similarcontent));	
+		}
+	
+		similarContentDummyView.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				if(mListener != null){
+					mListener.onSimilarContentAction();
+				}
+			}
+		});
+		
+		return similarContentDummyView;
 	}
 	private void addSpace(ViewGroup v,int space){
 		Space gap = new Space(mContext);

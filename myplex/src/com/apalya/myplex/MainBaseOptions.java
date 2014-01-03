@@ -43,4 +43,5 @@ public interface MainBaseOptions {
 	public void searchButtonClicked();
 
 	public void setSearchViewVisibilty(int visibility);
+	public void setUpShareButton(String toBeshared);
 }

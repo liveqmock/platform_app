@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.apalya.myplex.adapters.NavigationOptionsMenuAdapter;
 import com.apalya.myplex.cache.CacheHolder;
+import com.apalya.myplex.utils.LocationUtil;
 import com.apalya.myplex.utils.MyVolley;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 
@@ -55,6 +56,7 @@ public class myplexapplication extends Application {
 	 * You can take a look at this application's AndroidManifest.xml file for an example of what is needed.
 	 */
 	public static final String ANDROID_PUSH_SENDER_ID = "976964091787";
+	public static LocationUtil locationUtil;
 
 	@Override
 	public void onCreate() {
@@ -65,6 +67,8 @@ public class myplexapplication extends Application {
 	}
 	private void init() {
 		MyVolley.init(this);
+		locationUtil = LocationUtil.getInstance(this);
+		locationUtil.init();
 	}
 	public static ApplicationConfig getApplicationConfig(){
 		if(mDisplayInfo == null){

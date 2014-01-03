@@ -1,18 +1,29 @@
 package com.apalya.myplex.utils;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.Response.ErrorListener;
+import com.android.volley.Response.Listener;
 import com.android.volley.toolbox.StringRequest;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDataVideos;
 import com.apalya.myplex.data.CardDataVideosItem;
 import com.apalya.myplex.data.CardResponseData;
+import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.media.PlayerListener;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
@@ -22,6 +33,7 @@ public class MediaUtil {
 	
 	public interface MediaUtilEventListener{
 		public void urlReceived(boolean aStatus,String url, String message , String statusCode);
+		public void lastPausedTimeFetched(int ellapseTime);
 	}
 	public static MediaUtilEventListener urlEventListener;
 	private static String sQualityType;
@@ -34,6 +46,13 @@ public class MediaUtil {
 		sDownloadStatus=isESTPackPurchased;
 		sStreamingType = streamingType;
 		String url=ConsumerApi.getVideosDetail(aContentId);
+		String url1 = ConsumerApi.getPlayerEventDetails(aContentId, "Pause");
+		String location_params  = myplexapplication.locationUtil.getVideoUrlParams();
+		Log.d("amlan","got location ="+location_params);
+		if(location_params.length()>0){
+			Log.d(TAG, location_params);
+			url += location_params; 
+		}
 		if(!TextUtils.isEmpty(streamFormat)){
 			sStreamFormat=streamFormat;
 		}
@@ -62,6 +81,8 @@ public class MediaUtil {
 	}
 	private static Response.Listener<String> getVideoUrlSuccessListener() {
 		return new Response.Listener<String>() {
+			private int elapsedTime ;
+
 			@Override
 			public void onResponse(String response) {
 				Log.d(TAG, response);
@@ -102,7 +123,7 @@ public class MediaUtil {
 					for(CardDataVideosItem video:data.videos.values){
 						//if(sDownloadStatus)
 						{
-							if(video.profile != null && video.profile.equalsIgnoreCase(sQualityType) && video.link != null && video.type.equalsIgnoreCase(ConsumerApi.STREAMDOWNLOAD)){
+							if(video.profile != null && video.profile.equalsIgnoreCase(sQualityType) && video.link != null && video.type.equalsIgnoreCase(ConsumerApi.STREAMDOWNLOAD)){								
 								sendResponse(true,video.link,null,null);
 								return;
 							}
@@ -119,6 +140,7 @@ public class MediaUtil {
 									&& video.type.equalsIgnoreCase(sStreamingType)) {
 								Log.i(TAG, video.link);
 								url=video.link;
+								elapsedTime  = video.elapsedTime;
 								//sendResponse(true, video.link);
 								//return;
 							}
@@ -128,6 +150,7 @@ public class MediaUtil {
 				if(url.length()>0)
 				{
 					sendResponse(true, url, null,null);
+					urlEventListener.lastPausedTimeFetched(elapsedTime);
 					return;
 				}
 				sendResponse(false,null, null,null);
@@ -151,4 +174,85 @@ public class MediaUtil {
 	public static void setUrlEventListener(MediaUtilEventListener aUrlEventListener) {
 		urlEventListener = aUrlEventListener;
 	}
+	/*
+	 *  <p>This method will save the state of a media(like PLAY/PAUSE/STOP/RESUME).
+	 *  This will update the data in the server and while fetching the media data the response will return
+	 *  while the media was paused. 
+	 *  </p>
+	 */
+	public static  boolean savePlayerState(String contentId , int state , final int elapsedTime)
+	{
+		if (state == PlayerListener.STATE_PAUSED) {
+			if (elapsedTime!=0) {
+				String pauseRequestUrl = ConsumerApi.setPlayerEventDetails(contentId, "Pause", elapsedTime);
+				Log.d(TAG, pauseRequestUrl);
+				RequestQueue queue = MyVolley.getRequestQueue();
+				StringRequest pauseRequest = new StringRequest(Request.Method.POST, pauseRequestUrl,
+						new Listener<String>() {
+							@Override
+							public void onResponse(String response) {
+								Log.d(TAG,
+										"successfull upadted in server with response"
+												+ response.toString());
+							}
+						}, new ErrorListener() {
+							@Override
+							public void onErrorResponse(VolleyError error) {
+								Log.d(TAG, "error occured with response"
+										+ error.getLocalizedMessage());
+							}})
+				{
+					@Override
+					protected Map<String, String> getParams()
+							throws AuthFailureError {
+						Map<String, String> params = new HashMap<String, String>();
+						params.put("action", "Pause");
+						params.put("elapsedTime", ""+elapsedTime);
+						return params;
+				}
+			};
+				pauseRequest.setShouldCache(false);
+				queue.add(pauseRequest);
+				return true;
+			} else
+				return false;
+		} else {
+			return false;
+		}
+	}
+	public static void getPlayerState(String contentID ){
+		String url = ConsumerApi.getPlayerEventDetails(contentID, "Pause");
+		RequestQueue queue = MyVolley.getRequestQueue();
+		StringRequest request = new StringRequest(Request.Method.GET, url, ellapseTimeCallBack, new ErrorListener() {
+			@Override
+			public void onErrorResponse(VolleyError error) {
+			}
+		});
+		queue.add(request);
+		
+	}
+	static Listener<String> ellapseTimeCallBack = new Listener<String>() 
+			{
+			private int ellapsedTime = 0;
+			@Override
+			public void onResponse(String response){
+				Log.d(TAG, response);
+				if(response!=null && response.length()>0){
+					try {
+						JSONObject jsonObject = new JSONObject(response);
+						ellapsedTime  =  jsonObject.getInt("elapsedTime");
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}catch (Exception e) {
+						e.printStackTrace();
+					}
+					Log.d(TAG, "Ellapsed time is "+ellapsedTime);					
+				}
+				
+					urlEventListener.lastPausedTimeFetched(ellapsedTime);
+//				ELLAPSE_TIME = ellapsedTime;
+					Log.d(TAG,"here we need to fetch the last played status");
+				
+			}
+		};
 }

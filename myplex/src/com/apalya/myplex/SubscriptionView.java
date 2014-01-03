@@ -26,13 +26,12 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.Toast;
 
-import com.apalya.myplex.cache.CacheManager;
 import com.apalya.myplex.cache.InsertionResult;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardResponseData;
 import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.utils.AlertDialogUtil;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FetchCardField;
@@ -40,12 +39,15 @@ import com.apalya.myplex.utils.FetchCardField.FetchComplete;
 import com.apalya.myplex.utils.Util;
 import com.flurry.android.FlurryAgent;
 
-public class SubscriptionView extends Activity {
+public class SubscriptionView extends Activity implements AlertDialogUtil.NoticeDialogListener {
 	private static final String TAG="SubscriptionView";
 	WebView mWebView= null;
 	FbWebViewClient fbwebviewclient= null;
 	private String callbackUrl = new String();
 	private ProgressDialog mProgressDialog = null;
+	private String url;
+	public String status;
+	
 //	http://api.beta.myplex.in/user/v2/billing/callback/evergent/
 	@Override
 	public void onCreate(Bundle savedInstanceState){
@@ -55,7 +57,7 @@ public class SubscriptionView extends Activity {
 		else
 			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-		String url = new String();
+		url = new String();
 		try {
 			Bundle b = this.getIntent().getExtras();
 			url = b.getString("url");
@@ -197,6 +199,12 @@ public class SubscriptionView extends Activity {
 					
 					if(status.equalsIgnoreCase("SUCCESS")){
 						dofinish(ConsumerApi.SUBSCRIPTIONSUCCESS);
+					}else if(status.equalsIgnoreCase("ERR_IN_PROGRESS")){
+						Log.d(TAG,"error is progress");
+						AlertDialogUtil.showAlert(SubscriptionView.this,getResources().getString(R.string.transaction_server_error)
+								,getResources().getString(R.string.retry)
+								, getResources().getString(R.string.cancel)
+								, SubscriptionView.this);
 					}else{
 						Util.showToast(SubscriptionView.this, "Subscription: "+ status,Util.TOAST_TYPE_ERROR);
 						dofinish(ConsumerApi.SUBSCRIPTIONERROR);
@@ -308,5 +316,16 @@ public class SubscriptionView extends Activity {
 			mProgressDialog.dismiss();
 		}
 	}
+	@Override
+	public void onDialogOption1Click() 
+	{
+		mWebView.loadUrl(url+"&force=true");
+	}
+	@Override
+	public void onDialogOption2Click() 
+	{			
+		dofinish(ConsumerApi.SUBSCRIPTIONERROR);
+	}
+
 }
 

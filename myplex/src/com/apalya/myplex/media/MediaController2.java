@@ -249,6 +249,7 @@ public class MediaController2 extends LinearLayout {
 						if(mCustomVideoView != null){
 							mCustomVideoView.onCompletion(mMediaPlayer);
 						}
+						updatePlayerState(PlayerListener.STATE_STOP,0);
 					}
 				}
 			});
@@ -515,6 +516,7 @@ public class MediaController2 extends LinearLayout {
                 mPlayer.pause();
                 updatePausePlay();
             }
+            updatePlayerState(PlayerListener.STATE_STOP,0);
             return true;
         } else if (keyCode == KeyEvent.KEYCODE_VOLUME_DOWN ||
                 keyCode == KeyEvent.KEYCODE_VOLUME_UP) {
@@ -563,12 +565,15 @@ public class MediaController2 extends LinearLayout {
     }
 
     private void doPauseResume() {
-        if (mPlayer.isPlaying()) {
-            mPlayer.pause();
-        } else {
-            mPlayer.start();
-        }
-        updatePausePlay();
+    	if (mPlayer.isPlaying()) {
+    		mPlayer.pause();    		
+    		updatePlayerState(PlayerListener.STATE_PAUSED,mPlayer.getCurrentPosition());
+    	} else {
+    		mPlayer.start();
+    		updatePlayerState(PlayerListener.STATE_PLAYING,mPlayer.getCurrentPosition());
+    	}
+    	updatePausePlay();
+    	        	
     }
 
     // There are two scenarios that can trigger the seekbar listener to trigger:
@@ -597,11 +602,11 @@ public class MediaController2 extends LinearLayout {
         }
 
         public void onProgressChanged(SeekBar bar, int progress, boolean fromuser) {
-            if (!fromuser) {
+//            if (!fromuser) {
                 // We're not interested in programmatically generated changes to
                 // the progress bar's position.
-                return;
-            }
+//                return true;
+//            }
 
             
         }
@@ -716,5 +721,22 @@ public class MediaController2 extends LinearLayout {
         boolean canPause();
         boolean canSeekBackward();
         boolean canSeekForward();
+    }
+    /**
+     *  @param state 
+     *  This method is the callback method for the player state.
+     */
+    public void updatePlayerState(int state,int position)
+    {    
+    	if(mPlayerListener!= null){
+    		int pos = mPlayer.getCurrentPosition()/1000;
+    		mPlayerListener.onStateChanged(state,pos);
+    	}
+    	
+    }
+    public void resumePlay(int ellapseTime){
+    	 long pos = 1000L * ellapseTime ;
+//         mProgress.setProgress( (int) pos);
+         mPlayer.seekTo( (int)pos);
     }
 }

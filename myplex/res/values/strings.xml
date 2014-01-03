@@ -101,7 +101,7 @@
     <string name="icondiscover">&#xE671;</string>
     <string name="iconsettings">&#xF033;</string>
     <string name="iconfriends">&#xE972;</string>
-    <string name="iconlogout">&#x23CF;</string>
+    <string name="iconlogout">&#xEE10;</string>
     <string name="iconrate"></string>
     <string name="iconhome">&#x2302;</string>
     <string name="iconmovie">&#xE8B1;</string>
@@ -137,7 +137,15 @@
     <string name="downloadserror">no downloads yet… \nlet\'s start one, can watch it while downloading itself</string>
     <string name="searcherror">unable to find results … \ntry one of our suggested search terms?</string>
     <string name="purchaseserror">no purchases yet … \nlet\'s change that!</string>
-
+ 
+    <!-- Player Errors -->
+    <string name="must_logged_in">must be logged in to watch movie</string>
+    <string name="login_to_play">login to play</string>
+    <string name="continiue_as_guest">continue as guest</string>
+    <!-- Transaction related errors-->
+    <string name="transaction_server_error">our server thinks this is a duplicate transaction.if you think not, select ‘continue’, otherwise select ‘cancel’ and retry your transaction again in 60 seconds.</string>
+    <string name="retry">retry</string>
+    <string name="cancel">cancel</string>
     
     <string name="clientsecret">ApalyaAndroid</string>
     <!-- URLS -->

@@ -54,6 +54,7 @@ import com.apalya.myplex.data.CardDetailMultiMediaGroup;
 import com.apalya.myplex.data.CardExplorerData;
 import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.media.PlayerListener;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.FavouriteUtil;
 import com.apalya.myplex.utils.FavouriteUtil.FavouriteCallback;
@@ -87,9 +88,9 @@ public class CardDetails extends BaseFragment implements
 	private LinearLayout mCommentsContentLayout;
 
 	private CustomScrollView mScrollView;
-	private RelativeLayout mBottomActionBar;
-	private ImageView mShareButton;
-	private ImageView mFavButton;
+//	private RelativeLayout mBottomActionBar;
+//	private ImageView mShareButton;
+//	private ImageView mFavButton;
 
 	private ProgressBar mProgressBar;
 	private boolean mDescriptionExpanded = false;
@@ -122,18 +123,18 @@ public class CardDetails extends BaseFragment implements
 		mScrollView = (CustomScrollView) rootView
 				.findViewById(R.id.carddetail_scroll_view);
 		mProgressBar =(ProgressBar)rootView.findViewById(R.id.carddetail_progressBar);
-		mBottomActionBar = (RelativeLayout) rootView
+		/*mBottomActionBar = (RelativeLayout) rootView
 				.findViewById(R.id.carddetail_bottomactionbar);
 		if (mCardData._id == null || mCardData._id.equalsIgnoreCase("0")) {
 			mBottomActionBar.setVisibility(View.INVISIBLE);
-		}
-		mShareButton = (ImageView) rootView.findViewById(R.id.carddetail_share);
-		mFavButton = (ImageView) rootView.findViewById(R.id.carddetail_fav);
+		}*/
+//		mShareButton = (ImageView) rootView.findViewById(R.id.carddetail_share);
+//		mFavButton = (ImageView) rootView.findViewById(R.id.carddetail_fav);
 		if (mCardData.currentUserData != null
 				&& mCardData.currentUserData.favorite) {
-			mFavButton.setImageResource(R.drawable.card_iconheartblue);
+//			mFavButton.setImageResource(R.drawable.card_iconheartblue);
 		} else {
-			mFavButton.setImageResource(R.drawable.card_iconheart);
+//			mFavButton.setImageResource(R.drawable.card_iconheart);
 		}
 
 		mScrollView.setDirectionListener(this);
@@ -149,12 +150,13 @@ public class CardDetails extends BaseFragment implements
 		mCardDetailViewFactory.setOnCardDetailExpandListener(this);
 		mMainActivity.setSearchBarVisibilty(View.INVISIBLE);
 		mMainActivity.setSearchViewVisibilty(View.VISIBLE);
+		mMainActivity.setUpShareButton(mCardData.generalInfo.title.toLowerCase());
 		// prepareContent();
 		if (mCardData.generalInfo != null) {
 			mMainActivity.setActionBarTitle(mCardData.generalInfo.title.toLowerCase());
 		}
 		prepareContent();
-		mFavButton.setOnClickListener(new OnClickListener() {
+		/*mFavButton.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
@@ -196,13 +198,13 @@ public class CardDetails extends BaseFragment implements
 			public void onClick(View v) {
 
 				Map<String, String> params = new HashMap<String, String>();
-				/*
+				
 				params.put("CardId", mCardData._id);
 				params.put("CardType", mCardData.generalInfo.type);
 				params.put("CardName", mCardData.generalInfo.title);
 				params.put("Action", "Submit");
 				Analytics.trackEvent(Analytics.cardDetailsShare, params);
-				 */
+				 
 				//???
 				params.put(Analytics.CONTENT_ID_PROPERTY, mCardData._id);
 				params.put(Analytics.CONTENT_TYPE_PROPERTY, mCardData.generalInfo.type);
@@ -212,7 +214,8 @@ public class CardDetails extends BaseFragment implements
 				// TODO Auto-generated method stub
 				Util.shareData(getContext(), 3, "", mCardData.generalInfo.title);
 			}
-		});
+		});*/
+		
 
 		Map<String, String> params = new HashMap<String, String>();
 		/*params.put("CardId", mCardData._id);
@@ -234,14 +237,14 @@ public class CardDetails extends BaseFragment implements
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
 		if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-			if (mBottomActionBar != null) {
+			/*if (mBottomActionBar != null) {
 				mBottomActionBar.setVisibility(View.INVISIBLE);
-			}
+			}*/
 			mPlayer.playInLandscape();
 		} else {
-			if (mBottomActionBar != null) {
+			/*if (mBottomActionBar != null) {
 				mBottomActionBar.setVisibility(View.VISIBLE);
-			}
+			}*/
 			mPlayer.playInPortrait();
 		}
 		super.onConfigurationChanged(newConfig);
@@ -259,6 +262,15 @@ public class CardDetails extends BaseFragment implements
 		}
 		if (mCardDetailViewFactory != null) {
 			mCardDetailViewFactory.UpdateSubscriptionStatus();
+		}
+	}
+	
+	@Override
+	public void onPause() {	
+		super.onPause();
+		if(mPlayer!=null){
+			if(mPlayer.isMediaPlaying())
+				mPlayer.onStateChanged(PlayerListener.STATE_PAUSED, mPlayer.getStopPosition());
 		}
 	}
 
@@ -572,7 +584,7 @@ public class CardDetails extends BaseFragment implements
 	private int mLastScrollPosition = 0;
 	@Override
 	public void scrollDirection(boolean value) {
-		mQuickReturnHeight = mBottomActionBar.getHeight();
+//		mQuickReturnHeight = mBottomActionBar.getHeight();
 		int translationY = 0;
 
 		int mScrollY = mScrollView.getScrollY();
@@ -628,9 +640,9 @@ public class CardDetails extends BaseFragment implements
 			anim = new TranslateAnimation(0, 0, translationY, translationY);
 			anim.setFillAfter(true);
 			anim.setDuration(0);
-			mBottomActionBar.startAnimation(anim);
+//			mBottomActionBar.startAnimation(anim);
 		} else {
-			mBottomActionBar.setTranslationY(translationY);
+//			mBottomActionBar.setTranslationY(translationY);
 		}
 	}
 

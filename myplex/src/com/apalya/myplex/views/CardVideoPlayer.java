@@ -7,6 +7,9 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.json.JSONObject;
+
+import android.R.bool;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
@@ -33,6 +36,7 @@ import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 
+
 import com.apalya.myplex.MainBaseOptions;
 import com.apalya.myplex.R;
 import com.apalya.myplex.data.CardData;
@@ -45,19 +49,23 @@ import com.apalya.myplex.media.PlayerListener;
 import com.apalya.myplex.media.VideoViewExtn;
 import com.apalya.myplex.media.VideoViewPlayer;
 import com.apalya.myplex.media.VideoViewPlayer.StreamType;
+import com.apalya.myplex.utils.AlertDialogUtil;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FontUtil;
+import com.apalya.myplex.utils.LogOutUtil;
 import com.apalya.myplex.utils.MediaUtil;
 import com.apalya.myplex.utils.MediaUtil.MediaUtilEventListener;
+import com.apalya.myplex.utils.MessagePost.MessagePostCallback;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.utils.WidevineDrm.Settings;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
+import com.google.android.gms.internal.co;
 import com.google.android.gms.location.LocationClient;
 
-public class CardVideoPlayer implements PlayerListener {
+public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDialogListener  {
 	private Context mContext;
 	private LayoutInflater mInflator;
 	private View mParentLayout;
@@ -90,6 +98,9 @@ public class CardVideoPlayer implements PlayerListener {
 	private static final String TAG = "CardVideoPlayer";
 //	private Location location;
 //	private LocationClient locationClient;
+	private int state=0;
+	int currentDuration = 0;
+
 	
 
 	public void setFullScreenListener(PlayerFullScreen mListener){
@@ -332,7 +343,7 @@ public class CardVideoPlayer implements PlayerListener {
 						msg = message;
 					}
 					
-					Util.showToast(mContext, msg,Util.TOAST_TYPE_ERROR);		
+//					Util.showToast(mContext, msg,Util.TOAST_TYPE_ERROR);		
 					
 					if(statusCode != null && statusCode.equalsIgnoreCase("ERR_USER_NOT_SUBSCRIBED")){
 						
@@ -414,31 +425,37 @@ public class CardVideoPlayer implements PlayerListener {
 				// Toast.LENGTH_SHORT).show();
 				if(mPlayerStatusListener != null){
 					mPlayerStatusListener.playerStatusUpdate("Playing :: "+url);
-				}
-				VideoViewPlayer.StreamType streamType = StreamType.VOD;
-				if (mVideoViewPlayer == null) {
-					mVideoViewPlayer = new VideoViewPlayer(mVideoView,
-							mContext, uri, streamType);
-					//mVideoViewPlayer.openVideo();
-					mVideoViewPlayer.setPlayerListener(CardVideoPlayer.this);
-					mVideoViewPlayer.setUri(uri, streamType);
-				} else {
-					mVideoViewPlayer.setPlayerListener(CardVideoPlayer.this);
-					mVideoViewPlayer.setUri(uri, streamType);
-				}
-				mVideoViewPlayer.hideMediaController();
-				mVideoViewPlayer.setPlayerStatusUpdateListener(mPlayerStatusListener);
-				mVideoView.setOnTouchListener(new OnTouchListener() {
-
-					@Override
-					public boolean onTouch(View arg0, MotionEvent event) {
-						mVideoViewPlayer.onTouchEvent(event);
-						return false;
-					}
-				});
+				}				
+			
+				
+				// if movie then fetch elapse time
+				// default init player
+				
+				initializeVideoPlay(uri);
 				
 			}
+
+			@Override
+			public void lastPausedTimeFetched(int ellapseTime) {
+				if(ellapseTime > 60){
+					if(mVideoViewPlayer ==null){						
+						mVideoViewPlayer = new  VideoViewPlayer(mVideoView, mContext,null ,StreamType.VOD);
+					}
+					mVideoViewPlayer.setmPositionWhenPaused(ellapseTime*1000);
+				}
+			}
+
+			
 		});
+		 //Before playing any video we have to check whether user has logged In or not.
+		String email = myplexapplication.getUserProfileInstance().getUserEmail();
+		if(email.equalsIgnoreCase("NA") || email.equalsIgnoreCase(""))
+		{
+			AlertDialogUtil.showAlert(mContext,mContext.getResources().getString(R.string.must_logged_in) 
+					,mContext.getResources().getString(R.string.continiue_as_guest)
+					, mContext.getResources().getString(R.string.login_to_play)
+					, CardVideoPlayer.this);
+		}
 
 //		/*boolean*/ lastWatchedStatus=false;
 		for(CardData data:myplexapplication.getUserProfileInstance().lastVisitedCardData)
@@ -515,8 +532,11 @@ public class CardVideoPlayer implements PlayerListener {
 				}
 				CardDownloadData mDownloadData = myplexapplication.mDownloadList.mDownloadedList.get(mData._id);
 				if(mDownloadData!=null){
+					
+					// for local playback
 					if(mDownloadData.mCompleted && Util.isFileExist(mData._id+".wvm"))
 					{
+						// download complete
 						if(mDownloadData.mPercentage==0)
 						{
 							if(mPlayerStatusListener != null){
@@ -536,6 +556,7 @@ public class CardVideoPlayer implements PlayerListener {
 					}
 					else
 					{
+						// download inprogress
 						if(Util.isFileExist(mData._id+".wvm"))
 						{
 							if(mPlayerStatusListener != null){
@@ -549,36 +570,64 @@ public class CardVideoPlayer implements PlayerListener {
 							}
 							Util.removeDownload(mDownloadData.mDownloadId, mContext);
 							MediaUtil.getVideoUrl(mData._id,qualityType,streamingType,isESTPackPurchased,ConsumerApi.STREAMINGFORMATHLS);
+							
 						}
 					}
 				}
 				else{
+					
+					// streaming 
 					if(mPlayerStatusListener != null){
 						mPlayerStatusListener.playerStatusUpdate("Download Details for this content not available, so requesting url...");
 					}
 					MediaUtil.getVideoUrl(mData._id,qualityType,streamingType,isESTPackPurchased,ConsumerApi.STREAMINGFORMATHLS);
+					/*if(mData.generalInfo != null && mData.generalInfo.type != null ){
+						if(!mData.generalInfo.type.equalsIgnoreCase("live")){
+							// Its a live video Dont fetch resumed status						
+							MediaUtil.getPlayerState(mData._id);	
+						}									
+					}*/
 				}
 			}
 	        else 
 	        {
+	        	// streaming Movie
 	        	if(mPlayerStatusListener != null){
 					mPlayerStatusListener.playerStatusUpdate("Download Details not available, so requesting url...");
 				}
 	        	MediaUtil.getVideoUrl(mData._id,qualityType,streamingType,isESTPackPurchased,ConsumerApi.STREAMINGFORMATHLS);	
+	        	/*if(mData.generalInfo != null && mData.generalInfo.type != null ){
+					if(!mData.generalInfo.type.equalsIgnoreCase("live")){
+						// Its a live video Dont fetch resumed status					
+						MediaUtil.getPlayerState(mData._id);	
+					}									
+				}*/
 	        }
 	      }
 	}
-	class ConnectionCallbacks implements GooglePlayServicesClient.ConnectionCallbacks {		
-		@Override
-		public void onDisconnected() {
-		}		
-		@Override
-		public void onConnected(Bundle arg0) {}
-	};
-	class ConnectionFailedCallBack implements GooglePlayServicesClient.OnConnectionFailedListener{
-		@Override
-		public void onConnectionFailed(ConnectionResult arg0) {			
-		}	
+	
+	protected void initializeVideoPlay(Uri uri ) {
+		VideoViewPlayer.StreamType streamType = StreamType.VOD;
+		if (mVideoViewPlayer == null) {
+			mVideoViewPlayer = new VideoViewPlayer(mVideoView, mContext, uri,streamType);
+			// mVideoViewPlayer.openVideo();
+			mVideoViewPlayer.setPlayerListener(CardVideoPlayer.this);
+			mVideoViewPlayer.setUri(uri, streamType);
+		} else {
+			mVideoViewPlayer.setPlayerListener(CardVideoPlayer.this);
+			mVideoViewPlayer.setUri(uri, streamType);
+		}
+		
+		mVideoViewPlayer.hideMediaController();
+		mVideoViewPlayer.setPlayerStatusUpdateListener(mPlayerStatusListener);
+		mVideoView.setOnTouchListener(new OnTouchListener() {
+			@Override
+			public boolean onTouch(View arg0, MotionEvent event) {
+				mVideoViewPlayer.onTouchEvent(event);
+				return false;
+			}
+		});
+//		mVideoViewPlayer.goToTime(MediaUtil.ELLAPSE_TIME);
 	}
 private void playVideoFile(CardDownloadData mDownloadData){
 
@@ -661,7 +710,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
         String streamingType = new String();
         
         streamingType = ConsumerApi.STREAMNORMAL;
-    	qualityType = ConsumerApi.VIDEOQUALTYLOW;
+    	qualityType = ConsumerApi.VIDEOQUALTYHIGH;
         
         if(Util.isWifiEnabled(mContext))
         {
@@ -729,8 +778,11 @@ private void playVideoFile(CardDownloadData mDownloadData){
 					}
 				});
 			}
+
+			@Override
+			public void lastPausedTimeFetched(int ellapseTime) {}	
 		});
-        MediaUtil.getVideoUrl(contentId,qualityType,streamingType,isESTPackPurchased,ConsumerApi.STREAMINGFORMATRTSP);
+        MediaUtil.getVideoUrl(contentId,qualityType,streamingType,isESTPackPurchased,ConsumerApi.STREAMINGFORMATHTTP);
 	}
 
 	public View CreateTabletPlayerView(View parentLayout) {
@@ -1075,7 +1127,57 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		}
 		// mParentLayout.setLayoutParams(params);
 	}
+	@Override
+	public void onStateChanged(int state , int elapsedTime) 
+	{
+		System.out.println("state changed" + state + elapsedTime);
+		this.state = PlayerListener.STATE_PAUSED;
+		currentDuration = elapsedTime;
+		switch (state) {
+		case PlayerListener.STATE_PAUSED:
+			Log.d(TAG, "paused" + elapsedTime);
+			break;
+		case PlayerListener.STATE_PLAYING:
+			Log.d(TAG, "playing" + elapsedTime);
+			break;
+		case PlayerListener.STATE_STOP:
+			Log.d(TAG, "stop");
+			break;
+		case PlayerListener.STATE_RESUME:
+			Log.d(TAG, "resumes");
+			break;
+		case PlayerListener.STATE_STARTED:
+			Log.d(TAG, "started");
+			break;
+
+		}
+		MediaUtil.savePlayerState(mData._id, state, elapsedTime);
+
+	}
 	
 	
+	public int getStopPosition(){
+		return (mVideoView.getCurrentPosition()/1000);
+	}
+	public boolean isMediaPlaying(){		
+		if(mVideoView == null){
+			return false;
+		}
+		if(mVideoView.getCurrentPosition() == 0)
+			return false;
+		else
+			return true;
+
+	}
+	@Override
+	public void onDialogOption2Click() 
+	{
+		
+		LogOutUtil.onClickLogout(mContext);
+	}
+	@Override
+	public void onDialogOption1Click() {
+		
+	}
 
 }

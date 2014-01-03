@@ -104,6 +104,7 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 	public FrameLayout mContentLayout;
 	public Context mContext;
 	private Stack<BaseFragment> mFragmentStack = new Stack<BaseFragment>();
+	private ImageView socialShare;
 
 	NavigationOptionsMenuAdapter mNavigationAdapter;
 	
@@ -181,7 +182,10 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 		if(fbSession!=null && fbSession.isOpened())
 			mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.INVITEFRIENDS,R.string.iconfriends, null, NavigationOptionsMenuAdapter.INVITE_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.SETTINGS,R.string.iconsettings, null, NavigationOptionsMenuAdapter.SETTINGS_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGOUT,R.string.iconlogout, null, NavigationOptionsMenuAdapter.LOGOUT_ACTION,R.layout.navigation_menuitemsmall));
+		if(mIsUserLoggedIn)
+			mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGOUT,R.string.iconlogout, null, NavigationOptionsMenuAdapter.LOGOUT_ACTION,R.layout.navigation_menuitemsmall));
+		else
+			mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGIN,R.string.iconlogout, null, NavigationOptionsMenuAdapter.LOGOUT_ACTION,R.layout.navigation_menuitemsmall));
 //		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.TVSHOWS,R.drawable.icontv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		mNavigationAdapter.setMenuList(mMenuItemList);
 		mNavigationAdapter.setLoginStatus(mIsUserLoggedIn);
@@ -253,6 +257,7 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 			}
 
 			public void onDrawerOpened(View drawerView) {
+				Util.closeKeyBoard(mContext, mTitleTextView);
 				showNavigationFullImage(false);
 				mNavigationDrawerOpened = true;
 				invalidateOptionsMenu(); // creates call to
@@ -390,6 +395,7 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 		Util.showFeedbackOnSame(mCustomActionBarSearch);
 		mCustomActionBarProgressBar = (ProgressBar) v
 				.findViewById(R.id.customactionbar_progressBar);
+		socialShare = (ImageView)v.findViewById(R.id.actionbar_share);		
 	}
 	@Override
 	public void enableFilterAction(boolean value){
@@ -620,11 +626,13 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 		}
 		case NavigationOptionsMenuAdapter.LOGOUT_ACTION: {
 			LogOutUtil.onClickLogout(MainActivity.this);
+			// This line is added as email was not removed from shared preference And it was treated as user is logged in
+			myplexapplication.getUserProfileInstance().setUserEmail("NA");
 			return;
 		}
 		case NavigationOptionsMenuAdapter.CARDDETAILS_ACTION: {
-			if(mCurrentFragment!=mCardDetails)
-			{
+//			if(mCurrentFragment==mCardDetails)
+//			{
 				mCardDetails = new CardDetails();
 				CardData profileData = new CardData();
 				profileData._id="0";
@@ -647,10 +655,11 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 				mCurrentFragment=mCardDetails;
 				mCurrentFragment.mDataObject=profileData;
 				setActionBarTitle("My Profile");
-			}else{
+//				setUpShareview();
+			//}else{
 				mDrawerLayout.closeDrawer(mDrawerList);
-				return;
-			}
+//				return;
+//			}
 			break;
 		}
 		case NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION: {
@@ -983,6 +992,8 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 		if (mSearchView != null) {
 				mSearchView.setVisibility(visibility);
 		}
+		socialShare.setVisibility(View.GONE);
+		socialShare.setOnClickListener(null);		
 	}
 	@Override
 	public void hidefilterMenu() {
@@ -1172,5 +1183,22 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 	@Override
 	public void OnOnlineError(VolleyError error) {
 		hideActionBarProgressBar();
+	}
+
+	/**
+	 * This method is added to show share button instead of search icon.
+	 * 
+	 */
+	@Override
+	public void setUpShareButton(final String toBeshared) {
+		if (mSearchView != null) 
+			mSearchView.setVisibility(View.GONE);
+		socialShare.setVisibility(View.VISIBLE);		
+		socialShare.setOnClickListener(new OnClickListener() {			
+			@Override
+			public void onClick(View v) {
+				Util.shareData(mContext, 3, "",toBeshared);
+			}
+		});
 	}
 }

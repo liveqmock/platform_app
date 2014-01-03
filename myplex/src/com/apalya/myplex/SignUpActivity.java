@@ -82,8 +82,9 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 	private TranslateAnimation translateAnim;
 	private RelativeLayout backgroundScrollLayout;
 
-	private static final String PASSWORD_PATTERN = 
-			"((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%]).{6,18})";
+//	private static final String PASSWORD_PATTERN = 
+//			"((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%]).{6,18})";
+	private static final String PASSWORD_PATTERN = "((?=.*\\d)(?=.*[a-z]).{6,18})";
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {

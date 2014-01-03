@@ -163,7 +163,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 		return errordata;
 	}
 	public void setUri(Uri videoUri,StreamType type){
-		mPositionWhenPaused = -1;
+//		mPositionWhenPaused = -1;
 		mMediaPlayer = null;
 		errordata = null;
 		mStopHandler = false;
@@ -577,9 +577,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 //			}
 //		});
 
-		if (mVideoView.canSeekForward() && mPositionWhenPaused > 0) {
-			mVideoView.seekTo(mPositionWhenPaused);
-		}
+		
 			Log.d("PlayerScreen","onBufferingUpdate form onPrepared");
 		onBufferingUpdate(mp, mVideoView.getBufferPercentage());
 
@@ -588,8 +586,14 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 		if (mMediaPlayerController != null) {
 			mMediaPlayerController.setMediaPlayer(mVideoView);
 		}
-
+		if (mVideoView.canSeekForward() && mPositionWhenPaused > 0) {
+			mVideoView.seekTo(mPositionWhenPaused);
+		}
 	}
+	public int getmPositionWhenPaused() {
+		return mPositionWhenPaused;
+	}
+	
 	public void deregisteronBufferingUpdate(){
 		mStopHandler = true;
 		if(mMediaPlayer != null){
@@ -918,5 +922,8 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 				drmManager.unRegisterLogListener();
 		
 		}
+	}
+	public void setmPositionWhenPaused(int mPositionWhenPaused) {
+		this.mPositionWhenPaused = mPositionWhenPaused;
 	}
 }

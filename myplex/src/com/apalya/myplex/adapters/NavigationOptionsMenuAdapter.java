@@ -42,6 +42,7 @@ public class NavigationOptionsMenuAdapter extends BaseAdapter {
 	public final static String TVSHOWS = "TV shows";
 	public final static String SETTINGS = "settings";
 	public final static String LOGOUT = "logout";
+	public final static String LOGIN = "login";
 	public final static String LOGO = "ApplicationLogo";
 	public final static String INVITEFRIENDS = "invite friends";
 			

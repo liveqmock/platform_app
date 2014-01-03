@@ -2,6 +2,7 @@ package com.apalya.myplex.tablet;
 
 import com.apalya.myplex.R;
 import com.apalya.myplex.adapters.NavigationOptionsMenuAdapter;
+import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.fragments.CardDetailsTabletFrag;
 import com.apalya.myplex.fragments.CardExplorer;
@@ -30,6 +31,7 @@ public class TabletCardDetails extends BaseActivity{
 		hideActionBarProgressBar();
 		enableFilterAction(false);
 		setSearchBarVisibilty(View.INVISIBLE);
+		setUpShareButton(((CardData)cardDetails.mDataObject).generalInfo.title.toLowerCase());
 		if(mDrawerLayout != null){
 			mDrawerLayout.closeDrawer(mDrawerList);
 		}

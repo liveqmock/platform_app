@@ -156,4 +156,11 @@ public class docketVideoWidget implements PlayerListener{
 	}
 
 
+	@Override
+	public void onStateChanged(int state, int position) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 }

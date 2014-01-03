@@ -141,6 +141,7 @@ public class SearchActivity extends BaseFragment implements
 
 					mAdapter.notifyDataSetChanged();
 				}
+				mMainActivity.setSearchBarVisibilty(View.INVISIBLE);
 			}
 		});
 		// ArrayList<SearchData> mSearchData = fillSearchData();

@@ -81,6 +81,13 @@ public class ConsumerApi {
 	public static final String LEVELDEVICEMAX = "devicemax";
 	//public static String DEBUGCLIENTKEY = "dcb11454ccdafdd4706c7186d37abd2ff96cd02dc998d1111d16d4778a797f85";//"c86f79514ec7976bd20de36f1c6f15900d8e09f699818024283bad1bf0609650";
 	public static String DEBUGCLIENTKEY = myplexapplication.getDevDetailsInstance().getClientKey();
+	public static final String PLAYERDETAILSACTION = "player";
+	public static final String UPDATE_STATUS = "updateStatus";
+	public static final String ACTION = "action=";
+	public static final String EVENTS = "events";
+	public static final String ELAPSED_TIME = "elapsedTime=";
+	public static final String DURATION = "";
+	public static final String FORCE_TRUE = "&force=true";
 	
 	public static String getSearch(String queryStr, String level,int startIndex, String searchType) {
 		if(queryStr == null||(queryStr != null && queryStr.length() ==0)){
@@ -193,5 +200,16 @@ public class ConsumerApi {
 	{
 		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + "unregisterDevice"
 				+ SLASH ;
+	}
+	public static String getPlayerEventDetails(String contentID,String action){
+		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + EVENTS +  SLASH + PLAYERDETAILSACTION
+				+ SLASH + contentID + SLASH + UPDATE_STATUS +	QUESTION_MARK	+	ACTION + action +
+				AMPERSAND + CLIENTKEY + DEBUGCLIENTKEY;	
+	}
+	public static String setPlayerEventDetails(String contentID,String action,int elapsedTime){
+		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + EVENTS +  SLASH + PLAYERDETAILSACTION
+				+ SLASH + contentID + SLASH + UPDATE_STATUS +	QUESTION_MARK	+	ACTION + action +
+				AMPERSAND + CLIENTKEY + DEBUGCLIENTKEY;
+					
 	}
 }

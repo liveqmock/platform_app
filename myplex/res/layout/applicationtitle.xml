@@ -112,5 +112,16 @@
         android:queryHint="Search myplex"
         >
     </SearchView>
+    <ImageView
+        android:id="@+id/actionbar_share"
+        android:layout_width="wrap_content"
+        android:src="@drawable/ic_action_share" 
+        android:maxWidth="260dp"
+        android:layout_height="48dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_margin="5dp"
+        android:iconifiedByDefault="true"
+        android:visibility="gone"/> 
 
 </RelativeLayout>

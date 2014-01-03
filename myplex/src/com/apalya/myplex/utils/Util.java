@@ -33,17 +33,12 @@ import android.animation.Animator.AnimatorListener;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.DownloadManager;
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapShader;
@@ -67,30 +62,26 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.animation.DecelerateInterpolator;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.Request.Method;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.apalya.myplex.LoginActivity;
 import com.apalya.myplex.MainActivity;
 import com.apalya.myplex.R;
 import com.apalya.myplex.R.color;
-import com.apalya.myplex.adapters.CacheManagerCallback;
-import com.apalya.myplex.cache.CacheManager;
-import com.apalya.myplex.cache.IndexHandler;
 import com.apalya.myplex.data.ApplicationConfig;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDownloadData;
 import com.apalya.myplex.data.CardDownloadedDataList;
 import com.apalya.myplex.data.myplexapplication;
-import com.apalya.myplex.fragments.CardExplorer;
 import com.apalya.myplex.tablet.MultiPaneActivity;
 import com.facebook.FacebookException;
 import com.facebook.FacebookOperationCanceledException;
@@ -991,5 +982,9 @@ public class Util {
 			}
 		}
 
+	}
+	public static void closeKeyBoard(Context context,View view){
+		InputMethodManager imm = (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
 	}
 }

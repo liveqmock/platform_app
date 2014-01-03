@@ -12,8 +12,8 @@
 
         <ImageView
             android:id="@+id/searchlens"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
             android:contentDescription="@string/hello_world"
             android:src="@drawable/iconsearchgrey"
             android:visibility="invisible" />

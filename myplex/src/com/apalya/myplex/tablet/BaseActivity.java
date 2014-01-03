@@ -99,6 +99,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 	private Stack<BaseFragment> mFragmentStack = new Stack<BaseFragment>();
 
 	NavigationOptionsMenuAdapter mNavigationAdapter;
+	private ImageView socialShare;
 
 	@Override
 	public void setOrientation(int value){
@@ -211,7 +212,10 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		if(fbSession!=null && fbSession.isOpened())
 			mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.INVITEFRIENDS,R.string.iconfriends, null, NavigationOptionsMenuAdapter.INVITE_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.SETTINGS,R.string.iconsettings, null, NavigationOptionsMenuAdapter.SETTINGS_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGOUT,R.string.iconlogout, null, NavigationOptionsMenuAdapter.LOGOUT_ACTION,R.layout.navigation_menuitemsmall));
+		if(mIsUserLoggedIn)
+			mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGOUT,R.string.iconlogout, null, NavigationOptionsMenuAdapter.LOGOUT_ACTION,R.layout.navigation_menuitemsmall));
+		else
+			mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGIN,R.string.iconlogout, null, NavigationOptionsMenuAdapter.LOGOUT_ACTION,R.layout.navigation_menuitemsmall));
 //		 mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.TVSHOWS,R.drawable.icontv,null,NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 	}
 	@Override
@@ -327,7 +331,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		Util.showFeedbackOnSame(mCustomActionBarSearch);
 		mCustomActionBarProgressBar = (ProgressBar) v
 				.findViewById(R.id.customactionbar_progressBar);
-		
+		socialShare = (ImageView)v.findViewById(R.id.actionbar_share);		
 	}
 	@Override
 	public void enableFilterAction(boolean value){
@@ -809,6 +813,17 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 	@Override
 	public void setSearchViewVisibilty(int visibility) {
 		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void setUpShareButton(final String toBeShared) {	
+		socialShare.setVisibility(View.VISIBLE);
+		socialShare.setOnClickListener(new OnClickListener() {			
+			@Override
+			public void onClick(View v) {
+				Util.shareData(mContext, 3, "",toBeShared);
+			}
+		});
 		
 	}
 }

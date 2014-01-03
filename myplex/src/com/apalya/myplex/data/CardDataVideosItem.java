@@ -15,6 +15,7 @@ public class CardDataVideosItem implements Serializable{
 	public String bitrate;
 	public String link;
 	public String resolution; 
+	public int elapsedTime;
 	public CardDataVideosItem(){
 		
 	}
