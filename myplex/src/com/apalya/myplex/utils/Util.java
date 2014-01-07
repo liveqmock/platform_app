@@ -52,6 +52,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Patterns;
@@ -986,5 +987,33 @@ public class Util {
 	public static void closeKeyBoard(Context context,View view){
 		InputMethodManager imm = (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+	}
+
+	public static String getInternetConnectivity(Context context) {
+		String network_type = "";
+		ConnectivityManager manager = (ConnectivityManager) context
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo active_network = manager.getActiveNetworkInfo();
+
+		if (active_network == null) {
+			return network_type;
+		}
+		switch (active_network.getType()) {
+		case ConnectivityManager.TYPE_MOBILE:
+			if (active_network.getSubtype() > TelephonyManager.NETWORK_TYPE_EDGE) {
+				network_type = "3G";
+			}
+
+			switch (active_network.getSubtype()) {
+			case TelephonyManager.NETWORK_TYPE_GPRS:
+
+			case TelephonyManager.NETWORK_TYPE_EDGE:
+
+				network_type = "2G";
+				break;
+
+			}
+		}
+		return network_type;
 	}
 }

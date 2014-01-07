@@ -272,8 +272,11 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 			params.put(Analytics.CONTENT_NAME_PROPERTY, mData.generalInfo.title);
 			params.put(Analytics.CONTENT_TYPE_PROPERTY,Analytics.CONTENT_ACTION_TYPES.movie.toString());
 			Analytics.trackEvent(Analytics.EVENT_PLAY,params);
-			FetchUrl();
-			mVideoViewParent.setOnClickListener(null);
+			
+			if(canBePlayed(true)){
+				FetchUrl();
+				mVideoViewParent.setOnClickListener(null);
+			}
 			// TODO Auto-generated method stub
 
 		}
@@ -312,7 +315,9 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		
 	}
 
-	public void FetchUrl() {		
+	public void FetchUrl() {	
+		
+		
 		
 //		
 //		if(mData._id == null || !AllowedContentIdList.isAllowed(mData._id) ){
@@ -447,15 +452,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 
 			
 		});
-		 //Before playing any video we have to check whether user has logged In or not.
-		String email = myplexapplication.getUserProfileInstance().getUserEmail();
-		if(email.equalsIgnoreCase("NA") || email.equalsIgnoreCase(""))
-		{
-			AlertDialogUtil.showAlert(mContext,mContext.getResources().getString(R.string.must_logged_in) 
-					,mContext.getResources().getString(R.string.continiue_as_guest)
-					, mContext.getResources().getString(R.string.login_to_play)
-					, CardVideoPlayer.this);
-		}
+		 
 
 //		/*boolean*/ lastWatchedStatus=false;
 		for(CardData data:myplexapplication.getUserProfileInstance().lastVisitedCardData)
@@ -1178,6 +1175,55 @@ private void playVideoFile(CardDownloadData mDownloadData){
 	@Override
 	public void onDialogOption1Click() {
 		
+	}
+
+	/**
+	 * @param is a movie Only to show the alert message
+	 * @return can able to play 
+	 */
+	public boolean canBePlayed(boolean isMovie) {
+		// Before playing any video we have to check whether user has logged In
+		// or not.
+		String email = myplexapplication.getUserProfileInstance()
+				.getUserEmail();
+		if (email.equalsIgnoreCase("NA") || email.equalsIgnoreCase("")) {
+			AlertDialogUtil.showAlert(mContext, mContext.getResources()
+					.getString(R.string.must_logged_in), mContext
+					.getResources().getString(R.string.continiue_as_guest),
+					mContext.getResources().getString(R.string.login_to_play),
+					CardVideoPlayer.this);
+			return false;
+		}
+
+		if (myplexapplication.mDownloadList != null && mData != null) {
+			
+			CardDownloadData mDownloadData = myplexapplication.mDownloadList.mDownloadedList
+					.get(mData._id);
+			if (mDownloadData != null) {
+				return true;
+			}
+		}
+
+		String networkInfo = Util.getInternetConnectivity(mContext);
+		if (networkInfo.equalsIgnoreCase("2G")) {
+			Util.showToast(
+					mContext.getResources().getString(
+							R.string.error_message_2g_videoplay), mContext);
+			return false;
+		} else if (networkInfo.equalsIgnoreCase("3G")) {
+			if (isMovie)
+				Util.showToast(
+						mContext.getResources().getString(
+								R.string.alert_message_3g_movie), mContext);
+			else
+				Util.showToast(
+						mContext.getResources().getString(
+								R.string.alert_message_3g_trailer), mContext);
+			return true;
+		}
+
+		// It is a wifi
+		return true;
 	}
 
 }

@@ -106,6 +106,8 @@
     <string name="iconhome">&#x2302;</string>
     <string name="iconmovie">&#xE8B1;</string>
     <string name="iconlivetv">&#xE8C0;</string>
+    <string name="icontv">&#x1F4FA;</string>
+    <string name="iconshare">&#xF601;</string>
     <!--Navigation drawer icons-->
     
     <string-array name="hometabletanim">
@@ -142,7 +144,10 @@
     <string name="must_logged_in">must be logged in to watch movie</string>
     <string name="login_to_play">login to play</string>
     <string name="continiue_as_guest">continue as guest</string>
-    <!-- Transaction related errors-->
+    <string name="error_message_2g_videoplay">cannt play video in 2G network.</string>
+    <string name="alert_message_3g_movie">playing movie in 3G. data charges may apply.</string>
+    <string name="alert_message_3g_trailer">playing trailer in 3G. data charges may apply.</string>
+        <!-- Transaction related errors-->
     <string name="transaction_server_error">our server thinks this is a duplicate transaction.if you think not, select ‘continue’, otherwise select ‘cancel’ and retry your transaction again in 60 seconds.</string>
     <string name="retry">retry</string>
     <string name="cancel">cancel</string>
