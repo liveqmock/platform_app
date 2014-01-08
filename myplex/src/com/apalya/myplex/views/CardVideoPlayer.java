@@ -390,7 +390,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 						}
 						else
 						{
-							Util.showToast(mContext, "Downloading is supported only on Wifi, please turn of wifi and try again.", Util.TOAST_TYPE_INFO);
+							Util.showToast(mContext, "Downloading is supported only on Wifi, please turn on wifi and try again.", Util.TOAST_TYPE_INFO);
 						}
 					}
 					else
