@@ -89,7 +89,6 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 	private CacheManager mCacheManager = new CacheManager();
 	private String mSearchQuery = new String();
 	//Code end from SearchActiivty
-	private ImageView socialShare;
 	
 	public static final String TAG = "MultiPaneActivity";
 

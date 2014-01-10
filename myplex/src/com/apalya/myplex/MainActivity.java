@@ -24,6 +24,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -104,7 +105,9 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 	public FrameLayout mContentLayout;
 	public Context mContext;
 	private Stack<BaseFragment> mFragmentStack = new Stack<BaseFragment>();
-	private ImageView socialShare;
+	private TextView socialShare;
+	private TextView tvOrMovie;
+	private Handler handler= new Handler();
 
 	NavigationOptionsMenuAdapter mNavigationAdapter;
 	
@@ -395,7 +398,11 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 		Util.showFeedbackOnSame(mCustomActionBarSearch);
 		mCustomActionBarProgressBar = (ProgressBar) v
 				.findViewById(R.id.customactionbar_progressBar);
-		socialShare = (ImageView)v.findViewById(R.id.actionbar_share);		
+		socialShare = (TextView)v.findViewById(R.id.actionbar_share);		
+		tvOrMovie = (TextView)v.findViewById(R.id.livetv);
+		FontUtil.loadFonts(getAssets());
+		tvOrMovie.setTypeface(FontUtil.ss_symbolicons_line);
+		
 	}
 	@Override
 	public void enableFilterAction(boolean value){
@@ -599,6 +606,7 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 		if (fragment == null) {
 			return;
 		}
+		removeLiveTvActionBarIcon();
 		HideSearchView();
 		HideSearchView();
 		mCurrentFragment = fragment;
@@ -633,6 +641,7 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 		case NavigationOptionsMenuAdapter.CARDDETAILS_ACTION: {
 //			if(mCurrentFragment==mCardDetails)
 //			{
+			    removeLiveTvActionBarIcon();
 				mCardDetails = new CardDetails();
 				CardData profileData = new CardData();
 				profileData._id="0";
@@ -668,30 +677,37 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 			data.reset();
 			
 			if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.FAVOURITE)){
+				removeLiveTvActionBarIcon();
 				setActionBarTitle("my "+NavigationOptionsMenuAdapter.FAVOURITE);
 				data.requestType = CardExplorerData.REQUEST_FAVOURITE;
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.RECOMMENDED)){
+				showLiveTvOrMovieIcon("recommended");
 				data.requestType = CardExplorerData.REQUEST_RECOMMENDATION;
-				setActionBarTitle("myplex");
+				setActionBarTitle("myplex");				
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.MOVIES)){
+				showLiveTvOrMovieIcon("movies");
 				data.requestType = CardExplorerData.REQUEST_BROWSE;
 				data.searchQuery ="movie";
 				data.searchScope = "movie";
-				setActionBarTitle(NavigationOptionsMenuAdapter.MOVIES);
+				setActionBarTitle(NavigationOptionsMenuAdapter.MOVIES);				
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.LIVETV)){
+				showLiveTvOrMovieIcon("live");
 				data.requestType = CardExplorerData.REQUEST_BROWSE;
 				data.searchQuery ="live";
 				data.searchScope = "live";
 				setActionBarTitle(NavigationOptionsMenuAdapter.LIVETV);
 				setSearchviewHint("search live tv");
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.TVSHOWS)){
+				removeLiveTvActionBarIcon();
 				data.requestType = CardExplorerData.REQUEST_BROWSE;
 				data.searchQuery ="tvshows";
 				setActionBarTitle(NavigationOptionsMenuAdapter.TVSHOWS);
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.DOWNLOADS)){
+				removeLiveTvActionBarIcon();
 				data.requestType = CardExplorerData.REQUEST_DOWNLOADS;
 				setActionBarTitle("my "+NavigationOptionsMenuAdapter.DOWNLOADS);
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.PURCHASES)){
+				removeLiveTvActionBarIcon();
 				data.requestType = CardExplorerData.REQUEST_PURCHASES;
 				setActionBarTitle("my "+NavigationOptionsMenuAdapter.PURCHASES);
 			}
@@ -705,6 +721,7 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 		}
 		case NavigationOptionsMenuAdapter.SEARCH_ACTION:
 		{
+			removeLiveTvActionBarIcon();
 			mSearchActivity = (SearchActivity) createFragment(NavigationOptionsMenuAdapter.SEARCH_ACTION);
 			mCurrentFragment = mSearchActivity;
 			saveActionBarTitle();
@@ -713,6 +730,7 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 		}
 		case NavigationOptionsMenuAdapter.SETTINGS_ACTION:
 		{
+			removeLiveTvActionBarIcon();
 			mSettingsScreen = (SetttingsFragment) createFragment(NavigationOptionsMenuAdapter.SETTINGS_ACTION);
 			mCurrentFragment = mSettingsScreen;
 			saveActionBarTitle();
@@ -1064,7 +1082,7 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 					findViewById(R.id.customactionbar_drawer).setVisibility(View.VISIBLE);
 					findViewById(R.id.customactionbar_filter).setVisibility(View.VISIBLE);
 					findViewById(R.id.customactionbar_back).setVisibility(View.INVISIBLE);
-
+					tvOrMovie.setVisibility(View.VISIBLE);
 //					changeVisibility(mCustomActionBarTitleLayout,View.VISIBLE);
 //					mSearchView.setIconified(true);
 					if(mSearchSuggestionFrag !=null)
@@ -1193,7 +1211,10 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 	public void setUpShareButton(final String toBeshared) {
 		if (mSearchView != null) 
 			mSearchView.setVisibility(View.GONE);
-		socialShare.setVisibility(View.VISIBLE);		
+		socialShare.setVisibility(View.VISIBLE);
+		FontUtil.loadFonts(getAssets());
+		socialShare.setTypeface(FontUtil.ss_symbolicons_line);
+		socialShare.setText(R.string.iconshare);
 		socialShare.setOnClickListener(new OnClickListener() {			
 			@Override
 			public void onClick(View v) {
@@ -1201,4 +1222,65 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 			}
 		});
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see com.apalya.myplex.MainBaseOptions#setUpLivetvOrMovie(boolean)
+	 *  0 to diable 
+	 *  1 for moview 
+	 *  2 for live tv
+	 */
+	@Override
+	public void setUpLivetvOrMovie(boolean isMovie) {
+		if(isMovie)
+			showLiveTvOrMovieIcon("movie");
+		else
+			showLiveTvOrMovieIcon("live");
+		
+	}
+	private class  LiveTvListener implements OnClickListener{
+		@Override
+		public void onClick(View v) {
+			tvOrMovie.setEnabled(false);
+			handler.postDelayed(new Runnable() {				
+				@Override
+				public void run() {
+					tvOrMovie.setEnabled(true);
+				}
+			}, 3000);
+			selectItem(3);
+		}		
+	};
+	private class  MovieListener implements OnClickListener{
+		@Override
+		public void onClick(View v) {
+			tvOrMovie.setOnClickListener(null);
+			tvOrMovie.setEnabled(false);
+			handler.postDelayed(new Runnable() {				
+				@Override
+				public void run() {
+					tvOrMovie.setEnabled(true);
+				}
+			}, 3000);
+			selectItem(1);
+		}		
+	};
+	
+	public void showLiveTvOrMovieIcon(String liveTv){
+		if(liveTv.equalsIgnoreCase("live")){
+			tvOrMovie.setVisibility(View.VISIBLE);
+			tvOrMovie.setOnClickListener(new MovieListener());
+			tvOrMovie.setText(R.string.iconmovie);
+		}else{
+			tvOrMovie.setVisibility(View.VISIBLE);
+			tvOrMovie.setText(R.string.iconlivetv);
+			tvOrMovie.setOnClickListener(new LiveTvListener());
+		}
+	}
+	public void removeLiveTvActionBarIcon(){
+		tvOrMovie.setVisibility(View.GONE);
+	}
+	
+	
+	
 }

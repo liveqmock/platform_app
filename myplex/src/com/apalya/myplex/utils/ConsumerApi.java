@@ -29,6 +29,10 @@ public class ConsumerApi {
 	public static final String PACKAGEID = "packageId=";
 	public static final String CONTENT_CONTEXT = "content/v2";
 	public static final String USER_CONTEXT = "user/v2";
+	public static final String BILLING_EVENT = "billing"; 
+	public static final String CHECK_COUPON = "check/coupon";
+	public static final String COUPON_CODE ="couponCode=";
+	public static final String PACKAGE_ID  = "packageId=";
 	public static final String SCHEME = "https://";
 	public static final String HTTPSCHEME = "http://";
 	public static final String SLASH = "/";
@@ -177,6 +181,11 @@ public class ConsumerApi {
 		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + BILLING_TAG
 				+ SLASH + SUBSCRIBE_TAG+ SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY + AMPERSAND+ PAYMENTCHANNEL +paymentChannel+ AMPERSAND +PACKAGEID+packageId;
 	}
+	public static String getSusbcriptionRequest(String paymentChannel,String packageId,String couponCode){
+		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + BILLING_TAG
+				+ SLASH + SUBSCRIBE_TAG+ SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY + AMPERSAND+ PAYMENTCHANNEL +paymentChannel+
+				AMPERSAND +PACKAGEID+packageId + AMPERSAND + COUPON_CODE + couponCode;
+	}
 	
 	public static String getDownloadNotifyUrl(String contentId) {
 		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + CONTENT_TAG +SLASH + contentId +SLASH
@@ -211,5 +220,15 @@ public class ConsumerApi {
 				+ SLASH + contentID + SLASH + UPDATE_STATUS +	QUESTION_MARK	+	ACTION + action +
 				AMPERSAND + CLIENTKEY + DEBUGCLIENTKEY;
 					
+	}
+	public static String checkCouponCode(String couponCode, String packages[]){
+		String packageString = packages[0]; 
+		for(int i=1;i<packages.length;i++){
+			packageString += ","+packages[i];
+		}
+		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + BILLING_EVENT + SLASH +
+			 CHECK_COUPON +  QUESTION_MARK +CLIENTKEY + DEBUGCLIENTKEY + AMPERSAND + COUPON_CODE  + couponCode + AMPERSAND +
+			 PACKAGE_ID  + packageString;
+		
 	}
 }

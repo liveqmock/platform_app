@@ -29,16 +29,40 @@
             android:textStyle="italic" />
 
         <TextView
-            android:id="@+id/purchasepackItem1_price"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-               android:layout_gravity="center_vertical"
+            android:layout_gravity="center_vertical"
             android:layout_marginLeft="5dp"
+            android:singleLine="true"
+            android:text="@string/price_rupeecode"
+            android:textColor="#ffffff"
+            android:textSize="12sp" />
+        <com.apalya.myplex.views.StrikeTextView
+            android:id="@+id/purchasepackItem1_price_before_coupon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="2dp"
             android:layout_marginRight="5dp"
             android:singleLine="true"
             android:text="99"
             android:textColor="#ffffff"
-            android:textSize="12sp" />
+            android:textSize="12sp" 
+            android:visibility="gone"
+            android:textStyle="bold"/>
+        <TextView
+            android:id="@+id/purchasepackItem1_price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="2dp"
+            android:layout_marginRight="5dp"
+            android:singleLine="true"
+            android:text="99"
+            android:textColor="#ffffff"
+            android:textSize="12sp" 
+            android:visibility="visible"/>
+        
 
     <LinearLayout
         android:id="@+id/purchasepackItem1_offer"

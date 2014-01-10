@@ -53,6 +53,16 @@ public class SharedPrefUtils {
 		prefsEditor.putBoolean(key, value);
 		prefsEditor.commit();
 	}
+	public static void writeToSharedPref(Context context, String key,
+			long value) {
+
+		if (myPrefs == null)
+			myPrefs = context.getSharedPreferences(
+					null, Context.MODE_PRIVATE);
+		SharedPreferences.Editor prefsEditor = myPrefs.edit();
+		prefsEditor.putLong(key, value);
+		prefsEditor.commit();
+	}
 
 	/**
 	 * 
@@ -116,4 +126,13 @@ public class SharedPrefUtils {
 
 	    return data;
 	}
+	public static long getLongFromSharedPreference(Context context, String key) {
+
+		if (myPrefs == null)
+			myPrefs = context.getSharedPreferences(
+					null, Context.MODE_PRIVATE);
+		return myPrefs.getLong(key, 0);
+	}
+	
+	
 }

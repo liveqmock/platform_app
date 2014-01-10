@@ -995,7 +995,14 @@ public class CardDetailViewFactory {
 		
 		@Override
 		public void onClick(View v) {
-			
+			final View view = v;
+				view.setEnabled(false);
+				view.postDelayed(new Runnable() {					
+					@Override
+					public void run() {
+						view.setEnabled(true);
+					}
+				}, 2000);
 				PackagePopUp popup = new PackagePopUp(mContext,mParentView);
 				myplexapplication.getCardExplorerData().cardDataToSubscribe =  mData;
 				popup.showPackDialog(mData, ((Activity)mContext).getActionBar().getCustomView());	

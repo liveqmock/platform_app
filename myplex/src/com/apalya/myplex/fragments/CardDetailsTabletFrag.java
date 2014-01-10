@@ -41,6 +41,7 @@ import com.apalya.myplex.data.CardDetailMultiMediaGroup;
 import com.apalya.myplex.data.CardExplorerData;
 import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.media.PlayerListener;
 import com.apalya.myplex.tablet.MultiPaneActivity;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
@@ -116,6 +117,15 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		}
 		prepareContent();
 		return rootView;
+	}
+	@Override
+	public void onPause() {		
+		super.onPause();
+		if(mPlayer!=null){
+			if(mPlayer.isMediaPlaying()){
+				mPlayer.onStateChanged(PlayerListener.STATE_PAUSED, mPlayer.getStopPosition());
+			}
+		}
 	}
 
 	private CardData mCardData;

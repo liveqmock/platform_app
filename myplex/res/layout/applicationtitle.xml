@@ -30,8 +30,8 @@
             android:layout_centerVertical="true"
             android:contentDescription="@string/hello_world"
             android:src="@drawable/iconmenu" />
-        
-                <ImageView
+
+        <ImageView
             android:id="@+id/customactionbar_back"
             android:layout_width="24dp"
             android:layout_height="48dp"
@@ -49,14 +49,79 @@
             android:src="@drawable/watermark" />
     </RelativeLayout>
 
+    <ImageView
+        android:id="@+id/customactionbar_search_button"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_margin="5dp"
+        android:contentDescription="@string/hello_world"
+        android:src="@drawable/social_send_now"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/ac_icon_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="10dp"
+        android:gravity="center_vertical|right|center_horizontal"
+        android:weightSum="3" >
+
+        <SearchView
+            android:id="@+id/customsearchview"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/actionbar_share"
+            android:layout_weight="1"
+            android:gravity="center_vertical|right"
+            android:iconifiedByDefault="true"
+            android:maxWidth="260dp"
+            android:queryHint="Search myplex" />
+
+        <TextView
+            android:id="@+id/actionbar_share"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_margin="8dp"
+            android:layout_toLeftOf="@+id/livetv"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:paddingTop="3sp"
+            android:src="@drawable/ic_action_share"
+            android:textColor="@drawable/ab_ic_selector"
+            android:textSize="@dimen/textsize_22"
+            android:visibility="visible" />
+
+        <TextView
+            android:id="@+id/livetv"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_margin="8dp"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:paddingTop="3sp"
+            android:text="ss"
+            android:textColor="@drawable/ab_ic_selector"
+            android:textSize="@dimen/textsize_22"
+            android:visibility="gone" />
+    </LinearLayout>
+
     <RelativeLayout
         android:id="@+id/customactionbar_filter"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="fill_parent"
-        android:layout_alignParentLeft="true"
-        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
         android:layout_marginLeft="64dp"
-        android:layout_marginRight="50dp"
+        android:layout_toLeftOf="@+id/ac_icon_layout"
+        android:gravity="left"
         android:orientation="horizontal"
         android:paddingLeft="8dp" >
 
@@ -88,40 +153,5 @@
             android:textColor="#ffffff"
             android:textSize="20sp" />
     </RelativeLayout>
-
-    <ImageView
-        android:id="@+id/customactionbar_search_button"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:layout_margin="5dp"
-        android:contentDescription="@string/hello_world"
-        android:src="@drawable/social_send_now"
-        android:visibility="gone" />
-
-    <SearchView
-        android:id="@+id/customsearchview"
-        android:layout_width="wrap_content"
-        android:maxWidth="260dp"
-        android:layout_height="48dp"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:layout_margin="5dp"
-        android:iconifiedByDefault="true"
-        android:queryHint="Search myplex"
-        >
-    </SearchView>
-    <ImageView
-        android:id="@+id/actionbar_share"
-        android:layout_width="wrap_content"
-        android:src="@drawable/ic_action_share" 
-        android:maxWidth="260dp"
-        android:layout_height="48dp"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:layout_margin="5dp"
-        android:iconifiedByDefault="true"
-        android:visibility="gone"/> 
 
 </RelativeLayout>

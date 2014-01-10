@@ -147,6 +147,7 @@
     <string name="error_message_2g_videoplay">cannt play video in 2G network.</string>
     <string name="alert_message_3g_movie">playing movie in 3G. data charges may apply.</string>
     <string name="alert_message_3g_trailer">playing trailer in 3G. data charges may apply.</string>
+    <string name="lastSharedTime">lastSharedTime</string>
         <!-- Transaction related errors-->
     <string name="transaction_server_error">our server thinks this is a duplicate transaction.if you think not, select ‘continue’, otherwise select ‘cancel’ and retry your transaction again in 60 seconds.</string>
     <string name="retry">retry</string>

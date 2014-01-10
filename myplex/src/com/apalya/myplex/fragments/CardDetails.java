@@ -269,8 +269,13 @@ public class CardDetails extends BaseFragment implements
 	public void onPause() {	
 		super.onPause();
 		if(mPlayer!=null){
-			if(mPlayer.isMediaPlaying())
+			if(mPlayer.isMediaPlaying()){
 				mPlayer.onStateChanged(PlayerListener.STATE_PAUSED, mPlayer.getStopPosition());
+				if(mCardData.generalInfo.isSellable){
+					Log.d(TAG, "free content");
+					Util.showFacebookShareDialog();
+				}
+			}
 		}
 	}
 

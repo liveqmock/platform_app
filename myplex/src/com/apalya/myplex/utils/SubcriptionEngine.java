@@ -48,6 +48,13 @@ public class SubcriptionEngine {
 	private CardDataPackagePriceDetailsItem mSelectedPriceItem;
 	private CardDataPackages mSelectedPackageItem;
 	private CustomDialog mAlbumDialog;
+	private String couponCode = "";	
+	public String getCouponCode() {
+		return couponCode;
+	}
+	public void setCouponCode(String couponCode) {
+		this.couponCode = couponCode;
+	}
 	public SubcriptionEngine(Context context){
 		this.mContext = context;
 	}
@@ -226,7 +233,11 @@ public class SubcriptionEngine {
 	}
 	private void launchWebBasedSubscription(){
 		Log.e(TAG, "launchWebBasedSubscription");
-		String requestUrl = ConsumerApi.getSusbcriptionRequest(mSelectedPriceItem.paymentChannel, mSelectedPackageItem.packageId);
+		String requestUrl = "";
+		if(couponCode.length()<1)
+			requestUrl = ConsumerApi.getSusbcriptionRequest(mSelectedPriceItem.paymentChannel, mSelectedPackageItem.packageId);
+		else
+			requestUrl = ConsumerApi.getSusbcriptionRequest(mSelectedPriceItem.paymentChannel, mSelectedPackageItem.packageId,couponCode);
 		Intent i = new Intent(mContext,SubscriptionView.class);
 		Bundle b = new Bundle();
 		b.putString("url", requestUrl);

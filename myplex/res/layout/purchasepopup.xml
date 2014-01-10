@@ -6,9 +6,12 @@
     tools:ignore="all" >
 
     <ScrollView
+        android:id="@+id/pkg_scrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#E6343433" >
+        android:background="#E6343433"
+        android:fillViewport="true"
+        >
 
         <RelativeLayout
             android:id="@+id/purchasepopup_background"
@@ -30,12 +33,12 @@
             <RatingBar
                 android:id="@+id/purchasepopup_setRating"
                 style="@style/movieRatingBar"
-                android:rating="3.5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignLeft="@+id/purchasepopup_contentname"
                 android:layout_below="@+id/purchasepopup_contentname"
-                android:layout_marginTop="10dp" />
+                android:layout_marginTop="10dp"
+                android:rating="3.5" />
 
             <LinearLayout
                 android:id="@+id/purchasepopup_subtitle"
@@ -103,20 +106,90 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical" >
                 </LinearLayout>
-
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/purchasepopup_packsDescription"
-                android:layout_width="fill_parent"
+            <RelativeLayout
+                android:id="@+id/couponLayout"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/purchasepopup_packsparentlayout"
-                android:layout_marginLeft="30dp"
                 android:layout_marginRight="30dp"
-                android:layout_marginTop="40dp"
-                android:lineSpacingExtra="2dp"
-                android:textColor="#ffffff"
-                android:textSize="14sp" />
+                android:orientation="vertical" >
+
+                <TextView
+                    android:id="@+id/coupon_applied_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center_horizontal"
+                    android:textColor="@color/coupon_applied_txt_color"
+                    android:textStyle="bold" />
+
+                <EditText
+                    android:id="@+id/couponCodeET"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_below="@+id/coupon_applied_message"
+                    android:layout_marginLeft="@dimen/margin_gap_24"
+                    android:layout_marginRight="10dp"
+                    android:layout_marginTop="20dp"
+                    android:background="@drawable/coupon_editbox_bg"
+                    android:ems="10"
+                    android:hint="Enter coupon"
+                    android:maxLines="1"
+                    android:paddingRight="5dp"
+                    android:singleLine="true"
+                    android:textColor="#71afe5"
+                    android:textColorHint="#71afe5"
+                    android:textSize="15sp"
+                    android:windowSoftInputMode="adjustResize"
+                    android:digits="abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ" 
+                    android:maxLength="25">
+
+                    <requestFocus />
+                </EditText>
+
+                <Button
+                    android:id="@+id/applyCouponBtn"
+                    android:layout_width="120sp"
+                    android:layout_height="40dp"
+                    android:layout_below="@+id/couponCodeET"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="@dimen/margin_gap_24"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/apply_btn_bg"
+                    android:gravity="center"
+                    android:text="Apply"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:typeface="monospace"
+                    android:visibility="invisible" />
+
+                
+
+                <ImageView
+                    android:id="@+id/clar_coupon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@+id/couponCodeET"
+                    android:layout_alignRight="@+id/couponCodeET"
+                    android:layout_marginBottom="3dp"
+                    android:layout_marginRight="3dp"
+                    android:src="@drawable/ic_action_remove"
+                    android:visibility="invisible" />
+            </RelativeLayout>
+            <TextView
+                    android:id="@+id/purchasepopup_packsDescription"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/couponLayout"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginRight="30dp"
+                    android:layout_marginTop="40dp"
+                    android:lineSpacingExtra="4dp"
+                    android:textColor="#ffffff"
+                    android:textSize="14sp" >
+                </TextView>
         </RelativeLayout>
     </ScrollView>
 

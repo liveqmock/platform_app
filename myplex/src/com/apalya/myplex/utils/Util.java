@@ -550,7 +550,7 @@ public class Util {
 		Intent sendIntent = new Intent();
 		sendIntent.setAction(Intent.ACTION_SEND);
 		//sendIntent.putExtra(Intent.EXTRA_TEXT, "This is my text to send.");
-		String msg="Watching "+aTitle+" on myplex \n check it out on http://www.myplex.com/ \n https://play.google.com/store/apps/details?id=com.apalya.myplex";
+		String msg="Watching "+aTitle+" on myplex \n check it out on http://www.myplex.com/";
 		sendIntent.putExtra(Intent.EXTRA_TEXT, msg);
 		if(aType==1)
 		{
@@ -1015,5 +1015,34 @@ public class Util {
 			}
 		}
 		return network_type;
+	}
+	
+	/**
+	 *  After watching a free content just show this Dialog
+	 */
+	public static  void showFacebookShareDialog() {
+		
+		Long lastwatchedTime  = SharedPrefUtils.getLongFromSharedPreference(mContext, mContext.getString(R.string.lastSharedTime));
+		long difference  = lastwatchedTime -  System.currentTimeMillis();
+			if( lastwatchedTime == 0 || ((difference /(1000*60*60*24) ))>= 1){
+				SharedPrefUtils.writeToSharedPref(mContext, mContext.getString(R.string.lastSharedTime), System.currentTimeMillis());
+			}else{
+				return;
+			}		
+		Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
+		shareIntent.setType("text/plain");
+		shareIntent.putExtra("com.facebook.platform.extra.TITLE","title");
+		
+		shareIntent.putExtra("com.facebook.platform.extra.DESCRIPTION","DESC   ");
+		shareIntent.putExtra(android.content.Intent.EXTRA_TEXT, "www.myplex.com");
+		PackageManager pm = mContext.getPackageManager();
+		List<ResolveInfo> activityList = pm.queryIntentActivities(shareIntent, 0);
+		for (final ResolveInfo app : activityList) {
+			if ((app.activityInfo.packageName).contains("com.facebook.katana")) {
+				shareIntent.setPackage("com.facebook.katana");
+				mContext.startActivity(shareIntent);
+				break;
+			}
+		}
 	}
 }

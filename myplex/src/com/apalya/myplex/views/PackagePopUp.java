@@ -1,10 +1,12 @@
 package com.apalya.myplex.views;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -15,22 +17,32 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.webkit.WebView;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RadioButton;
@@ -38,10 +50,12 @@ import android.widget.RadioGroup;
 import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
+import android.widget.ScrollView;
 import android.widget.Space;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -58,7 +72,10 @@ import com.apalya.myplex.data.CardDataCertifiedRatingsItem;
 import com.apalya.myplex.data.CardDataPackagePriceDetailsItem;
 import com.apalya.myplex.data.CardDataPackages;
 import com.apalya.myplex.data.CardDataPromotionDetailsItem;
+import com.apalya.myplex.data.CardResponseData;
+import com.apalya.myplex.data.CouponResponseData;
 import com.apalya.myplex.data.MsisdnData;
+import com.apalya.myplex.data.ResultsData;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.Blur;
@@ -71,6 +88,9 @@ import com.apalya.myplex.utils.SubcriptionEngine;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.utils.Blur.BlurResponse;
 import com.crashlytics.android.Crashlytics;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.Module.SetupContext;
 import com.flurry.android.FlurryAgent;
 import com.flurry.android.monolithic.sdk.impl.ca;
 
@@ -84,6 +104,18 @@ public class PackagePopUp {
 	private RelativeLayout mPopupBackground;
 	private SubcriptionEngine mSubscriptionEngine;
 	private MsisdnRetrivalEngine mMsisdnRetrivalEngine;
+	private Button applyCouponBtn;
+	private EditText couponCodeEt;
+	private String packages [] ;
+//	private String couponCode;
+	private ProgressDialog mProgressDialog;
+	private ImageView clearCoupon;
+//	private boolean isCouponcodeApplied = false;
+	private HashMap<String, String> coupanCodes= new HashMap<String, String>(1);
+	private static String COUPON_CODE ="";
+	private ScrollView pkgScrollView;
+	private RelativeLayout couponLayout;
+	
 	public PackagePopUp(Context cxt,View background){
 		this.mContext = cxt;
 		this.mBackground = background;
@@ -115,6 +147,8 @@ public class PackagePopUp {
 	}
 	private Bitmap mOrginalBitmap;
 	private Blur mBlurEngine;
+	private LinearLayout susblayout;
+	private TextView couponMessage;
 	private void addBlur(){
 		if(mBackground == null){return;}
 		if(mPopupBackground == null){return;}
@@ -150,15 +184,148 @@ public class PackagePopUp {
 	}
 	public void showPackDialog(CardData data,View anchorView) {
 		View v = mInflater.inflate(R.layout.purchasepopup,null);
+		pkgScrollView = (ScrollView)v.findViewById(R.id.pkg_scrollView);			
 		mPopupBackground = (RelativeLayout)v;
 		fillPackData(data,v);
-		LinearLayout susblayout = (LinearLayout) v.findViewById(R.id.purchasepopup_packslayout);
+		 susblayout = (LinearLayout) v.findViewById(R.id.purchasepopup_packslayout);
 		addBlur();
 		addPack(data,susblayout);
 		Util.showAdultToast(mContext.getString(R.string.adultwarning),data,mContext);
+		setUpCouponFunctionality(v,data);
+//		if(isCouponAvailable(data))
+//		else
+//			hideCouponFunctionality(v);
 		showPopup(v,anchorView);
+		
 	}
-	
+	private void setUpCouponFunctionality(View view,CardData data) {	
+		couponLayout = (RelativeLayout)view.findViewById(R.id.couponLayout);
+		couponLayout.setVisibility(View.VISIBLE);
+		couponMessage  = (TextView) view.findViewById(R.id.coupon_applied_message);
+		applyCouponBtn = (Button) view.findViewById(R.id.applyCouponBtn);
+		couponCodeEt   =  (EditText) view.findViewById(R.id.couponCodeET);		
+		clearCoupon = (ImageView)view.findViewById(R.id.clar_coupon);
+		clearCoupon.setOnClickListener(new ClearListener());
+		couponCodeEt.addTextChangedListener(new CouponCodeWatcher());
+		packages = new String[data.packages.size()];
+		for(int i=0;i<data.packages.size();i++)
+		{
+			packages[i] = data.packages.get(i).packageId;	
+		}								
+		applyCouponBtn.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) 
+			{
+				applyCouponBtn.setEnabled(false);
+				showProgressBar();
+//				applyCouponBtn.setVisibility(View.GONE);
+				String validateCouponUrl = ConsumerApi.checkCouponCode(COUPON_CODE, packages);
+				RequestQueue queue = MyVolley.getRequestQueue();
+				StringRequest applyCouponRequest = new StringRequest(Request.Method.GET, validateCouponUrl, new Listener<String>() {
+				@Override
+				public void onResponse(String response) {						
+					Log.d(TAG, response);					
+					String message =null,error = null;
+					try {
+						ResultsData resultsData  =(ResultsData) Util.fromJson(response, ResultsData.class);
+						if(resultsData.code  == 200){
+							if(resultsData.results!=null){
+								List<CouponResponseData> values = resultsData.results.values;
+								for(CouponResponseData coupon : resultsData.results.values){
+									if(coupon.status.equalsIgnoreCase("SUCCESS")){
+										applyCoupon(coupon.packageId,coupon.priceTobeCharged);
+										coupanCodes.put(coupon.packageId, COUPON_CODE);
+										if(!coupon.message.equalsIgnoreCase(""))
+											message = coupon.message;
+									}else{
+										// ERROR										
+											error = coupon.errors.get(0);
+										
+									}
+								}
+							}
+						}
+					} catch (JsonMappingException e) {
+						e.printStackTrace();
+					} catch (JsonParseException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}						
+						
+						/*
+								Log.d(TAG, "Response  = " + response);
+								
+								JSONObject object;
+								try {
+									object = new JSONObject(response);
+									if (object.getInt("code") == 200 && object.getString("status").equalsIgnoreCase("SUCCESS")) 
+									{
+										JSONObject result = new JSONObject(object.getString("results"));
+										JSONArray coupons = result.getJSONArray("values");
+										for(int i=0;i<coupons.length();i++){
+											JSONObject coupon = coupons.getJSONObject(i);
+											if(coupon.getString("status").equalsIgnoreCase("SUCCESS")){
+												isCouponcodeApplied = true;
+												if(coupon.getString("status").equalsIgnoreCase("SUCCESS")){
+													applyCoupon(coupon.getString("packageId"),coupon.getDouble("priceTobeCharged"));
+													coupanCodes.put("packageId", "coupancode");
+												}
+												Log.d(TAG, coupon.toString());
+												if(!coupon.isNull("message"))
+													message = coupon.getString("message");
+											}else{
+												JSONArray errors = coupon.getJSONArray("errors");
+												if(message.length()<1)
+													message = (String) errors.get(0);
+											}
+										}
+									}else{
+										isCouponcodeApplied = false;
+										message = " Invalid Coupon Code";
+									}
+								} catch (JSONException e) {
+									e.printStackTrace();
+									isCouponcodeApplied = false;
+								}
+								couponMessage.setText(message);
+								*/
+								dismissProgressBar();
+								
+								if(message!=null)
+									couponMessage.setText(message);	
+								else 
+									couponMessage.setText(error);	
+							}
+
+					
+				}, new ErrorListener() {
+
+					@Override
+					public void onErrorResponse(VolleyError error) {
+						Log.d(TAG,"error  ="+error.getMessage());
+					}
+				});
+				applyCouponRequest.setShouldCache(false);
+				queue.add(applyCouponRequest);
+			}
+		});
+		
+		
+	}
+
+
+	private boolean isCouponAvailable(CardData data) {
+		for(CardDataPackages pkg: data.packages){
+			if(pkg.couponFlag){
+				Log.d(TAG,"cupon available?"+pkg.couponFlag);
+				return true;
+			}
+		}
+		return false;
+	}
+
+
 	private void addPack(CardData data,LinearLayout parentlayout) {
 		if(data.packages == null){return;}
 		for(CardDataPackages packageitem:data.packages){
@@ -248,6 +415,9 @@ public class PackagePopUp {
 								if (arg0.getTag() instanceof CardDataPackages) {
 									CardDataPackages packageitem = (CardDataPackages) arg0.getTag();
 									int id = arg0.getId();
+									if(coupanCodes.containsKey(packageitem.packageId)){
+										mSubscriptionEngine.setCouponCode(COUPON_CODE);
+									}									
 									mSubscriptionEngine.doSubscription(packageitem, id);
 									paymentModeText.setChecked(false);
 									dismissFilterMenuPopupWindow();
@@ -267,6 +437,7 @@ public class PackagePopUp {
 		}
 	}
 	List<View> mPackViewList = new ArrayList<View>();
+	
 	private void createPackItem(CardDataPackagePriceDetailsItem priceDetailItem,CardDataPackages packageitem,LinearLayout parentLayout){
 
 		LinearLayout packLayout = new LinearLayout(mContext);
@@ -303,7 +474,7 @@ public class PackagePopUp {
 
 		TextView amount = (TextView)v.findViewById(R.id.purchasepackItem1_price);
 		amount.setTypeface(FontUtil.Roboto_Medium);
-		amount.setText(mContext.getResources().getString(R.string.price_rupeecode)+" "+priceDetailItem.price);
+		amount.setText(/*mContext.getResources().getString(R.string.price_rupeecode)+*/""+priceDetailItem.price);
 		TextView quality = (TextView)v.findViewById(R.id.purchasepackItem1_quality);
 		quality.setTypeface(FontUtil.Roboto_Medium);
 		quality.setText(packageitem.contentType);
@@ -355,7 +526,8 @@ public class PackagePopUp {
 		description.setTypeface(FontUtil.Roboto_Regular);
 		if(data.generalInfo != null){
 			description.setText(data.generalInfo.description);
-		}
+		}	
+		 pkgScrollView.scrollTo(0, description.getBottom());	
 	}
 	private void RegisterUserReq(String contextPath, final Map<String,String> bodyParams) {
 
@@ -451,5 +623,117 @@ public class PackagePopUp {
 				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 			}
 		};
+	}
+	private class CouponCodeWatcher implements TextWatcher{
+		
+		@Override
+		public void afterTextChanged(Editable s) {
+			if(s.length() >0){				
+				applyCouponBtn.setEnabled(true);
+			}else{
+				applyCouponBtn.setVisibility(View.GONE);
+				applyCouponBtn.setEnabled(false);
+				clearCoupon.setVisibility(View.VISIBLE);
+				Animation anim = AnimationUtils.loadAnimation(mContext, R.anim.slide_down);
+				applyCouponBtn.startAnimation(anim);
+			}
+			
+			COUPON_CODE = s.toString().trim();
+		}
+
+		@Override
+		public void beforeTextChanged(CharSequence s, int start, int count,int after) {
+			pkgScrollView.smoothScrollTo(0, couponCodeEt.getBottom());
+		}
+
+		@Override
+		public void onTextChanged(CharSequence s, int start, int before,int count){	
+			if(before == 0){
+				applyCouponBtn.setVisibility(View.VISIBLE);
+				clearCoupon.setVisibility(View.VISIBLE);
+				Animation anim = AnimationUtils.loadAnimation(mContext, R.anim.slide_up);
+				applyCouponBtn.startAnimation(anim);
+			}/*if(start==1  && count == 0){
+				applyCouponBtn.setVisibility(View.INVISIBLE);
+				clearCoupon.setVisibility(View.INVISIBLE);
+				Animation anim = AnimationUtils.loadAnimation(mContext, R.anim.slide_down);
+				applyCouponBtn.startAnimation(anim);
+			}*/
+		}
+		
+	}
+
+	private void applyCoupon(String packageId, double priceToBeCharged) {
+	for (int i = 0; i < susblayout.getChildCount(); i++) {
+			Log.d(TAG, "i =" + i);
+			View view = susblayout.getChildAt(i);
+			CardDataPackages dataPackages = (CardDataPackages) view.getTag();
+			if (dataPackages != null) {
+				if (dataPackages.packageId != null) {
+					if (dataPackages.packageId.equalsIgnoreCase(packageId)) {
+						Log.d(TAG, "found");
+						showDiscountAnimation(view, priceToBeCharged);
+						for (CardDataPackagePriceDetailsItem item : dataPackages.priceDetails) {
+							float price = item.price;
+							susblayout.setTag(item);
+						}
+						break;
+					}
+				}
+			}
+			// Log.d(TAG,""+dataPackages.packageId);
+		}
+	}
+	
+	
+
+
+	private void showDiscountAnimation(View view,double priceTobecharged) {
+		
+		LinearLayout layout = (LinearLayout)view;
+		layout.setOnClickListener(mPackClickListener);
+		for(int i=0;i<layout.getChildCount();i++){
+			LinearLayout layout2 = (LinearLayout)layout.getChildAt(i);
+			for(int j=0;j<layout2.getChildCount();j++){
+				if(layout2.getChildAt(j).getId() == R.id.purchasepackItem1_price){
+					LayoutTransition transition = new LayoutTransition();
+					transition.setStartDelay(LayoutTransition.CHANGE_APPEARING, 0);
+					layout2.setLayoutTransition(transition);
+					TextView new_price = (TextView) layout2.findViewById(R.id.purchasepackItem1_price);
+					Animation anim = AnimationUtils.loadAnimation(mContext, R.anim.shake);
+					new_price.startAnimation(anim);
+					String oldPrice = new_price.getText().toString().trim();
+					StrikeTextView oldprice = (StrikeTextView) layout2.findViewById(R.id.purchasepackItem1_price_before_coupon);
+					oldprice.setVisibility(View.VISIBLE);
+//					oldprice.setPaintFlags(oldprice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+					oldprice.setText(oldPrice);					
+					new_price.setText(" "+priceTobecharged);
+					Util.showToast(mContext, "coupon applied", Util.TOAST_TYPE_INFO);
+					break;
+				}				
+			}
+		}
+	
+//	 couponCodeEt.setText("");	
+	}
+	public void showProgressBar() {
+		if (mProgressDialog != null) {
+			mProgressDialog.dismiss();
+		}
+		mProgressDialog = ProgressDialog.show(mContext, "","Applying coupon...", true, false);
+	}
+
+	public void dismissProgressBar() {
+		if (mProgressDialog != null && mProgressDialog.isShowing()) {
+			mProgressDialog.dismiss();
+		}
+	}
+	private class ClearListener implements OnClickListener{
+		@Override
+		public void onClick(View v) {			
+			couponCodeEt.getText().clear();		
+			couponMessage.setText("");
+		}
+		
 	}
 }

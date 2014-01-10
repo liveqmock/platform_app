@@ -44,4 +44,6 @@ public interface MainBaseOptions {
 
 	public void setSearchViewVisibilty(int visibility);
 	public void setUpShareButton(String toBeshared);
+
+	public void setUpLivetvOrMovie(boolean isMovie);
 }

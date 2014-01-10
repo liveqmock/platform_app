@@ -405,6 +405,17 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			mCardView.updateData(myplexapplication.getCardExplorerData().cardDataToSubscribe);
 		}
 		Log.d(TAG,"onResume");
+		boolean isMovie = false;  
+		if((mData.requestType == CardExplorerData.REQUEST_RECOMMENDATION )||( mData.requestType ==CardExplorerData.REQUEST_BROWSE))
+		{
+			if(mData.requestType == CardExplorerData.REQUEST_RECOMMENDATION ){
+				isMovie = true;
+				mMainActivity.setUpLivetvOrMovie(isMovie);
+			}else{
+				if(mData.searchQuery.equalsIgnoreCase("live"))
+					mMainActivity.setUpLivetvOrMovie(false);
+			}
+		}		
 	}
 	@Override
 	public void onPause() {

@@ -99,7 +99,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 	private Stack<BaseFragment> mFragmentStack = new Stack<BaseFragment>();
 
 	NavigationOptionsMenuAdapter mNavigationAdapter;
-	private ImageView socialShare;
+	private TextView socialShare;
 
 	@Override
 	public void setOrientation(int value){
@@ -331,7 +331,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		Util.showFeedbackOnSame(mCustomActionBarSearch);
 		mCustomActionBarProgressBar = (ProgressBar) v
 				.findViewById(R.id.customactionbar_progressBar);
-		socialShare = (ImageView)v.findViewById(R.id.actionbar_share);		
+		socialShare = (TextView)v.findViewById(R.id.actionbar_share);		
 	}
 	@Override
 	public void enableFilterAction(boolean value){
@@ -824,6 +824,11 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 				Util.shareData(mContext, 3, "",toBeShared);
 			}
 		});
+		
+	}
+	@Override
+	public void setUpLivetvOrMovie(boolean isMovie) {
+		// TODO Auto-generated method stub
 		
 	}
 }
