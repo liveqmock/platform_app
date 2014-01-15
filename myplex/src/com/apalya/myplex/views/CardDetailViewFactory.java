@@ -539,6 +539,10 @@ public class CardDetailViewFactory {
 			groupname.setText(mContext.getString(R.string.similarcontent));	
 		}
 	
+		if(mData.generalInfo != null && mData.generalInfo.type != null && mData.generalInfo.type.equalsIgnoreCase(ConsumerApi.CONTENT_SPORTS_LIVE)){
+			//groupname.setText(mContext.getString(R.string.similarcontent_sportslive));	
+		}
+		
 		similarContentDummyView.setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -885,6 +889,13 @@ public class CardDetailViewFactory {
 				break;
 			}
 		}
+		
+		if(mData.generalInfo != null && mData.generalInfo.type != null && mData.generalInfo.type.equalsIgnoreCase(ConsumerApi.CONTENT_SPORTS_LIVE)){
+			v.findViewById(R.id.carddetailbriefdescription_setRating).setVisibility(View.GONE);
+			v.findViewById(R.id.carddetailbriefdescriptionsubtitle).setVisibility(View.GONE);
+			
+		}
+		
 		parentalRating.setTypeface(FontUtil.Roboto_Medium);
 		RatingBar ratingBar = (RatingBar)v.findViewById(R.id.carddetailbriefdescription_setRating);
 		if(mData.userReviews != null){

@@ -40,6 +40,9 @@ public class DownloadUtil {
 			return;
 		}
 
+		if(downloadlist == null){
+			return;
+		}
 		HashMap<String, CardDownloadData> mDownloadedList = downloadlist.mDownloadedList;
 
 		if (mDownloadedList == null || mDownloadedList.isEmpty()) {

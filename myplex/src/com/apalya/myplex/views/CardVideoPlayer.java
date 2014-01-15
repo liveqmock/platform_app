@@ -10,9 +10,12 @@ import java.util.TimerTask;
 import org.json.JSONObject;
 
 import android.R.bool;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.DownloadManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.location.Location;
@@ -39,11 +42,14 @@ import android.widget.TextView;
 
 import com.apalya.myplex.MainBaseOptions;
 import com.apalya.myplex.R;
+import com.apalya.myplex.SubscriptionView;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDataImagesItem;
 import com.apalya.myplex.data.CardDataPurchaseItem;
 import com.apalya.myplex.data.CardDataRelatedMultimediaItem;
 import com.apalya.myplex.data.CardDownloadData;
+import com.apalya.myplex.data.MatchStatus;
+import com.apalya.myplex.data.Team;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.media.PlayerListener;
 import com.apalya.myplex.media.VideoViewExtn;
@@ -58,6 +64,8 @@ import com.apalya.myplex.utils.MediaUtil;
 import com.apalya.myplex.utils.MediaUtil.MediaUtilEventListener;
 import com.apalya.myplex.utils.MessagePost.MessagePostCallback;
 import com.apalya.myplex.utils.MyVolley;
+import com.apalya.myplex.utils.SportsStatusRefresh;
+import com.apalya.myplex.utils.SportsStatusRefresh.OnResponseListener;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.utils.WidevineDrm.Settings;
 import com.google.android.gms.common.ConnectionResult;
@@ -77,6 +85,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 	private RelativeLayout mProgressBarLayout;
 	private RelativeLayout mVideoViewParent;
 	private VideoViewExtn mVideoView;
+	private LinearLayout mScoreCardLayout;
 	private CardData mData;
 	private VideoViewPlayer mVideoViewPlayer;
 	private int mPerBuffer;
@@ -101,7 +110,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 	private int state=0;
 	int currentDuration = 0;
 
-	
+	private SportsStatusRefresh sportsStatusRefresh;
 
 	public void setFullScreenListener(PlayerFullScreen mListener){
 		this.mPlayerFullScreen = mListener;
@@ -169,6 +178,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		
 		mTrailerButton.setVisibility(mTrailerAvailable == true ? View.VISIBLE : View.GONE);
 		
+        initSportsStatusLayout(v);
 		int[] location = new int[2];
 		mTrailerButton.getLocationOnScreen(location);
 		if(location.length >0)
@@ -298,6 +308,12 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		mProgressBarLayout.setVisibility(View.GONE);
 		mPreviewImage.setVisibility(View.VISIBLE);
 		mVideoView.setVisibility(View.INVISIBLE);
+		if(mScoreCardLayout != null){
+			mScoreCardLayout.setVisibility(View.VISIBLE);
+		}
+		if(mScoreCardLayout != null){
+			mScoreCardLayout.setVisibility(View.VISIBLE);
+		}
 		if(!mContext.getResources().getBoolean(R.bool.isTablet)){
 			((MainBaseOptions) mContext).setOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		}
@@ -335,6 +351,12 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		mProgressBarLayout.setVisibility(View.VISIBLE);
 		mVideoView.setVisibility(View.VISIBLE);
 		mPreviewImage.setVisibility(View.INVISIBLE);
+		if(mScoreCardLayout != null){
+			mScoreCardLayout.setVisibility(View.INVISIBLE);
+		}
+		if(sportsStatusRefresh !=null){
+			sportsStatusRefresh.stop();
+		}
 		MediaUtil.setUrlEventListener(new MediaUtilEventListener() {
 
 			@Override
@@ -521,6 +543,11 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 	        	}
 	        	else
 	        		qualityType= ConsumerApi.VIDEOQUALTYHIGH;
+	        	
+	        	if(mContext.getResources().getBoolean(R.bool.isTablet) && mData.generalInfo != null && mData.generalInfo.type != null && mData.generalInfo.type.equalsIgnoreCase(ConsumerApi.CONTENT_SPORTS_LIVE)){
+	        		// for tablet use very high quality link.
+	        		qualityType= ConsumerApi.VIDEOQUALTYVERYHIGH;
+	        	}
 	        }
 			
 	        if(myplexapplication.mDownloadList != null){
@@ -811,6 +838,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		mTrailerButton.setTypeface(FontUtil.ss_symbolicons_line);
 		mTrailerButton.setVisibility(mTrailerAvailable == true ? View.VISIBLE : View.GONE);
 		
+		initSportsStatusLayout(v);
 		mTrailerButton.setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -1224,6 +1252,122 @@ private void playVideoFile(CardDownloadData mDownloadData){
 
 		// It is a wifi
 		return true;
+	}
+
+	private OnClickListener mScoreCardClickListener = new OnClickListener() {
+		
+		@Override
+		public void onClick(View v) {
+			
+			if(!Util.isNetworkAvailable(mContext)){
+				Util.showToast(mContext, "No Network connection",Util.TOAST_TYPE_ERROR);
+				return;
+			}
+			Intent i = new Intent(mContext,SubscriptionView.class);
+			Bundle b = new Bundle();
+			b.putString("url", "http://m.espncricinfo.com/ci/engine/match/690617.html");
+			b.putBoolean("isProgressDialogCancelable", true);
+			i.putExtras(b);	
+			((Activity) mContext).startActivityForResult(i, ConsumerApi.SUBSCRIPTIONREQUEST);
+			
+		}
+	};
+	
+	private void initSportsStatusLayout(final View view){
+		if(mData.generalInfo != null && mData.generalInfo.type != null && mData.generalInfo.type.equalsIgnoreCase(ConsumerApi.CONTENT_SPORTS_LIVE)){
+			mTrailerButton.setVisibility(View.GONE);
+			mScoreCardLayout = (LinearLayout)view.findViewById(R.id.cardmedia_scorecard_layout);
+			mScoreCardLayout.setVisibility(View.VISIBLE);
+			mScoreCardLayout.setOnClickListener(mScoreCardClickListener);
+			mTrailerAvailable=false;
+			
+			
+			OnResponseListener onResponseListener = new OnResponseListener() {
+
+				@Override
+				public void response(boolean status, MatchStatus matchStatus) {
+
+					if (!status) {
+						return;
+					}
+					
+					if(!TextUtils.equals(MatchStatus.STATUS_LIVE, matchStatus.status)){
+						stopSportsStatusRefresh();
+					}
+					
+					TextView textView1 = (TextView) view
+							.findViewById(R.id.cardmedia_scorecard_textLine1);
+					TextView textView2 = (TextView) view
+							.findViewById(R.id.cardmedia_scorecard_textLine2);
+					TextView textView3 = (TextView) view
+							.findViewById(R.id.cardmedia_scorecard_textLine3);
+					
+					ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(mScoreCardLayout,
+							"alpha", 0f, 1f);
+					fadeAnim2.setDuration(800);
+					fadeAnim2.start();
+															
+					if(!TextUtils.equals(MatchStatus.STATUS_LIVE, matchStatus.status) || 
+							matchStatus.teams == null || 
+							matchStatus.teams.isEmpty()){
+
+						if(!TextUtils.isEmpty(matchStatus.matchTitle)){
+							textView1.setText(matchStatus.matchTitle);
+						}
+						if(!TextUtils.isEmpty(matchStatus.statusDescription)){
+							textView2.setText(matchStatus.statusDescription);
+							textView2.setSelected(true);
+						}
+						return;
+					}
+					
+					if(matchStatus.teams.size() ==1){
+						
+						Team team= matchStatus.teams.get(0);
+						
+						if(team.validate()){
+							textView1.setText(team.sname +" " + team.score);						
+						}
+						if(!TextUtils.isEmpty(matchStatus.statusDescription)){
+							textView2.setText(matchStatus.statusDescription);
+						}
+						
+						return;
+					}
+					
+					if(matchStatus.teams.size() == 2 ){
+						
+						Team team1= matchStatus.teams.get(0);
+						Team team2= matchStatus.teams.get(1);
+						if(team1.validate()){
+							textView1.setText(team1.sname +" " + team1.score);
+						}
+						if(team2.validate()){
+							textView2.setText(team2.sname +" " + team2.score);						
+						}
+						if(!TextUtils.isEmpty(matchStatus.statusDescription)){
+							textView3.setVisibility(View.VISIBLE);
+							textView3.setText(matchStatus.statusDescription);	
+							textView3.setSelected(true);
+						}
+					}
+					
+
+				}
+
+			
+			};
+			
+			sportsStatusRefresh = new SportsStatusRefresh(mData._id, onResponseListener);
+			sportsStatusRefresh.start();
+		}
+	}
+	
+	
+	public void stopSportsStatusRefresh(){
+		if(sportsStatusRefresh != null){
+			sportsStatusRefresh.stop();
+		}
 	}
 
 }

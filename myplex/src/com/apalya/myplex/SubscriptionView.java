@@ -13,12 +13,14 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnClickListener;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.net.http.SslError;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
 import android.webkit.SslErrorHandler;
@@ -47,6 +49,7 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 	private ProgressDialog mProgressDialog = null;
 	private String url;
 	public String status;
+	private boolean isProgressDialogCancelable=false;
 	
 //	http://api.beta.myplex.in/user/v2/billing/callback/evergent/
 	@Override
@@ -61,6 +64,7 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 		try {
 			Bundle b = this.getIntent().getExtras();
 			url = b.getString("url");
+			isProgressDialogCancelable= b.getBoolean("isProgressDialogCancelable", false);
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
@@ -73,6 +77,7 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 		try{		
 			setUpWebView(url);
 		}catch(Exception e){
+			e.printStackTrace();
 			dofinish(ConsumerApi.SUBSCRIPTIONERROR);
 		}
 	}
@@ -309,11 +314,31 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 		if(mProgressDialog != null && mProgressDialog.isShowing()){
 			mProgressDialog.dismiss();
 		}
-		mProgressDialog = ProgressDialog.show(this,"", "Loading...", true,false);
+		
+		if(isProgressDialogCancelable){
+			findViewById(R.id.customactionbar_progressBar).setVisibility(View.VISIBLE);
+			return;
+		}
+		OnCancelListener onCancelListener = new OnCancelListener() {
+			
+			@Override
+			public void onCancel(DialogInterface dialog) {
+				if(isProgressDialogCancelable){
+					finish();
+				}
+				
+			}
+		};
+		mProgressDialog = ProgressDialog.show(this,"", "Loading...", true,isProgressDialogCancelable,onCancelListener);
+		mProgressDialog.setCanceledOnTouchOutside(false);
 	}
 	public void dismissProgressBar(){
 		if(mProgressDialog != null && mProgressDialog.isShowing()){
 			mProgressDialog.dismiss();
+		}
+		if(isProgressDialogCancelable){
+			findViewById(R.id.customactionbar_progressBar).setVisibility(View.GONE);
+			return;
 		}
 	}
 	@Override

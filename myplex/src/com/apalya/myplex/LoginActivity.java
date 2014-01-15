@@ -175,6 +175,17 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>(){
+
+			@Override
+			protected Void doInBackground(Void... params) {
+				// TODO Auto-generated method stub
+				return null;
+			}
+			
+		};
+		task.execute();
 		Crashlytics.start(this);
 		FontUtil.loadFonts(getAssets());
 		String trackingDistinctId = getTrackingDistinctId();
@@ -473,7 +484,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		// To preserve battery life, the Mixpanel library will store
 		// events rather than send them immediately. This means it
 		// is important to call flush() to send any unsent events
-		// before your application is taken out of memory.
+		// before your application is taken out of memory.		
 		mMixpanel.flush();
 	}
 	private void prepareSlideNotifiation() {

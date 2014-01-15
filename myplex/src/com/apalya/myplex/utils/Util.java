@@ -1022,27 +1022,27 @@ public class Util {
 	 */
 	public static  void showFacebookShareDialog() {
 		
-		Long lastwatchedTime  = SharedPrefUtils.getLongFromSharedPreference(mContext, mContext.getString(R.string.lastSharedTime));
-		long difference  = lastwatchedTime -  System.currentTimeMillis();
-			if( lastwatchedTime == 0 || ((difference /(1000*60*60*24) ))>= 1){
-				SharedPrefUtils.writeToSharedPref(mContext, mContext.getString(R.string.lastSharedTime), System.currentTimeMillis());
-			}else{
-				return;
-			}		
-		Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
-		shareIntent.setType("text/plain");
-		shareIntent.putExtra("com.facebook.platform.extra.TITLE","title");
-		
-		shareIntent.putExtra("com.facebook.platform.extra.DESCRIPTION","DESC   ");
-		shareIntent.putExtra(android.content.Intent.EXTRA_TEXT, "www.myplex.com");
-		PackageManager pm = mContext.getPackageManager();
-		List<ResolveInfo> activityList = pm.queryIntentActivities(shareIntent, 0);
-		for (final ResolveInfo app : activityList) {
-			if ((app.activityInfo.packageName).contains("com.facebook.katana")) {
-				shareIntent.setPackage("com.facebook.katana");
-				mContext.startActivity(shareIntent);
-				break;
-			}
-		}
+//		Long lastwatchedTime  = SharedPrefUtils.getLongFromSharedPreference(mContext, mContext.getString(R.string.lastSharedTime));
+//		long difference  = lastwatchedTime -  System.currentTimeMillis();
+//			if( lastwatchedTime == 0 || ((difference /(1000*60*60*24) ))>= 1){
+//				SharedPrefUtils.writeToSharedPref(mContext, mContext.getString(R.string.lastSharedTime), System.currentTimeMillis());
+//			}else{
+//				return;
+//			}		
+//		Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
+//		shareIntent.setType("text/plain");
+//		shareIntent.putExtra("com.facebook.platform.extra.TITLE","title");
+//		
+//		shareIntent.putExtra("com.facebook.platform.extra.DESCRIPTION","DESC   ");
+//		shareIntent.putExtra(android.content.Intent.EXTRA_TEXT, "www.myplex.com");
+//		PackageManager pm = mContext.getPackageManager();
+//		List<ResolveInfo> activityList = pm.queryIntentActivities(shareIntent, 0);
+//		for (final ResolveInfo app : activityList) {
+//			if ((app.activityInfo.packageName).contains("com.facebook.katana")) {
+//				shareIntent.setPackage("com.facebook.katana");
+//				mContext.startActivity(shareIntent);
+//				break;
+//			}
+//		}
 	}
 }

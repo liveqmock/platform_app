@@ -106,6 +106,7 @@
     <string name="iconhome">&#x2302;</string>
     <string name="iconmovie">&#xE8B1;</string>
     <string name="iconlivetv">&#xE8C0;</string>
+    <string name="iconcricket">&#x26BE;</string>
     <string name="icontv">&#x1F4FA;</string>
     <string name="iconshare">&#xF601;</string>
     <!--Navigation drawer icons-->

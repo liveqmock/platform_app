@@ -16,6 +16,7 @@ public class ConsumerApi {
 	public static final String RECOMMENDATIONS_ACTION = "recommendations";
 	public static final String SIGN_OUT_ACTION = "signOut";
 	public static final String CONTENTDETAILS_ACTION = "contentDetail";
+	public static final String MATCHSTATUS_ACTION = "matchStatus";
 	public static final String SIMILARCONTENT = "similar";
 	public static final String COMMENT_TAG= "comment";
 	public static final String RATING_TAG= "rating";
@@ -93,6 +94,11 @@ public class ConsumerApi {
 	public static final String DURATION = "";
 	public static final String FORCE_TRUE = "&force=true";
 	
+	// list of content types
+	
+	public static final String CONTENT_SPORTS_LIVE = "sportsEvent";
+	public static final String CONTENT_SPORTS_VOD = "sports";
+		
 	public static String getSearch(String queryStr, String level,int startIndex, String searchType) {
 		if(queryStr == null||(queryStr != null && queryStr.length() ==0)){
 			queryStr = "*";
@@ -230,5 +236,10 @@ public class ConsumerApi {
 			 CHECK_COUPON +  QUESTION_MARK +CLIENTKEY + DEBUGCLIENTKEY + AMPERSAND + COUPON_CODE  + couponCode + AMPERSAND +
 			 PACKAGE_ID  + packageString;
 		
+	}
+	
+	public static String getMatchStatus(String contentID){
+		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH + CONTENT_TAG +SLASH + contentID
+				+ SLASH +  MATCHSTATUS_ACTION + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY ;
 	}
 }

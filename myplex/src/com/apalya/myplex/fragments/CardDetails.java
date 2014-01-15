@@ -56,6 +56,7 @@ import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.media.PlayerListener;
 import com.apalya.myplex.utils.Analytics;
+import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FavouriteUtil;
 import com.apalya.myplex.utils.FavouriteUtil.FavouriteCallback;
 import com.apalya.myplex.utils.FontUtil;
@@ -271,6 +272,7 @@ public class CardDetails extends BaseFragment implements
 		if(mPlayer!=null){
 			if(mPlayer.isMediaPlaying()){
 				mPlayer.onStateChanged(PlayerListener.STATE_PAUSED, mPlayer.getStopPosition());
+				mPlayer.stopSportsStatusRefresh();
 				if(mCardData.generalInfo.isSellable){
 					Log.d(TAG, "free content");
 					Util.showFacebookShareDialog();

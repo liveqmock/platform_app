@@ -7,5 +7,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Result {
+
+	public MatchStatus matchStatus;
+
 	public List<CouponResponseData> values = new ArrayList<CouponResponseData>();
 }

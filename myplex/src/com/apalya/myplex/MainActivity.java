@@ -170,7 +170,7 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.RECOMMENDED,R.string.iconhome, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.MOVIES,R.string.iconmovie, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LIVETV,R.string.iconlivetv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.SPORTS,R.string.iconcricket, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGO,R.string.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
 
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FAVOURITE,R.string.iconfav, null, screenType,R.layout.navigation_menuitemsmall));
@@ -710,6 +710,13 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 				removeLiveTvActionBarIcon();
 				data.requestType = CardExplorerData.REQUEST_PURCHASES;
 				setActionBarTitle("my "+NavigationOptionsMenuAdapter.PURCHASES);
+			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.SPORTS)){
+				removeLiveTvActionBarIcon();
+				data.requestType = CardExplorerData.REQUEST_BROWSE;
+				data.searchQuery =ConsumerApi.CONTENT_SPORTS_LIVE+","+ConsumerApi.CONTENT_SPORTS_VOD;
+				data.searchScope = "sportsEvent";
+				setActionBarTitle(NavigationOptionsMenuAdapter.SPORTS);
+				setSearchviewHint("search live tv");
 			}
 			else
 			{
