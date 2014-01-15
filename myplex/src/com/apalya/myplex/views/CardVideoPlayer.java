@@ -1262,10 +1262,15 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			if(!Util.isNetworkAvailable(mContext)){
 				Util.showToast(mContext, "No Network connection",Util.TOAST_TYPE_ERROR);
 				return;
+			}			
+			
+			if(mData.matchInfo == null || TextUtils.isEmpty(mData.matchInfo.matchMobileUrl )){
+				Util.showToast(mContext, "Not Available",Util.TOAST_TYPE_ERROR);
+				return;
 			}
 			Intent i = new Intent(mContext,SubscriptionView.class);
 			Bundle b = new Bundle();
-			b.putString("url", "http://m.espncricinfo.com/ci/engine/match/690617.html");
+			b.putString("url", mData.matchInfo.matchMobileUrl );
 			b.putBoolean("isProgressDialogCancelable", true);
 			i.putExtras(b);	
 			((Activity) mContext).startActivityForResult(i, ConsumerApi.SUBSCRIPTIONREQUEST);

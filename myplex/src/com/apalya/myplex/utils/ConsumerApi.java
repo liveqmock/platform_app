@@ -97,7 +97,7 @@ public class ConsumerApi {
 	// list of content types
 	
 	public static final String CONTENT_SPORTS_LIVE = "sportsEvent";
-	public static final String CONTENT_SPORTS_VOD = "sports";
+	public static final String CONTENT_SPORTS_VOD = "sportsEventVod";
 		
 	public static String getSearch(String queryStr, String level,int startIndex, String searchType) {
 		if(queryStr == null||(queryStr != null && queryStr.length() ==0)){

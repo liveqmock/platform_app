@@ -8,4 +8,5 @@ public class ApplicationSettings {
 	public static final boolean ENABLE_MIXPANEL_API = true;
 	// Enable below flag to display player log option in settings menu.
 	public static boolean ENABLE_SHOW_PLAYER_LOGS_SETTINGS = false;
+	public static final boolean ENABLE_SERIALIZE_LAST_SEESION=false; 
 }

@@ -36,6 +36,7 @@ public class CardData implements Serializable{
 	public CardDataSimilarContent similarContent;
 	public String _id;
 	public CardDownloadData downloadData;
+	public MatchInfo matchInfo;
 	public CardData(){
 		
 	}

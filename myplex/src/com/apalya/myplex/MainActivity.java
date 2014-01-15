@@ -62,6 +62,7 @@ import com.apalya.myplex.adapters.FliterMenuAdapter;
 import com.apalya.myplex.adapters.NavigationOptionsMenuAdapter;
 import com.apalya.myplex.cache.CacheManager;
 import com.apalya.myplex.cache.IndexHandler;
+import com.apalya.myplex.data.ApplicationSettings;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDataGenralInfo;
 import com.apalya.myplex.data.CardDataImages;
@@ -585,6 +586,9 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 		return fragment;
 	}
 	private void saveCurrentSessionData(){
+		if(!ApplicationSettings.ENABLE_SERIALIZE_LAST_SEESION){
+			return;
+		}
 		CardExplorerData explorerData = myplexapplication.getCardExplorerData();
 		if(explorerData.requestType == CardExplorerData.REQUEST_RECOMMENDATION){
 			List<CardData> toStoreList = new ArrayList<CardData>();
@@ -619,8 +623,8 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 	private CardDetails mCardDetails;
 	private SearchActivity mSearchActivity;
 	private SetttingsFragment mSettingsScreen;
-	private void selectItem(int position) {
-		saveCurrentSessionData();
+	private void selectItem(int position) {		
+		saveCurrentSessionData();		
 		changeVisibility(mTitleFilterSymbol, View.GONE);
 		NavigationOptionsMenu menu = mMenuItemList.get(position);
 		setSearchviewHint("search movies");

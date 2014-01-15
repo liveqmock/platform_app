@@ -51,6 +51,7 @@ import com.apalya.myplex.adapters.CardTabletAdapater;
 import com.apalya.myplex.adapters.NavigationOptionsMenuAdapter;
 import com.apalya.myplex.cache.CacheManager;
 import com.apalya.myplex.cache.IndexHandler;
+import com.apalya.myplex.data.ApplicationSettings;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDataGenralInfo;
 import com.apalya.myplex.data.CardDataGenre;
@@ -462,6 +463,9 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		});
 	}
 	private void prepareLastSessionData(){
+		if(!ApplicationSettings.ENABLE_SERIALIZE_LAST_SEESION){
+			return;
+		}
 		Thread t = new Thread() {
 			public void run() {
 				CardExplorerData explorerData = myplexapplication.getCardExplorerData();
