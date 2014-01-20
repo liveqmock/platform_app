@@ -48,7 +48,6 @@ public class MediaUtil {
 		String url=ConsumerApi.getVideosDetail(aContentId);
 		String url1 = ConsumerApi.getPlayerEventDetails(aContentId, "Pause");
 		String location_params  = myplexapplication.locationUtil.getVideoUrlParams();
-		Log.d("amlan","got location ="+location_params);
 		if(location_params.length()>0){
 			Log.d(TAG, location_params);
 			url += location_params; 

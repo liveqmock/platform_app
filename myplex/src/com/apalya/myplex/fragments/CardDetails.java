@@ -275,7 +275,7 @@ public class CardDetails extends BaseFragment implements
 				mPlayer.stopSportsStatusRefresh();
 				if(mCardData.generalInfo.isSellable){
 					Log.d(TAG, "free content");
-					Util.showFacebookShareDialog();
+					Util.showFacebookShareDialog(mContext);
 				}
 			}
 		}

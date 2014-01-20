@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.TimeZone;
 import java.util.regex.Pattern;
 
 import org.json.JSONException;
@@ -34,9 +35,15 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.app.DownloadManager;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ResolveInfo;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -52,6 +59,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.app.NotificationCompat;
 import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -75,13 +83,17 @@ import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.apalya.myplex.LoginActivity;
 import com.apalya.myplex.MainActivity;
 import com.apalya.myplex.R;
 import com.apalya.myplex.R.color;
+import com.apalya.myplex.cache.CacheManager;
+import com.apalya.myplex.cache.IndexHandler;
 import com.apalya.myplex.data.ApplicationConfig;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDownloadData;
 import com.apalya.myplex.data.CardDownloadedDataList;
+import com.apalya.myplex.data.FetchDownloadData;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.tablet.MultiPaneActivity;
 import com.facebook.FacebookException;
@@ -1020,29 +1032,78 @@ public class Util {
 	/**
 	 *  After watching a free content just show this Dialog
 	 */
-	public static  void showFacebookShareDialog() {
+	public static  void showFacebookShareDialog(Context context) {
+		mContext = context;
+		Long lastwatchedTime  = SharedPrefUtils.getLongFromSharedPreference(mContext, mContext.getString(R.string.lastSharedTime));
+		long difference  = lastwatchedTime -  System.currentTimeMillis();
+			if( lastwatchedTime == 0 || ((difference /(1000*60*60*24) ))>= 1){
+				SharedPrefUtils.writeToSharedPref(mContext, mContext.getString(R.string.lastSharedTime), System.currentTimeMillis());
+			}else{
+				return;
+			}		
+		Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
+		shareIntent.setType("text/plain");
+		shareIntent.putExtra("com.facebook.platform.extra.TITLE","title");
 		
-//		Long lastwatchedTime  = SharedPrefUtils.getLongFromSharedPreference(mContext, mContext.getString(R.string.lastSharedTime));
-//		long difference  = lastwatchedTime -  System.currentTimeMillis();
-//			if( lastwatchedTime == 0 || ((difference /(1000*60*60*24) ))>= 1){
-//				SharedPrefUtils.writeToSharedPref(mContext, mContext.getString(R.string.lastSharedTime), System.currentTimeMillis());
-//			}else{
-//				return;
-//			}		
-//		Intent shareIntent = new Intent(android.content.Intent.ACTION_SEND);
-//		shareIntent.setType("text/plain");
-//		shareIntent.putExtra("com.facebook.platform.extra.TITLE","title");
-//		
-//		shareIntent.putExtra("com.facebook.platform.extra.DESCRIPTION","DESC   ");
-//		shareIntent.putExtra(android.content.Intent.EXTRA_TEXT, "www.myplex.com");
-//		PackageManager pm = mContext.getPackageManager();
-//		List<ResolveInfo> activityList = pm.queryIntentActivities(shareIntent, 0);
-//		for (final ResolveInfo app : activityList) {
-//			if ((app.activityInfo.packageName).contains("com.facebook.katana")) {
-//				shareIntent.setPackage("com.facebook.katana");
-//				mContext.startActivity(shareIntent);
-//				break;
-//			}
-//		}
+		shareIntent.putExtra("com.facebook.platform.extra.DESCRIPTION","DESC   ");
+		shareIntent.putExtra(android.content.Intent.EXTRA_TEXT, "www.myplex.com");
+		PackageManager pm = mContext.getPackageManager();
+		List<ResolveInfo> activityList = pm.queryIntentActivities(shareIntent, 0);
+		for (final ResolveInfo app : activityList) {
+			if ((app.activityInfo.packageName).contains("com.facebook.katana")) {
+				shareIntent.setPackage("com.facebook.katana");
+				mContext.startActivity(shareIntent);
+				break;
+			}
+		}
+	}
+	
+	public static String getDate(String dateInString) {
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		format.setTimeZone(TimeZone.getTimeZone("UTC"));
+		Date date = null;
+		try {
+			date = format.parse(dateInString);
+			System.out.println(date);			
+			System.out.println(format.format(date));
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		if(date!=null){
+			SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy hh:mm a");
+			sdf.setTimeZone(TimeZone.getDefault());			
+			return sdf.format(date).toString();
+		}else 
+			return null;
+	}
+	
+	public static void showNotification(Context context, String title) {	
+		
+		
+		Intent notificationIntent = new Intent(context,	LoginActivity.class);
+		PendingIntent contentIntent =  PendingIntent.getActivity(context, 0, notificationIntent, 0);
+		
+		PackageManager manager = context.getPackageManager();
+		Intent appIntent = manager.getLaunchIntentForPackage(context.getPackageName());
+		
+		 try {
+	            ApplicationInfo appInfo = manager.getApplicationInfo(context.getPackageName(), 0);
+	            CharSequence notificationTitle = manager.getApplicationLabel(appInfo);
+	            int notificationIcon = appInfo.icon;
+	            NotificationManager nm = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+	            NotificationCompat.Builder mBuilder =
+	            		new NotificationCompat.Builder(context)
+	            .setSmallIcon(notificationIcon)
+	            .setContentTitle(notificationTitle)
+	            .setContentText(title+" Download Complete")
+	            .setContentIntent(contentIntent);
+	            Notification notification = mBuilder.build();
+	            notification.flags = Notification.FLAG_AUTO_CANCEL;
+	            nm.notify(1, notification);	
+	        } catch (NameNotFoundException e) {
+	            // In this case, use a blank title and default icon
+	        }catch (Exception e) {
+			}
+
 	}
 }

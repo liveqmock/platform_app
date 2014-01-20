@@ -12,6 +12,7 @@ public interface PlayerListener {
 	int STATE_RESUME = 7;
 	int STATE_SUSPEND_UNSUPPORTED = 8;
 	int STATE_STARTED = 9;
+	int STATE_COMPLETED = 10;
 
 	public void onSeekComplete(MediaPlayer mp) ;
 

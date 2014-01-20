@@ -113,6 +113,7 @@
             <category android:name="com.apalya.myplex" />
         </intent-filter>
     </receiver>
+        <activity android:name="LiveScoreWebView"></activity>
         
     </application>
 

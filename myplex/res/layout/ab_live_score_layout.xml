@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#54B5E9"
+    android:orientation="vertical" >
+
+    <ImageView
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="20dp"
+        android:contentDescription="@string/hello_world"
+        android:src="@drawable/watermark" 
+        android:id="@+id/ab_icon"/>
+
+    <TextView
+        android:id="@+id/customactionbar_filter_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:singleLine="true"
+        android:text="@string/app_name"
+        android:textColor="#ffffff"
+        android:textSize="22sp"
+        android:layout_toRightOf="@+id/ab_icon" 
+        android:paddingLeft="20dp"/>
+
+    <ProgressBar
+        android:id="@+id/livescore_progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="4dp"
+        android:layout_alignParentBottom="true"
+        android:indeterminate="true"
+        android:indeterminateBehavior="repeat"
+        android:indeterminateDrawable="@drawable/custom_progress_bar_horizontal" />
+
+</RelativeLayout>

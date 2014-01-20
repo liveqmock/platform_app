@@ -529,6 +529,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 		Log.d("PlayerScreen", "VideoViewPlayer onCompletion End");
 		if (mPlayerListener != null) {
 			mPlayerListener.onCompletion(mp);
+			mPlayerListener.onStateChanged(PlayerListener.STATE_COMPLETED, 	0);
 		}
 	}
 

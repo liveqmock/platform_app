@@ -200,7 +200,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.RECOMMENDED,R.string.iconhome, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.MOVIES,R.string.iconmovie, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LIVETV,R.string.iconlivetv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.SPORTS,R.string.iconcricket, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+//		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.SPORTS,R.string.iconcricket, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGO,R.string.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
 
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FAVOURITE,R.string.iconfav, null, screenType,R.layout.navigation_menuitemsmall));
@@ -562,11 +562,11 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 			}else if(label.equalsIgnoreCase(NavigationOptionsMenuAdapter.PURCHASES)){
 				data.requestType = CardExplorerData.REQUEST_PURCHASES;
 				setActionBarTitle("my "+NavigationOptionsMenuAdapter.PURCHASES);
-			}else if(label.equalsIgnoreCase(NavigationOptionsMenuAdapter.SPORTS)){
+			}/*else if(label.equalsIgnoreCase(NavigationOptionsMenuAdapter.SPORTS)){
 				data.requestType = CardExplorerData.REQUEST_BROWSE;
 				data.searchQuery =ConsumerApi.CONTENT_SPORTS_LIVE+","+ConsumerApi.CONTENT_SPORTS_VOD;				
 				setActionBarTitle(NavigationOptionsMenuAdapter.SPORTS);				
-			}
+			}*/
 			else
 			{
 				setActionBarTitle("myplex");

@@ -40,6 +40,7 @@ import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 
 
+import com.apalya.myplex.LiveScoreWebView;
 import com.apalya.myplex.MainBaseOptions;
 import com.apalya.myplex.R;
 import com.apalya.myplex.SubscriptionView;
@@ -64,6 +65,7 @@ import com.apalya.myplex.utils.MediaUtil;
 import com.apalya.myplex.utils.MediaUtil.MediaUtilEventListener;
 import com.apalya.myplex.utils.MessagePost.MessagePostCallback;
 import com.apalya.myplex.utils.MyVolley;
+import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.utils.SportsStatusRefresh;
 import com.apalya.myplex.utils.SportsStatusRefresh.OnResponseListener;
 import com.apalya.myplex.utils.Util;
@@ -103,7 +105,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 	private String mVideoUrl;
 	private Uri mVideoUri ;
 	private boolean mTrailerAvailable = false;
-	
+	private boolean isLocalPlayback = false;
 	private static final String TAG = "CardVideoPlayer";
 //	private Location location;
 //	private LocationClient locationClient;
@@ -178,7 +180,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		
 		mTrailerButton.setVisibility(mTrailerAvailable == true ? View.VISIBLE : View.GONE);
 		
-        initSportsStatusLayout(v);
+//        initSportsStatusLayout(v);
 		int[] location = new int[2];
 		mTrailerButton.getLocationOnScreen(location);
 		if(location.length >0)
@@ -333,7 +335,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 
 	public void FetchUrl() {	
 		
-		
+		isLocalPlayback = false;
 		
 //		
 //		if(mData._id == null || !AllowedContentIdList.isAllowed(mData._id) ){
@@ -403,6 +405,8 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 				if(isESTPackPurchased || url.contains("_est_"))
 				{
 					url=url.replace("widevine:", "http:");
+//					url = "http://122.248.233.48/wvm/100_ff_4_medium.wvm";
+//					url = "https://demostb.s3.amazonaws.com/myplex2.apk";
 					closePlayer();
 					if(Util.getSpaceAvailable()>=1)
 					{
@@ -655,6 +659,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 	}
 private void playVideoFile(CardDownloadData mDownloadData){
 
+	isLocalPlayback  = true;
 	drmLicenseType="lp";
 	String url="file://"+mDownloadData.mDownloadPath;
 	
@@ -705,8 +710,9 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			return false;
 		}
 	});
-			
 	
+	 int ellapseTime = SharedPrefUtils.getIntFromSharedPreference(mContext, mData._id);
+		mVideoViewPlayer.setmPositionWhenPaused(ellapseTime *1000);	
 }
 	private void FetchTrailerUrl(String contentId)
 	{
@@ -838,7 +844,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		mTrailerButton.setTypeface(FontUtil.ss_symbolicons_line);
 		mTrailerButton.setVisibility(mTrailerAvailable == true ? View.VISIBLE : View.GONE);
 		
-		initSportsStatusLayout(v);
+//		initSportsStatusLayout(v);
 		mTrailerButton.setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -1160,12 +1166,18 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		currentDuration = elapsedTime;
 		switch (state) {
 		case PlayerListener.STATE_PAUSED:
+			if(isLocalPlayback){
+				SharedPrefUtils.writeToSharedPref(mContext, mData._id, elapsedTime);
+			}
 			Log.d(TAG, "paused" + elapsedTime);
 			break;
 		case PlayerListener.STATE_PLAYING:
 			Log.d(TAG, "playing" + elapsedTime);
 			break;
 		case PlayerListener.STATE_STOP:
+			if(isLocalPlayback){
+				SharedPrefUtils.writeToSharedPref(mContext, mData._id, elapsedTime);
+			}
 			Log.d(TAG, "stop");
 			break;
 		case PlayerListener.STATE_RESUME:
@@ -1174,10 +1186,16 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		case PlayerListener.STATE_STARTED:
 			Log.d(TAG, "started");
 			break;
-
+		case PlayerListener.STATE_COMPLETED:
+			Log.d(TAG,"completed");
+			if(isLocalPlayback){
+				SharedPrefUtils.writeToSharedPref(mContext, mData._id, elapsedTime);
+			}
+			break;
 		}
 		MediaUtil.savePlayerState(mData._id, state, elapsedTime);
 
+		
 	}
 	
 	
@@ -1268,7 +1286,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 				Util.showToast(mContext, "Not Available",Util.TOAST_TYPE_ERROR);
 				return;
 			}
-			Intent i = new Intent(mContext,SubscriptionView.class);
+			Intent i = new Intent(mContext,LiveScoreWebView.class);
 			Bundle b = new Bundle();
 			b.putString("url", mData.matchInfo.matchMobileUrl );
 			b.putBoolean("isProgressDialogCancelable", true);
