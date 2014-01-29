@@ -968,7 +968,7 @@ public class CardDetailViewFactory {
 				for(CardDataPackages packageitem:mData.packages){
 					if(packageitem.priceDetails != null){
 						for(CardDataPackagePriceDetailsItem priceDetailItem:packageitem.priceDetails){
-							if(priceDetailItem.price < price){
+							if(!priceDetailItem.paymentChannel.equalsIgnoreCase(ConsumerApi.PAYMENT_CHANNEL_INAPP) && priceDetailItem.price < price){
 								price = priceDetailItem.price;
 							}
 						}

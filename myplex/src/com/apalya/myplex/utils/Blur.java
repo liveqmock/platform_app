@@ -288,6 +288,9 @@ public class Blur {
 					sendBlurredBitmap(listener,bitmap);
 				} catch (Exception e) {
 					sendBlurredBitmap(listener,null);
+				}catch (OutOfMemoryError e) {
+					System.gc();
+					sendBlurredBitmap(listener,null);
 				}
 			}
 		};

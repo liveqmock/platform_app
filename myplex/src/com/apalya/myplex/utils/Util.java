@@ -42,6 +42,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ResolveInfo;
@@ -61,6 +62,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Patterns;
@@ -1105,5 +1107,21 @@ public class Util {
 	        }catch (Exception e) {
 			}
 
+	}
+	public static String getAppVersionName(Context context){
+		
+		String version = "";
+		PackageManager manager = context.getPackageManager();
+		PackageInfo info;
+		try {
+			info = manager.getPackageInfo(
+					context.getPackageName(), 0);
+			if(!TextUtils.isEmpty(info.versionName)){
+				version = " " + info.versionName;
+			}
+		} catch (Exception e) {			
+			return "";
+		}
+		return version;
 	}
 }

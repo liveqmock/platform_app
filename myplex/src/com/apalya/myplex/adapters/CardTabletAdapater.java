@@ -43,6 +43,7 @@ import com.apalya.myplex.data.CardViewMeta;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.CardImageLoader;
+import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FavouriteUtil;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
@@ -305,7 +306,7 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 				for(CardDataPackages packageitem:data.packages){
 					if(packageitem.priceDetails != null){
 						for(CardDataPackagePriceDetailsItem priceDetailItem:packageitem.priceDetails){
-							if(priceDetailItem.price < price){
+							if(!priceDetailItem.paymentChannel.equalsIgnoreCase(ConsumerApi.PAYMENT_CHANNEL_INAPP) && priceDetailItem.price < price){
 								price = priceDetailItem.price;
 							}
 						}

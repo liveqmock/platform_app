@@ -148,7 +148,8 @@ public class SetttingsFragment extends BaseFragment {
 			mSettingsList.add(new SettingsData(SettingsData.ITEM, DERIGISTER_DEVICE , 0,SettingsData.VIEWTYPE_NORMAL));
 			
 		}
-		mSettingsList.add(new SettingsData(SettingsData.SECTION, "myplex", 0,SettingsData.VIEWTYPE_NORMAL));
+		String version= Util.getAppVersionName(mContext);
+		mSettingsList.add(new SettingsData(SettingsData.SECTION, "myplex"+ " "+version, 0,SettingsData.VIEWTYPE_NORMAL));
 		mSettingsList.add(new SettingsData(SettingsData.ITEM, FEEDBACK, 0,SettingsData.VIEWTYPE_NORMAL));
 		mSettingsList.add(new SettingsData(SettingsData.ITEM, TANDC, 0,SettingsData.VIEWTYPE_NORMAL));
 		mSettingsList.add(new SettingsData(SettingsData.ITEM, PRIVACYPOLIY, 0,SettingsData.VIEWTYPE_NORMAL));

@@ -154,6 +154,10 @@
     <string name="retry">retry</string>
     <string name="cancel">cancel</string>
     
+     <string name="transaction_cancel_msg">Do you really want to cancel the transaction ?</string>
+     <string name="transaction_cancel_yes">yes</string>
+     <string name="transaction_cancel_no">no</string>
+     
     <string name="clientsecret">ApalyaAndroid</string>
     <!-- URLS -->
     <!-- <string name="url">http://alpha.myplex.in:8866/user/v2/</string> -->

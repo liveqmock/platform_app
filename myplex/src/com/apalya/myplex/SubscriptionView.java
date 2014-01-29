@@ -34,6 +34,7 @@ import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardResponseData;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.AlertDialogUtil;
+import com.apalya.myplex.utils.AlertDialogUtil.NoticeDialogListener;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FetchCardField;
@@ -74,6 +75,7 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 				+ "/callback/evergent/";
 		setContentView(R.layout.layout_webview);
 		mWebView= (WebView)findViewById(R.id.webview);
+		
 		try{		
 			setUpWebView(url);
 		}catch(Exception e){
@@ -307,7 +309,25 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 	
 	@Override
 	public void onBackPressed() {
-		super.onBackPressed();
+		
+		AlertDialogUtil.showAlert(SubscriptionView.this,getResources().getString(R.string.transaction_cancel_msg)
+				,getResources().getString(R.string.transaction_cancel_no)
+				,getResources().getString(R.string.transaction_cancel_yes)
+				
+				, new NoticeDialogListener() {
+					
+					public void onDialogOption2Click() {
+					
+						dofinish(ConsumerApi.SUBSCRIPTIONERROR);
+					}
+					
+					public void onDialogOption1Click() {
+					
+						
+					}
+				});
+		
+		
 	}
 	
 	public void showProgressBar(){

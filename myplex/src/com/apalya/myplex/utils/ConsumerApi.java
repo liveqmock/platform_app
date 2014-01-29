@@ -72,6 +72,8 @@ public class ConsumerApi {
 	public static final String STREAMNORMAL = "streaming";
 	public static final String STREAMDOWNLOAD = "download";
 	
+	public static final String PAYMENT_CHANNEL_INAPP="INAPP";
+	
 	// min: returns only content ids.
 	// static: returns static sub-entities.
 	// dynamic: returns dynamic sub-entities.
