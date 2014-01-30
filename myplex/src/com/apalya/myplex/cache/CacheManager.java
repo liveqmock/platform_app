@@ -112,6 +112,7 @@ public class CacheManager {
 				resultData.userReviews = data.userReviews;
 				resultData.criticReviews = data.criticReviews;
 				resultData._expiresAt = data._expiresAt;
+				resultData.packages=data.packages;
 				if(data.comments != null){
 					Log.d(TAG,"number of comments for  "+data._id+" "+data.comments.numComments);	
 				}
