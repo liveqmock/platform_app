@@ -79,6 +79,21 @@
     <string name="playhint">play</string>
     <string name="trailerhint">play trailer</string>
     <string name="adultwarning">18+ only </string>
+    <string name="stream">stream</string>
+    <string name="download">download</string>
+    <string name="continieu">continue</string>
+    <string name="dont_ask_again">Don\'t ask again</string>
+    <string name="dont_ask_again_msg">(you may change the options in settings)</string>
+    <string name="best_option">best : download to watch offline</string>
+    <string name="best_option_msg">SD,highest quality video and audio watch offline for 48 hrs; unlimited views</string>
+    <string name="good_option">good : stream online</string>
+    <string name="good_option_msg">384-1664kbps, adaptive bit rate streaming buffering possible due to network conditions</string>
+    <string name="is_dont_ask_again">is_dont_ask_again</string>
+    <string name="isDownload">isDownload</string>
+    <string name="unable_download_msg">Unable to download.Insufficient space to download.free up storage</string>
+    <string name="canot_fetch_url">can\'t fetch url</string>
+    <string name="no_internet_connection">no internet connection</string>
+    <string name="download_or_stream_msg">play rental movies  download, stream</string>
     
     <string name="moredetails">more details</string>
     

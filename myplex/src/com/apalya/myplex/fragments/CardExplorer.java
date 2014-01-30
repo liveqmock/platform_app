@@ -79,7 +79,7 @@ import com.apalya.myplex.views.PackagePopUp;
 import com.fasterxml.jackson.core.JsonParseException;
 
 public class CardExplorer extends BaseFragment implements CardActionListener,CacheManagerCallback,DownloadProgressStatus,
-		OnDismissCallback, AlertDialogUtil.NoticeDialogListener {
+		OnDismissCallback, AlertDialogUtil.NoticeDialogListener,Util.KeyRenewListener {
 	public static final String TAG = "CardExplorer";
 	private CardView mCardView;
 	private GridView mGridView;
@@ -572,6 +572,10 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		return new Response.Listener<String>() {
 			@Override
 			public void onResponse(String response) {
+//				response = "{\n  \"status\": \"ERR_INVALID_SESSION_ID\", \n  \"message\": \"Invalid or missing session id\", \n  \"code\": 401\n }";
+				if(Util.isInvalidSession(mContext,response,CardExplorer.this)){
+					return;
+				}
 				//Analytics.endTimedEvent(Analytics.cardBrowseDuration);
 				try {
 //					Log.d(TAG,"server response "+response);
@@ -1106,4 +1110,19 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		}
 		
 	}
+	interface RenewKey{
+		public void keyRenewed();
+	}
+	@Override
+	public void onKeyRenewed() {
+		fetchMinData();
+	}
+
+	@Override
+	public void onKeyRenewFailed(String message) {		
+		mMainActivity.hideActionBarProgressBar();
+		dismissProgressBar();
+		Util.showToast(mContext, message, Util.TOAST_TYPE_INFO);
+	}
+	
 }

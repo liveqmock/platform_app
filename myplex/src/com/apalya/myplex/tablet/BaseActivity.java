@@ -140,6 +140,10 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 //		if (savedInstanceState == null) {
 //			OnSelectedOption(8);
 //		}
+		Util.prepareDisplayinfo(this);
+		if(!myplexapplication.isInitlized){
+			myplexapplication.init(this);
+		}
 	}
 
 	public void prepareNavigationMenuList(ListView listview) {

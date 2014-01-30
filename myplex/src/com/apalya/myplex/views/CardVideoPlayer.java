@@ -2,6 +2,7 @@ package com.apalya.myplex.views;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Timer;
@@ -38,6 +39,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
+import android.widget.Toast;
 
 
 import com.apalya.myplex.LiveScoreWebView;
@@ -48,6 +50,7 @@ import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDataImagesItem;
 import com.apalya.myplex.data.CardDataPurchaseItem;
 import com.apalya.myplex.data.CardDataRelatedMultimediaItem;
+import com.apalya.myplex.data.CardDataVideosItem;
 import com.apalya.myplex.data.CardDownloadData;
 import com.apalya.myplex.data.MatchStatus;
 import com.apalya.myplex.data.Team;
@@ -63,19 +66,21 @@ import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.LogOutUtil;
 import com.apalya.myplex.utils.MediaUtil;
 import com.apalya.myplex.utils.MediaUtil.MediaUtilEventListener;
-import com.apalya.myplex.utils.MessagePost.MessagePostCallback;
+import com.apalya.myplex.utils.MediaUtility;
+import com.apalya.myplex.utils.MediaUtility.VideoUrlFetchListener;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.utils.SportsStatusRefresh;
 import com.apalya.myplex.utils.SportsStatusRefresh.OnResponseListener;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.utils.WidevineDrm.Settings;
+import com.apalya.myplex.views.DownloadStreamDialog.DownloadListener;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.internal.co;
 import com.google.android.gms.location.LocationClient;
 
-public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDialogListener  {
+public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDialogListener,VideoUrlFetchListener  {
 	private Context mContext;
 	private LayoutInflater mInflator;
 	private View mParentLayout;
@@ -111,6 +116,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 //	private LocationClient locationClient;
 	private int state=0;
 	int currentDuration = 0;
+	private String  download_link,adaptive_link;
 
 	private SportsStatusRefresh sportsStatusRefresh;
 
@@ -211,7 +217,11 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 										params.put(Analytics.CONTENT_NAME_PROPERTY, mmItem.content.categoryName);
 										params.put(Analytics.CONTENT_CATEGORY_PROPERTY,Analytics.CONTENT_ACTION_TYPES.PlayTrailer.toString());
 										Analytics.trackEvent(Analytics.EVENT_PLAY,params);
-										FetchTrailerUrl(mmItem.generalInfo._id);
+										//FetchTrailerUrl(mmItem.generalInfo._id);
+										if(canBePlayed(true)){			
+											fetchUrl(mmItem.generalInfo._id);			
+											mVideoViewParent.setOnClickListener(null);		
+										}
 										mVideoViewParent.setOnClickListener(null);
 										break;
 									}
@@ -267,6 +277,27 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		return v;
 	}
 
+	 	
+	public void fetchUrl(String id){			
+
+		mPlayButton.setVisibility(View.INVISIBLE);			
+		mTrailerButton.setVisibility(View.INVISIBLE);			
+		mProgressBarLayout.setVisibility(View.VISIBLE);			
+		mVideoView.setVisibility(View.VISIBLE);			
+		mPreviewImage.setVisibility(View.INVISIBLE);			
+
+		MediaUtility utility ;                			
+		if(id==null){			
+			utility = new MediaUtility(mContext,this,false);			
+			utility.fetchVideoUrl(mData._id);			
+		}			
+		else{			
+			utility = new MediaUtility(mContext,this,true);			
+			utility.fetchVideoUrl(id);			
+		}			
+	}			
+	        			
+        
 	private OnClickListener mPlayerClickListener = new OnClickListener() {
 
 		@Override
@@ -286,7 +317,8 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 			Analytics.trackEvent(Analytics.EVENT_PLAY,params);
 			
 			if(canBePlayed(true)){
-				FetchUrl();
+				//FetchUrl();
+				 fetchUrl(null);
 				mVideoViewParent.setOnClickListener(null);
 			}
 			// TODO Auto-generated method stub
@@ -597,6 +629,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 								mPlayerStatusListener.playerStatusUpdate("Download Completed and file doesn't exists, starting player.....");
 							}
 							Util.removeDownload(mDownloadData.mDownloadId, mContext);
+							MediaUtil.setContext(mContext);
 							MediaUtil.getVideoUrl(mData._id,qualityType,streamingType,isESTPackPurchased,ConsumerApi.STREAMINGFORMATHLS);
 							
 						}
@@ -608,6 +641,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 					if(mPlayerStatusListener != null){
 						mPlayerStatusListener.playerStatusUpdate("Download Details for this content not available, so requesting url...");
 					}
+					MediaUtil.setContext(mContext);
 					MediaUtil.getVideoUrl(mData._id,qualityType,streamingType,isESTPackPurchased,ConsumerApi.STREAMINGFORMATHLS);
 					/*if(mData.generalInfo != null && mData.generalInfo.type != null ){
 						if(!mData.generalInfo.type.equalsIgnoreCase("live")){
@@ -812,6 +846,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			@Override
 			public void lastPausedTimeFetched(int ellapseTime) {}	
 		});
+        MediaUtil.setContext(mContext);
         MediaUtil.getVideoUrl(contentId,qualityType,streamingType,isESTPackPurchased,ConsumerApi.STREAMINGFORMATHTTP);
 	}
 
@@ -1230,6 +1265,8 @@ private void playVideoFile(CardDownloadData mDownloadData){
 	public boolean canBePlayed(boolean isMovie) {
 		// Before playing any video we have to check whether user has logged In
 		// or not.
+		 if(mData.generalInfo.type.equalsIgnoreCase("live"))	
+			 return true;
 		String email = myplexapplication.getUserProfileInstance()
 				.getUserEmail();
 		if (email.equalsIgnoreCase("NA") || email.equalsIgnoreCase("")) {
@@ -1392,5 +1429,225 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			sportsStatusRefresh.stop();
 		}
 	}
+	
+	@Override
+	public void onUrlFetched(List<CardDataVideosItem> items) 
+	{
+		String videoType = mData.generalInfo.type;		
+		Log.d(TAG,"Video type "+ videoType);
+		
+		if(videoType.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_MOVIE)){		
+			chooseStreamOrDownload(items);
+		}else if(videoType.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
+			chooseLiveStreamType(items,false);			
+		}
+		
+	}
+	@Override
+	public void onTrailerUrlFetched(List<CardDataVideosItem> videos) {
+		chooseLiveStreamType(videos,true);
+		
+	}
+	
+	private String getLink(Map<String, String> pMap, String firstPref, String secondPref,String ...profile)
+	{		
+		for(String string : profile){
+			if(pMap.get(string+firstPref)!=null)
+				return pMap.get(string+firstPref);
+			else if(pMap.get(string+secondPref)!=null)
+				return pMap.get(string+secondPref);				
+			
+		}
+		return "";
+		
+	}
+	
+	private void chooseLiveStreamType(List<CardDataVideosItem> items,boolean isTrailer) 
+	{
+		HashMap<String, String> profileMap = new HashMap<String, String>();
+		
+		for(CardDataVideosItem item : items){
+			if(item.profile.equalsIgnoreCase(ConsumerApi.STREAMADAPTIVE)){
+				profileMap.put(item.profile+item.format, item.link);
+			}else if((item.profile.equalsIgnoreCase(ConsumerApi.VIDEOQUALTYVERYHIGH)) && (item.format.equalsIgnoreCase(ConsumerApi.STREAMINGFORMATHLS))){
+				profileMap.put(item.profile+item.format, item.link);
+			}else if((item.profile.equalsIgnoreCase(ConsumerApi.VIDEOQUALTYVERYHIGH)) && (item.format.equalsIgnoreCase(ConsumerApi.STREAMINGFORMATRTSP))){
+				profileMap.put(item.profile+item.format, item.link);
+			}else if((item.profile.equalsIgnoreCase(ConsumerApi.VIDEOQUALTYHIGH)) && (item.format.equalsIgnoreCase(ConsumerApi.STREAMINGFORMATHLS))){
+				profileMap.put(item.profile+item.format, item.link);
+			}else if((item.profile.equalsIgnoreCase(ConsumerApi.VIDEOQUALTYHIGH)) && (item.format.equalsIgnoreCase(ConsumerApi.STREAMINGFORMATRTSP))){
+				profileMap.put(item.profile+item.format, item.link);
+			}else if((item.profile.equalsIgnoreCase(ConsumerApi.VIDEOQUALTYLOW)) && (item.format.equalsIgnoreCase(ConsumerApi.STREAMINGFORMATHLS))){
+				profileMap.put(item.profile+item.format, item.link);
+			}else if((item.profile.equalsIgnoreCase(ConsumerApi.VIDEOQUALTYLOW)) && (item.format.equalsIgnoreCase(ConsumerApi.STREAMINGFORMATRTSP))){
+				profileMap.put(item.profile+item.format, item.link);
+			}
+		}
+			
+		if (android.os.Build.VERSION.SDK_INT >= 19) {
+				initPlayBack(getLink(profileMap, ConsumerApi.STREAMADAPTIVE,
+						ConsumerApi.STREAMINGFORMATHLS,
+						new String[]{ConsumerApi.STREAMADAPTIVE,ConsumerApi.VIDEOQUALTYVERYHIGH,
+							ConsumerApi.VIDEOQUALTYHIGH,ConsumerApi.VIDEOQUALTYLOW}));
+		}
+		
+		String mConnectivity  = Util.getInternetConnectivity(mContext);
+		if(isTrailer){
+			if(mConnectivity.equalsIgnoreCase("wifi")){
+				initPlayBack(getLink(profileMap, ConsumerApi.STREAMINGFORMATHTTP,
+						ConsumerApi.STREAMINGFORMATRTSP,
+						new String[]{ConsumerApi.VIDEOQUALTYVERYHIGH,ConsumerApi.VIDEOQUALTYHIGH,ConsumerApi.VIDEOQUALTYLOW}));
+			}else if(mConnectivity.equalsIgnoreCase("3G")){
+				initPlayBack(getLink(profileMap, ConsumerApi.STREAMINGFORMATHTTP,
+						ConsumerApi.STREAMINGFORMATRTSP,
+						new String[]{ConsumerApi.VIDEOQUALTYHIGH,ConsumerApi.VIDEOQUALTYLOW}));
+			}else if(mConnectivity.equalsIgnoreCase("2G")){
+				initPlayBack(getLink(profileMap, ConsumerApi.STREAMINGFORMATHTTP,ConsumerApi.STREAMINGFORMATRTSP,
+						new String[]{ConsumerApi.VIDEOQUALTYLOW}));
+			}else{
+				Toast.makeText(mContext,mContext.getString(R.string.no_internet_connection), Toast.LENGTH_LONG).show();
+			}
+			return;
+		}
+		
+		if(mConnectivity.equalsIgnoreCase("wifi")){
+			initPlayBack(getLink(profileMap, ConsumerApi.STREAMINGFORMATHLS,
+					ConsumerApi.STREAMINGFORMATRTSP,
+					new String[]{ConsumerApi.VIDEOQUALTYVERYHIGH,ConsumerApi.VIDEOQUALTYHIGH,ConsumerApi.VIDEOQUALTYLOW}));
+		}else if(mConnectivity.equalsIgnoreCase("3G")){
+			initPlayBack(getLink(profileMap, ConsumerApi.STREAMINGFORMATHLS,
+					ConsumerApi.STREAMINGFORMATRTSP,
+					new String[]{ConsumerApi.VIDEOQUALTYHIGH,ConsumerApi.VIDEOQUALTYLOW}));
+		}else if(mConnectivity.equalsIgnoreCase("2G")){
+			initPlayBack(getLink(profileMap, ConsumerApi.STREAMINGFORMATHLS,ConsumerApi.STREAMINGFORMATRTSP,
+					new String[]{ConsumerApi.VIDEOQUALTYLOW}));
+		}else{
+			Toast.makeText(mContext,mContext.getString(R.string.no_internet_connection), Toast.LENGTH_LONG).show();
+		}
+		
+		
+	}	
+	private void chooseStreamOrDownload(List<CardDataVideosItem> items) {
+		CardDataVideosItem adaptive = new CardDataVideosItem();
+		CardDataVideosItem download = new CardDataVideosItem();	
+		for(CardDataVideosItem item : items){
+			if(item.type!=null && item.type.equalsIgnoreCase("adaptive")){
+				if((item.link!=null && item.link.length()>0)&&(item.format!=null 
+										&& item.format.equalsIgnoreCase(ConsumerApi.STREAMINGFORMATHTTP)))				
+					adaptive = item;
+			}else if(item.type.equalsIgnoreCase("download")){
+				if((item.link!=null && item.link.length()>0)&&(item.format!=null &&
+										item.format.equalsIgnoreCase(ConsumerApi.STREAMINGFORMATHTTP)))		
+					download = item;	
+			}
+		}
+		if(download!=null)
+			 download_link = download.link;		
+		if(adaptive!=null){			
+			adaptive_link = adaptive.link;
+		}
+		if(SharedPrefUtils.getBoolFromSharedPreference(mContext, mContext.getString(R.string.is_dont_ask_again))){
+			if(SharedPrefUtils.getBoolFromSharedPreference(mContext, mContext.getString(R.string.isDownload)))
+				initPlayBack(download_link);
+			else
+				initPlayBack(adaptive_link);
+		}else if(download_link!=null && adaptive_link!=null){
+				DownloadStreamDialog dialog = new DownloadStreamDialog(mContext,mData.generalInfo.title+" rental options");
+				dialog.setListener(new DownloadListener() {			
+					@Override
+					public void onOptionSelected(boolean isDownload) {	
+						if(isDownload){
+							initPlayBack(download_link);
+						}else{
+							initPlayBack(adaptive_link);
+						}					
+					}
+				});
+				dialog.showDialog();	
+				return;
+		}else if(adaptive_link!=null){
+			initPlayBack(adaptive_link);
+			return;
+		}else if(download_link!=null){
+			initPlayBack(download_link);
+			return;
+		}
+	}
+	@Override
+	public void onUrlFetchFailed(String message) 
+	{
+		if(message != null && message.equalsIgnoreCase("ERR_USER_NOT_SUBSCRIBED")){			
+			PackagePopUp popup = new PackagePopUp(mContext,(View)mParentLayout.getParent());
+			myplexapplication.getCardExplorerData().cardDataToSubscribe =  mData;
+			popup.showPackDialog(mData, ((Activity)mContext).getActionBar().getCustomView());	
+			
+		}else
+			Util.showToast(mContext,message,Util.TOAST_TYPE_INFO);
+		
+	}
+	
+	public void initPlayBack(String url){
+		Log.d(TAG,"Got the link for playback = "+url);
+		if (url == null) {
+			closePlayer();
+			if(mPlayerStatusListener != null){
+				mPlayerStatusListener.playerStatusUpdate("No url to play.");
+			}
+			Util.showToast(mContext, "No url to play.",Util.TOAST_TYPE_ERROR);
+			return;
+		}
+		
+		if(isESTPackPurchased || url.contains("_est_"))
+		{
+			url=url.replace("widevine:", "http:");			
+			closePlayer();
+			if(Util.getSpaceAvailable()>=1)
+			{
+				if(Util.isWifiEnabled(mContext))
+				{
+					Util.startDownload(url, mData, mContext);
+				}
+				else
+				{
+					Util.showToast(mContext, "Downloading is supported only on Wifi, please turn on wifi and try again.", Util.TOAST_TYPE_INFO);
+				}
+			}
+			else
+			{
+				Util.showToast(mContext, "Download failed due to insufficent memory, please free space up to 1GB to start download", Util.TOAST_TYPE_INFO);
+			}
+			return;
+		}				
+		else{
+			drmLicenseType="st";
+		}
 
+		if(mData.content !=null && mData.content.drmEnabled)
+		{
+			String licenseData="clientkey:"+myplexapplication.getDevDetailsInstance().getClientKey()+",contentid:"+mData._id+",type:"+drmLicenseType+",profile:0";
+
+			byte[] data;
+			try {
+				data = licenseData.getBytes("UTF-8");
+				String base64 = Base64.encodeToString(data, Base64.DEFAULT);
+				Settings.USER_DATA=base64;
+				Settings.DEVICE_ID=myplexapplication.getDevDetailsInstance().getClientDeviceId();
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}	
+		}
+		if(!lastWatchedStatus)
+			myplexapplication.getUserProfileInstance().lastVisitedCardData.add(mData);
+		Util.showAdultToast(mContext.getString(R.string.adultwarning), mData, mContext);
+		Uri uri ;	
+		uri = Uri.parse(url);
+		if(mPlayerStatusListener != null){
+			mPlayerStatusListener.playerStatusUpdate("Playing :: "+url);
+		}
+		initializeVideoPlay(uri);
+	}
+	
+	
+	
+	
 }

@@ -115,13 +115,13 @@ public class Util {
 	public final static int TOAST_TYPE_INFO = 1;
 	public final static int TOAST_TYPE_ERROR = 2;
 	public final static String downloadStoragePath="/sdcard/Android/data/com.apalya.myplex/files/";
-	
+	public static KeyRenewListener keyRenewListener;
 	
 	
 	public static void showToast(Context context,String msg,int type){
 		if(context == null){return;}
 		try {
-			Toast toast = new Toast(context);
+			/*Toast toast = new Toast(context);
 			LayoutInflater inflate = LayoutInflater.from(context);
 			View v = inflate.inflate(R.layout.toastlayout, null);
 			TextView header = (TextView)v.findViewById(R.id.toast_type);
@@ -134,7 +134,8 @@ public class Util {
 			message.setText(msg);
 			toast.setView(v);
 			toast.setDuration(Toast.LENGTH_LONG);
-			toast.show();
+			toast.show();*/
+			Toast.makeText(mContext, msg,type).show();
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
@@ -690,6 +691,9 @@ public class Util {
 				//Analytics.endTimedEvent("NEW-CLIENT-KEY-GENERATION");
 				//Analytics.trackEvent("NEW-CLIENT-KEY-GENERATION-ERROR");
 				Log.d(TAG,"Error: "+error.toString());
+				if(keyRenewListener!=null){
+					keyRenewListener.onKeyRenewFailed(error.toString());
+				}
 				if(error.toString().indexOf("NoConnectionError")>0)
 				{
 					//Util.showToast(getString(R.string.interneterr),LoginActivity.this);
@@ -728,11 +732,10 @@ public class Util {
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
 						Log.d(TAG, "clientKey: "+jsonResponse.getString("clientKey"));
 						Log.d(TAG, "########################################################");
-						myplexapplication.getDevDetailsInstance().setClientKey(jsonResponse.getString("clientKey"));
-						myplexapplication.getDevDetailsInstance().setClientKeyExp(jsonResponse.getString("expiresAt"));
+						(myplexapplication.getDevDetailsInstance()).setClientKey(jsonResponse.getString("clientKey"));
+						(myplexapplication.getDevDetailsInstance()).setClientKeyExp(jsonResponse.getString("expiresAt"));
 						Log.d(TAG, "---------------------------------------------------------");
-
-
+						ConsumerApi.DEBUGCLIENTKEY=  jsonResponse.getString("clientKey");
 
 						SharedPrefUtils.writeToSharedPref(mContext,
 								mContext.getString(R.string.devclientkey), jsonResponse.getString("clientKey"));
@@ -740,6 +743,9 @@ public class Util {
 								mContext.getString(R.string.devclientkeyexp), jsonResponse.getString("expiresAt"));
 
 						//Util.showToast(mContext,"Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),Util.TOAST_TYPE_ERROR);
+						if(keyRenewListener!=null){
+							keyRenewListener.onKeyRenewed();
+						}
 					}
 					else
 					{
@@ -755,6 +761,11 @@ public class Util {
 						
 						//Util.showToast(mContext,"Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),Util.TOAST_TYPE_ERROR);
 //						Util.showToast("Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),mContext);
+						if(keyRenewListener!=null){
+							
+							keyRenewListener.onKeyRenewFailed(jsonResponse.getString("message"));
+						}
+						
 					}
 				} catch (JSONException e) {
 					e.printStackTrace();
@@ -1013,6 +1024,9 @@ public class Util {
 			return network_type;
 		}
 		switch (active_network.getType()) {
+		case ConnectivityManager.TYPE_WIFI:
+			network_type = "wifi";
+			break;
 		case ConnectivityManager.TYPE_MOBILE:
 			if (active_network.getSubtype() > TelephonyManager.NETWORK_TYPE_EDGE) {
 				network_type = "3G";
@@ -1108,6 +1122,7 @@ public class Util {
 			}
 
 	}
+
 	public static String getAppVersionName(Context context){
 		
 		String version = "";
@@ -1124,4 +1139,31 @@ public class Util {
 		}
 		return version;
 	}
+
+	
+
+	public static boolean isInvalidSession(Context context, String response,KeyRenewListener keyRenewListener) {
+		try {
+			Util.keyRenewListener = keyRenewListener;
+			mContext = context;
+			JSONObject json = new JSONObject(response);
+			if(json.getString("status").equalsIgnoreCase("ERR_INVALID_SESSION_ID") && json.getInt("code")== 401){
+				Log.d(TAG,"ERR_INVALID_SESSION_ID");
+				String devId=SharedPrefUtils.getFromSharedPreference(mContext,mContext.getString(R.string.devclientdevid));
+				Map<String, String> params = new HashMap<String, String>();
+				params.put("deviceId", devId);
+				Util.genKeyRequest(mContext,mContext.getString(R.string.genKeyReqPath),params);
+				return true;
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+	
+	public interface KeyRenewListener {
+        public void onKeyRenewed();
+        public void onKeyRenewFailed(String message);
+    }
+
 }
