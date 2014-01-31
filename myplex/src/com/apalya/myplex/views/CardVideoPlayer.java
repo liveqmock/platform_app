@@ -1265,8 +1265,6 @@ private void playVideoFile(CardDownloadData mDownloadData){
 	public boolean canBePlayed(boolean isMovie) {
 		// Before playing any video we have to check whether user has logged In
 		// or not.
-		 if(mData.generalInfo.type.equalsIgnoreCase("live"))	
-			 return true;
 		String email = myplexapplication.getUserProfileInstance()
 				.getUserEmail();
 		if (email.equalsIgnoreCase("NA") || email.equalsIgnoreCase("")) {
@@ -1277,6 +1275,8 @@ private void playVideoFile(CardDownloadData mDownloadData){
 					CardVideoPlayer.this);
 			return false;
 		}
+		if(mData.generalInfo.type.equalsIgnoreCase("live"))	
+			return true;
 
 		if (myplexapplication.mDownloadList != null && mData != null) {
 			

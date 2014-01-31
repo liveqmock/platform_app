@@ -113,12 +113,13 @@
             <category android:name="com.apalya.myplex" />
         </intent-filter>
     </receiver>
-        <activity android:name="LiveScoreWebView"></activity>
-   <!--  <receiver android:name="com.apalya.myplex.widget.MyplexWidgetProvider">
-        <intent-filter>
+        
+    </application>
+    <!--  <receiver android:name="com.apalya.myplex.widget.MyplexWidgetProvider">
+         <intent-filter>
             <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-        </intent-filter>
-         <meta-data  android:name="android.appwidget.provider"
+         </intent-filter>
+          <meta-data  android:name="android.appwidget.provider"
           			 android:resource="@xml/widget_info" />
     </receiver>
     <activity android:name=".widget.WidgetHandlerActivity">
@@ -126,7 +127,5 @@
         <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
     </intent-filter>
     </activity> -->
-        
-    </application>
 
 </manifest>

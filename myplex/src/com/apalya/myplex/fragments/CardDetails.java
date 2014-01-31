@@ -45,8 +45,11 @@ import com.apalya.myplex.adapters.NavigationOptionsMenuAdapter;
 import com.apalya.myplex.adapters.ScrollingDirection;
 import com.apalya.myplex.cache.CacheManager;
 import com.apalya.myplex.cache.IndexHandler;
+import com.apalya.myplex.data.ApplicationSettings;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDataImagesItem;
+import com.apalya.myplex.data.CardDataPackagePriceDetailsItem;
+import com.apalya.myplex.data.CardDataPackages;
 import com.apalya.myplex.data.CardDataRelatedCastItem;
 import com.apalya.myplex.data.CardDetailMediaData;
 import com.apalya.myplex.data.CardDetailMediaListData;
@@ -273,10 +276,20 @@ public class CardDetails extends BaseFragment implements
 			if(mPlayer.isMediaPlaying()){
 				mPlayer.onStateChanged(PlayerListener.STATE_PAUSED, mPlayer.getStopPosition());
 				mPlayer.stopSportsStatusRefresh();
-				if(mCardData.generalInfo.isSellable){
+				if(ApplicationSettings.ENABLE_FB_SHARE_FREE_MOVIE){
+					for(CardDataPackages pkg: mCardData.packages){
+						for(CardDataPackagePriceDetailsItem pkgItem: pkg.priceDetails){
+							if(pkgItem.price == 0.0){
+								Util.showFacebookShareDialog(mContext);
+								return;
+							}
+						}
+					}
+				}				
+				/*if(mCardData.generalInfo.isSellable){
 					Log.d(TAG, "free content");
 					Util.showFacebookShareDialog(mContext);
-				}
+				}*/
 			}
 		}
 	}
