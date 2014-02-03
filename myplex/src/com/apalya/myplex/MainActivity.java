@@ -397,19 +397,7 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 		RelativeLayout navigationMenuLayout = (RelativeLayout)v.findViewById(R.id.customactionbar_drawerLayout);
 		Util.showFeedbackOnSame(navigationMenuLayout);
 		mNavigationMenu = (ImageView) v.findViewById(R.id.customactionbar_drawer);
-		navigationMenuLayout.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View arg0) {
-				if (mNavigationDrawerOpened) {
-					mDrawerLayout.closeDrawer(mDrawerList);
-					mNavigationDrawerOpened = false;
-				} else {
-					mDrawerLayout.openDrawer(mDrawerList);
-					mNavigationDrawerOpened = true;
-				}
-			}
-		});
+		navigationMenuLayout.setOnClickListener(navigationClickListener);
 		mCustomActionBarTitleLayout = (RelativeLayout) v.findViewById(R.id.customactionbar_filter);
 		mCustomActionBarTitleLayout.setOnClickListener(mOnFilterClickListener);
 		Util.showFeedbackOnSame(mCustomActionBarTitleLayout);
@@ -455,6 +443,19 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 		tvOrMovie.setTypeface(FontUtil.ss_symbolicons_line);
 		
 	}
+	OnClickListener navigationClickListener = new  OnClickListener() {
+
+		@Override
+		public void onClick(View arg0) {
+			if (mNavigationDrawerOpened) {
+				mDrawerLayout.closeDrawer(mDrawerList);
+				mNavigationDrawerOpened = false;
+			} else {
+				mDrawerLayout.openDrawer(mDrawerList);
+				mNavigationDrawerOpened = true;
+			}
+		}
+	};
 	@Override
 	public void enableFilterAction(boolean value){
 		if(value){
@@ -569,6 +570,10 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 	
 	@Override
 	public void onBackPressed() {
+		if(mCurrentFragment instanceof CardDetails){
+			if(mCurrentFragment.onBackClicked())
+				return;
+		}
 		try {
 			if (mDrawerLayout!=null && mNavigationDrawerOpened) {
 				mDrawerLayout.closeDrawer(mDrawerList);
@@ -1072,7 +1077,10 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 				mSearchView.setVisibility(visibility);
 		}
 		socialShare.setVisibility(View.GONE);
-		socialShare.setOnClickListener(null);		
+		socialShare.setOnClickListener(null);
+		mNavigationMenu.setImageResource(R.drawable.iconmenu);
+		mNavigationMenu.setOnClickListener(navigationClickListener);
+		
 	}
 	@Override
 	public void hidefilterMenu() {
@@ -1280,6 +1288,14 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 			@Override
 			public void onClick(View v) {
 				Util.shareData(mContext, 3, "",toBeshared);
+			}
+		});
+		mNavigationMenu.setImageResource(R.drawable.abs__ic_ab_back_holo_dark);
+		mNavigationMenu.setOnClickListener(new OnClickListener() {			
+			@Override
+			public void onClick(View arg0) {
+				onBackPressed();
+//				removeFragment(mCurrentFragment);
 			}
 		});
 	}

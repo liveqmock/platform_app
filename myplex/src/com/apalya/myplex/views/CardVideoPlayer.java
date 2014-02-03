@@ -46,6 +46,7 @@ import com.apalya.myplex.LiveScoreWebView;
 import com.apalya.myplex.MainBaseOptions;
 import com.apalya.myplex.R;
 import com.apalya.myplex.SubscriptionView;
+import com.apalya.myplex.data.ApplicationConfig;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDataImagesItem;
 import com.apalya.myplex.data.CardDataPurchaseItem;
@@ -119,6 +120,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 	private String  download_link,adaptive_link;
 
 	private SportsStatusRefresh sportsStatusRefresh;
+	private boolean isFullScreen;
 
 	public void setFullScreenListener(PlayerFullScreen mListener){
 		this.mPlayerFullScreen = mListener;
@@ -926,7 +928,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		if (mData.images != null) {
 			for (CardDataImagesItem imageItem : mData.images.values) {
 				if (imageItem.type != null && imageItem.type.equalsIgnoreCase("coverposter") && imageItem.profile != null
-						&& imageItem.profile.equalsIgnoreCase("xxhdpi")) {
+						&& imageItem.profile.equalsIgnoreCase(ApplicationConfig.HDPI)) {
 					if (imageItem.link == null
 							|| imageItem.link.compareTo("Images/NoImage.jpg") == 0) {
 						mPreviewImage.setImageResource(0);
@@ -987,6 +989,15 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			}
 			if(!mContext.getResources().getBoolean(R.bool.isTablet)){
 				((MainBaseOptions) mContext).setOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
+			}
+		}else if(mVideoView.isPlaying() && mData.generalInfo.type.equalsIgnoreCase("live")){
+			this.mPerBuffer = 0;
+			mVideoViewPlayer.deregisteronBufferingUpdate();
+			mProgressBarLayout.setVisibility(View.GONE);
+			mVideoViewPlayer.showMediaController();
+			mPlayerState = PLAYER_PLAY;
+			if(mPlayerStatusListener != null){
+				mPlayerStatusListener.playerStatusUpdate("Buffering ended");
 			}
 		}
 	}
@@ -1109,6 +1120,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 	}
 	@Override
 	public void onFullScreen(boolean value) {
+		isFullScreen = value;
 		if (mContext.getResources().getBoolean(R.bool.isTablet)) {
 			if (value) {
 				playInLandscape();
@@ -1547,10 +1559,19 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			adaptive_link = adaptive.link;
 		}
 		if(SharedPrefUtils.getBoolFromSharedPreference(mContext, mContext.getString(R.string.is_dont_ask_again))){
-			if(SharedPrefUtils.getBoolFromSharedPreference(mContext, mContext.getString(R.string.isDownload)))
-				initPlayBack(download_link);
-			else
-				initPlayBack(adaptive_link);
+			if(SharedPrefUtils.getBoolFromSharedPreference(mContext, mContext.getString(R.string.isDownload))){
+				if(download_link!=null)					
+					initPlayBack(download_link);
+				else if(adaptive_link!=null){                                        			
+					initPlayBack(adaptive_link);			
+					onLastPausedTimeFetched(adaptive.elapsedTime);			
+				}
+			}else{
+				 if(adaptive_link!=null)			
+					 initPlayBack(adaptive_link);
+				else if(download_link!=null)			
+					initPlayBack(download_link);
+			}
 		}else if(download_link!=null && adaptive_link!=null){
 				DownloadStreamDialog dialog = new DownloadStreamDialog(mContext,mData.generalInfo.title+" rental options");
 				dialog.setListener(new DownloadListener() {			
@@ -1567,6 +1588,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 				return;
 		}else if(adaptive_link!=null){
 			initPlayBack(adaptive_link);
+			onLastPausedTimeFetched(adaptive.elapsedTime);	
 			return;
 		}else if(download_link!=null){
 			initPlayBack(download_link);
@@ -1647,7 +1669,20 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		initializeVideoPlay(uri);
 	}
 	
-	
+	public boolean isFullScreen() {	
+		   return isFullScreen;			
+		}
+	public void setFullScreen(boolean isFullScreen) {			
+		this.isFullScreen = isFullScreen;			
+		}        			
+	public void onLastPausedTimeFetched(int ellapseTime) {			
+		if(ellapseTime > 60){			
+			if(mVideoViewPlayer ==null){                                                			
+					mVideoViewPlayer = new  VideoViewPlayer(mVideoView, mContext,null ,StreamType.VOD);			
+				}			
+			mVideoViewPlayer.setmPositionWhenPaused(ellapseTime*1000);			
+			}			
+	}
 	
 	
 }

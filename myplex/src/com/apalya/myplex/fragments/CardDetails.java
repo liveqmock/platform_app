@@ -39,6 +39,7 @@ import android.widget.RelativeLayout.LayoutParams;
 
 import com.android.volley.VolleyError;
 import com.apalya.myplex.BaseFragment;
+import com.apalya.myplex.MainBaseOptions;
 import com.apalya.myplex.R;
 import com.apalya.myplex.adapters.CacheManagerCallback;
 import com.apalya.myplex.adapters.NavigationOptionsMenuAdapter;
@@ -913,6 +914,32 @@ public class CardDetails extends BaseFragment implements
 	public void onProgressBarVisibility(int value) {
 		if(mProgressBar != null){
 			mProgressBar.setVisibility(value);
+		}
+	}
+	@Override
+	public boolean onBackClicked() {
+		try{
+			if(mPlayer.isFullScreen()){
+				if (!mContext.getResources().getBoolean(R.bool.isTablet)) {
+					if(mPlayer.getScreenOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE){
+						((MainBaseOptions) mContext).setOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+						mPlayer.resumePreviousOrientaionTimer();
+					}
+					else {
+						((MainBaseOptions) mContext).setOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+						mPlayer.resumePreviousOrientaionTimer();
+					} 
+				}
+				mPlayer.setFullScreen(!mPlayer.isFullScreen());
+				return true;
+			}
+			if(mPlayer.isMediaPlaying()){
+				mPlayer.closePlayer();
+				return true;
+			}
+			return false;
+		}catch(Throwable e){			
+			return false;
 		}
 	}
 }
