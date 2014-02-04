@@ -7,6 +7,7 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Context;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -24,6 +25,7 @@ import com.apalya.myplex.data.CardDataVideosItem;
 import com.apalya.myplex.data.CardResponseData;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.media.PlayerListener;
+import com.apalya.myplex.utils.Util.KeyRenewListener;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
@@ -40,12 +42,15 @@ public class MediaUtil {
 	private static boolean sDownloadStatus;
 	private static String sStreamingType;
 	private static String sStreamFormat=ConsumerApi.STREAMINGFORMATHLS;
+	private static Context mContext;
+	private static String url,aContentId;
 
 	public static void getVideoUrl(String aContentId,String bitRate,String streamingType, boolean isESTPackPurchased, String streamFormat){
 		sQualityType=bitRate;
 		sDownloadStatus=isESTPackPurchased;
 		sStreamingType = streamingType;
-		String url=ConsumerApi.getVideosDetail(aContentId);
+		MediaUtil.aContentId = aContentId;
+		url=ConsumerApi.getVideosDetail(aContentId);
 		String url1 = ConsumerApi.getPlayerEventDetails(aContentId, "Pause");
 		String location_params  = myplexapplication.locationUtil.getVideoUrlParams();
 		if(location_params.length()>0){
@@ -83,8 +88,21 @@ public class MediaUtil {
 			private int elapsedTime ;
 
 			@Override
-			public void onResponse(String response) {
-				Log.d(TAG, response);
+			public void onResponse(String response) {				
+				Log.d(TAG, response);		
+				if(Util.isInvalidSession(mContext,response,new KeyRenewListener() {					
+					@Override
+					public void onKeyRenewed() {
+						getContentUrlReq(ConsumerApi.getVideosDetail(aContentId));
+					}					
+					@Override
+					public void onKeyRenewFailed(String message) {
+						urlEventListener.urlReceived(false,null, null,null);
+						Util.showToast(mContext, message, Util.TOAST_TYPE_INFO);
+					}
+				})){
+					return;
+				}
 				CardResponseData minResultSet = null;
 				try {
 					//Analytics.endTimedEvent("RECOMMENDATIONS-REQUEST");
@@ -170,6 +188,7 @@ public class MediaUtil {
 			}
 		};
 	}
+	
 	public static void setUrlEventListener(MediaUtilEventListener aUrlEventListener) {
 		urlEventListener = aUrlEventListener;
 	}
@@ -254,4 +273,7 @@ public class MediaUtil {
 				
 			}
 		};
+		public static void setContext(Context context){
+			mContext = context;
+		}	
 }

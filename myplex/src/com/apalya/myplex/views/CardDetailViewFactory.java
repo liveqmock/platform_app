@@ -208,7 +208,7 @@ public class CardDetailViewFactory {
 				personName.setText(reviewItem.username);
 				personName.setTypeface(FontUtil.Roboto_Regular);
 				TextView commentTime = (TextView)child.findViewById(R.id.carddetailcomment_time);
-				commentTime.setText(reviewItem.timestamp);
+				commentTime.setText(Util.getDate(reviewItem.timestamp));
 				commentTime.setTypeface(FontUtil.Roboto_Regular);
 				TextView commentMessage  = (TextView)child.findViewById(R.id.carddetailcomment_comment);
 				commentMessage.setText(reviewItem.review);

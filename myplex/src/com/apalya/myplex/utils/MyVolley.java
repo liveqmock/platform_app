@@ -30,8 +30,8 @@ public class MyVolley {
     public static void init(Context context) {
     	
     	int memClass = ((ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE)).getMemoryClass();
-    	 // Use 1/8th of the available memory for this memory cache.
-    	MAX_IMAGE_CACHE_ENTIRES = 1024 * 1024 * memClass / 8;
+    	 // Use 1/4th of the available memory for this memory cache.
+    	MAX_IMAGE_CACHE_ENTIRES = 1024 * 1024 * memClass / 4;
         mRequestQueue = Volley.newRequestQueue(context);
         mImageLoader = new ImageLoader(mRequestQueue, new BitmapLruCache(MAX_IMAGE_CACHE_ENTIRES));
     }

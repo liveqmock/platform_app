@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" 
+    android:background="@android:color/transparent">
+
+    <View
+        android:id="@+id/top_blue"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:background="@drawable/dialog_top_blue" />
+
+    <LinearLayout
+        android:id="@+id/title_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/round_corner_dialog_bg"
+        android:gravity="center_vertical"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:id="@+id/linear_ll_options"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/title_layout"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"
+            android:gravity="top|center_vertical"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/dialog_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:gravity="center"
+                android:paddingTop="10dp"
+                android:text="TextView"
+                android:textSize="@dimen/textsize_18" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical" >
+
+                <RadioButton
+                    android:id="@+id/best_radio_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/best_option"
+                    android:textColor="@color/blue"
+                    android:textSize="@dimen/textsize_16"
+                    android:checked="true" />
+
+                <TextView
+                    android:id="@+id/best_tv_msg"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="25dp"
+                    android:layout_marginTop="5dp"
+                    android:text="@string/best_option_msg"
+                    android:textSize="@dimen/textsize_12" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:orientation="vertical" >
+
+                <RadioButton
+                    android:id="@+id/good_radio_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/good_option"
+                    android:textColor="@color/blue"
+                    android:textSize="@dimen/textsize_16" />
+
+                <TextView
+                    android:id="@+id/good_tv_msg"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="25dp"
+                    android:layout_marginTop="5dp"
+                    android:text="@string/good_option_msg"
+                    android:textSize="@dimen/textsize_12" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/dont_ask_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/linear_ll_options"
+            android:layout_marginBottom="@dimen/cardtitleheight"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="@dimen/textsize_30"
+            android:orientation="vertical" >
+
+            <CheckBox
+                android:id="@+id/dont_ask_me_again"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/dont_ask_again" />
+
+            <TextView
+                android:id="@+id/dont_ask_msg"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="25dp"
+                android:maxLines="2"
+                android:text="@string/dont_ask_again_msg"
+                android:textSize="@dimen/textsize_12" />
+        </LinearLayout>
+
+        <View
+            android:id="@+id/btn_divider"
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:layout_below="@+id/dont_ask_layout"
+            android:background="@android:color/darker_gray" />
+
+        <Button
+            android:id="@+id/dialog_continue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btn_divider"
+            android:background="@drawable/button_selector"
+            android:paddingLeft=".5dp"
+            android:text="@string/continieu" />
+    </LinearLayout>
+
+</LinearLayout>

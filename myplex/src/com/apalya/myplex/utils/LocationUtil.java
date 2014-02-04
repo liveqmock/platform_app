@@ -111,7 +111,6 @@ public class LocationUtil
 		}		
 		@Override
 		public void onConnected(Bundle arg0) {
-			Log.d("amlan","connected");
 			location = client.getLastLocation();
 			init();
 			client.disconnect();

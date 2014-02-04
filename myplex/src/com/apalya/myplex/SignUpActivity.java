@@ -206,13 +206,13 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 						{
 							if(mEmail.getText().toString().contains("@")&& mEmail.getText().toString().contains("."))
 							{
+								showProgressBar();
 								Map<String, String> params = new HashMap<String, String>();
 								params.put("userid", mEmail.getText().toString());
 								params.put("password", mPassword.getText().toString());
 								params.put("profile", "work");
 								params.put("clientKey",mDevInfo.getClientKey());
 								Log.d(TAG, "clientKey-----------: "+mDevInfo.getClientKey());
-								showProgressBar();
 								userLoginRequest(getString(R.string.signin), params);
 							}
 							else if(isValidPhoneNumber)
@@ -503,10 +503,16 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 		}
 		mProgressDialog = ProgressDialog.show(this,"", "Loading...", true,false);
 	}
-	public void dismissProgressBar(){
-		if(mProgressDialog != null){
-			mProgressDialog.dismiss();
+
+	public void dismissProgressBar() {
+
+		try {
+			if (mProgressDialog != null && mProgressDialog.isShowing()) {
+				mProgressDialog.dismiss();
+			}
+		} catch (Throwable e) {
 		}
+
 	}
 	private void RegisterUserReq(String contextPath, final Map<String,String> bodyParams) {
 		
@@ -557,7 +563,7 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 		return new Response.Listener<String>() {
 			@Override
 			public void onResponse(String response) {
-				dismissProgressBar();
+				
 				//Analytics.endTimedEvent(Analytics.loginSignUp);
 				
 				Log.d(TAG,"Response: "+response);
@@ -632,6 +638,7 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
+				dismissProgressBar();
 			}
 		};
 	}
@@ -660,7 +667,7 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 
 
 	protected Listener<String> forgotPasswordSuccessListener() {
-		dismissProgressBar();
+		
 		return new Response.Listener<String>() {
 			@Override
 			public void onResponse(String response) {
@@ -689,6 +696,7 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
+				dismissProgressBar();
 			}
 		};
 	}
@@ -720,7 +728,7 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 
 	}
 	protected ErrorListener userLoginErrorListener() {
-		dismissProgressBar();
+		
 		return new Response.ErrorListener() {
 			@Override
 			public void onErrorResponse(VolleyError error) {
@@ -755,12 +763,13 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 					sendNotification(msg);	
 				}
 				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
+				dismissProgressBar();
 			}
 		};
 	}
 
 	protected Listener<String> userLoginSuccessListener() {
-		dismissProgressBar();
+		
 		return new Response.Listener<String>() {
 			@Override
 			public void onResponse(String response) {
@@ -832,6 +841,7 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
+				dismissProgressBar();
 			}
 		};
 	}
