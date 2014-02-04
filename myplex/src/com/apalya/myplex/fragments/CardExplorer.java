@@ -568,19 +568,18 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		}
 	}
 	
-	private Response.Listener<String> deviceMinSuccessListener() {
-		return new Response.Listener<String>() {
+	private Response.Listener<CardResponseData> deviceMinSuccessListener() {
+		return new Response.Listener<CardResponseData>() {
 			@Override
-			public void onResponse(String response) {
-//				response = "{\n  \"status\": \"ERR_INVALID_SESSION_ID\", \n  \"message\": \"Invalid or missing session id\", \n  \"code\": 401\n }";
-				if(Util.isInvalidSession(mContext,response,CardExplorer.this)){
-					return;
-				}
+			public void onResponse(CardResponseData minResultSet) {
 				//Analytics.endTimedEvent(Analytics.cardBrowseDuration);
 				try {
 //					Log.d(TAG,"server response "+response);
 //					updateText("parsing results");
-					CardResponseData minResultSet  =(CardResponseData) Util.fromJson(response, CardResponseData.class);
+					if(minResultSet ==  null){showNoDataMessage(false);return;}
+					long startTime=System.currentTimeMillis();
+//					CardResponseData minResultSet  =(CardResponseData) Util.fromJson(response, CardResponseData.class);
+					Log.d(TAG,"reponse process time taken-1 :"+(System.currentTimeMillis()-startTime));
 					if(minResultSet.code != 200){
 						Util.showToast(getContext(), minResultSet.message,Util.TOAST_TYPE_ERROR);
 //						Toast.makeText(getContext(), minResultSet.message, Toast.LENGTH_SHORT).show();
@@ -602,14 +601,12 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 						if(minResultSet.results ==  null){showNoDataMessage(false);return;}
 						if(minResultSet.results.size() ==  0){showNoDataMessage(false);return;}
 						mCacheManager.getCardDetails(minResultSet.results,IndexHandler.OperationType.IDSEARCH,CardExplorer.this);
+						Log.d(TAG,"reponse process time taken-2 :"+(System.currentTimeMillis()-startTime));
 					}
-				} catch (JsonParseException e) {
+				} catch (Exception e) {
 					showNoDataMessage(false);
 					e.printStackTrace();
-				} catch (IOException e) {
-					showNoDataMessage(false);
-					e.printStackTrace();
-				}
+				} 
 			}
 		};
 	}

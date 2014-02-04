@@ -17,11 +17,15 @@ import com.android.volley.Response;
 import com.android.volley.Request.Method;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
+import com.apalya.myplex.data.CardResponseData;
+import com.apalya.myplex.utils.Util;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 
-public class GZipRequest extends Request<String> {
+public class GZipRequest extends Request<CardResponseData> {
 	public static final String TAG = "GZipRequest";
 	private boolean mShowLogs = false;
-	 private final Listener<String> mListener;
+	 private final Listener<CardResponseData> mListener;
 	  /**
 	     * Creates a new request with the given method.
 	     *
@@ -30,7 +34,7 @@ public class GZipRequest extends Request<String> {
 	     * @param listener Listener to receive the String response
 	     * @param errorListener Error listener, or null to ignore errors
 	     */
-	    public GZipRequest(int method, String url, Listener<String> listener,
+	    public GZipRequest(int method, String url, Listener<CardResponseData> listener,
 	            ErrorListener errorListener) {
 	        super(method, url, errorListener);
 	        mListener = listener;
@@ -43,12 +47,12 @@ public class GZipRequest extends Request<String> {
 	     * @param listener Listener to receive the String response
 	     * @param errorListener Error listener, or null to ignore errors
 	     */
-	    public GZipRequest(String url, Listener<String> listener, ErrorListener errorListener) {
+	    public GZipRequest(String url, Listener<CardResponseData> listener, ErrorListener errorListener) {
 	        this(Method.GET, url, listener, errorListener);
 	    }
 
 	    @Override
-	    protected void deliverResponse(String response) {
+	    protected void deliverResponse(CardResponseData response) {
 	        mListener.onResponse(response);
 	    }
 		@Override
@@ -61,7 +65,7 @@ public class GZipRequest extends Request<String> {
 			mShowLogs = value;
 		}
 	    @Override
-	    protected Response<String> parseNetworkResponse(NetworkResponse response) {
+	    protected Response<CardResponseData> parseNetworkResponse(NetworkResponse response) {
 	    	if(mShowLogs && response != null && response.headers != null ){
 				Log.d(TAG,"Response Headers");
 				for(String key:response.headers.keySet()){
@@ -114,6 +118,21 @@ public class GZipRequest extends Request<String> {
 	        if(mShowLogs){
 	        	Log.d(TAG,"Response :: " +parsed);
 	        }
-	        return Response.success(parsed, HttpHeaderParser.parseCacheHeaders(response));
+	        
+	        CardResponseData minResultSet=null;
+	        try {
+	        	minResultSet =(CardResponseData) Util.fromJson(parsed, CardResponseData.class);
+			} catch (JsonMappingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (JsonParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	        
+	        return Response.success(minResultSet, HttpHeaderParser.parseCacheHeaders(response));
 	    }
 }

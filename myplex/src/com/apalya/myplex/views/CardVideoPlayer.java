@@ -249,7 +249,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		if (mData.images != null) {
 			for (CardDataImagesItem imageItem : mData.images.values) {
 				if (imageItem.type != null && imageItem.type.equalsIgnoreCase("coverposter") && imageItem.profile != null
-						&& imageItem.profile.equalsIgnoreCase(myplexapplication.getApplicationConfig().type)) {
+						&& imageItem.profile.equalsIgnoreCase(ApplicationConfig.MDPI)) {
 					if (imageItem.link == null
 							|| imageItem.link.compareTo("Images/NoImage.jpg") == 0) {
 						mPreviewImage.setImageResource(0);
