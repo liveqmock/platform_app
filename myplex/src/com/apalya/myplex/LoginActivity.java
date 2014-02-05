@@ -32,6 +32,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.telephony.TelephonyManager;
+import android.util.AttributeSet;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -85,7 +86,10 @@ import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.Settings;
 import com.facebook.model.GraphUser;
-import com.flurry.android.FlurryAgent;
+
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.Fields;
+import com.google.analytics.tracking.android.MapBuilder;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -142,6 +146,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 	private DeviceDetails mDevInfo;
 	private UserProfile mUserInfo;
 	private MixpanelAPI mMixpanel;
+	private EasyTracker easyTracker = null;
 	private Twitter11 twitter11;
 	private static int scrollWidth;
 	private TranslateAnimation translateAnim;
@@ -175,6 +180,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 		
 		AsyncTask<Void, Void, Void> task = new AsyncTask<Void, Void, Void>(){
 
@@ -186,9 +192,11 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			
 		};
 		task.execute();
-		Crashlytics.start(this);
+		//Crashlytics.start(this);
+
 		FontUtil.loadFonts(getAssets());
 		String trackingDistinctId = getTrackingDistinctId();
+		Analytics.trackingId = trackingDistinctId;
 		mMixpanel=myplexapplication.getMixPanel();
 		// We also identify the current user with a distinct ID, and
 		// register ourselves for push notifications from Mixpanel.
@@ -202,6 +210,13 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		// to dispatch people data.
 
 		mMixpanel.getPeople().initPushHandling(myplexapplication.ANDROID_PUSH_SENDER_ID);
+		easyTracker = myplexapplication.getGaTracker();
+		Analytics.startActivity(easyTracker, this);
+		
+		Map<String,String> params1 = new HashMap<String, String>();
+		Analytics.trackEvent(Analytics.EVENT_LOGIN_OPTIONS_PRESENTED,params1);
+		//easyTracker.activityStart(this);
+		
 
 		// You can call enableLogAboutMessagesToMixpanel to see
 		// how messages are queued and sent to the Mixpanel servers.
@@ -261,9 +276,11 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				}, 3000);
 				ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(mLoginText, "alpha", 0.5f, 1f);
 				fadeAnim2.setDuration(300);
-				fadeAnim2.start();				
+				fadeAnim2.start();
 				
-				if(mDevInfo.getClientKey()!=null)
+				
+				
+     			if(mDevInfo.getClientKey()!=null)
 				{
 					finish();
 					Map<String, String> map = new HashMap<String, String>();
@@ -321,16 +338,19 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(mLetMeIn, "alpha", 0.5f, 1f);
 				fadeAnim2.setDuration(300);
 				fadeAnim2.start();
+				
+				
+				
+						
 				Map<String,String> param1=new HashMap<String, String>();
 				param1.put(Analytics.LOGIN_TYPE_PROPERTY, LOGIN_TYPES.Guest.toString());
 				param1.put(Analytics.LOGIN_DATE_PROPERTY, new Date().toString());
 				
 				if(mDevInfo.getClientKey()!=null)
 				{
-					
-					param1.put(Analytics.LOGIN_STATUS_PROPERTY,Analytics.LOGIN_STATUS_TYPES.Success.toString());
-					Analytics.trackEvent(Analytics.EVENT_LOGIN,param1);
-					
+					Analytics.trackEvent(Analytics.EVENT_BROWSING_AS_GUEST,param1);
+					EasyTracker easyTracker = EasyTracker.getInstance(LoginActivity.this);	
+					Analytics.createEventGA(easyTracker, Analytics.EVENT_LOGIN, Analytics.LOGIN_TYPES.Guest.toString(),Analytics.LOGIN_STATUS_TYPES.Success.toString());
 					mUserInfo.setName(Analytics.LOGIN_AS_GUEST);
 					finish();
 					Util.launchMainActivity(LoginActivity.this);
@@ -385,17 +405,6 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			
 			if(session.isOpened())
 			{
-			
-				/*Map<String,String> params=new HashMap<String, String>();
-				params.put("status", "Success");*/
-				Map<String,String> params=new HashMap<String, String>();
-				params.put(Analytics.LOGIN_TYPE_PROPERTY, LOGIN_TYPES.FaceBook.toString());
-				params.put(Analytics.LOGIN_DATE_PROPERTY, new Date().toString());
-				params.put(Analytics.LOGIN_EMAIL_PROPERTY, "");
-				params.put(Analytics.LOGIN_STATUS_PROPERTY, Analytics.LOGIN_STATUS_TYPES.Success.toString());
-				//Analytics.trackEvent(Analytics.loginFacebook,params);
-				Analytics.trackEvent(Analytics.EVENT_LOGIN,params);
-				
 				finish();
 				Util.launchMainActivity(LoginActivity.this);
 			}
@@ -476,6 +485,17 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 	}
 
+	/*
+	 * added by sreedhar for capturing login screen options
+	 * (non-Javadoc)
+	 * @see android.app.Activity#onCreateView(android.view.View, java.lang.String, android.content.Context, android.util.AttributeSet)
+	 */
+	@Override
+	public View onCreateView(View parent, String name, Context context,
+			AttributeSet attrs) {
+		Log.d(TAG, "onCreateView");
+		return super.onCreateView(parent, name, context, attrs);
+	}
 
 	@Override
 	protected void onDestroy() {
@@ -619,7 +639,11 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 	}
 	public void dismissProgressBar(){
 		if(mProgressDialog != null && mProgressDialog.isShowing()){
-			mProgressDialog.dismiss();
+			try{
+				mProgressDialog.dismiss();
+			}catch(Exception excp) {
+				//this is left blank intentionally to avoid IllegalArgumentxception
+			}
 		}
 	}
 	private boolean mShowExitToast = true;
@@ -698,7 +722,10 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		//mPlusClient.connect();
 		
 		Session.getActiveSession().addCallback(statusCallback);
-		FlurryAgent.onStartSession(this, "X6WWX57TJQM54CVZRB3K");
+		
+		
+		
+		
 		
 	}
 
@@ -786,11 +813,6 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 	private void onSessionStateChange(Session session, SessionState state, Exception exception) {
 		if (exception instanceof FacebookOperationCanceledException || exception instanceof FacebookAuthorizationException) {
 
-			/*Analytics.endTimedEvent(Analytics.loginFacebook);
-			Map<String,String> attribs=new HashMap<String, String>();
-			attribs.put("Status", "Cancel");
-			attribs.put("Msg", "User Cancelled");
-			Analytics.trackEvent(Analytics.loginFacebook,attribs);*/
 			Log.d(TAG,getString(R.string.userCancelled));
 		} else {
 
@@ -857,7 +879,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 						Crashlytics.setUserEmail(user.getProperty("email").toString());
 
 						String userIdSha1=Util.sha1Hash(user.getProperty("email").toString());
-						FlurryAgent.setUserId(userIdSha1);
+						
 						Crashlytics.setUserName(userIdSha1);
 						Crashlytics.setUserIdentifier(userIdSha1);
 						
@@ -923,6 +945,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		};
 		myReq.setShouldCache(false);
 		Log.d(TAG,"Request sent ");
+		
 		queue.add(myReq);
 
 	}
@@ -931,11 +954,12 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			@Override
 			public void onErrorResponse(VolleyError error) {
 				dismissProgressBar();
-				/*Analytics.endTimedEvent(Analytics.loginFacebook);
 				Map<String,String> params=new HashMap<String, String>();
-				params.put("Status", "Failure");
-				params.put("Msg", error.toString());
-				Analytics.trackEvent(Analytics.loginFacebook,params);*/
+				params.put(Analytics.ACCOUNT_TYPE, Analytics.ALL_LOGIN_TYPES.facebook.toString());
+				params.put(Analytics.USER_ID,mUserInfo.getUserEmail());
+				params.put(Analytics.REASON_FAILURE,error.toString());
+				Analytics.trackEvent(Analytics.EVENT_FACEBOOK_LOGIN_FAILURE,params);
+								
 				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 				Log.d(TAG,"Error: "+error.toString());
 				
@@ -962,11 +986,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			@Override
 			public void onResponse(String response) {
 				Log.d(TAG,"Response: "+response);
-				//Analytics.endTimedEvent(Analytics.loginFacebook);
-				Map<String,String> params1=new HashMap<String, String>();
-				params1.put(Analytics.LOGIN_TYPE_PROPERTY, LOGIN_TYPES.FaceBook.toString());
-				params1.put(Analytics.LOGIN_DATE_PROPERTY, new Date().toString());
-				params1.put(Analytics.LOGIN_EMAIL_PROPERTY, "");
+								
+				
 				
 				try {	
 					dismissProgressBar();
@@ -991,15 +1012,11 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 								getString(R.string.userpic), "https://graph.facebook.com/"+fbUserId+"/picture?width=480&height=320");
 		
 						}
-						
 						Map<String,String> attribs=new HashMap<String, String>();
-
-						/*Map<String,String> attribs=new HashMap<String, String>();
->>>>>>> Stashed changes
-						attribs.put("Status", "Success");
-						Analytics.trackEvent(Analytics.loginFacebook,attribs);*/
-						params1.put(Analytics.LOGIN_STATUS_PROPERTY, Analytics.LOGIN_STATUS_TYPES.Success.toString());
-						Analytics.trackEvent(Analytics.EVENT_LOGIN, params1);
+						attribs.put(Analytics.ACCOUNT_TYPE, Analytics.ALL_LOGIN_TYPES.facebook.toString());
+						attribs.put(Analytics.USER_ID,mUserInfo.getUserEmail());
+						Analytics.trackEvent(Analytics.EVENT_FACEBOOK_LOGIN_SUCCESS,attribs);
+						
 						Log.d(TAG, "status: "+jsonResponse.getString("status"));
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
@@ -1017,15 +1034,13 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 							mUserInfo.setGoogleId(null);
 							mUserInfo.setName("NA");
 						}
-						Map<String,String> attribs=new HashMap<String, String>();
-
-						/*Map<String,String> attribs=new HashMap<String, String>();
->>>>>>> Stashed changes
-						attribs.put("Status", "Failure");
-						attribs.put("Msg", jsonResponse.getString("code"));
-						Analytics.trackEvent(Analytics.loginFacebook,attribs);*/
-						params1.put(Analytics.LOGIN_STATUS_PROPERTY, Analytics.LOGIN_STATUS_TYPES.Failure.toString());
-						Analytics.trackEvent(Analytics.EVENT_LOGIN, params1);
+									
+						Map<String,String> attribs2=new HashMap<String, String>();
+						attribs2.put(Analytics.ACCOUNT_TYPE, Analytics.ALL_LOGIN_TYPES.facebook.toString());
+						attribs2.put(Analytics.USER_ID,mUserInfo.getUserEmail());
+						attribs2.put(Analytics.REASON_FAILURE,jsonResponse.getString("message"));
+						Analytics.trackEvent(Analytics.EVENT_FACEBOOK_LOGIN_FAILURE,attribs2);
+						
 						if(jsonResponse.getString("code").equalsIgnoreCase("401"))
 						{
 							String devId=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
@@ -1090,12 +1105,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			if(mDevInfo.getClientKey()!=null)
 			{
 				
-				Map<String,String> param1=new HashMap<String, String>();
-				//param1.put("Duration", "");
-				param1.put(Analytics.LOGIN_FACEBOOK,Analytics.LOGIN_CLICK);
-				Analytics.trackEvent(Analytics.EVENT_LOGIN_SOCIAL,param1);
-				//Analytics.trackEvent(Analytics.loginFacebook,param1,true);
-				
+				Analytics.mixPanelFacebookLoginSelected();
+								
 				if(Session.getActiveSession().isOpened())
 				{
 					//onClickLogout();
@@ -1132,11 +1143,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					{
 						if(mPlusClient!=null)
 						{
-							Map<String,String> param1=new HashMap<String, String>();
-							//param1.put("Duration", "");
-							param1.put(Analytics.LOGIN_GOOGLE,Analytics.LOGIN_CLICK);
-							//Analytics.trackEvent(Analytics.loginGoogle,param1,true);
-							Analytics.trackEvent(Analytics.EVENT_LOGIN_SOCIAL,param1);
+											
 							if(mPlusClient.isConnected()){
 								mPlusClient.clearDefaultAccount();
 							}
@@ -1157,11 +1164,6 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			{
 				//if (!isAuthTwitter())
 				{
-					Map<String,String> param1=new HashMap<String, String>();
-					param1.put(Analytics.LOGIN_TWITTER,Analytics.LOGIN_CLICK);
-					//Analytics.trackEvent(Analytics.loginGoogle,param1,true);
-					Analytics.trackEvent(Analytics.EVENT_LOGIN_SOCIAL,param1);
-					//Analytics.trackEvent(Analytics.loginTwitter,param1,true);
 					twitter11.login();
 				}
 			}
@@ -1216,6 +1218,9 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		};
 		myReq.setShouldCache(false);
 		Log.d(TAG,"Request sent ");
+		
+		Analytics.mixPanelGoogleLoginSelected();
+		
 		queue.add(myReq);
 
 	}
@@ -1227,6 +1232,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				dismissProgressBar();
 				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 				Log.d(TAG,"Error: "+error.toString());
+				
+				Analytics.mixPanelGoogleLoginFailure(mUserInfo.getUserEmail(),error.toString());
 				if(error.toString().indexOf("NoConnectionError")>0)
 				{
 					Log.d(TAG,"Error: NoConnectionError");
@@ -1238,7 +1245,6 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				else
 				{
 					Log.d(TAG, error.toString());
-
 				}
 				sendNotification(getString(R.string.interneterr));
 				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
@@ -1252,13 +1258,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			@Override
 			public void onResponse(String response) {
 				dismissProgressBar();
-				//Analytics.endTimedEvent(Analytics.loginGoogle);
-				
-				Map<String,String> params1=new HashMap<String, String>();
-				params1.put(Analytics.LOGIN_TYPE_PROPERTY, LOGIN_TYPES.Google.toString());
-				params1.put(Analytics.LOGIN_DATE_PROPERTY, new Date().toString());
-				//params1.put(Analytics.LOGIN_EMAIL_PROPERTY, "");
-				
+								
 				Log.d(TAG,"Response: "+response);
 				try {	
 					Log.d(TAG, "########################################################");
@@ -1278,17 +1278,13 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 						}
 						SharedPrefUtils.writeToSharedPref(LoginActivity.this, getString(R.string.devusername), mUserInfo.getUserEmail());
 						
-						Map<String,String> attribs=new HashMap<String, String>();
-
-						params1.put(Analytics.LOGIN_STATUS_PROPERTY,Analytics.LOGIN_STATUS_TYPES.Success.toString());
-						Analytics.trackEvent(Analytics.EVENT_LOGIN_SOCIAL, params1);
+						Analytics.mixPanelGoogleLoginSuccess(mUserInfo.getUserEmail());
+						
 						Log.d(TAG, "status: "+jsonResponse.getString("status"));
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
 						Log.d(TAG, "########################################################");
 						Log.d(TAG, "---------------------------------------------------------");
-						
-
 						
 						finish();
 						Util.launchMainActivity(LoginActivity.this);
@@ -1301,17 +1297,9 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 							mUserInfo.setGoogleId(null);
 							mUserInfo.setName("NA");
 						}
-						Map<String,String> attribs=new HashMap<String, String>();
-
-						/*Map<String,String> attribs=new HashMap<String, String>();
-
-						attribs.put("Status", "Failure");
-						attribs.put("Msg", jsonResponse.getString("code"));
-						Analytics.trackEvent(Analytics.loginGoogle,attribs);*/
-						params1.put(Analytics.LOGIN_STATUS_PROPERTY,Analytics.LOGIN_STATUS_TYPES.Failure.toString());
-						params1.put(Analytics.LOGIN_TYPE_PROPERTY,Analytics.LOGIN_TYPES.Google.toString());
-						Analytics.trackEvent(Analytics.EVENT_LOGIN_SOCIAL, params1);
 						
+						Analytics.mixPanelGoogleLoginFailure(mUserInfo.getUserEmail(),jsonResponse.getString("message"));
+												
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
 						if(jsonResponse.getString("code").equalsIgnoreCase("419"))
@@ -1359,15 +1347,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 	@Override
 	public void onConnectionFailed(ConnectionResult connectionResult) {
-		//Analytics.endTimedEvent(Analytics.loginGoogle);
-		Map<String,String> attribs=new HashMap<String, String>();
-		attribs.put(Analytics.LOGIN_TYPE_PROPERTY, Analytics.LOGIN_TYPES.Google.toString());
-		attribs.put(Analytics.LOGIN_STATUS_PROPERTY, Analytics.LOGIN_STATUS_TYPES.Failure.toString());
-		//attribs.put("Status", "Failure");
-		attribs.put(Analytics.LOGIN_STATUS_MESSAGE_PROPERTY, connectionResult.toString());
-		//attribs.put("Msg", connectionResult.toString());
-		Analytics.trackEvent(Analytics.EVENT_LOGIN_SOCIAL,attribs);
-		
+				
 		if (connectionResult.hasResolution()) {
 			try {
 				connectionResult.startResolutionForResult(this,
@@ -1478,12 +1458,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 						break;
 					}
 				}else if(resultCode == Activity.RESULT_CANCELED){
-					//Analytics.endTimedEvent(Analytics.loginTwitter);
-					Map<String,String> params=new HashMap<String, String>();
-					params.put(Analytics.LOGIN_TYPE_PROPERTY, Analytics.LOGIN_TYPES.Twitter.toString());
-					params.put(Analytics.LOGIN_STATUS_PROPERTY, Analytics.LOGIN_STATUS_TYPES.Cancel.toString());
-					//params.put("Status", "Cancel");
-					//Analytics.trackEvent(Analytics.loginTwitter,params);
+					
 					if(requestCode==TWITTER_CALLBACK){
 						Util.showToast(this, isAuthTwitter()? "Logged In" : "Request Cancelled",Util.TOAST_TYPE_ERROR);
 //						Toast.makeText(LoginActivity.this, isAuthTwitter()? "Logged In" : "Request Cancelled", Toast.LENGTH_SHORT).show();
@@ -1511,9 +1486,10 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		if(Session.getActiveSession()!=null)
 			Session.getActiveSession().removeCallback(statusCallback);
 
-		FlurryAgent.onEndSession(this);
+		
 		
 		super.onStop();
+		
 	}
 
 	@Override
@@ -1539,7 +1515,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				
 				Crashlytics.setUserEmail(mUserInfo.getUserEmail());
 				String userIdSha1=Util.sha1Hash(mUserInfo.getUserEmail());
-				FlurryAgent.setUserId(userIdSha1);
+				
 				Crashlytics.setUserName(userIdSha1);
 				Crashlytics.setUserIdentifier(userIdSha1);
 				tryAuthenticate();
@@ -1562,8 +1538,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				mPlusClient.connect();*/
 		}
 	}
-	////////////////////////////////////////////////////
-
+	
 	private String getTrackingDistinctId() {
 		SharedPreferences prefs = getPreferences(MODE_PRIVATE);
 
@@ -1605,7 +1580,6 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			
 	}
 
-	///////////////////////////////////////////////////////
 	private int hourOfTheDay() {
 		Calendar calendar = Calendar.getInstance();
 		return calendar.get(Calendar.HOUR_OF_DAY);
@@ -1722,7 +1696,13 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				try {	
 					Log.d(TAG, "########################################################");
 					JSONObject jsonResponse= new JSONObject(response);
-
+					
+					String deviceId = jsonResponse.getString("deviceId");
+					String deviceDesc  = mUserInfo.getName()+Analytics.APOS+ Analytics.EMPTY_SPACE+ mDevInfo.getDeviceOs();
+					Map<String,String> params = new HashMap<String, String>();
+					params.put(Analytics.DEVICE_ID, deviceId);
+					params.put(Analytics.DEVICE_DESC, deviceDesc);
+					
 					if(jsonResponse.getString("status").equalsIgnoreCase("SUCCESS"))
 					{
 
@@ -1742,6 +1722,9 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 						Date now=new Date(nowinms);
 						mUserInfo.joinedDate=now.toLocaleString();
 						mUserInfo.lastVisitedDate=now.toLocaleString();
+						
+						
+						Analytics.trackEvent(Analytics.EVENT_DEVICE_REGISTRATION_SUCCESS,params);
 
 						ConsumerApi.DEBUGCLIENTKEY = jsonResponse.getString("clientKey");
 
@@ -1758,6 +1741,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					{
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
+						
+						Analytics.trackEvent(Analytics.EVENT_DEVICE_REGISTRATION_FAILED,params);
 						Util.showToast(LoginActivity.this, "Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),Util.TOAST_TYPE_ERROR);
 //						Util.showToast("Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),LoginActivity.this);
 					}
@@ -1812,7 +1797,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					Crashlytics.setUserEmail(username);
 					
 					String userIdSha1=Util.sha1Hash(username);
-					FlurryAgent.setUserId(userIdSha1);
+					
 					Crashlytics.setUserName(userIdSha1);
 					Crashlytics.setUserIdentifier(userIdSha1);
 					
@@ -1915,6 +1900,10 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 		if(mProgressDialog!=null)
 			mProgressDialog.setMessage("Logging in, Please wait...");
+		
+		Map<String,String> attribs=new HashMap<String, String>();
+		attribs.put(Analytics.ACCOUNT_TYPE, Analytics.ALL_LOGIN_TYPES.twitter.toString());
+		Analytics.trackEvent(Analytics.EVENT_TWITTER_LOGIN_SELECTED,attribs); 
 
 		String url=ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+ConsumerApi.USER_CONTEXT+ConsumerApi.SLASH+contextPath;
 		StringRequest myReq = new StringRequest(Method.POST,
@@ -1938,13 +1927,14 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			@Override
 			public void onErrorResponse(VolleyError error) {
 				dismissProgressBar();
-				//Analytics.endTimedEvent(Analytics.loginTwitter);
-				Map<String,String> params=new HashMap<String, String>();
-				params.put("Status", "Failure");
-				params.put("Msg", error.toString());
-				//Analytics.trackEvent(Analytics.loginTwitter,params);
+				Map<String,String> params1 = new HashMap<String, String>();
+				params1.put(Analytics.ACCOUNT_TYPE, Analytics.ALL_LOGIN_TYPES.twitter.toString());
+				params1.put(Analytics.USER_ID,mUserInfo.getUserId());
+				params1.put(Analytics.REASON_FAILURE, error.toString());
+				Analytics.trackEvent(Analytics.EVENT_TWITTER_LOGIN_FAILURE, params1);
 				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 				Log.d(TAG,"Error: "+error.toString());
+				
 				if(error.toString().indexOf("NoConnectionError")>0)
 				{
 					sendNotification(getString(R.string.loginerr));
@@ -1968,19 +1958,14 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				try {	
 					dismissProgressBar();
 					Map<String,String> params1 = new HashMap<String, String>();
-					params1.put(Analytics.LOGIN_TYPE_PROPERTY, LOGIN_TYPES.Twitter.toString());
-					params1.put(Analytics.LOGIN_DATE_PROPERTY, new Date().toString());
-					params1.put(Analytics.LOGIN_EMAIL_PROPERTY, "");
+					params1.put(Analytics.ACCOUNT_TYPE, Analytics.ALL_LOGIN_TYPES.twitter.toString());
+					params1.put(Analytics.USER_ID,mUserInfo.getUserId());					
 					
 					Log.d(TAG, "########################################################");
 					JSONObject jsonResponse= new JSONObject(response);
 					if(jsonResponse.getString("status").equalsIgnoreCase("SUCCESS"))
 					{
-						/*Map<String,String> attribs=new HashMap<String, String>();
-						attribs.put("Status", "Success");
-						Analytics.trackEvent(Analytics.loginTwitter,attribs);*/
-						params1.put(Analytics.LOGIN_STATUS_PROPERTY,Analytics.LOGIN_STATUS_TYPES.Success.toString());
-						Analytics.trackEvent(Analytics.EVENT_LOGIN, params1);
+						Analytics.trackEvent(Analytics.EVENT_TWITTER_LOGIN_SUCCESS, params1);
 						Log.d(TAG, "status: "+jsonResponse.getString("status"));
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
@@ -1992,12 +1977,9 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					}
 					else
 					{
-						/*Map<String,String> attribs=new HashMap<String, String>();
-						attribs.put("Status", "Failure");
-						attribs.put("Msg", jsonResponse.getString("code"));
-						Analytics.trackEvent(Analytics.loginTwitter,attribs);*/
-						params1.put(Analytics.LOGIN_STATUS_PROPERTY,Analytics.LOGIN_STATUS_TYPES.Failure.toString());
-						Analytics.trackEvent(Analytics.EVENT_LOGIN, params1);
+						params1.put(Analytics.REASON_FAILURE, jsonResponse.getString("message"));
+						Analytics.trackEvent(Analytics.EVENT_TWITTER_LOGIN_FAILURE, params1);
+												
 						if(jsonResponse.getString("code").equalsIgnoreCase("401"))
 						{
 							String devId=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,

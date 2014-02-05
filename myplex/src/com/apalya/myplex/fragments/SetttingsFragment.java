@@ -1,7 +1,9 @@
 package com.apalya.myplex.fragments;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import android.content.Intent;
@@ -23,13 +25,16 @@ import com.apalya.myplex.adapters.SettingsAdapter;
 import com.apalya.myplex.data.ApplicationSettings;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.SettingsData;
+import com.apalya.myplex.data.UserProfile;
 import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.DeviceRegUtil;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.utils.WidevineDrm;
 import com.apalya.myplex.utils.MessagePost.MessagePostCallback;
 import com.apalya.myplex.views.PinnedSectionListView;
 import com.apalya.myplex.views.RatingDialog;
+import com.google.analytics.tracking.android.EasyTracker;
 
 public class SetttingsFragment extends BaseFragment {
 
@@ -56,6 +61,8 @@ public class SetttingsFragment extends BaseFragment {
 				.findViewById(R.id.settings_list);		
 		PreapreSettingsData();
 		debug_mode_counter=0;
+		
+		Analytics.mixPanelBrowsedSettings();
 		mSettingsListView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
@@ -95,6 +102,8 @@ public class SetttingsFragment extends BaseFragment {
 					return;
 				
 				if (data.mSettingName.equals(FEEDBACK)) {
+					Analytics.mixPanelFeedbackInitiation();
+					UserProfile userProfile = myplexapplication.getUserProfileInstance();
 					CardData profileData=new CardData();
 					profileData._id="0";
 					RatingDialog dialog = new RatingDialog(mContext);
@@ -104,6 +113,8 @@ public class SetttingsFragment extends BaseFragment {
 						@Override
 						public void sendMessage(boolean status) {
 							if(status){
+								//Map<String,String> params=new HashMap<String, String>();
+								//Analytics.trackEvent(Analytics.EVENT_PROVIDED_FEEDBACK,params);
 								Util.showToast(mContext, "Thanks for your feedback.",Util.TOAST_TYPE_INFO);
 								
 							}else{

@@ -77,7 +77,7 @@ public class DownloadUtil {
 							context, context.getString(R.string.devclientkey));
 					ConsumerApi.DEBUGCLIENTKEY = clientKey;
 				}
-
+				
 				notifyDownloadComplete(contentId);
 				acquireRights(cardDownloadData,context,contentId);
 				

@@ -40,7 +40,7 @@ public class FetchDownloadData implements CacheManagerCallback{
 		try {
 			downloadlist = (CardDownloadedDataList) Util.loadObject(myplexapplication.getApplicationConfig().downloadCardsPath);	
 		} catch (Exception e) {
-			// TODO: handle exception
+			e.printStackTrace();
 		}
 		if(downloadlist == null){
 			if(mListener != null){

@@ -1,7 +1,11 @@
 package com.apalya.myplex.views;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.apalya.myplex.R;
 import com.apalya.myplex.data.CardData;
+import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MessagePost;
 import com.apalya.myplex.utils.MessagePost.MessagePostCallback;
@@ -98,6 +102,11 @@ public class RatingDialog {
 			public void onClick(View v) {
 				MessagePost post = new MessagePost();
 				mProgressBar.setVisibility(View.VISIBLE);
+				String str = mMessageBox.getEditableText().toString();
+				if(str == null || str.length() == 0) {
+					str = "Good";
+				}
+				Analytics.mixPanelProvidedFeedback(str, mRatingBar.getProgress()+"");
 				post.sendComment(mMessageBox.getEditableText().toString(), mRatingBar.getProgress(), data,MessagePost.POST_RATING, new MessagePostCallback() {
 					
 					@Override

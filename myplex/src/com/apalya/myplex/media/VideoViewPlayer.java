@@ -35,7 +35,9 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.apalya.myplex.data.ApplicationSettings;
+import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.ErrorManagerData;
+import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.exception.DRMException;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.Util;
@@ -45,7 +47,7 @@ import com.apalya.myplex.views.CardVideoPlayer;
 import com.apalya.myplex.views.CardVideoPlayer.PlayerFullScreen;
 import com.apalya.myplex.views.CardVideoPlayer.PlayerStatusUpdate;
 import com.crashlytics.android.Crashlytics;
-import com.flurry.android.monolithic.sdk.impl.mc;
+import com.google.analytics.tracking.android.EasyTracker;
 public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.OnInfoListener,
 		MediaPlayer.OnCompletionListener, OnPreparedListener,
 		OnSeekCompleteListener, OnBufferingUpdateListener {
@@ -129,11 +131,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 				if (msg != null) {
 					sendMessageDelayed(msg, INTERVAL_BUFFERING_PER_UPDATE);
 				}
-				//???
-				Map<String,String> params=new HashMap<String, String>();
-				params.put("Buffering", "start");
-				//Analytics.trackEvent(Analytics.PlayerBuffering,params);
-				
+								
 				break;
 			}
 		}
@@ -299,9 +297,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 
 		if (visibility) {
 			mProgressBar.setVisibility(View.VISIBLE);
-			Map<String,String> params=new HashMap<String, String>();
-			params.put("Buffering", "start");
-			//Analytics.trackEvent(Analytics.PlayerBuffering,params,true);
+			
 			return;
 		}
 
@@ -361,16 +357,6 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 	public void onPause() {
 		Log.d("PlayerScreen", "VideoViewPlayer onPause Start");
 		
-		/*
-		Map<String,String> params=new HashMap<String, String>();
-		params.put("status", "pause");
-		Analytics.trackEvent(Analytics.PlayerPlaySelect,params);
-		*/
-		//???
-		Map<String,String> params = new HashMap<String, String>();
-		params.put(Analytics.PLAY_CONTENT_STATUS_PROPERTY,Analytics.PLAY_CONTENT_STATUS_TYPES.Pause.toString());
-		Analytics.trackEvent(Analytics.EVENT_PLAY,params);
-		
 		if(mVideoView == null){
 			return;
 		}
@@ -426,7 +412,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 
 			break;
 		}
-		Log.d("PlayerScreen", "VideoViewPlayer onPause end");
+		Log.d("PlayerScreen", "VideoViewPlayer onPause end"+ "  "+mPositionWhenPaused);
 	}
 
 	/**
@@ -435,16 +421,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 
 	public void onResume() {
 		Log.d("PlayerScreen", "VideoViewPlayer onResume Start");
-		/*
-		Map<String,String> params=new HashMap<String, String>();
-		params.put("status", "resume");
-		Analytics.trackEvent(Analytics.PlayerPlaySelect,params);
-		 */	
-		//???
-		Map<String,String> params = new HashMap<String, String>();
-		params.put(Analytics.PLAY_CONTENT_STATUS_PROPERTY,Analytics.PLAY_CONTENT_STATUS_TYPES.Resume.toString());
-		Analytics.trackEvent(Analytics.EVENT_PLAY,params);
-		
+				
 		if(mVideoView == null){
 			return;
 		}
@@ -528,10 +505,42 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 	public void onCompletion(MediaPlayer mp) {
 		Log.d("PlayerScreen", "VideoViewPlayer onCompletion End");
 		if (mPlayerListener != null) {
+			Analytics.stoppedAt();
 			mPlayerListener.onCompletion(mp);
+			//mixPanelVideoTimeCalculationOnCompletion();
+			Analytics.mixPanelVideoTimeCalculationOnCompletion();
 			mPlayerListener.onStateChanged(PlayerListener.STATE_COMPLETED, 	0);
 		}
 	}
+	
+	//Already in Analytics
+	/*private void mixPanelVideoTimeCalculationOnCompletion() {
+		int selected = myplexapplication.getCardExplorerData().currentSelectedCard;
+		CardData  mData = myplexapplication.getCardExplorerData().mMasterEntries.get(selected);
+		String contentName = mData.generalInfo.title;
+		String contentType = mData.generalInfo.type; //movie or livetv
+		String ctype = Analytics.movieOrLivetv(contentType);
+		
+		Map<String,String> params=new HashMap<String, String>();
+		params.put(Analytics.CONTENT_ID_PROPERTY, mData._id);
+		params.put(Analytics.CONTENT_NAME_PROPERTY, mData.generalInfo.title);
+		params.put(Analytics.TIME_PLAYED_PROPERTY, ""+Analytics.getTotalPlayedTime());
+		String event = null;
+		if("movies".equalsIgnoreCase(ctype))  {
+			event = Analytics.EVENT_PLAY+ Analytics.EMPTY_SPACE+mData.generalInfo.title+Analytics.EMPTY_SPACE+Analytics.MOVIE;
+		}
+		
+		if("live tv".equalsIgnoreCase(ctype))  {
+			event = Analytics.EVENT_PLAY+ Analytics.EMPTY_SPACE+mData.generalInfo.title+Analytics.EMPTY_SPACE+Analytics.TV_CHANNEL;
+		}
+		
+		if(Analytics.isTrailer)  {
+			event = Analytics.EVENT_PLAY+ Analytics.EMPTY_SPACE+mData.generalInfo.title+Analytics.EMPTY_SPACE+Analytics.TRAILER;
+			Analytics.isTrailer = false;
+		}
+		Analytics.trackEvent(event,params);
+		Analytics.totalPlayedTime = 0;
+	}*/
 
 	@Override
 	public void onPrepared(MediaPlayer mp) {
@@ -625,16 +634,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 	public void onSeekComplete(MediaPlayer mp) {
 		Log.d("PlayerScreen", "VideoViewPlayer onSeekComplete");
 		
-		/*
-		Map<String,String> params=new HashMap<String, String>();
-		params.put("status", "seek");
-		Analytics.trackEvent(Analytics.PlayerPlaySelect,params);
-*/		
-		//???
-		Map<String,String> params = new HashMap<String, String>();
-		params.put(Analytics.PLAY_CONTENT_STATUS_PROPERTY,Analytics.PLAY_CONTENT_STATUS_TYPES.SeekComplete.toString());
-		Analytics.trackEvent(Analytics.EVENT_PLAY,params);
-		
+			
 		if (mPlayerListener != null) {
 			mPlayerListener.onSeekComplete(mp);
 
@@ -690,10 +690,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 				showProgressBar(false);
 				mCurrentState = STATE_PREPARED;
 				
-				//???
-				Map<String,String> params=new HashMap<String, String>();
-				params.put("Buffering", "stop");
-				//Analytics.trackEvent(Analytics.PlayerBuffering,params);
+				
 			}
 //			if (perBuffer > 100) {
 //				showProgressBar(false);
@@ -795,7 +792,8 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 				{
 					Crashlytics.logException(new DRMException("acquireRights failed, status:"+status + " \n url:"+url));
 				}
-				
+				//mixPanelUnableToPlayVideo(Analytics.ACQUIRE_RIGHTS_FAILED);
+				Analytics.mixPanelUnableToPlayVideo2(Analytics.ACQUIRE_RIGHTS_FAILED);
 				Util.showToast(mContext, "Acquire Rights Failed", Util.TOAST_TYPE_INFO);
 				//closeSession();
 				if(mPlayerListener!=null)
@@ -863,24 +861,16 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 			if(status==0 && value== DrmInfoEvent.TYPE_RIGHTS_INSTALLED)
 			{
 				iPlayerStarted=true;
-				/*
-				Map<String,String> params=new HashMap<String, String>();
-				params.put("Status", "PlayerRightsAcqusition");
-				Analytics.trackEvent(Analytics.PlayerRightsAcqusition,params);
-*/				//Util.showToast(mContext,"RIGHTS INSTALLED",Util.TOAST_TYPE_INFO);	
-				//???
+				
 				Map<String,String> params=new HashMap<String, String>();
 				params.put(Analytics.PLAY_CONTENT_STATUS_PROPERTY,Analytics.PLAY_CONTENT_STATUS_TYPES.PlayerRightsAcquisition.toString());
 				params.put(Analytics.PLAY_CONTENT_STATUS_PROPERTY,Analytics.PLAY_CONTENT_STATUS_TYPES.Playing.toString());
-				Analytics.trackEvent(Analytics.EVENT_PLAY,params);
 				startPlayer(true);
 			}
 			if(status!=0 ){
 				iPlayerStarted=true;
 				String errMsg = "Error while playing";
-				Map<String,String> params=new HashMap<String, String>();
-				params.put(Analytics.PLAY_CONTENT_STATUS_PROPERTY,Analytics.PLAY_CONTENT_STATUS_TYPES.Error.toString());
-				
+								
 				switch (value) {
 				case DrmErrorEvent.TYPE_NO_INTERNET_CONNECTION:
 					errMsg="No Internet Connection";
@@ -904,8 +894,8 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 					errMsg="Rights renewal not allowed";
 					break;
 			}
-				params.put(Analytics.PLAY_CONTENT_ERROR_PROPERTY,errMsg);
-				Analytics.trackEvent(Analytics.EVENT_PLAY,params);
+				//mixPanelUnableToPlayVideo(errMsg);
+				Analytics.mixPanelUnableToPlayVideo2(errMsg);
 				Util.showToast(mContext,errMsg+" ("+status+")",Util.TOAST_TYPE_INFO);
 				startPlayer(false);
 				//drmManager.
@@ -913,10 +903,8 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 			
 			if(status == Settings.WIDEVINE_AUTH_FAILED){
 				//TODO Refresh purchase detail for content id.
-				Map<String,String> params=new HashMap<String, String>();
-				params.put(Analytics.PLAY_CONTENT_STATUS_PROPERTY,Analytics.PLAY_CONTENT_STATUS_TYPES.Error.toString());
-				params.put(Analytics.PLAY_CONTENT_ERROR_PROPERTY,Analytics.PLAY_CONTENT_WIDEVINE_ERROR);
-				Analytics.trackEvent(Analytics.EVENT_PLAY,params);
+				//mixPanelUnableToPlayVideo(Analytics.WIDEVINE_AUTH_FAILED);
+				Analytics.mixPanelUnableToPlayVideo2(Analytics.WIDEVINE_AUTH_FAILED);
 			}
 			
 			if(drmManager!=null)
@@ -924,6 +912,23 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 		
 		}
 	}
+	
+	/*private void mixPanelUnableToPlayVideo(String error) {
+    	
+        EasyTracker easyTracker = myplexapplication.getGaTracker();
+    	int selected = myplexapplication.getCardExplorerData().currentSelectedCard;
+		CardData  cardData = myplexapplication.getCardExplorerData().mMasterEntries.get(selected);
+		String contentName = cardData.generalInfo.title;
+		Map<String,String> params = new HashMap<String, String>();
+		params.put(Analytics.CONTENT_NAME_PROPERTY,contentName);
+		params.put(Analytics.CONTENT_ID_PROPERTY,cardData._id);
+		params.put(Analytics.CONTENT_TYPE_PROPERTY,Analytics.movieOrLivetv(cardData.generalInfo.type));
+		params.put(Analytics.REASON_FAILURE,error);
+		String event = Analytics.EVENT_UNABLE_TO_PLAY + Analytics.EMPTY_SPACE + contentName;
+		Analytics.trackEvent(event,params);
+		//Analytics.createEventGA(easyTracker, Analytics.EVENT_PLAY,Analytics.CONTENT_PLAY_ERROR,contentName );
+    }*/
+	
 	public void setmPositionWhenPaused(int mPositionWhenPaused) {
 		this.mPositionWhenPaused = mPositionWhenPaused;
 	}

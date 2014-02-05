@@ -44,6 +44,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.GZipRequest;
 import com.apalya.myplex.BaseFragment;
+import com.apalya.myplex.MainActivity;
 import com.apalya.myplex.R;
 import com.apalya.myplex.adapters.CacheManagerCallback;
 import com.apalya.myplex.adapters.CardActionListener;
@@ -77,6 +78,12 @@ import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.views.CardView;
 import com.apalya.myplex.views.PackagePopUp;
 import com.fasterxml.jackson.core.JsonParseException;
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.Fields;
+import com.google.analytics.tracking.android.GoogleAnalytics;
+import com.google.analytics.tracking.android.HitTypes;
+import com.google.analytics.tracking.android.MapBuilder;
+import com.google.analytics.tracking.android.Tracker;
 
 public class CardExplorer extends BaseFragment implements CardActionListener,CacheManagerCallback,DownloadProgressStatus,
 		OnDismissCallback, AlertDialogUtil.NoticeDialogListener {
@@ -96,20 +103,12 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	private LinearLayout mStackFrame;
 	private HashMap<CardData,Integer> mDownloadTracker= new HashMap<CardData,Integer>();
 	private boolean mRefreshOnce = false;
+	public static  boolean mfirstTime = false;
+	//private EasyTracker easyTracker = null;
 	
 	@Override
 	public void open(CardData object) {
 		
-		Map<String,String> params=new HashMap<String, String>();
-		/*params.put("CardId", object._id);
-		params.put("CardType", object.generalInfo.type);
-		params.put("CardName", object.generalInfo.title);*/
-		//???
-		params.put(Analytics.CONTENT_ID_PROPERTY, object._id);
-		params.put(Analytics.CONTENT_NAME_PROPERTY, object.generalInfo.title);
-		params.put(Analytics.CONTENT_TYPE_PROPERTY,object.generalInfo.type);
-		//Analytics.trackEvent(Analytics.EVENT_PLAY,params);
-		Analytics.trackEvent(Analytics.EVENT_BROWSE,params);
 		mMainActivity.saveActionBarTitle();
 		if(getResources().getBoolean(R.bool.isTablet)){
 			myplexapplication.mSelectedCard = object;
@@ -127,10 +126,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		mData = myplexapplication.getCardExplorerData();
-		Map<String,String> params=new HashMap<String, String>();
-		params.put(Analytics.BROWSE_TYPE_PROPERTY, Analytics.BROWSE_TYPES.Cards.toString());
-		Analytics.trackEvent(Analytics.EVENT_BROWSE,params);
-		Log.d(TAG,"onCreate");
+		mfirstTime = true;
 	}
 
 	public void showProgressBar() {
@@ -421,6 +417,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	@Override
 	public void onPause() {
 		// TODO Auto-generated method stub
+		//mCardView.mixpanelBrowsing(false);
 		super.onPause();
 	}
 	public void fillDownloadList(){
@@ -551,11 +548,6 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		}
 		
 		
-		/*attrib.put("Category", screenName);
-		attrib.put("Duration", "");
-		Analytics.trackEvent(Analytics.cardBrowseDuration,attrib,true);*/
-		
-		
 		requestUrl = requestUrl.replaceAll(" ", "%20");
 		mVolleyRequest = new GZipRequest(requestMethod, requestUrl, deviceMinSuccessListener(), responseErrorListener());
 //		mVolleyRequest.printLogs(true);
@@ -663,10 +655,6 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				String label = ((FilterMenudata) v.getTag()).label;
 				if (label != null && label.equalsIgnoreCase("All")) {
 					mMainActivity.setActionBarTitle("All");
-					Map<String,String> params=new HashMap<String, String>();
-					params.put(Analytics.SEARCH_TYPE_PROPERTY, Analytics.SEARCH_TYPES.Filter.toString());
-					params.put(Analytics.SEARCH_FILTER_TYPE_PROPERTY,label);
-					Analytics.trackEvent(Analytics.EVENT_SEARCH,params);
 					sort(mData.mMasterEntries);
 					return;
 				}
@@ -687,16 +675,13 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 					}
 				}
 				mMainActivity.setActionBarTitle(label/*+" ("+localData.size()+"+)"*/);
-				Map<String,String> params=new HashMap<String, String>();
-				params.put(Analytics.SEARCH_TYPE_PROPERTY, Analytics.SEARCH_TYPES.Filter.toString());
-				params.put(Analytics.SEARCH_NUMBER_FOUND_PROPERTY, String.valueOf(localData.size()));
-				params.put(Analytics.SEARCH_FILTER_TYPE_PROPERTY,label);
-				Analytics.trackEvent(Analytics.EVENT_SEARCH,params);
+				//mixPanelFilter(label,localData);
+				Analytics.mixPanelFilter(mData,label,localData);
 				sort(localData);
 			}
 		}
 	};
-
+	
 	private void sort(ArrayList<CardData> localData) {
 		if(getResources().getBoolean(R.bool.isTablet)){
 			mTabletAdapter.forceUpdateData(localData);
@@ -704,11 +689,13 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			mCardView.forceUpdateData(localData);
 		}
 	}
-
+	
 	private void applyData() {
+		
 		if(mData.mMasterEntries == null || mData.mMasterEntries.size() == 0){
 			return;
 		}
+		Analytics.mixPanelBrowsingEvents(mData,mfirstTime);
 		if(!isAdded())
 		{
 			Log.e(TAG, "acitivty is NULL");
@@ -726,6 +713,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		prepareFilterData();
 		dismissProgressBar();
 		mMainActivity.hideActionBarProgressBar();
+		//mixPanelBrowsingEvents(); //can be improved
+		//Analytics.mixPanelBrowsingEvents(mData,mfirstTime);
 	}
 
 	private void showErrorDialog() {
@@ -763,6 +752,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			}
 		};
 	}
+	
+	
 	@Override
 	public void favouriteAction(final CardData data,final int type){
 		FavouriteUtil favUtil = new FavouriteUtil();
@@ -776,10 +767,15 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				String status="";
 				if(value){
 					status="Not Favourite";
-					if(type == FavouriteUtil.FAVOURITEUTIL_ADD)
+					if(type == FavouriteUtil.FAVOURITEUTIL_ADD) {
+						//mixPanelAddFavorite(data,1);
+						Analytics.mixPanelAddFavorite(data,1);
 						Util.showToast(getContext(), data.generalInfo.title+" set as favourite",Toast.LENGTH_SHORT);
-					else
+					}
+					else {
+						Analytics.mixPanelAddFavorite(data,2);
 						Util.showToast(getContext(), data.generalInfo.title+" removed from favourites",Toast.LENGTH_SHORT);
+					}
 //					Toast.makeText(getContext(), "Chan", Toast.LENGTH_SHORT).show();
 				}else{
 					status="Favourite";
@@ -787,23 +783,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 //					Toast.makeText(getContext(), "Add as Favourite", Toast.LENGTH_SHORT).show();
 				}
 				
-				Map<String,String> params=new HashMap<String, String>();
-				/*params.put("Status", status);
-				params.put("CardId", data._id);
-				if(data.generalInfo != null){
-					params.put("CardType", data.generalInfo.type);
-					params.put("CardName", data.generalInfo.title);
-				}*/
-				//???
-				params.put(Analytics.BROWSE_TYPE_PROPERTY, status);
-				params.put(Analytics.CONTENT_ID_PROPERTY, data._id);
-				if(data.generalInfo != null){
-					params.put(Analytics.CONTENT_TYPE_PROPERTY, data.generalInfo.type);
-					params.put(Analytics.CONTENT_NAME_PROPERTY, data.generalInfo.title);
-				}
 				
-				//Analytics.trackEvent(Analytics.cardBrowseFavorite,params);
-				Analytics.trackEvent(Analytics.EVENT_BROWSE,params);
 				if(getResources().getBoolean(R.bool.isTablet)){
 					mTabletAdapter.notifyDataSetChanged();
 				}else{
@@ -822,20 +802,13 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			showStackedFrame();
 		}
 		Map<String,String> params=new HashMap<String, String>();
-		/*params.put("CardId", data._id);
-		if(data.generalInfo != null){
-			params.put("CardType", data.generalInfo.type);
-			params.put("CardName", data.generalInfo.title);
-		}
-		Analytics.trackEvent(Analytics.cardBrowseSelect,params);*/
-		
+			
 		params.put(Analytics.CONTENT_ID_PROPERTY, data._id);
 		if(data.generalInfo != null){
 			params.put(Analytics.CONTENT_TYPE_PROPERTY, data.generalInfo.type);
 			params.put(Analytics.CONTENT_NAME_PROPERTY, data.generalInfo.title);
 		}
-		//Analytics.trackEvent(Analytics.EVENT_BROWSE,params);
-		
+				
 		mData.currentSelectedCard = index;
 		mSelectedCard = data;
 		isDownloadView(mSelectedCard);
@@ -871,14 +844,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	}
 	@Override
 	public void deletedCard(CardData data) {
-		// TODO Auto-generated method stub
-		Map<String,String> params=new HashMap<String, String>();
-		params.put("CardId", data._id);
-		if(data.generalInfo != null){
-			params.put("CardType", data.generalInfo.type);
-			params.put("CardName", data.generalInfo.title);
-		}
-		//Analytics.trackEvent(Analytics.cardBrowseCancel,params);
+		
 	}
 
 	@Override
@@ -886,21 +852,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		PackagePopUp popup = new PackagePopUp(getContext(),mRootView);
 		mData.cardDataToSubscribe = data;
 		popup.showPackDialog(data, getActionBar().getCustomView());
-		Map<String,String> params=new HashMap<String, String>();
-		/*params.put("CardId", data._id);
-		if(data.generalInfo != null){
-			params.put("CardType", data.generalInfo.type);
-			params.put("CardName", data.generalInfo.title);
-		}
-		Analytics.trackEvent(Analytics.cardBrowsePurchase,params);*/
 		
-		params.put(Analytics.CONTENT_ID_PROPERTY, data._id);
-		if(data.generalInfo != null){
-			params.put(Analytics.CONTENT_TYPE_PROPERTY, data.generalInfo.type);
-			params.put(Analytics.CONTENT_NAME_PROPERTY, data.generalInfo.title);
-		}
-		params.put(Analytics.PAY_STATUS_PROPERTY, Analytics.PAY_COMMERCIAL_TYPES.Buy.toString());
-		Analytics.trackEvent(Analytics.EVENT_PAY,params);
 	}
 
 	@Override
@@ -928,9 +880,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				params.put(Analytics.CONTENT_TYPE_PROPERTY, mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo.type);
 				params.put(Analytics.CONTENT_NAME_PROPERTY, mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo.title);
 			}
-			//doesnot have data how control comes her. whether through filter|search etc
-			//params.put(Analytics.BROWSE_TYPE_PROPERTY,Analytics.BROWSE_CARDACTION_TYPES.Swipe.toString());
-			//Analytics.trackEvent(Analytics.EVENT_BROWSE,params);
+			
 		}
 	}
 	
@@ -984,7 +934,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				params.put("Network", "Mobile");
 			}
 			
-			//Analytics.trackEvent(Analytics.cardBrowseScreen,params);
+			
 		}
 		else
 		{
@@ -1003,7 +953,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				params.put("Network", "Mobile");
 			}
 			
-			//Analytics.trackEvent(Analytics.cardBrowseScreen,params);
+			
 		}
 	}
 
@@ -1036,9 +986,10 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				params.put("Network", "Mobile");
 			}
 			
-			//Analytics.trackEvent(Analytics.cardBrowseScreen,params);
+			
 		showNoDataMessage(false);
-		applyData();		
+		applyData();
+		//mixPanel();
 		if(mOldDataAdded){
 			mOldDataAdded = false;
 			if(itemsAdded){

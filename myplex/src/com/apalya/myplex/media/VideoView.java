@@ -39,7 +39,13 @@ import android.widget.MediaController;
 import android.widget.MediaController.*;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
+
+import com.apalya.myplex.data.CardData;
+import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.utils.Analytics;
+import com.google.analytics.tracking.android.EasyTracker;
 
 /**
  * Displays a video file.  The VideoView class
@@ -370,7 +376,10 @@ public class VideoView extends SurfaceView implements MediaPlayerControl {
              */
             if (getWindowToken() != null) {
                 Resources r = mContext.getResources();
-
+               
+                //mixPanelUnableToPlayVideo("Cannot play video");
+                Analytics.mixPanelUnableToPlayVideo("Cannot play video");
+        		
                 new AlertDialog.Builder(mContext)
                         .setTitle("Error")
                         .setMessage("Cannot play video")
@@ -391,6 +400,23 @@ public class VideoView extends SurfaceView implements MediaPlayerControl {
             return true;
         }
     };
+    
+    //Already in Analytics
+    /*private void mixPanelUnableToPlayVideo(String error) {
+    	
+        EasyTracker easyTracker = myplexapplication.getGaTracker();
+    	int selected = myplexapplication.getCardExplorerData().currentSelectedCard;
+		CardData  cardData = myplexapplication.getCardExplorerData().mMasterEntries.get(selected);
+		String contentName = cardData.generalInfo.title;
+		Map<String,String> params = new HashMap<String, String>();
+		params.put(Analytics.CONTENT_NAME_PROPERTY,contentName);
+		params.put(Analytics.CONTENT_ID_PROPERTY,cardData._id);
+		params.put(Analytics.CONTENT_TYPE_PROPERTY,Analytics.movieOrLivetv(cardData.generalInfo.type));
+		params.put(Analytics.REASON_FAILURE,error);
+		String event = Analytics.EVENT_UNABLE_TO_PLAY + Analytics.EMPTY_SPACE + contentName;
+		Analytics.trackEvent(event,params);
+		//Analytics.createEventGA(easyTracker, Analytics.EVENT_PLAY,Analytics.CONTENT_PLAY_ERROR,contentName );
+    }*/
 
     private MediaPlayer.OnBufferingUpdateListener mBufferingUpdateListener =
         new MediaPlayer.OnBufferingUpdateListener() {
@@ -573,7 +599,7 @@ public class VideoView extends SurfaceView implements MediaPlayerControl {
 
     public int getCurrentPosition() {
         if (isInPlaybackState()) {
-            return mMediaPlayer.getCurrentPosition();
+        	return mMediaPlayer.getCurrentPosition();
         }
         return 0;
     }

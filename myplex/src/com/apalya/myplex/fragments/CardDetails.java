@@ -29,13 +29,11 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.animation.TranslateAnimation;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.RelativeLayout.LayoutParams;
 
 import com.android.volley.VolleyError;
 import com.apalya.myplex.BaseFragment;
@@ -56,9 +54,6 @@ import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.media.PlayerListener;
 import com.apalya.myplex.utils.Analytics;
-import com.apalya.myplex.utils.ConsumerApi;
-import com.apalya.myplex.utils.FavouriteUtil;
-import com.apalya.myplex.utils.FavouriteUtil.FavouriteCallback;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
@@ -74,6 +69,7 @@ import com.apalya.myplex.views.JazzyViewPager;
 import com.apalya.myplex.views.JazzyViewPager.TransitionEffect;
 import com.apalya.myplex.views.OutlineContainer;
 import com.apalya.myplex.views.docketVideoWidget;
+import com.google.analytics.tracking.android.EasyTracker;
 
 public class CardDetails extends BaseFragment implements
 		ItemExpandListenerCallBackListener, CardDetailViewFactoryListener,
@@ -102,12 +98,15 @@ public class CardDetails extends BaseFragment implements
 	public static final int LiveTvDetail = 3;
 	public View rootView;
 	public boolean mPlayStarted = false;
+	
 	private CacheManager mCacheManager = new CacheManager();
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		EasyTracker easyTracker2 = EasyTracker.getInstance(getActivity());	
+		Analytics.createScreenGA(easyTracker2, Analytics.SCREEN_NAMES.CardDetails.toString());
+			
 	}
 
 	@Override
@@ -117,7 +116,8 @@ public class CardDetails extends BaseFragment implements
 			mCardData = (CardData) mDataObject;
 			Log.d(TAG, "content ID =" + mCardData._id);
 		}
-
+		
+		
 		mMainActivity.setOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		mInflater = LayoutInflater.from(getContext());
 		rootView = inflater.inflate(R.layout.carddetails, container, false);
@@ -152,6 +152,7 @@ public class CardDetails extends BaseFragment implements
 		mMainActivity.setSearchBarVisibilty(View.INVISIBLE);
 		mMainActivity.setSearchViewVisibilty(View.VISIBLE);
 		mMainActivity.setUpShareButton(mCardData.generalInfo.title.toLowerCase());
+		Analytics.cardData = mCardData;
 		// prepareContent();
 		if (mCardData.generalInfo != null) {
 			mMainActivity.setActionBarTitle(mCardData.generalInfo.title.toLowerCase());
@@ -204,33 +205,29 @@ public class CardDetails extends BaseFragment implements
 				params.put("CardType", mCardData.generalInfo.type);
 				params.put("CardName", mCardData.generalInfo.title);
 				params.put("Action", "Submit");
-				Analytics.trackEvent(Analytics.cardDetailsShare, params);
+				//Analytics.trackEvent(Analytics.cardDetailsShare, params);
 				 
 				//???
 				params.put(Analytics.CONTENT_ID_PROPERTY, mCardData._id);
 				params.put(Analytics.CONTENT_TYPE_PROPERTY, mCardData.generalInfo.type);
 				params.put(Analytics.CONTENT_NAME_PROPERTY, mCardData.generalInfo.title);
-				Analytics.trackEvent(Analytics.EVENT_BROWSE, params);				
+				//Analytics.trackEvent(Analytics.EVENT_BROWSE, params);				
 				
 				// TODO Auto-generated method stub
 				Util.shareData(getContext(), 3, "", mCardData.generalInfo.title);
 			}
 		});*/
 		
-
-		Map<String, String> params = new HashMap<String, String>();
-		/*params.put("CardId", mCardData._id);
-		params.put("CardType", mCardData.generalInfo.type);
-		params.put("CardName", mCardData.generalInfo.title);
-		Analytics.trackEvent(Analytics.cardDetailsScreen, params);*/
-		params.put(Analytics.CONTENT_ID_PROPERTY, mCardData._id);
-		params.put(Analytics.CONTENT_TYPE_PROPERTY, mCardData.generalInfo.type);
-		params.put(Analytics.CONTENT_NAME_PROPERTY, mCardData.generalInfo.title);
-		//params.put(Analytics.BROWSE_TYPE_PROPERTY,Analytics.BROWSE_TYPES.Filter.toString());
-		Analytics.trackEvent(Analytics.EVENT_BROWSE, params);
-
+		//mixPanelcardSelected();
+		Analytics.mixPanelcardSelected(mCardData);
 		return rootView;
 	}
+	
+	
+	private void showToast() {
+		Util.showToast(getActivity(), "Hey do the syrvey",0);
+	}
+	
 
 	private CardVideoPlayer mPlayer;
 	private CardData mCardData;
@@ -266,12 +263,15 @@ public class CardDetails extends BaseFragment implements
 		}
 	}
 	
+	//time analytics
 	@Override
 	public void onPause() {	
 		super.onPause();
 		if(mPlayer!=null){
 			if(mPlayer.isMediaPlaying()){
 				mPlayer.onStateChanged(PlayerListener.STATE_PAUSED, mPlayer.getStopPosition());
+				Analytics.stoppedAt();
+				Analytics.mixPanelVideoTimeCalculation(mCardData);
 				mPlayer.stopSportsStatusRefresh();
 				if(mCardData.generalInfo.isSellable){
 					Log.d(TAG, "free content");
@@ -360,17 +360,7 @@ public class CardDetails extends BaseFragment implements
 			return;
 		}
 		if (v.getTag() instanceof CardDetailMediaListData) {
-
-			Map<String, String> params = new HashMap<String, String>();
-			/*params.put("CardId", mCardData._id);
-			params.put("CardType", mCardData.generalInfo.type);
-			params.put("CardName", mCardData.generalInfo.title);*/
-			params.put(Analytics.CONTENT_ID_PROPERTY, mCardData._id);
-			params.put(Analytics.CONTENT_TYPE_PROPERTY, mCardData.generalInfo.type);
-			params.put(Analytics.CONTENT_NAME_PROPERTY, mCardData.generalInfo.title);
-			params.put(Analytics.CONTENT_CARD_STATUS, Analytics.CONTENT_CARD_OPENED);
-			Analytics.trackEvent(Analytics.CONTENT_DETAILS_PROPERTY, params);
-
+			
 			CardDetailMediaListData mainData = (CardDetailMediaListData) v
 					.getTag();
 			mMediaList = mainData.mList;
@@ -662,16 +652,6 @@ public class CardDetails extends BaseFragment implements
 				CardDetailViewFactory.CARDDETAIL_FULL_DESCRIPTION);
 		if (v != null) {
 			Map<String, String> params = new HashMap<String, String>();
-			/*params.put("CardId", mCardData._id);
-			params.put("CardType", mCardData.generalInfo.type);
-			params.put("CardName", mCardData.generalInfo.title);
-			params.put("Status", "Expand");*/
-			
-			params.put(Analytics.CONTENT_ID_PROPERTY, mCardData._id);
-			params.put(Analytics.CONTENT_TYPE_PROPERTY, mCardData.generalInfo.type);
-			params.put(Analytics.CONTENT_NAME_PROPERTY, mCardData.generalInfo.title);
-			params.put(Analytics.CONTENT_CARD_STATUS, Analytics.CONTENT_CARD_OPENED);
-			Analytics.trackEvent(Analytics.EVENT_CONTENT, params);
 			mDescriptionContentLayout.addView(v);
 		}
 		// prepareFilterData();
@@ -684,15 +664,6 @@ public class CardDetails extends BaseFragment implements
 				CardDetailViewFactory.CARDDETAIL_COMMENTS);
 		if (v != null) {
 			Map<String, String> params = new HashMap<String, String>();
-			/*params.put("CardId", mCardData._id);
-			params.put("CardType", mCardData.generalInfo.type);
-			params.put("CardName", mCardData.generalInfo.title);
-			params.put("Status", "Expand");
-			Analytics.trackEvent(Analytics.cardDetailsComment, params);*/
-		/*	params.put(Analytics.CONTENT_ID_PROPERTY, mCardData._id);
-			params.put(Analytics.CONTENT_NAME_PROPERTY,mCardData.generalInfo.title);
-			params.put(Analytics.CONTENT_TYPE_PROPERTY,mCardData.generalInfo.type);
-			Analytics.trackEvent(Analytics.EVENT_PLAY,params);*/
 			addSpace();
 			mCommentsContentLayout.addView(v);
 		}
@@ -706,12 +677,7 @@ public class CardDetails extends BaseFragment implements
 		if (v != null) {
 			addSpace();
 			mCommentsContentLayout.addView(v);
-			/*Map<String, String> params = new HashMap<String, String>();
-			params.put("CardId", mCardData._id);
-			params.put("CardType", mCardData.generalInfo.type);
-			params.put("CardName", mCardData.generalInfo.title);
-			params.put("Status", "Contract");
-			Analytics.trackEvent(Analytics.cardDetailsComment, params);*/
+			
 		}
 	}
 
@@ -723,12 +689,7 @@ public class CardDetails extends BaseFragment implements
 				CardDetailViewFactory.CARDDETAIL_BRIEF_DESCRIPTION);
 		if (v != null) {
 			mDescriptionContentLayout.addView(v);
-			/*Map<String, String> params = new HashMap<String, String>();
-			params.put("CardId", mCardData._id);
-			params.put("CardType", mCardData.generalInfo.type);
-			params.put("CardName", mCardData.generalInfo.title);
-			params.put("Status", "Contract");
-			Analytics.trackEvent(Analytics.cardDetailsDescription, params);*/
+			
 		}
 		// prepareFilterData();
 	}
@@ -796,18 +757,23 @@ public class CardDetails extends BaseFragment implements
 		}/*`else{
 			data.mMasterEntries = (ArrayList<CardData>) mCardData.similarContent.values;
 		}*/
+		//mixPanelSimilarContent();
+		Analytics.mixPanelSimilarContent(mCardData);
 		mMainActivity.bringFragment(fragment);
 		mMainActivity.setActionBarTitle("similar content");
 
 	}
-
+	
+	
 	@Override
 	public void onFullDetailCastAction() {
 		mRelatedCastList = mCardData.relatedCast.values;
 		popupType = MainAdapter.PAGE_CASTVIEW;
+		//mixPanelCastCrewPopup();
+		Analytics.mixPanelCastCrewPopup(mCardData);
 		showAlbumDialog();
 	}
-
+	
 	private void updatePlayerLogVisiblity() {
 		if (myplexapplication.getApplicationSettings().showPlayerLogs) {
 			mPlayerLogsLayout.setVisibility(View.VISIBLE);

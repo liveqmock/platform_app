@@ -70,10 +70,13 @@ import com.apalya.myplex.utils.SportsStatusRefresh;
 import com.apalya.myplex.utils.SportsStatusRefresh.OnResponseListener;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.utils.WidevineDrm.Settings;
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.MapBuilder;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.internal.co;
 import com.google.android.gms.location.LocationClient;
+import com.apalya.myplex.data.myplexapplication;
 
 public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDialogListener  {
 	private Context mContext;
@@ -201,16 +204,9 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 								{
 									if(mmItem.content !=null && mmItem.content.categoryName !=null && mmItem.content.categoryName.equalsIgnoreCase("trailer") && mmItem.generalInfo !=null && mmItem.generalInfo._id !=null)
 									{
-										Map<String,String> params=new HashMap<String, String>();
-										/*
-										params.put("CardId", mmItem.generalInfo._id);
-										params.put("CardCategory", mmItem.content.categoryName);
-										Analytics.trackEvent(Analytics.PlayerPlaySelect,params);*/
-										//???
-										params.put(Analytics.CONTENT_ID_PROPERTY, mmItem.generalInfo._id);
-										params.put(Analytics.CONTENT_NAME_PROPERTY, mmItem.content.categoryName);
-										params.put(Analytics.CONTENT_CATEGORY_PROPERTY,Analytics.CONTENT_ACTION_TYPES.PlayTrailer.toString());
-										Analytics.trackEvent(Analytics.EVENT_PLAY,params);
+										Analytics.isTrailer = true;
+										Analytics.startVideoTime();
+										
 										FetchTrailerUrl(mmItem.generalInfo._id);
 										mVideoViewParent.setOnClickListener(null);
 										break;
@@ -266,34 +262,25 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		}
 		return v;
 	}
-
+	
+	//time analytics
 	private OnClickListener mPlayerClickListener = new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {
 			
-			
-			
-			Map<String,String> params=new HashMap<String, String>();
-			/*params.put("CardId", mData._id);
-			params.put("CardType", mData.generalInfo.type);
-			params.put("CardName", mData.generalInfo.title);
-			Analytics.trackEvent(Analytics.PlayerPlaySelect,params);*/
-			
-			params.put(Analytics.CONTENT_ID_PROPERTY, mData._id);
-			params.put(Analytics.CONTENT_NAME_PROPERTY, mData.generalInfo.title);
-			params.put(Analytics.CONTENT_TYPE_PROPERTY,Analytics.CONTENT_ACTION_TYPES.movie.toString());
-			Analytics.trackEvent(Analytics.EVENT_PLAY,params);
-			
+			//This event is handled in CardDEtails
 			if(canBePlayed(true)){
 				FetchUrl();
 				mVideoViewParent.setOnClickListener(null);
+				Analytics.startVideoTime();
 			}
 			// TODO Auto-generated method stub
 
 		}
 	};
 	private boolean lastWatchedStatus = false;
+	
 
 	public void closePlayer() {
 		mPlayerState = PLAYER_STOPPED; 
@@ -319,18 +306,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		if(!mContext.getResources().getBoolean(R.bool.isTablet)){
 			((MainBaseOptions) mContext).setOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		}
-		
-		Map<String,String> params=new HashMap<String, String>();
-		/*params.put("CardId", mData._id);
-		params.put("CardType", mData.generalInfo.type);
-		params.put("CardName", mData.generalInfo.title);
-		Analytics.trackEvent(Analytics.PlayerPlayComplete,params);*/
-		
-		params.put(Analytics.CONTENT_ID_PROPERTY, mData._id);
-		params.put(Analytics.CONTENT_NAME_PROPERTY, mData.generalInfo.title);
-		params.put(Analytics.CONTENT_TYPE_PROPERTY,mData.generalInfo.type);
-		Analytics.trackEvent(Analytics.EVENT_PLAY,params);
-		
+				
 	}
 
 	public void FetchUrl() {	
@@ -384,6 +360,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 					
 					if(mPlayerStatusListener != null){
 						mPlayerStatusListener.playerStatusUpdate("Failed in fetching the url.");
+						mixPanelUnableToPlayVideo(Analytics.FAILED_TO_FETCH_URL);
 					}
 //					Toast.makeText(mContext, "Failed in fetching the url.",
 //							Toast.LENGTH_SHORT).show();
@@ -393,6 +370,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 					closePlayer();
 					if(mPlayerStatusListener != null){
 						mPlayerStatusListener.playerStatusUpdate("No url to play.");
+						mixPanelUnableToPlayVideo(Analytics.NO_URL_TO_PLAY);
 					}
 					Util.showToast(mContext, "No url to play.",Util.TOAST_TYPE_ERROR);
 //					Toast.makeText(mContext, "No url to play.",
@@ -472,7 +450,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 					if(mVideoViewPlayer ==null){						
 						mVideoViewPlayer = new  VideoViewPlayer(mVideoView, mContext,null ,StreamType.VOD);
 					}
-					mVideoViewPlayer.setmPositionWhenPaused(ellapseTime*1000);
+//					mVideoViewPlayer.setmPositionWhenPaused(ellapseTime*1000);
 				}
 			}
 
@@ -486,6 +464,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 			if(data._id.equalsIgnoreCase(mData._id))
 			{
 				lastWatchedStatus=true;
+				
 			}
 		}
 		/*if(!lastWatchedStatus)
@@ -711,8 +690,8 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		}
 	});
 	
-	 int ellapseTime = SharedPrefUtils.getIntFromSharedPreference(mContext, mData._id);
-		mVideoViewPlayer.setmPositionWhenPaused(ellapseTime *1000);	
+//	 int ellapseTime = SharedPrefUtils.getIntFromSharedPreference(mContext, mData._id);
+//		mVideoViewPlayer.setmPositionWhenPaused(ellapseTime *1000);	
 }
 	private void FetchTrailerUrl(String contentId)
 	{
@@ -763,6 +742,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 					
 					if(mPlayerStatusListener != null){
 						mPlayerStatusListener.playerStatusUpdate("Failed in fetching the url.");
+						mixPanelUnableToPlayVideo(Analytics.FAILED_TO_FETCH_URL);
 					}
 					return;
 				}
@@ -771,6 +751,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 					if(mPlayerStatusListener != null){
 						mPlayerStatusListener.playerStatusUpdate("No url to play.");
 					}
+					mixPanelUnableToPlayVideo(Analytics.NO_URL_TO_PLAY);
 					Util.showToast(mContext, "No url to play.",Util.TOAST_TYPE_ERROR);
 					return;
 				}
@@ -814,7 +795,23 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		});
         MediaUtil.getVideoUrl(contentId,qualityType,streamingType,isESTPackPurchased,ConsumerApi.STREAMINGFORMATHTTP);
 	}
-
+	
+	private void mixPanelUnableToPlayVideo(String error) {
+    	
+        EasyTracker easyTracker = myplexapplication.getGaTracker();
+    	int selected = myplexapplication.getCardExplorerData().currentSelectedCard;
+		CardData  cardData = myplexapplication.getCardExplorerData().mMasterEntries.get(selected);
+		String contentName = cardData.generalInfo.title;
+		Map<String,String> params = new HashMap<String, String>();
+		params.put(Analytics.CONTENT_NAME_PROPERTY,contentName);
+		params.put(Analytics.CONTENT_ID_PROPERTY,cardData._id);
+		params.put(Analytics.CONTENT_TYPE_PROPERTY,Analytics.movieOrLivetv(cardData.generalInfo.type));
+		params.put(Analytics.REASON_FAILURE,error);
+		String event = Analytics.EVENT_UNABLE_TO_PLAY + Analytics.EMPTY_SPACE + contentName;
+		Analytics.trackEvent(event,params);
+		//Analytics.createEventGA(easyTracker, Analytics.EVENT_PLAY,Analytics.CONTENT_PLAY_ERROR,contentName );
+    }
+	
 	public View CreateTabletPlayerView(View parentLayout) {
 
 		mWidth = myplexapplication.getApplicationConfig().screenWidth;
@@ -857,14 +854,9 @@ private void playVideoFile(CardDownloadData mDownloadData){
 						{
 							if(mmItem.content !=null && mmItem.content.categoryName !=null && mmItem.content.categoryName.equalsIgnoreCase("trailer") && mmItem.generalInfo !=null && mmItem.generalInfo._id !=null)
 							{
-								Map<String,String> params=new HashMap<String, String>();
-								/*params.put("CardId", mmItem.generalInfo._id);
-								params.put("CardCategory", mmItem.content.categoryName);
-								Analytics.trackEvent(Analytics.PlayerPlaySelect,params);*/
-								params.put(Analytics.CONTENT_ID_PROPERTY, mmItem.generalInfo._id);
-								params.put(Analytics.CONTENT_NAME_PROPERTY, mmItem.generalInfo.title);
-								params.put(Analytics.CONTENT_CATEGORY_PROPERTY,mmItem.content.categoryName);
-								Analytics.trackEvent(Analytics.EVENT_PLAY,params);
+								Analytics.isTrailer = true;
+								Analytics.startVideoTime();
+																
 								FetchTrailerUrl(mmItem.generalInfo._id);
 								mVideoViewParent.setOnClickListener(null);
 								break;

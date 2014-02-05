@@ -88,7 +88,8 @@ import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.views.RatingDialog;
 import com.facebook.Session;
-import com.flurry.android.FlurryAgent;
+
+import com.google.analytics.tracking.android.EasyTracker;
 
 public class MainActivity extends Activity implements MainBaseOptions, SearchView.OnQueryTextListener, CacheManagerCallback {
 	private SearchView mSearchView;
@@ -102,7 +103,7 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 	private boolean mIsUserLoggedIn = true ;
 	public static final String TAG = "MainActivity";
 	private CacheManager mCacheManager = new CacheManager();
-	
+	private EasyTracker easyTracker = null;
 	public FrameLayout mContentLayout;
 	public Context mContext;
 	private Stack<BaseFragment> mFragmentStack = new Stack<BaseFragment>();
@@ -116,16 +117,20 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 	protected void onStart() {
 		// TODO Auto-generated method stub
 		super.onStart();
-		FlurryAgent.onStartSession(this, "X6WWX57TJQM54CVZRB3K");
+		
+		easyTracker = myplexapplication.getGaTracker();
+		Analytics.startActivity(easyTracker, this);
+		//easyTracker.activityStart(this);
 	}
 	
 	@Override
 	protected void onStop() {
 		// TODO Auto-generated method stub
 		
-		FlurryAgent.onEndSession(this);
+		
 		
 		super.onStop();
+		EasyTracker.getInstance(this).activityStop(this); 
 	}
 	
 	@Override
@@ -336,6 +341,29 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 			v.setVisibility(value);
 		}
 	}
+	private String getCurrentScreen() {
+		String currentScreen = null;
+		if(mCurrentFragment != null) {
+			currentScreen = mCurrentFragment.getClass().getName();
+			if(currentScreen.contains("CardDetails")) {
+				currentScreen = "CardDetails";
+			}
+			else if(currentScreen.contains("SearchSuggestions")) {
+				currentScreen = "SearchSuggestions";
+			}
+			else if(currentScreen.contains("SettingsFragment")) {
+				currentScreen = "SettingsFragment";
+			}
+			else {
+				currentScreen = "CardExplorer";
+			}
+			return currentScreen;
+		}
+		else{
+			return "CardExplorer Screen";
+		}
+		
+	}
 	private ImageView mNavigationMenu;
 	public void prepareCustomActionBar() {
 		getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
@@ -347,6 +375,7 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 		RelativeLayout navigationMenuLayout = (RelativeLayout)v.findViewById(R.id.customactionbar_drawerLayout);
 		Util.showFeedbackOnSame(navigationMenuLayout);
 		mNavigationMenu = (ImageView) v.findViewById(R.id.customactionbar_drawer);
+		
 		navigationMenuLayout.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -357,9 +386,13 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 				} else {
 					mDrawerLayout.openDrawer(mDrawerList);
 					mNavigationDrawerOpened = true;
+					
+					String screenOpenedFrom = getCurrentScreen();
+					Analytics.mixPanelNavigationOpened(screenOpenedFrom);
 				}
 			}
 		});
+				
 		mCustomActionBarTitleLayout = (RelativeLayout) v.findViewById(R.id.customactionbar_filter);
 		mCustomActionBarTitleLayout.setOnClickListener(mOnFilterClickListener);
 		Util.showFeedbackOnSame(mCustomActionBarTitleLayout);
@@ -1070,6 +1103,8 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 			@Override
 			public void onClick(View v) {
 				Log.i(TAG,"onClick");
+				Analytics.mixPanelInlineSearchInitiated();
+				
 //				changeVisibility(mCustomActionBarTitleLayout,View.GONE);
 				if (mDrawerLayout!=null && mNavigationDrawerOpened) {
 					mDrawerLayout.closeDrawer(mDrawerList);
@@ -1135,27 +1170,20 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
     protected boolean isAlwaysExpanded() {
         return false;
     }
-    
+    //action bar search
     private void doSearch(String query)
     {
 		showActionBarProgressBar();
-
+		Analytics.SEARCH_TYPE = "actionbar";//SEARCHED_FOR action bar search
 		String searchQuery = new String();
 		final List<CardData> searchString = new ArrayList<CardData>();
-			CardData temp = new CardData();
-			// temp._id = data.getButtonId() != null ? data.getButtonId() :
-			// data.getButtonName();
-			temp._id = query;
-			searchString.add(temp);
-			searchQuery = query;
-			
-			Map<String,String> params=new HashMap<String, String>();
-			params.put(Analytics.SEARCH_TYPE_PROPERTY,Analytics.SEARCH_TYPES.Discover.toString());
-			params.put(Analytics.SEARCH_QUERY_PROPERTY,searchQuery);
-			//params.put("tagsSelected", searchQuery);
-			//Analytics.trackEvent(Analytics.SearchQuery,params);
-			
-			Analytics.trackEvent(Analytics.EVENT_SEARCH,params);
+		CardData temp = new CardData();
+		// temp._id = data.getButtonId() != null ? data.getButtonId() :
+		// data.getButtonName();
+		temp._id = query;
+		searchString.add(temp);
+		searchQuery = query;
+				
 		mSearchQuery = searchQuery;
 		setActionBarTitle(query);
 		IndexHandler.OperationType searchType = IndexHandler.OperationType.DONTSEARCHDB;

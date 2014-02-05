@@ -1,7 +1,9 @@
 package com.apalya.myplex.adapters;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import twitter4j.RelatedResults;
 
@@ -9,10 +11,12 @@ import com.apalya.myplex.R;
 import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.SettingsData;
 import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.views.PinnedSectionListView.PinnedSectionListAdapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -84,6 +88,10 @@ public class SettingsAdapter extends ArrayAdapter<SettingsData> implements Pinne
 		public void onCheckedChanged(CompoundButton buttonView,
 				boolean isChecked) {
 			try {
+				if(isChecked) {
+					//mixPanelWifiOnly();
+					Analytics.mixPanelWifiOnly();
+				}
 				SettingsData obj = (SettingsData)buttonView.getTag();
 				if(obj != null){
 					if(obj.mSettingName.equalsIgnoreCase("Download only on Wifi")){
@@ -93,7 +101,7 @@ public class SettingsAdapter extends ArrayAdapter<SettingsData> implements Pinne
 					}
 				}
 			} catch (Exception e) {
-				// TODO: handle exception
+				Log.e("SettingsAdapter",e.toString());
 			}
 			
 		}
@@ -113,4 +121,5 @@ public class SettingsAdapter extends ArrayAdapter<SettingsData> implements Pinne
 		// TODO Auto-generated method stub
 		return viewType == SettingsData.SECTION;
 	}
+	
 }

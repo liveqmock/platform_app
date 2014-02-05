@@ -107,6 +107,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.analytics.tracking.android.EasyTracker;
 
 public class Util {
 
@@ -386,11 +387,11 @@ public class Util {
 	
 	public static String startDownload(String aUrl,CardData aMovieData,Context mContext)
 	{
-		
+		Analytics.downloadStartTime = System.currentTimeMillis();
 		long lastDownloadId=-1L;
 		String aMovieName=aMovieData.generalInfo.title.toLowerCase();
 		String aFileName=aMovieData._id;
-		
+		//Analytics.mixPanelDownloadsMovie(aMovieName,aFileName);
 		CardDownloadedDataList downloadlist =  null;
 		try {
 			downloadlist = (CardDownloadedDataList) Util.loadObject(myplexapplication.getApplicationConfig().downloadCardsPath);	
@@ -487,6 +488,9 @@ public class Util {
 														"Request cancelled", 
 														Toast.LENGTH_SHORT).show();
 											} else {
+												int numberofInvitees = 1;
+												Analytics.mixPanelInviteFriends("facebook", numberofInvitees+"", "failure");
+
 												Toast.makeText(mContext, 
 														"Network Error", 
 														Toast.LENGTH_SHORT).show();
@@ -494,6 +498,8 @@ public class Util {
 										} else {
 											final String requestId = values.getString("request");
 											if (requestId != null) {
+												int numberofInvitees = 1;
+												Analytics.mixPanelInviteFriends("facebook", numberofInvitees+"", "success");
 												Toast.makeText(mContext, 
 														"Request sent",  
 														Toast.LENGTH_SHORT).show();
@@ -584,7 +590,8 @@ public class Util {
 		{
 			sendIntent.setType("text/plain");	
 		}
-
+		
+		Analytics.mixPanelSharedMyplexExperience();
 		mContext.startActivity(Intent.createChooser(sendIntent,  mContext.getResources().getText(R.string.send_to)));
 	}
 	public static void FitToRound(Context mContext,ImageView View,Bitmap bm){
@@ -685,8 +692,7 @@ public class Util {
 	protected static ErrorListener genKeyRegErrorListener() {
 		return new Response.ErrorListener() {
 			public void onErrorResponse(VolleyError error) {
-				//Analytics.endTimedEvent("NEW-CLIENT-KEY-GENERATION");
-				//Analytics.trackEvent("NEW-CLIENT-KEY-GENERATION-ERROR");
+				
 				Log.d(TAG,"Error: "+error.toString());
 				if(error.toString().indexOf("NoConnectionError")>0)
 				{
@@ -719,7 +725,7 @@ public class Util {
 
 					if(jsonResponse.getString("status").equalsIgnoreCase("SUCCESS"))
 					{
-						//Analytics.trackEvent("NEW-CLIENT-KEY-GENERATION-Success");
+						
 						Log.d(TAG, "status: "+jsonResponse.getString("status"));
 						Log.d(TAG, "expiresAt: "+jsonResponse.getString("expiresAt"));
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
@@ -747,7 +753,6 @@ public class Util {
 						SharedPrefUtils.writeToSharedPref(mContext,
 								mContext.getString(R.string.devclientkeyexp), "");
 
-						//Analytics.trackEvent("NEW-CLIENT-KEY-GENERATION-SERVER-ERROR");
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
 						
@@ -996,6 +1001,7 @@ public class Util {
 		}
 
 	}
+
 	public static void closeKeyBoard(Context context,View view){
 		InputMethodManager imm = (InputMethodManager)context.getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
@@ -1027,6 +1033,7 @@ public class Util {
 			}
 		}
 		return network_type;
+
 	}
 	
 	/**
@@ -1106,4 +1113,5 @@ public class Util {
 			}
 
 	}
+
 }

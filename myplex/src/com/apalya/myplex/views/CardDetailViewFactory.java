@@ -43,6 +43,7 @@ import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MessagePost.MessagePostCallback;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
+import com.google.analytics.tracking.android.EasyTracker;
 
 public class CardDetailViewFactory {
 	
@@ -53,6 +54,8 @@ public class CardDetailViewFactory {
 	public static final String SECTION_CREDITS = "Credits";
 	public static final String SECTION_COMMENTS = "Comments";
 	public static final String SECTION_RELATEDMULTIMEDIA = "Related Multimedia";
+	
+	public static String COMMENT_POSTED = null; //useful to getdata from MessagePost to CardDetailViewFactory
 	
 	private View mDetails;
 	private View mDescription;
@@ -192,9 +195,7 @@ public class CardDetailViewFactory {
 	//			addSpace(layout, 16);
 				mCommentContentLayout.addView(child);
 				
-				Map<String,String> params=new HashMap<String, String>();
-				params.put("Action", "Submit");
-				//Analytics.trackEvent(Analytics.cardDetailsComment,params);
+				
 			}
 		}else if(type == COMMENTSECTION_REVIEW){
 			if(card.userReviews == null){return ;}
@@ -215,10 +216,7 @@ public class CardDetailViewFactory {
 				commentMessage.setTypeface(FontUtil.Roboto_Regular);
 	//			addSpace(layout, 16);
 				mCommentContentLayout.addView(child);
-				
-				Map<String,String> params=new HashMap<String, String>();
-				params.put("Action", "Submit");
-				//Analytics.trackEvent(Analytics.cardDetailsReview,params);
+								
 			}
 		}
 	}
@@ -257,7 +255,7 @@ public class CardDetailViewFactory {
 			
 			@Override
 			public void onClick(View arg0) {
-				String label = (String) editBox.getText();
+				final String label = (String) editBox.getText();
 				if(label.equalsIgnoreCase(mContext.getResources().getString(R.string.carddetailcommentsection_editcomment))){
 					CommentDialog dialog = new CommentDialog(mContext);
 					dialog.showDialog(new MessagePostCallback() {
@@ -265,8 +263,13 @@ public class CardDetailViewFactory {
 						@Override
 						public void sendMessage(boolean status) {
 							if(status){
-								Util.showToast(mContext, "Comment has posted successfully.",Util.TOAST_TYPE_INFO);
-//								Toast.makeText(mContext, "Comment has posted successfully.", Toast.LENGTH_SHORT).show();
+								Util.showToast(mContext, "Comment has been posted successfully.",Util.TOAST_TYPE_INFO);
+								if(COMMENT_POSTED != null) {
+									//mixPanelEneteredCommentsReviews(COMMENT_POSTED,"comment");
+									Analytics.mixPanelEnteredCommentsReviews(mData,COMMENT_POSTED,"comment");
+								}
+								//final String label = (String) editBox.getText();
+								//Toast.makeText(mContext, "Comment has posted successfully.", Toast.LENGTH_SHORT).show();
 								mCurrentCommentViewType = COMMENTSECTION_COMMENTS;
 								refreshSection();
 							}else{
@@ -285,6 +288,10 @@ public class CardDetailViewFactory {
 						public void sendMessage(boolean status) {
 							if(status){
 								Util.showToast(mContext, "Review has posted successfully.",Util.TOAST_TYPE_INFO);
+								if(COMMENT_POSTED != null) {
+									//mixPanelEneteredCommentsReviews(COMMENT_POSTED,"review");
+									Analytics.mixPanelEnteredCommentsReviews(mData,COMMENT_POSTED,"review");
+								}
 //								Toast.makeText(mContext, "Review has posted successfully.", Toast.LENGTH_SHORT).show();
 								mCurrentCommentViewType = COMMENTSECTION_REVIEW;
 								refreshSection();
@@ -774,9 +781,12 @@ public class CardDetailViewFactory {
 		text.setTypeface(FontUtil.Roboto_Regular);
 		return v;
 	}
-
+		
 	private View createFullDescriptionView() {
 		if(mData.generalInfo == null){mDetails = null; return null;}
+		
+		//mixPanelExpandedCastCrew();		
+		Analytics.mixPanelExpandedCastCrew(mData);
 		View v = mInflator.inflate(R.layout.carddetailfulldescription, null);
 		mDetails  = v;
 		TextView movieName = (TextView)v.findViewById(R.id.carddetaildesc_movename);
@@ -1084,4 +1094,6 @@ public class CardDetailViewFactory {
 		}	
 		return returnValue;
 	}
+	
+	
 }

@@ -43,6 +43,7 @@ import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.media.PlayerListener;
 import com.apalya.myplex.tablet.MultiPaneActivity;
+import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.views.CardDetailViewFactory;
@@ -56,6 +57,9 @@ import com.apalya.myplex.views.JazzyViewPager;
 import com.apalya.myplex.views.JazzyViewPager.TransitionEffect;
 import com.apalya.myplex.views.OutlineContainer;
 import com.apalya.myplex.views.docketVideoWidget;
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.Fields;
+import com.google.analytics.tracking.android.MapBuilder;
 
 public class CardDetailsTabletFrag extends BaseFragment implements
 ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirection,CacheManagerCallback,PlayerFullScreen {
@@ -83,7 +87,9 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+		EasyTracker easyTracker2 = EasyTracker.getInstance(getActivity());	
+		Analytics.createScreenGA(easyTracker2, Analytics.SCREEN_NAMES.CardDetailsTabletFrag.toString());
+			
 	}
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,

@@ -39,7 +39,9 @@ import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FetchCardField;
 import com.apalya.myplex.utils.FetchCardField.FetchComplete;
 import com.apalya.myplex.utils.Util;
-import com.flurry.android.FlurryAgent;
+
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.MapBuilder;
 
 public class SubscriptionView extends Activity implements AlertDialogUtil.NoticeDialogListener {
 	private static final String TAG="SubscriptionView";
@@ -47,10 +49,23 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 	FbWebViewClient fbwebviewclient= null;
 	private String callbackUrl = new String();
 	private ProgressDialog mProgressDialog = null;
+
 	private String url;
 	public String status;
 	private boolean isProgressDialogCancelable=false;
 	
+
+	String contentName = null;
+	String contentType = null; //SD or HD
+	String contentId = null;
+	Double contentPrice = null;
+	String ctype = null;
+	String commercialModel = null;
+	String paymentModel = null;
+	String transactionid = null;
+	String couponCode = null;
+	double priceTobecharged = 0.0;
+
 //	http://api.beta.myplex.in/user/v2/billing/callback/evergent/
 	@Override
 	public void onCreate(Bundle savedInstanceState){
@@ -64,9 +79,22 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 		try {
 			Bundle b = this.getIntent().getExtras();
 			url = b.getString("url");
+
 			isProgressDialogCancelable= b.getBoolean("isProgressDialogCancelable", false);
+
+			contentName = b.getString("contentname");
+			contentId = b.getString("contentid");
+			contentPrice = b.getDouble("contentprice");
+			ctype = b.getString("ctype");
+			commercialModel = b.getString("commercialModel");
+			paymentModel =  b.getString("paymentMode");
+			contentType = b.getString("contentType");
+			couponCode = b.getString("couponCode");
+			priceTobecharged = b.getDouble("priceAfterCoupon");
+
 		} catch (Exception e) {
 			// TODO: handle exception
+			e.printStackTrace();
 		}
 		callbackUrl = ConsumerApi.SCHEME + ConsumerApi.DOMAIN
 				+ ConsumerApi.SLASH + ConsumerApi.USER_CONTEXT
@@ -85,19 +113,52 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 	protected void onStart() {
 		// TODO Auto-generated method stub
 		super.onStart();
-		FlurryAgent.onStartSession(this, "X6WWX57TJQM54CVZRB3K");
+		
 	}
 	@Override
 	protected void onStop() {
 		// TODO Auto-generated method stub
-		FlurryAgent.onEndSession(this);
+		
 		super.onStop();
 	}
+	
+	private void mixPanelPaySuccess(CardData subscribedData) {
+		
+			Map<String,String> params=new HashMap<String, String>();
+			params.put(Analytics.CONTENT_ID_PROPERTY, subscribedData._id);
+			params.put(Analytics.CONTENT_NAME_PROPERTY, subscribedData.generalInfo.title);
+			//params.put(Analytics.PAY_CONTENT_PRICE, contentPrice.toString());
+			params.put(Analytics.PAY_PURCHASE_TYPE, commercialModel); //Rental or buy
+			params.put(Analytics.PAYMENT_METHOD, paymentModel); //cc or dc
+			params.put(Analytics.CONTENT_QUALITY, contentType); //SD or HD
+			String ctype = Analytics.movieOrLivetv(subscribedData.generalInfo.type); //movie or livetv
+			String event = Analytics.EVENT_PAID_FOR + Analytics.EMPTY_SPACE+subscribedData.generalInfo.title;
+			if(couponCode != null && couponCode.length() > 0) { //coupon is applied
+				if(priceTobecharged > 0) {
+					params.put(Analytics.PAY_CONTENT_PRICE,priceTobecharged+"");
+					Analytics.trackEvent(event,params);
+					Analytics.trackCharge(priceTobecharged);
+				}	
+				if(priceTobecharged == 0) {
+					event = Analytics.EVENT_SUBSCRIBED_FREE_FOR + Analytics.EMPTY_SPACE+subscribedData.generalInfo.title;
+					Analytics.trackEvent(event,params);
+				}
+			}
+			else { //regular price
+				params.put(Analytics.PAY_CONTENT_PRICE, contentPrice.toString());
+				Analytics.trackEvent(event,params);
+				Analytics.trackCharge(contentPrice);
+			}
+				
+	}
+	
 	private void dofinish(final int response){
 		if(response == ConsumerApi.SUBSCRIPTIONSUCCESS){
 			Util.showToast(SubscriptionView.this, "Subscription: Success",Util.TOAST_TYPE_INFO);
 //			Toast.makeText(SubscriptionView.this, "Subscription: Success", Toast.LENGTH_SHORT).show();
 			FetchCardField fetch = new FetchCardField();
+					
+			
 			fetch.Fetch(myplexapplication.getCardExplorerData().cardDataToSubscribe, ConsumerApi.FIELD_CURRENTUSERDATA, new FetchComplete() {
 				
 				@Override
@@ -108,20 +169,7 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 					}
 					CardData subscribedData = myplexapplication.getCardExplorerData().cardDataToSubscribe;
 					subscribedData.currentUserData =  data.results.get(0).currentUserData;
-					
-					/*
-					Map<String,String> params=new HashMap<String, String>();
-					params.put("CardId",subscribedData._id);
-					params.put("CardName", subscribedData.generalInfo.title);
-					params.put("Status", "Purchase Success");
-					Analytics.trackEvent(Analytics.PackagesPurchase,params);
-					*/	
-					//???
-					Map<String,String> params=new HashMap<String, String>();
-					params.put(Analytics.CONTENT_ID_PROPERTY, subscribedData._id);
-					params.put(Analytics.CONTENT_NAME_PROPERTY, subscribedData.generalInfo.title);
-					params.put(Analytics.PAY_STATUS_PROPERTY, Analytics.PAY_CONTENT_STATUS_TYPES.Success.toString());
-					Analytics.trackEvent(Analytics.EVENT_PAY,params);
+					mixPanelPaySuccess(subscribedData);					
 					
 					List<CardData> dataToSave = new ArrayList<CardData>();
 					dataToSave.add(subscribedData);
@@ -129,9 +177,6 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 						
 						@Override
 						public void updateComplete(Boolean updateStatus) {
-							
-							
-							
 							closeSession(response);
 							Util.showToast(SubscriptionView.this, "Subscription Info updated",Util.TOAST_TYPE_INFO);
 //							Toast.makeText(SubscriptionView.this, "Subscription Info updated", Toast.LENGTH_SHORT).show();
@@ -142,8 +187,25 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 		}else{
 			Util.showToast(SubscriptionView.this, "Subscription: Cancelled",Util.TOAST_TYPE_ERROR);
 //			Toast.makeText(SubscriptionView.this, "Subscription: Cancelled", Toast.LENGTH_SHORT).show();
+			mixPanelPayFailure("Subscription: Cancelled");
 			closeSession(response);
 		}
+	}
+	
+	private void mixPanelPayFailure(String error) {
+		CardData subscribedData = myplexapplication.getCardExplorerData().cardDataToSubscribe;
+		Map<String,String> params=new HashMap<String, String>();
+		params.put(Analytics.CONTENT_ID_PROPERTY, subscribedData._id);
+		params.put(Analytics.CONTENT_NAME_PROPERTY, subscribedData.generalInfo.title);
+		params.put(Analytics.PAY_CONTENT_PRICE, contentPrice.toString());
+		params.put(Analytics.PAY_PURCHASE_TYPE, commercialModel); //Rental or buy
+		params.put(Analytics.PAYMENT_METHOD, paymentModel); //cc or dc
+		params.put(Analytics.CONTENT_QUALITY, contentType); //SD or HD
+		String ctype = Analytics.movieOrLivetv(subscribedData.generalInfo.type); //movie or livetv
+		//String event = Analytics.EVENT_PAY + Analytics.EMPTY_SPACE+ctype;
+		String event = Analytics.EVENT_SUBSCRIPTION_FAILURE + Analytics.EMPTY_SPACE+subscribedData.generalInfo.title;
+		params.put(Analytics.REASON_FAILURE,error);
+		Analytics.trackEvent(event,params);
 	}
 	private void closeSession(int response){
 		setResult(response);
@@ -196,11 +258,17 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 				    }
 					String statusString = "status";
 					String messageString = "message";
+					String transactionString = "transactionId";
 					
 					if(paramMap.containsKey(statusString))
 						status = paramMap.get(statusString);
 					if(paramMap.containsKey(messageString))
 						message = paramMap.get(messageString);
+					if(paramMap.containsKey(transactionString)) { //the python server must return transaction-id
+						transactionid = paramMap.get(transactionString);
+					}else {
+						transactionid = contentName +"transactionId";
+					}
 					
 					if(status.equalsIgnoreCase("SUCCESS")){
 						dofinish(ConsumerApi.SUBSCRIPTIONSUCCESS);
@@ -217,6 +285,7 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 					
 				} catch (MalformedURLException e) {
 					dofinish(ConsumerApi.SUBSCRIPTIONERROR);
+					mixPanelPayFailure(e.toString());
 					e.printStackTrace();
 				}
 				return true;
@@ -230,6 +299,7 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 			Log.e(TAG, "ONRECEIVEDERROR "+failingUrl + " " +description);
 			closed= true;
 			dofinish(ConsumerApi.SUBSCRIPTIONERROR);
+			mixPanelPayFailure(description);
 			 dismissProgressBar();
 		}
 		@Override

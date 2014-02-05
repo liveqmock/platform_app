@@ -87,8 +87,7 @@ public class MediaUtil {
 				Log.d(TAG, response);
 				CardResponseData minResultSet = null;
 				try {
-					//Analytics.endTimedEvent("RECOMMENDATIONS-REQUEST");
-					//Analytics.trackEvent("RECOMMENDATIONS-REQUEST-SUCCESS");
+					
 					minResultSet  =(CardResponseData) Util.fromJson(response, CardResponseData.class);
 				} catch (JsonMappingException e) {
 					// TODO Auto-generated catch block
@@ -149,7 +148,7 @@ public class MediaUtil {
 				if(url.length()>0)
 				{
 					sendResponse(true, url, null,null);
-					urlEventListener.lastPausedTimeFetched(elapsedTime);
+					urlEventListener.lastPausedTimeFetched(0);
 					return;
 				}
 				sendResponse(false,null, null,null);
@@ -248,7 +247,7 @@ public class MediaUtil {
 					Log.d(TAG, "Ellapsed time is "+ellapsedTime);					
 				}
 				
-					urlEventListener.lastPausedTimeFetched(ellapsedTime);
+					urlEventListener.lastPausedTimeFetched(0);
 //				ELLAPSE_TIME = ellapsedTime;
 					Log.d(TAG,"here we need to fetch the last played status");
 				

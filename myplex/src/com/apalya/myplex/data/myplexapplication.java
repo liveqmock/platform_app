@@ -6,6 +6,8 @@ import com.apalya.myplex.adapters.NavigationOptionsMenuAdapter;
 import com.apalya.myplex.cache.CacheHolder;
 import com.apalya.myplex.utils.LocationUtil;
 import com.apalya.myplex.utils.MyVolley;
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.Tracker;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 
 public class myplexapplication extends Application {
@@ -19,6 +21,9 @@ public class myplexapplication extends Application {
 	private static CacheHolder mCache ;
 	private static MixpanelAPI mixPanel;
 	public static int mSelectedOption_Tablet = NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION;
+	
+	private static EasyTracker mTracker;
+	
 	private static final String MIXPANEL_DISTINCT_ID_NAME = "Mixpanel Example $distinctid";
 	/*
 	 * You will use a Mixpanel API token to allow your app to send data to Mixpanel. To get your token
@@ -63,6 +68,7 @@ public class myplexapplication extends Application {
 		// TODO Auto-generated method stub
 		super.onCreate();
 		init();
+		initializeGa();
 		mixPanel = MixpanelAPI.getInstance(this, MIXPANEL_API_TOKEN);
 	}
 	private void init() {
@@ -93,5 +99,15 @@ public class myplexapplication extends Application {
 			mCache = new CacheHolder();
 		}
 		return mCache;
-	}
+	}
+	
+	 private void initializeGa() {
+		mTracker = EasyTracker.getInstance(this);		    
+	 }
+	 
+	 public static EasyTracker getGaTracker() {
+	    return mTracker;
+	}
+	 
+	 
 }
