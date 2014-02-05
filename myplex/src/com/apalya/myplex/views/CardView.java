@@ -43,6 +43,7 @@ import com.android.volley.toolbox.CardNetworkImageView;
 import com.apalya.myplex.R;
 import com.apalya.myplex.adapters.CardActionListener;
 import com.apalya.myplex.adapters.CardItemClickListener;
+import com.apalya.myplex.data.ApplicationConfig;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDataHolder;
 import com.apalya.myplex.data.CardDataImagesItem;
@@ -56,6 +57,7 @@ import com.apalya.myplex.data.CardViewMeta;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.CardImageLoader;
+import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FavouriteUtil;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
@@ -384,7 +386,7 @@ public class CardView extends ScrollView {
 //		Log.e(TAG,"Erasing "+position+" for "+dataHolder.mTitle.getTextSize()+"  "+dataHolder.mTitle.getWidth() );
 		if(data.images != null){
 			for(CardDataImagesItem imageItem:data.images.values){
-				if(imageItem.type != null && imageItem.type.equalsIgnoreCase("coverposter") && imageItem.profile != null && imageItem.profile.equalsIgnoreCase(myplexapplication.getApplicationConfig().type)){
+				if(imageItem.type != null && imageItem.type.equalsIgnoreCase("coverposter") && imageItem.profile != null && imageItem.profile.equalsIgnoreCase(ApplicationConfig.MDPI)){
 					if (imageItem.link != null && !(imageItem.link.compareTo("Images/NoImage.jpg") == 0)) {
 						dataHolder.mPreview.mImageUrl = imageItem.link;
 //						Log.d("CardExplorer","imageItem.link ="+imageItem.link+" profile = "+imageItem.profile);
@@ -458,7 +460,7 @@ public class CardView extends ScrollView {
 				for(CardDataPackages packageitem:data.packages){
 					if(packageitem.priceDetails != null){
 						for(CardDataPackagePriceDetailsItem priceDetailItem:packageitem.priceDetails){
-							if(priceDetailItem.price < price){
+							if(!priceDetailItem.paymentChannel.equalsIgnoreCase(ConsumerApi.PAYMENT_CHANNEL_INAPP) &&  priceDetailItem.price < price){
 								price = priceDetailItem.price;
 							}
 						}

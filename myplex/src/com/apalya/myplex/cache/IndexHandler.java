@@ -400,6 +400,7 @@ public class IndexHandler {
 					Document document = indexSearcher.doc(scoreDoc[i].doc);
 					CardData data = (CardData) Util.fromJson(document.get(LUCENE_CONTENT_INFO), CardData.class);
 //	                JSONObject resultObj = new JSONObject(document.get(LUCENE_CONTENT_INFO));
+					data.similarContent=null;
 	                mSearchResult.put(document.get(LUCENE_CONTENT_ID), data);
 				}
 				Log.i(TAG, "time to get Search Results From : "+params[0]+"::"+(System.currentTimeMillis()-startTime)+" milliseconds");

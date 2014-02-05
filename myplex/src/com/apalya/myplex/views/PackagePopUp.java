@@ -297,7 +297,7 @@ public class PackagePopUp {
 								couponMessage.setText(message);
 								*/
 								dismissProgressBar();
-								
+								couponMessage.setVisibility(View.VISIBLE);
 								if(message!=null)
 									couponMessage.setText(message);	
 								else 
@@ -725,6 +725,7 @@ public class PackagePopUp {
 		public void onClick(View v) {			
 			couponCodeEt.getText().clear();		
 			couponMessage.setText("");
+			couponMessage.setVisibility(View.GONE);
 		}
 		
 	}

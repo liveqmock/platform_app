@@ -192,7 +192,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			
 		};
 		task.execute();
-		//Crashlytics.start(this);
+
+//		Crashlytics.start(this);
 
 		FontUtil.loadFonts(getAssets());
 		String trackingDistinctId = getTrackingDistinctId();
@@ -482,6 +483,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		
 		CheckUserStatus();
 		
+		myplexapplication.isInitlized=true;		
 
 	}
 
@@ -638,12 +640,13 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		mProgressDialog = ProgressDialog.show(this,"", "Loading...", true,false);
 	}
 	public void dismissProgressBar(){
-		if(mProgressDialog != null && mProgressDialog.isShowing()){
-			try{
+
+		try {
+			if (mProgressDialog != null && mProgressDialog.isShowing()) {
 				mProgressDialog.dismiss();
-			}catch(Exception excp) {
-				//this is left blank intentionally to avoid IllegalArgumentxception
 			}
+		} catch (Throwable e) {
+
 		}
 	}
 	private boolean mShowExitToast = true;

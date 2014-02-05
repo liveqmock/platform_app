@@ -63,6 +63,7 @@ import com.apalya.myplex.adapters.NavigationOptionsMenuAdapter;
 import com.apalya.myplex.cache.CacheManager;
 import com.apalya.myplex.cache.IndexHandler;
 import com.apalya.myplex.data.ApplicationSettings;
+import com.apalya.myplex.data.ApplicationSettings.APP_TYPE;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDataGenralInfo;
 import com.apalya.myplex.data.CardDataImages;
@@ -159,45 +160,65 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 	private List<NavigationOptionsMenu> mMenuItemList = new ArrayList<NavigationOptionsMenu>();
 	private void fillMenuItem() {
 		
-		String email = myplexapplication.getUserProfileInstance().getUserEmail();
-		if(email.equalsIgnoreCase("NA") || email.equalsIgnoreCase(""))
-		{
-			mIsUserLoggedIn = false;
-		}
-			
-		mMenuItemList.add(new NavigationOptionsMenu(myplexapplication.getUserProfileInstance().getName(),
-				R.drawable.menu_profile, myplexapplication.getUserProfileInstance().getProfilePic(),NavigationOptionsMenuAdapter.CARDDETAILS_ACTION,R.layout.navigation_menuitemlarge));
-		
-		int screenType = NavigationOptionsMenuAdapter.NOFOCUS_ACTION;
-		if(mIsUserLoggedIn)
-		{
-			screenType = NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION;
-		}
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.RECOMMENDED,R.string.iconhome, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.MOVIES,R.string.iconmovie, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LIVETV,R.string.iconlivetv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-//		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.SPORTS,R.string.iconcricket, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGO,R.string.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
+	String email = myplexapplication.getUserProfileInstance().getUserEmail();
+    if(email.equalsIgnoreCase("NA") || email.equalsIgnoreCase(""))
+    {
+            mIsUserLoggedIn = false;
+    }
+            
+    mMenuItemList.add(new NavigationOptionsMenu(myplexapplication.getUserProfileInstance().getName(),
+                    R.drawable.menu_profile, myplexapplication.getUserProfileInstance().getProfilePic(),NavigationOptionsMenuAdapter.CARDDETAILS_ACTION,R.layout.navigation_menuitemlarge));
+    
+    int screenType = NavigationOptionsMenuAdapter.NOFOCUS_ACTION;
+    if(mIsUserLoggedIn)
+    {
+            screenType = NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION;
+    }
+    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.RECOMMENDED,R.string.iconhome, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.MOVIES,R.string.iconmovie, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LIVETV,R.string.iconlivetv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+//    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.SPORTS,R.string.iconcricket, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGO,R.string.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
 
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FAVOURITE,R.string.iconfav, null, screenType,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.PURCHASES,R.string.iconpurchases, null,screenType,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.DOWNLOADS,R.string.icondnload, null, screenType,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.DISCOVER,R.string.icondiscover, null, NavigationOptionsMenuAdapter.SEARCH_ACTION,R.layout.navigation_menuitemsmall));
-		
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGO,R.string.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
-		
-		
-		Session fbSession=Session.getActiveSession();
-		if(fbSession!=null && fbSession.isOpened())
-			mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.INVITEFRIENDS,R.string.iconfriends, null, NavigationOptionsMenuAdapter.INVITE_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.SETTINGS,R.string.iconsettings, null, NavigationOptionsMenuAdapter.SETTINGS_ACTION,R.layout.navigation_menuitemsmall));
-		if(mIsUserLoggedIn)
-			mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGOUT,R.string.iconlogout, null, NavigationOptionsMenuAdapter.LOGOUT_ACTION,R.layout.navigation_menuitemsmall));
-		else
-			mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGIN,R.string.iconlogout, null, NavigationOptionsMenuAdapter.LOGOUT_ACTION,R.layout.navigation_menuitemsmall));
-//		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.TVSHOWS,R.drawable.icontv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-		mNavigationAdapter.setMenuList(mMenuItemList);
-		mNavigationAdapter.setLoginStatus(mIsUserLoggedIn);
+    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FAVOURITE,R.string.iconfav, null, screenType,R.layout.navigation_menuitemsmall));
+    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.PURCHASES,R.string.iconpurchases, null,screenType,R.layout.navigation_menuitemsmall));
+    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.DOWNLOADS,R.string.icondnload, null, screenType,R.layout.navigation_menuitemsmall));
+    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.DISCOVER,R.string.icondiscover, null, NavigationOptionsMenuAdapter.SEARCH_ACTION,R.layout.navigation_menuitemsmall));
+    
+    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGO,R.string.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
+    
+    
+    Session fbSession=Session.getActiveSession();
+    if(fbSession!=null && fbSession.isOpened())
+            mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.INVITEFRIENDS,R.string.iconfriends, null, NavigationOptionsMenuAdapter.INVITE_ACTION,R.layout.navigation_menuitemsmall));
+    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.SETTINGS,R.string.iconsettings, null, NavigationOptionsMenuAdapter.SETTINGS_ACTION,R.layout.navigation_menuitemsmall));
+    if(mIsUserLoggedIn)
+            mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGOUT,R.string.iconlogout, null, NavigationOptionsMenuAdapter.LOGOUT_ACTION,R.layout.navigation_menuitemsmall));
+    else
+            mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGIN,R.string.iconlogout, null, NavigationOptionsMenuAdapter.LOGOUT_ACTION,R.layout.navigation_menuitemsmall));
+//    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.TVSHOWS,R.drawable.icontv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+    mNavigationAdapter.setMenuList(mMenuItemList);
+    mNavigationAdapter.setLoginStatus(mIsUserLoggedIn);
+    }
+	private void fillMenuItemOffline() {
+		String email = myplexapplication.getUserProfileInstance().getUserEmail();
+        if(email.equalsIgnoreCase("NA") || email.equalsIgnoreCase(""))
+        {
+                mIsUserLoggedIn = false;
+        }                
+        mMenuItemList.add(new NavigationOptionsMenu(myplexapplication.getUserProfileInstance().getName(),
+                        R.drawable.menu_profile, myplexapplication.getUserProfileInstance().getProfilePic(),NavigationOptionsMenuAdapter.CARDDETAILS_ACTION,R.layout.navigation_menuitemlarge));        
+        int screenType = NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION;
+        mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.PURCHASES,R.string.iconpurchases, null,screenType,R.layout.navigation_menuitemsmall));
+        mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.DOWNLOADS,R.string.icondnload, null, screenType,R.layout.navigation_menuitemsmall));        
+        mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGO,R.string.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
+        mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.SETTINGS,R.string.iconsettings, null, NavigationOptionsMenuAdapter.SETTINGS_ACTION,R.layout.navigation_menuitemsmall));
+        if(mIsUserLoggedIn)
+                mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGOUT,R.string.iconlogout, null, NavigationOptionsMenuAdapter.LOGOUT_ACTION,R.layout.navigation_menuitemsmall));
+        else
+                mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGIN,R.string.iconlogout, null, NavigationOptionsMenuAdapter.LOGOUT_ACTION,R.layout.navigation_menuitemsmall));
+        mNavigationAdapter.setMenuList(mMenuItemList);
+        mNavigationAdapter.setLoginStatus(mIsUserLoggedIn);
 	}
 
 
@@ -207,6 +228,9 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 //		getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 		mContext = this;
 		Util.prepareDisplayinfo(this);
+		if(!myplexapplication.isInitlized){
+			myplexapplication.init(this);
+		}
 //		StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
 //				.detectDiskReads().detectDiskWrites().detectNetwork() // or
 //																		// .detectAll()
@@ -229,7 +253,10 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerList = (ListView) findViewById(R.id.left_drawer);
 		mNavigationAdapter = new NavigationOptionsMenuAdapter(this);
-		fillMenuItem();
+		if(ApplicationSettings.MODE_APP_TYPE == APP_TYPE.OFFLINE)
+			fillMenuItemOffline();
+		else
+			fillMenuItem();
 		mDrawerList.setAdapter(mNavigationAdapter);
 		// set a custom shadow that overlays the main content when the drawer
 		// opens
@@ -248,7 +275,8 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 		getActionBar().setIcon(new ColorDrawable(Color.TRANSPARENT));
 
 
-		prepareCustomActionBar();
+		prepareCustomActionBar();		
+		
 
 		// ActionBarDrawerToggle ties together the the proper interactions
 		// between the sliding drawer and the action bar app icon
@@ -275,7 +303,12 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 		};
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
 
-		selectItem(1);
+		if(!prepareWidgetEvent(getIntent())){
+			if(ApplicationSettings.MODE_APP_TYPE == APP_TYPE.OFFLINE )
+				selectItem(2);
+			else
+				selectItem(1);
+		}
 /*		if (savedInstanceState == null) {
 			Session fbSession=Session.getActiveSession();
 			if(fbSession!=null && fbSession.isOpened()){
@@ -287,6 +320,23 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 		}*/
 		
 		Util.deserializeData(MainActivity.this);
+	}
+
+	private boolean prepareWidgetEvent(Intent intent) {
+		if(intent==null)
+			return false;
+		String action  = "";
+		if(intent.hasExtra("widget_click_event")){
+			action = intent.getStringExtra("widget_click_event");
+		}
+		if(action.length()>0){
+			if(action.equalsIgnoreCase("live_tv"))
+				selectItem(3);
+			else if(action.equalsIgnoreCase("movie"))
+				selectItem(2);
+			return true;
+		}
+		return false;
 	}
 
 	private void showNavigationFullImage(boolean value){
@@ -375,24 +425,7 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 		RelativeLayout navigationMenuLayout = (RelativeLayout)v.findViewById(R.id.customactionbar_drawerLayout);
 		Util.showFeedbackOnSame(navigationMenuLayout);
 		mNavigationMenu = (ImageView) v.findViewById(R.id.customactionbar_drawer);
-		
-		navigationMenuLayout.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View arg0) {
-				if (mNavigationDrawerOpened) {
-					mDrawerLayout.closeDrawer(mDrawerList);
-					mNavigationDrawerOpened = false;
-				} else {
-					mDrawerLayout.openDrawer(mDrawerList);
-					mNavigationDrawerOpened = true;
-					
-					String screenOpenedFrom = getCurrentScreen();
-					Analytics.mixPanelNavigationOpened(screenOpenedFrom);
-				}
-			}
-		});
-				
+		navigationMenuLayout.setOnClickListener(navigationClickListener);
 		mCustomActionBarTitleLayout = (RelativeLayout) v.findViewById(R.id.customactionbar_filter);
 		mCustomActionBarTitleLayout.setOnClickListener(mOnFilterClickListener);
 		Util.showFeedbackOnSame(mCustomActionBarTitleLayout);
@@ -438,6 +471,19 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 		tvOrMovie.setTypeface(FontUtil.ss_symbolicons_line);
 		
 	}
+	OnClickListener navigationClickListener = new  OnClickListener() {
+
+		@Override
+		public void onClick(View arg0) {
+			if (mNavigationDrawerOpened) {
+				mDrawerLayout.closeDrawer(mDrawerList);
+				mNavigationDrawerOpened = false;
+			} else {
+				mDrawerLayout.openDrawer(mDrawerList);
+				mNavigationDrawerOpened = true;
+			}
+		}
+	};
 	@Override
 	public void enableFilterAction(boolean value){
 		if(value){
@@ -552,6 +598,10 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 	
 	@Override
 	public void onBackPressed() {
+		if(mCurrentFragment instanceof CardDetails){
+			if(mCurrentFragment.onBackClicked())
+				return;
+		}
 		try {
 			if (mDrawerLayout!=null && mNavigationDrawerOpened) {
 				mDrawerLayout.closeDrawer(mDrawerList);
@@ -1055,7 +1105,10 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 				mSearchView.setVisibility(visibility);
 		}
 		socialShare.setVisibility(View.GONE);
-		socialShare.setOnClickListener(null);		
+		socialShare.setOnClickListener(null);
+		mNavigationMenu.setImageResource(R.drawable.iconmenu);
+		mNavigationMenu.setOnClickListener(navigationClickListener);
+		
 	}
 	@Override
 	public void hidefilterMenu() {
@@ -1258,6 +1311,14 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 			@Override
 			public void onClick(View v) {
 				Util.shareData(mContext, 3, "",toBeshared);
+			}
+		});
+		mNavigationMenu.setImageResource(R.drawable.abs__ic_ab_back_holo_dark);
+		mNavigationMenu.setOnClickListener(new OnClickListener() {			
+			@Override
+			public void onClick(View arg0) {
+				onBackPressed();
+//				removeFragment(mCurrentFragment);
 			}
 		});
 	}

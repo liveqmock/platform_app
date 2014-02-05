@@ -43,4 +43,7 @@ public class BaseFragment extends Fragment {
 	public void searchButtonClicked() {
 
 	}
+	public boolean onBackClicked() {
+		return false;
+	}
 }

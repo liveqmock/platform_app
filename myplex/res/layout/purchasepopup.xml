@@ -123,14 +123,15 @@
                     android:layout_marginTop="10dp"
                     android:gravity="center_horizontal"
                     android:textColor="@color/coupon_applied_txt_color"
-                    android:textStyle="bold" />
+                    android:textStyle="bold" 
+                    android:visibility="gone"/>
 
                 <EditText
                     android:id="@+id/couponCodeET"
                     android:layout_width="match_parent"
                     android:layout_height="40dp"
                     android:layout_below="@+id/coupon_applied_message"
-                    android:layout_marginLeft="@dimen/margin_gap_24"
+                    android:layout_marginLeft="30dp"
                     android:layout_marginRight="10dp"
                     android:layout_marginTop="20dp"
                     android:background="@drawable/coupon_editbox_bg"
@@ -163,7 +164,7 @@
                     android:textColor="@android:color/white"
                     android:textSize="14sp"
                     android:typeface="monospace"
-                    android:visibility="invisible" />
+                    android:visibility="gone" />
 
                 
 
@@ -185,7 +186,7 @@
                     android:layout_below="@+id/couponLayout"
                     android:layout_marginLeft="30dp"
                     android:layout_marginRight="30dp"
-                    android:layout_marginTop="40dp"
+                    android:layout_marginTop="@dimen/margin_gap_16"
                     android:lineSpacingExtra="4dp"
                     android:textColor="#ffffff"
                     android:textSize="14sp" >

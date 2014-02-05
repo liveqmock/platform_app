@@ -112,6 +112,7 @@ public class CacheManager {
 				resultData.userReviews = data.userReviews;
 				resultData.criticReviews = data.criticReviews;
 				resultData._expiresAt = data._expiresAt;
+				resultData.packages=data.packages;
 				if(data.comments != null){
 					Log.d(TAG,"number of comments for  "+data._id+" "+data.comments.numComments);	
 				}
@@ -155,21 +156,21 @@ public class CacheManager {
 			mListener.OnOnlineResults(minResultSet.results);
 		}
 	}
-	private Response.Listener<String> onlineRequestSuccessListener() {
-		return new Response.Listener<String>() {
+	private Response.Listener<CardResponseData> onlineRequestSuccessListener() {
+		return new Response.Listener<CardResponseData>() {
 			@Override
-			public void onResponse(String response) {
+			public void onResponse(CardResponseData maxResultSet) {
 				try {
-					CardResponseData maxResultSet  = (CardResponseData) Util.fromJson(response, CardResponseData.class);
+//					CardResponseData maxResultSet  = (CardResponseData) Util.fromJson(response, CardResponseData.class);
+					if(maxResultSet == null || maxResultSet.results == null){return;}
+					
 					if(maxResultSet.results != null){
 						Log.d(TAG,"Number of result from online request :"+maxResultSet.results.size());
 					}
 					addToCache(maxResultSet);
-				} catch (JsonParseException e) {
+				} catch (Exception e) {
 					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				} 
 			}
 		};
 	}

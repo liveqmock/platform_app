@@ -1,13 +1,28 @@
 package com.apalya.myplex.data;
 
-import android.app.Application;
+import java.util.Date;
 
+import android.app.Activity;
+import android.app.Application;
+import android.content.Context;
+import android.telephony.TelephonyManager;
+import android.util.DisplayMetrics;
+
+import com.apalya.myplex.R;
 import com.apalya.myplex.adapters.NavigationOptionsMenuAdapter;
 import com.apalya.myplex.cache.CacheHolder;
+import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.LocationUtil;
 import com.apalya.myplex.utils.MyVolley;
+
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.Tracker;
+
+import com.apalya.myplex.utils.SharedPrefUtils;
+import com.apalya.myplex.utils.Util;
+import com.crashlytics.android.Crashlytics;
+import com.flurry.android.FlurryAgent;
+
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 
 public class myplexapplication extends Application {
@@ -21,9 +36,13 @@ public class myplexapplication extends Application {
 	private static CacheHolder mCache ;
 	private static MixpanelAPI mixPanel;
 	public static int mSelectedOption_Tablet = NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION;
+
 	
 	private static EasyTracker mTracker;
 	
+
+	public static boolean isInitlized=false;
+
 	private static final String MIXPANEL_DISTINCT_ID_NAME = "Mixpanel Example $distinctid";
 	/*
 	 * You will use a Mixpanel API token to allow your app to send data to Mixpanel. To get your token
@@ -101,6 +120,7 @@ public class myplexapplication extends Application {
 		return mCache;
 	}
 	
+
 	 private void initializeGa() {
 		mTracker = EasyTracker.getInstance(this);		    
 	 }
@@ -110,4 +130,118 @@ public class myplexapplication extends Application {
 	}
 	 
 	 
+
+	public static void init(Activity activity) {
+
+		isInitlized=true;
+		// Log.d(TAG,
+		// "******************************************************************");
+
+		getDevDetailsInstance();
+		mDeviceDetails.setDeviceOs(activity.getString(R.string.osname));
+		mDeviceDetails.setDeviceOsVer(android.os.Build.VERSION.RELEASE);
+		mDeviceDetails.setDeviceModel(android.os.Build.DEVICE);
+		mDeviceDetails.setDeviceMake(android.os.Build.MANUFACTURER);
+		mDeviceDetails.setDeviceSNo(android.os.Build.SERIAL);
+		//
+		// Log.d(TAG,
+		// "******************************************************************");
+
+		DisplayMetrics dm = new DisplayMetrics();
+		activity.getWindowManager().getDefaultDisplay().getMetrics(dm);
+
+		final int height = dm.heightPixels;
+		final int width = dm.widthPixels;
+		// Log.d(TAG, String.valueOf(height));
+		// Log.d(TAG, String.valueOf(width));
+		String devRes = String.valueOf(width) + "x" + String.valueOf(height);
+		mDeviceDetails.setDeviceRes(devRes);
+		//
+		// Log.d(TAG,
+		// "******************************************************************");
+
+		TelephonyManager mTelephonyMgr;
+		mTelephonyMgr = (TelephonyManager) activity
+				.getSystemService(Context.TELEPHONY_SERVICE);
+		if (mTelephonyMgr != null) {
+			mDeviceDetails.setDeviceId(mTelephonyMgr.getDeviceId());
+			mDeviceDetails.setOperatorName(mTelephonyMgr
+					.getNetworkOperatorName());
+			mDeviceDetails.setMccMnc(String.valueOf(mTelephonyMgr
+					.getSimOperator()));
+			mDeviceDetails.setSimSNo(mTelephonyMgr.getSimSerialNumber());
+			mDeviceDetails.setImsiNo(mTelephonyMgr.getSubscriberId());
+			mDeviceDetails.setSimState(mTelephonyMgr.getSimState());
+		}
+		// Log.d(TAG,
+		// "******************************************************************");
+
+		ConsumerApi.DOMAIN = activity.getString(R.string.domain_name);
+
+		String clientKey = SharedPrefUtils.getFromSharedPreference(activity,
+				activity.getString(R.string.devclientkey));
+		if (clientKey != null) {
+			ConsumerApi.DEBUGCLIENTKEY = clientKey;
+		}
+		String clientKeyExp = SharedPrefUtils.getFromSharedPreference(activity,
+				activity.getString(R.string.devclientkeyexp));
+
+		// Check if client is available, if not give device registration request
+		if (clientKey != null) {
+			getUserProfileInstance();
+			mUserProfile.firstVisitStatus = false;
+
+			long nowinms = System.currentTimeMillis();
+			Date now = new Date(nowinms);
+			mUserProfile.lastVisitedDate = now.toLocaleString();
+
+			// clientKeyExp ="2014-01-22T10:36:04+00:00Z";
+			// check if the client key is valid or not, if expired give generate
+			// key request
+			if (Util.isTokenValid(clientKeyExp)) {
+				mDeviceDetails.setClientKey(clientKey);
+				mDeviceDetails.setClientDeviceId(SharedPrefUtils
+						.getFromSharedPreference(activity,
+								activity.getString(R.string.devclientdevid)));
+				mDeviceDetails.setClientKeyExp(SharedPrefUtils
+						.getFromSharedPreference(activity,
+								activity.getString(R.string.devclientkeyexp)));
+				// Log.d(TAG,
+				// "---------------------------------------------------------");
+
+				String username = SharedPrefUtils.getFromSharedPreference(
+						activity, activity.getString(R.string.devusername));
+
+				// check if user is already logged in, if so take him to main
+				// screen or else login screen
+				if (username != null) {
+					Crashlytics.setUserEmail(username);
+
+					String userIdSha1 = Util.sha1Hash(username);
+					FlurryAgent.setUserId(userIdSha1);
+					Crashlytics.setUserName(userIdSha1);
+					Crashlytics.setUserIdentifier(userIdSha1);
+
+					String profilename = SharedPrefUtils
+							.getFromSharedPreference(activity, activity
+									.getString(R.string.userprofilename));
+					String profilePic = SharedPrefUtils
+							.getFromSharedPreference(activity,
+									activity.getString(R.string.userpic));
+
+					if (profilename != null) {
+						mUserProfile.setName(profilename);
+						// mMixpanel.getPeople().set("$first_name",
+						// profilename);
+					}
+					if (profilePic != null)
+						mUserProfile.setProfilePic(profilePic);
+					mUserProfile.setUserEmail(username);
+
+				}
+
+			}
+		}
+	}
+
 }

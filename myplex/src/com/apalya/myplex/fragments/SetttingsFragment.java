@@ -32,6 +32,8 @@ import com.apalya.myplex.utils.DeviceRegUtil;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.utils.WidevineDrm;
 import com.apalya.myplex.utils.MessagePost.MessagePostCallback;
+import com.apalya.myplex.views.DownloadStreamDialog;
+import com.apalya.myplex.views.DownloadStreamDialog.DownloadListener;
 import com.apalya.myplex.views.PinnedSectionListView;
 import com.apalya.myplex.views.RatingDialog;
 import com.google.analytics.tracking.android.EasyTracker;
@@ -46,6 +48,7 @@ public class SetttingsFragment extends BaseFragment {
 	private String TANDC = "Terms & Conditions";
 	private String PRIVACYPOLIY ="Privacy Policy";
 	private String HELP = "Help";
+	private String DOWNLOAD_OR_STREAM_MSG = "play rental movies download, stream";
 	public static final String DRM_STATUS_STRING="WVDRM Status";
 	public static final String DRM_LEVAL_STRING="WVDRM StatusKey";
 	public static final String ROOT_STATUS_STRING="Root Status";
@@ -123,6 +126,17 @@ public class SetttingsFragment extends BaseFragment {
 						}
 						
 					}, profileData);
+				}else if(data.mSettingName.equals(DOWNLOAD_OR_STREAM_MSG)){	
+				DownloadStreamDialog dialog = new DownloadStreamDialog(mContext, "Movie rental options");			
+				dialog.removeDontShowAgainLayout();			
+				dialog.setListener(new DownloadListener() {                                                			
+				@Override			
+				public void onOptionSelected(boolean isDownload)			
+				{			
+				
+				}			
+				});			
+				dialog.showDialog();
 				}
 				else
 				{
@@ -148,6 +162,7 @@ public class SetttingsFragment extends BaseFragment {
 	private void PreapreSettingsData() {
 		mSettingsList = new ArrayList<SettingsData>();		
 		mSettingsList.add(new SettingsData(SettingsData.SECTION, "App Settings", 0,SettingsData.VIEWTYPE_NORMAL));
+		mSettingsList.add(new SettingsData(SettingsData.ITEM, DOWNLOAD_OR_STREAM_MSG, 0,SettingsData.VIEWTYPE_NORMAL));
 		mSettingsList.add(new SettingsData(SettingsData.ITEM, "Download only on Wifi", 0,SettingsData.VIEWTYPE_TOGGLEBUTTON));
 		if(ApplicationSettings.ENABLE_SHOW_PLAYER_LOGS_SETTINGS){
 			mSettingsList.add(new SettingsData(SettingsData.ITEM, "Show player logs", 0,SettingsData.VIEWTYPE_TOGGLEBUTTON));
@@ -159,7 +174,8 @@ public class SetttingsFragment extends BaseFragment {
 			mSettingsList.add(new SettingsData(SettingsData.ITEM, DERIGISTER_DEVICE , 0,SettingsData.VIEWTYPE_NORMAL));
 			
 		}
-		mSettingsList.add(new SettingsData(SettingsData.SECTION, "myplex", 0,SettingsData.VIEWTYPE_NORMAL));
+		String version= Util.getAppVersionName(mContext);
+		mSettingsList.add(new SettingsData(SettingsData.SECTION, "myplex"+ " "+version, 0,SettingsData.VIEWTYPE_NORMAL));
 		mSettingsList.add(new SettingsData(SettingsData.ITEM, FEEDBACK, 0,SettingsData.VIEWTYPE_NORMAL));
 		mSettingsList.add(new SettingsData(SettingsData.ITEM, TANDC, 0,SettingsData.VIEWTYPE_NORMAL));
 		mSettingsList.add(new SettingsData(SettingsData.ITEM, PRIVACYPOLIY, 0,SettingsData.VIEWTYPE_NORMAL));

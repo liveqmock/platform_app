@@ -29,6 +29,7 @@ public class ConsumerApi {
 	public static final String PAYMENTCHANNEL = "paymentChannel=";
 	public static final String PACKAGEID = "packageId=";
 	public static final String CONTENT_CONTEXT = "content/v2";
+	public static final String CONTENT_CONTEXT_V3 = "content/v3";
 	public static final String USER_CONTEXT = "user/v2";
 	public static final String BILLING_EVENT = "billing"; 
 	public static final String CHECK_COUPON = "check/coupon";
@@ -60,7 +61,7 @@ public class ConsumerApi {
 	public static final String VIDEOQUALTYLOW = "Low";
 	public static final String VIDEOQUALTYMEDIUM = "Medium";
 	public static final String VIDEOQUALTYHIGH = "High";
-	public static final String VIDEOQUALTYVERYHIGH = "veryhigh";
+	public static final String VIDEOQUALTYVERYHIGH = "VeryHigh";
 	public static final String VIDEOQUALTYSD = "sd";
 	public static final String VIDEOQUALTYHD = "hd";
 	
@@ -71,6 +72,8 @@ public class ConsumerApi {
 	public static final String STREAMADAPTIVE = "adaptive";
 	public static final String STREAMNORMAL = "streaming";
 	public static final String STREAMDOWNLOAD = "download";
+	
+	public static final String PAYMENT_CHANNEL_INAPP="INAPP";
 	
 	// min: returns only content ids.
 	// static: returns static sub-entities.
@@ -93,6 +96,9 @@ public class ConsumerApi {
 	public static final String ELAPSED_TIME = "elapsedTime=";
 	public static final String DURATION = "";
 	public static final String FORCE_TRUE = "&force=true";
+	public static final String VIDEO_TYPE_MOVIE = "movie";
+	public static final String VIDEO_TYPE_LIVE = "live";
+	public static final String VIDEO_TYPE_TRAILER = "trailer";
 	
 	// list of content types
 	
@@ -170,12 +176,12 @@ public class ConsumerApi {
 				+ AMPERSAND + LEVEL + level ;
 	}
 	public static String getContentDetail(String contentID,String level){
-		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH + CONTENTDETAILS_ACTION
+		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT_V3 + SLASH + CONTENTDETAILS_ACTION
 				+ SLASH + contentID + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY  + AMPERSAND
 		        + LEVEL + level + AMPERSAND+COUNT;
 	}
 	public static String getVideosDetail(String contentID){
-		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH + CONTENTDETAILS_ACTION
+		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT_V3 +  SLASH + CONTENTDETAILS_ACTION
 				+ SLASH + contentID + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY  + AMPERSAND
 		        + FIELDS + FIELD_VIDEOS;
 	}

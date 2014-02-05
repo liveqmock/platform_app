@@ -37,14 +37,18 @@ import android.widget.TextView;
 
 import com.android.volley.VolleyError;
 import com.apalya.myplex.BaseFragment;
+import com.apalya.myplex.MainBaseOptions;
 import com.apalya.myplex.R;
 import com.apalya.myplex.adapters.CacheManagerCallback;
 import com.apalya.myplex.adapters.NavigationOptionsMenuAdapter;
 import com.apalya.myplex.adapters.ScrollingDirection;
 import com.apalya.myplex.cache.CacheManager;
 import com.apalya.myplex.cache.IndexHandler;
+import com.apalya.myplex.data.ApplicationSettings;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDataImagesItem;
+import com.apalya.myplex.data.CardDataPackagePriceDetailsItem;
+import com.apalya.myplex.data.CardDataPackages;
 import com.apalya.myplex.data.CardDataRelatedCastItem;
 import com.apalya.myplex.data.CardDetailMediaData;
 import com.apalya.myplex.data.CardDetailMediaListData;
@@ -273,10 +277,20 @@ public class CardDetails extends BaseFragment implements
 				Analytics.stoppedAt();
 				Analytics.mixPanelVideoTimeCalculation(mCardData);
 				mPlayer.stopSportsStatusRefresh();
-				if(mCardData.generalInfo.isSellable){
+				if(ApplicationSettings.ENABLE_FB_SHARE_FREE_MOVIE){
+					for(CardDataPackages pkg: mCardData.packages){
+						for(CardDataPackagePriceDetailsItem pkgItem: pkg.priceDetails){
+							if(pkgItem.price == 0.0){
+								Util.showFacebookShareDialog(mContext);
+								return;
+							}
+						}
+					}
+				}				
+				/*if(mCardData.generalInfo.isSellable){
 					Log.d(TAG, "free content");
 					Util.showFacebookShareDialog(mContext);
-				}
+				}*/
 			}
 		}
 	}
@@ -866,6 +880,32 @@ public class CardDetails extends BaseFragment implements
 	public void onProgressBarVisibility(int value) {
 		if(mProgressBar != null){
 			mProgressBar.setVisibility(value);
+		}
+	}
+	@Override
+	public boolean onBackClicked() {
+		try{
+			if(mPlayer.isFullScreen()){
+				if (!mContext.getResources().getBoolean(R.bool.isTablet)) {
+					if(mPlayer.getScreenOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE){
+						((MainBaseOptions) mContext).setOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+						mPlayer.resumePreviousOrientaionTimer();
+					}
+					else {
+						((MainBaseOptions) mContext).setOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+						mPlayer.resumePreviousOrientaionTimer();
+					} 
+				}
+				mPlayer.setFullScreen(!mPlayer.isFullScreen());
+				return true;
+			}
+			if(mPlayer.isMediaPlaying()){
+				mPlayer.closePlayer();
+				return true;
+			}
+			return false;
+		}catch(Throwable e){			
+			return false;
 		}
 	}
 }
