@@ -228,9 +228,7 @@ public class CardDetails extends BaseFragment implements
 	}
 	
 	
-	private void showToast() {
-		Util.showToast(getActivity(), "Hey do the syrvey",0);
-	}
+	
 	
 
 	private CardVideoPlayer mPlayer;

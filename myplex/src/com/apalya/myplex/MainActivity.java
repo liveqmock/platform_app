@@ -481,6 +481,8 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 			} else {
 				mDrawerLayout.openDrawer(mDrawerList);
 				mNavigationDrawerOpened = true;
+				String screenOpenedFrom = getCurrentScreen();
+				Analytics.mixPanelNavigationOpened(screenOpenedFrom);
 			}
 		}
 	};
