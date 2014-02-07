@@ -47,6 +47,7 @@ import com.apalya.myplex.data.ApplicationConfig;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDataHolder;
 import com.apalya.myplex.data.CardDataImagesItem;
+import com.apalya.myplex.data.CardDataPurchaseItem;
 import com.apalya.myplex.data.CardDownloadData;
 import com.apalya.myplex.data.CardDownloadedDataList;
 import com.apalya.myplex.data.CardExplorerData;
@@ -452,7 +453,15 @@ public class CardView extends ScrollView {
 			dataHolder.mRentLayout.setOnClickListener(null);
 		}else{
 			if(data.currentUserData != null && data.currentUserData.purchase != null && data.currentUserData.purchase.size() != 0){
-				dataHolder.mRentText.setText(mContext.getString(R.string.cardstatuspaid));
+				List<CardDataPurchaseItem> purchase = data.currentUserData.purchase;
+				String validity = "";
+				for(CardDataPurchaseItem item : purchase){
+					 validity = Util.getDate(item.validity);
+				}
+				if(validity.length()>0)
+					dataHolder.mRentText.setText(mContext.getString(R.string.card_watch_before)+" "+validity);
+				else
+					dataHolder.mRentText.setText(mContext.getString(R.string.cardstatuspaid));					
 				dataHolder.mRentLayout.setOnClickListener(null);
 			}else{
 				for(CardDataPackages packageitem:data.packages){

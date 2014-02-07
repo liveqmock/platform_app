@@ -288,6 +288,9 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		mVideoView.setVisibility(View.VISIBLE);			
 		mPreviewImage.setVisibility(View.INVISIBLE);			
 
+		if(checkForLocalPlayback()){
+			return;
+		}
 		MediaUtility utility ;                			
 		if(id==null){			
 			utility = new MediaUtility(mContext,this,false);			
@@ -300,6 +303,54 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 	}			
 	        			
         
+	private boolean checkForLocalPlayback() {
+
+		if (myplexapplication.mDownloadList == null) {
+			return false;
+		}
+
+		CardDownloadData mDownloadData = myplexapplication.mDownloadList.mDownloadedList
+				.get(mData._id);
+
+		if (mDownloadData == null) {
+			return false;
+		}
+
+		boolean isFileExist = Util.isFileExist(mData._id + ".wvm");
+
+		if (!isFileExist) {
+			if (mPlayerStatusListener != null) {
+				mPlayerStatusListener
+						.playerStatusUpdate("Download Completed and file doesn't exists, starting player.....");
+			}
+			Util.removeDownload(mDownloadData.mDownloadId, mContext);			
+			return false;
+		}
+		
+		if (mDownloadData.mCompleted && mDownloadData.mPercentage == 0) {
+			if (mPlayerStatusListener != null) {
+				mPlayerStatusListener
+						.playerStatusUpdate("Download failed and removing request and deleting the file");
+			}
+			closePlayer();
+			Util.removeDownload(mDownloadData.mDownloadId, mContext);
+			Util.showToast(
+					mContext,
+					"Download has failed, Please check if sufficent memory is available.",
+					Util.TOAST_TYPE_ERROR);
+			return false;
+		}
+
+		if (mPlayerStatusListener != null) {
+			mPlayerStatusListener
+					.playerStatusUpdate("file exists, starting player.....per download :"
+							+ mDownloadData.mPercentage);
+		}
+
+		playVideoFile(mDownloadData);
+		return true;
+
+	}
 	private OnClickListener mPlayerClickListener = new OnClickListener() {
 
 		@Override
@@ -1567,6 +1618,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 					onLastPausedTimeFetched(adaptive.elapsedTime);			
 				}
 			}else{
+				 Util.showToast(mContext, mContext.getString(R.string.switch_to_download_in_setting_msg), Util.TOAST_TYPE_INFO);
 				 if(adaptive_link!=null)			
 					 initPlayBack(adaptive_link);
 				else if(download_link!=null)			
@@ -1576,7 +1628,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 				DownloadStreamDialog dialog = new DownloadStreamDialog(mContext,mData.generalInfo.title+" rental options");
 				dialog.setListener(new DownloadListener() {			
 					@Override
-					public void onOptionSelected(boolean isDownload) {	
+					public void onOptionSelected(boolean isDownload) {
 						if(isDownload){
 							initPlayBack(download_link);
 						}else{
@@ -1598,7 +1650,8 @@ private void playVideoFile(CardDownloadData mDownloadData){
 	@Override
 	public void onUrlFetchFailed(String message) 
 	{
-		if(message != null && message.equalsIgnoreCase("ERR_USER_NOT_SUBSCRIBED")){			
+		if(message != null && message.equalsIgnoreCase("ERR_USER_NOT_SUBSCRIBED")){
+			closePlayer();
 			PackagePopUp popup = new PackagePopUp(mContext,(View)mParentLayout.getParent());
 			myplexapplication.getCardExplorerData().cardDataToSubscribe =  mData;
 			popup.showPackDialog(mData, ((Activity)mContext).getActionBar().getCustomView());	

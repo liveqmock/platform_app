@@ -416,6 +416,7 @@ public class Util {
 			
 			
 
+			try{
 			lastDownloadId=
 					manager.enqueue(new DownloadManager.Request(uri)
 					.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI)
@@ -424,7 +425,11 @@ public class Util {
 							.setDescription(aMovieName)
 							.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN)
 							.setDestinationInExternalFilesDir(mContext, "", aFileName+".wvm"));
-			
+			}catch(Throwable t){
+				lastDownloadId=0;
+				Log.d(TAG,"downl;oad failed");
+				Util.showToast(mContext, "Some error occured during downloading.",Util.TOAST_TYPE_INFO);
+			}
 			
 			if(lastDownloadId>0)
 			{
@@ -1080,8 +1085,6 @@ public class Util {
 		Date date = null;
 		try {
 			date = format.parse(dateInString);
-			System.out.println(date);			
-			System.out.println(format.format(date));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}

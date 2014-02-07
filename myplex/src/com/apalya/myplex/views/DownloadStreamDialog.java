@@ -3,6 +3,7 @@ package com.apalya.myplex.views;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
@@ -10,6 +11,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
@@ -21,12 +23,13 @@ import com.apalya.myplex.utils.Util;
 public class DownloadStreamDialog  implements OnClickListener
 {
 	private Dialog dialog;
-	private RadioButton best,good;
+	private RadioButton best,good,always_ask;
 	private Button continuee;
 	private TextView titleTV,bestTvMsg;
 	private CheckBox dontAsk;
 	private DownloadListener listener;
 	private Context context;
+	private LinearLayout dontAskLayout,alwaysAskLayout;
 
 	public DownloadStreamDialog(Context context,String title) 
 	{
@@ -42,10 +45,13 @@ public class DownloadStreamDialog  implements OnClickListener
 		continuee = (Button)dialog.findViewById(R.id.dialog_continue);
 		titleTV  = (TextView)dialog.findViewById(R.id.dialog_title);
 		dontAsk = (CheckBox)dialog.findViewById(R.id.dont_ask_me_again);
+		always_ask = (RadioButton)dialog.findViewById(R.id.always_ask_radio_btn);
+		dontAskLayout = (LinearLayout)dialog.findViewById(R.id.dont_ask_layout);
+		alwaysAskLayout = (LinearLayout)dialog.findViewById(R.id.always_ask_layout);
 
 		FontUtil.loadFonts(context.getAssets());
 		titleTV.setTypeface(FontUtil.Roboto_Regular);
-		titleTV.setText(title);
+		titleTV.setText(title.toLowerCase());
 		bestTvMsg = ((TextView)dialog.findViewById(R.id.best_tv_msg));
 		bestTvMsg.setTypeface(FontUtil.Roboto_Light);
 		((TextView)dialog.findViewById(R.id.good_tv_msg)).setTypeface(FontUtil.Roboto_Light);
@@ -56,6 +62,7 @@ public class DownloadStreamDialog  implements OnClickListener
 		((TextView)dialog.findViewById(R.id.dont_ask_msg)).setTypeface(FontUtil.Roboto_Light);
 		
 		
+		always_ask.setOnClickListener(this);
 		best.setOnClickListener(this);
 		good.setOnClickListener(this);		
 		continuee.setOnClickListener(this);
@@ -105,8 +112,7 @@ public class DownloadStreamDialog  implements OnClickListener
 		if(dialog!=null){
 			dialog.dismiss();
 			dialog = null;
-		}		
-	}
+		}	}
 
 
 
@@ -116,10 +122,20 @@ public class DownloadStreamDialog  implements OnClickListener
 
 		switch(view.getId()){
 		case R.id.dialog_continue:
-			if(dontAsk.isChecked()){
-				SharedPrefUtils.writeToSharedPref(context, context.getString(R.string.is_dont_ask_again), true);
-			}else{
-				SharedPrefUtils.writeToSharedPref(context, context.getString(R.string.is_dont_ask_again), false);
+			dismissDialog();
+			if(alwaysAskLayout.getVisibility() != View.GONE){
+				if(always_ask.isChecked()){
+					SharedPrefUtils.writeToSharedPref(context, context.getString(R.string.is_dont_ask_again), false);
+				}else{
+					SharedPrefUtils.writeToSharedPref(context, context.getString(R.string.is_dont_ask_again), true);
+				}
+			}
+			if(dontAskLayout.getVisibility() != View.GONE){
+				if(dontAsk.isChecked()){
+					SharedPrefUtils.writeToSharedPref(context, context.getString(R.string.is_dont_ask_again), true);
+				}else{
+					SharedPrefUtils.writeToSharedPref(context, context.getString(R.string.is_dont_ask_again), false);
+				}
 			}
 			if(best.isChecked()){				
 				SharedPrefUtils.writeToSharedPref(context, context.getString(R.string.isDownload), true);				
@@ -127,10 +143,10 @@ public class DownloadStreamDialog  implements OnClickListener
 			}else if(good.isChecked()){
 				SharedPrefUtils.writeToSharedPref(context, context.getString(R.string.isDownload), false);
 				listener.onOptionSelected(false);
-			}
-			dismissDialog();
+			}			
 			break;	
 		case R.id.best_radio_btn:
+			dontAsk.setChecked(true);
 			if(!best.isChecked()){
 				best.setChecked(false);
 				good.setChecked(true);
@@ -140,6 +156,7 @@ public class DownloadStreamDialog  implements OnClickListener
 			}
 			break;
 		case R.id.good_radio_btn:
+			dontAsk.setChecked(false);
 			if(!good.isChecked()){
 				good.setChecked(false);
 				best.setChecked(true);
@@ -153,6 +170,10 @@ public class DownloadStreamDialog  implements OnClickListener
 	}
 	public void removeDontShowAgainLayout() {
 		dialog.findViewById(R.id.dont_ask_layout).setVisibility(View.GONE);
+	}
+	public void showAlwaysAskOption(){
+		dontAskLayout.setVisibility(View.GONE);
+		alwaysAskLayout.setVisibility(View.VISIBLE);
 	}
 
 	public interface DownloadListener{
