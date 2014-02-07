@@ -25,6 +25,7 @@ import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.SettingsData;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.DeviceRegUtil;
+import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.utils.WidevineDrm;
 import com.apalya.myplex.utils.MessagePost.MessagePostCallback;
@@ -39,15 +40,15 @@ public class SetttingsFragment extends BaseFragment {
 	private PinnedSectionListView mSettingsListView;
 	private SettingsAdapter mListAdapter;
 	private List<SettingsData> mSettingsList;
-	private String FEEDBACK = "Feedback";
-	private String TANDC = "Terms & Conditions";
-	private String PRIVACYPOLIY ="Privacy Policy";
-	private String HELP = "Help";
-	private String DOWNLOAD_OR_STREAM_MSG = "play rental movies download, stream";
-	public static final String DRM_STATUS_STRING="WVDRM Status";
-	public static final String DRM_LEVAL_STRING="WVDRM StatusKey";
-	public static final String ROOT_STATUS_STRING="Root Status";
-	public static final String DERIGISTER_DEVICE="DeRegister Device";
+	private String FEEDBACK = "feedback";
+	private String TANDC = "terms & conditions";
+	private String PRIVACYPOLIY ="privacy policy";
+	private String HELP = "help";
+	private String DOWNLOAD_OR_STREAM_MSG = "play rental movies ";
+	public static final String DRM_STATUS_STRING="WVDRM status";
+	public static final String DRM_LEVAL_STRING="WVDRM statusKey";
+	public static final String ROOT_STATUS_STRING="root status";
+	public static final String DERIGISTER_DEVICE="deRegister device";
 	
 	private int debug_mode_counter=0;
 
@@ -115,9 +116,9 @@ public class SetttingsFragment extends BaseFragment {
 						}
 						
 					}, profileData);
-				}else if(data.mSettingName.equals(DOWNLOAD_OR_STREAM_MSG)){	
+				}else if(data.mSettingName.contains(DOWNLOAD_OR_STREAM_MSG)){	
 				DownloadStreamDialog dialog = new DownloadStreamDialog(mContext, "Movie rental options");			
-				dialog.removeDontShowAgainLayout();			
+				dialog.showAlwaysAskOption();	
 				dialog.setListener(new DownloadListener() {                                                			
 				@Override			
 				public void onOptionSelected(boolean isDownload)			
@@ -149,9 +150,11 @@ public class SetttingsFragment extends BaseFragment {
 	}
 
 	private void PreapreSettingsData() {
+		String currentRentalOptions = SharedPrefUtils.getBoolFromSharedPreference(mContext, mContext.getString(R.string.isDownload))?
+				mContext.getString(R.string.download):mContext.getString(R.string.stream);
 		mSettingsList = new ArrayList<SettingsData>();		
 		mSettingsList.add(new SettingsData(SettingsData.SECTION, "App Settings", 0,SettingsData.VIEWTYPE_NORMAL));
-		mSettingsList.add(new SettingsData(SettingsData.ITEM, DOWNLOAD_OR_STREAM_MSG, 0,SettingsData.VIEWTYPE_NORMAL));
+		mSettingsList.add(new SettingsData(SettingsData.ITEM, DOWNLOAD_OR_STREAM_MSG+"\t\t"+currentRentalOptions, 0,SettingsData.VIEWTYPE_NORMAL));
 		mSettingsList.add(new SettingsData(SettingsData.ITEM, "Download only on Wifi", 0,SettingsData.VIEWTYPE_TOGGLEBUTTON));
 		if(ApplicationSettings.ENABLE_SHOW_PLAYER_LOGS_SETTINGS){
 			mSettingsList.add(new SettingsData(SettingsData.ITEM, "Show player logs", 0,SettingsData.VIEWTYPE_TOGGLEBUTTON));

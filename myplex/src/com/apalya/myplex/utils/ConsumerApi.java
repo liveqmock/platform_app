@@ -176,7 +176,7 @@ public class ConsumerApi {
 				+ AMPERSAND + LEVEL + level ;
 	}
 	public static String getContentDetail(String contentID,String level){
-		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT_V3 + SLASH + CONTENTDETAILS_ACTION
+		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH + CONTENTDETAILS_ACTION
 				+ SLASH + contentID + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY  + AMPERSAND
 		        + LEVEL + level + AMPERSAND+COUNT;
 	}

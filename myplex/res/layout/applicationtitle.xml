@@ -116,36 +116,48 @@
     <RelativeLayout
         android:id="@+id/customactionbar_filter"
         android:layout_width="match_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_marginLeft="64dp"
         android:layout_toLeftOf="@+id/ac_icon_layout"
         android:gravity="left"
         android:orientation="horizontal"
-        android:paddingLeft="8dp" >
+        android:paddingLeft="8dp" 
+        android:layout_centerVertical="true">
 
         <TextView
             android:id="@+id/customactionbar_filter_text"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_centerVertical="true"
             android:ellipsize="marquee"
             android:focusable="true"
             android:focusableInTouchMode="true"
+            android:gravity="top|center_horizontal"
             android:marqueeRepeatLimit="marquee_forever"
             android:singleLine="true"
             android:text="@string/app_name"
             android:textColor="#ffffff"
-            android:textSize="22sp" />
+            android:textSize="20sp"
+             />
+
+        <TextView 
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/textsize_8"
+            android:gravity="top|center_horizontal"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/filter_levle"
+            android:text="filter_level"
+            android:layout_below="@+id/customactionbar_filter_text"/>
 
         <TextView
             android:id="@+id/customactionbar_filter_text1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginLeft="2dp"
-            android:layout_toRightOf="@+id/customactionbar_filter_text"
+            android:layout_alignParentRight="true"
+            android:layout_alignBaseline="@+id/filter_levle"
             android:paddingBottom="4dp"
             android:singleLine="true"
             android:text="@string/actionbar_filter"

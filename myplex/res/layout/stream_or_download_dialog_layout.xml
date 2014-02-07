@@ -24,8 +24,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/title_layout"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="20dp"
+            android:layout_margin="8dp"
             android:gravity="top|center_vertical"
             android:orientation="vertical" >
 
@@ -33,17 +32,16 @@
                 android:id="@+id/dialog_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:gravity="center"
-                android:paddingTop="10dp"
+                android:layout_margin="10dp"
+                android:gravity="left"
                 android:text="TextView"
                 android:textSize="@dimen/textsize_18" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical" >
+                android:orientation="vertical"
+                android:layout_margin="8dp">
 
                 <RadioButton
                     android:id="@+id/best_radio_btn"
@@ -58,7 +56,7 @@
                     android:id="@+id/best_tv_msg"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="25dp"
+                    android:layout_marginLeft="35dp"
                     android:layout_marginTop="5dp"
                     android:text="@string/best_option_msg"
                     android:textSize="@dimen/textsize_12" />
@@ -67,7 +65,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_margin="8dp"
                 android:orientation="vertical" >
 
                 <RadioButton
@@ -82,55 +80,79 @@
                     android:id="@+id/good_tv_msg"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="25dp"
+                    android:layout_marginLeft="35dp"
                     android:layout_marginTop="5dp"
                     android:text="@string/good_option_msg"
                     android:textSize="@dimen/textsize_12" />
+
+               
+
             </LinearLayout>
-        </LinearLayout>
+             <LinearLayout
+                    android:id="@+id/dont_ask_layout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="8dp"
+                    android:orientation="vertical"
+                    android:layout_margin="8dp"
+                    >
 
-        <LinearLayout
-            android:id="@+id/dont_ask_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/linear_ll_options"
-            android:layout_marginBottom="@dimen/cardtitleheight"
-            android:layout_marginLeft="20dp"
-            android:layout_marginTop="@dimen/textsize_30"
-            android:orientation="vertical" >
+                    <CheckBox
+                        android:id="@+id/dont_ask_me_again"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:layout_gravity="left"
+                        android:text="@string/dont_ask_again" />
 
-            <CheckBox
-                android:id="@+id/dont_ask_me_again"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="@string/dont_ask_again" />
+                    <TextView
+                        android:id="@+id/dont_ask_msg"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="35dp"
+                        android:maxLines="2"
+                        android:text="@string/dont_ask_again_msg"
+                        android:textSize="@dimen/textsize_12" />
+                </LinearLayout>
 
-            <TextView
-                android:id="@+id/dont_ask_msg"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="25dp"
-                android:maxLines="2"
-                android:text="@string/dont_ask_again_msg"
-                android:textSize="@dimen/textsize_12" />
+             <LinearLayout
+                 android:id="@+id/always_ask_layout"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:layout_margin="8dp"
+                 android:orientation="vertical"
+                 android:paddingBottom="8dp"
+                 android:visibility="gone" >
+
+                 <RadioButton
+                     android:id="@+id/always_ask_radio_btn"
+                     android:layout_width="wrap_content"
+                     android:layout_height="wrap_content"
+                     android:text="@string/always_ask"
+                     android:textColor="@color/blue"
+                     android:textSize="@dimen/textsize_16" />
+             </LinearLayout>
+
         </LinearLayout>
 
         <View
+            android:layout_marginTop="8dp"
             android:id="@+id/btn_divider"
             android:layout_width="match_parent"
             android:layout_height="0.5dp"
             android:layout_below="@+id/dont_ask_layout"
-            android:background="@android:color/darker_gray" />
+            android:background="@android:color/darker_gray" 
+            />
 
-        <Button
+        <Button           
             android:id="@+id/dialog_continue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/btn_divider"
             android:background="@drawable/button_selector"
             android:paddingLeft=".5dp"
-            android:text="@string/continieu" />
+            android:text="@string/continieu"
+            android:gravity="center_vertical|center_horizontal" />
     </LinearLayout>
 
 </LinearLayout>

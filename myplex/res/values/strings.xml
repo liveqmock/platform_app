@@ -79,14 +79,19 @@
     <string name="playhint">play</string>
     <string name="trailerhint">play trailer</string>
     <string name="adultwarning">18+ only </string>
+    <string name="myplex_home">myplex home</string>
+    <string name="rate_this">rate </string>
+    <string name="add_live_tv_review">add a live tv review</string>
     
     <string name="stream">stream</string>	
     <string name="download">download</string>			
 	<string name="continieu">continue</string>			
 	<string name="dont_ask_again">Don\'t ask again</string>			
 	<string name="dont_ask_again_msg">(you may change the options in settings)</string>			
-	<string name="best_option">best : download to watch offline</string>			
-	<string name="best_option_msg">SD,highest quality video and audio watch offline for 48 hrs; unlimited views</string>				    <string name="good_option">good : stream online</string>			
+	<string name="best_option">best: download to watch offline</string>			
+	<string name="best_option_msg">highest quality SD video and audio \nwatch offline for 48 hrs; \nunlimited views</string>				   
+	<string name="good_option">good : stream online</string>
+	<string name="always_ask">always ask</string>			
 	<string name="good_option_msg">384-1664kbps, adaptive bit rate streaming buffering possible due to network conditions</string>			
 	<string name="is_dont_ask_again">is_dont_ask_again</string>			
 	<string name="isDownload">isDownload</string>			
@@ -94,15 +99,19 @@
 	<string name="canot_fetch_url">can\'t fetch url</string>			
 	<string name="no_internet_connection">no internet connection</string>			
 	<string name="download_or_stream_msg">play rental movies  download, stream</string>	
+	<string name="switch_to_download_in_setting_msg">you can switch to download in settings</string>
     
     <string name="moredetails">more details</string>
     
     <string name="cardstatusfree">coming soon</string>
     <string name="cardstatustempfree">watch now for free</string>
     <string name="cardstatuspaid">watch now</string>
+    <string name="card_watch_before">watch before</string>
     
     <string name="lastwatchedcontent">last watched content</string>
     <string name="similarcontent">similar content</string>
+    <string name="similar_live_tv">similar channels</string>
+    <string name="similar_movies">similar movies</string>
 
     <string name="listempty">no data</string>
     
@@ -157,7 +166,7 @@
     <string name="purchaseserror">no purchases yet … \nlet\'s change that!</string>
  
     <!-- Player Errors -->
-    <string name="must_logged_in">must be logged in to watch movie</string>
+    <string name="must_logged_in">must be logged in to watch</string>
     <string name="login_to_play">login to play</string>
     <string name="continiue_as_guest">continue as guest</string>
     <string name="error_message_2g_videoplay">cannt play video in 2G network.</string>

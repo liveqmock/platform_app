@@ -455,7 +455,8 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		CardExplorerData data = myplexapplication.getCardExplorerData();
 		data.reset();
 		data.requestType = CardExplorerData.REQUEST_SIMILARCONTENT;
-		data.mMasterEntries =  (ArrayList<CardData>) mCardData.similarContent.values;
+		data.searchQuery = mCardData._id;
+//		data.mMasterEntries =  (ArrayList<CardData>) mCardData.similarContent.values;
 		getActivity().startActivity(new Intent(getActivity(),MultiPaneActivity.class));
 		getActivity().finish();
 	}

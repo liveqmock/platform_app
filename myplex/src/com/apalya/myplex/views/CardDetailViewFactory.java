@@ -278,7 +278,14 @@ public class CardDetailViewFactory {
 					}, mData);
 				}else{
 					RatingDialog dialog = new RatingDialog(mContext);
-					dialog.prepareRating();
+					if(mData.generalInfo.type.equalsIgnoreCase("live")){
+						dialog.prepareRating(mData.generalInfo.title,
+								mContext.getString(R.string.rate_this)+" "+mData.generalInfo.title,
+								mContext.getString(R.string.add_live_tv_review)
+								);
+					}else{
+						dialog.prepareRating();
+					}
 					dialog.showDialog(new MessagePostCallback() {
 						
 						@Override
@@ -536,7 +543,13 @@ public class CardDetailViewFactory {
 		}
 		else
 		{
-			groupname.setText(mContext.getString(R.string.similarcontent));	
+			if(mData.generalInfo.type.equalsIgnoreCase("live")){				
+				groupname.setText(mContext.getString(R.string.similar_live_tv));	
+			}else if(mData.generalInfo.type.equalsIgnoreCase("movie")){
+				groupname.setText(mContext.getString(R.string.similar_movies));
+			}else{
+				groupname.setText(mContext.getString(R.string.similarcontent));
+			}
 		}
 	
 		if(mData.generalInfo != null && mData.generalInfo.type != null && mData.generalInfo.type.equalsIgnoreCase(ConsumerApi.CONTENT_SPORTS_LIVE)){

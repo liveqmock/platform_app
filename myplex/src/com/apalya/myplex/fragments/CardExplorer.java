@@ -577,9 +577,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 //					Log.d(TAG,"server response "+response);
 //					updateText("parsing results");
 					if(minResultSet ==  null){showNoDataMessage(false);return;}
-					long startTime=System.currentTimeMillis();
 //					CardResponseData minResultSet  =(CardResponseData) Util.fromJson(response, CardResponseData.class);
-					Log.d(TAG,"reponse process time taken-1 :"+(System.currentTimeMillis()-startTime));
 					if(minResultSet.code != 200){
 						Util.showToast(getContext(), minResultSet.message,Util.TOAST_TYPE_ERROR);
 //						Toast.makeText(getContext(), minResultSet.message, Toast.LENGTH_SHORT).show();
@@ -601,7 +599,6 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 						if(minResultSet.results ==  null){showNoDataMessage(false);return;}
 						if(minResultSet.results.size() ==  0){showNoDataMessage(false);return;}
 						mCacheManager.getCardDetails(minResultSet.results,IndexHandler.OperationType.IDSEARCH,CardExplorer.this);
-						Log.d(TAG,"reponse process time taken-2 :"+(System.currentTimeMillis()-startTime));
 					}
 				} catch (Exception e) {
 					showNoDataMessage(false);
@@ -663,7 +660,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			if (v.getTag() instanceof FilterMenudata) {
 				String label = ((FilterMenudata) v.getTag()).label;
 				if (label != null && label.equalsIgnoreCase("All")) {
-					mMainActivity.setActionBarTitle("All");
+//					mMainActivity.setActionBarTitle("All");
 					Map<String,String> params=new HashMap<String, String>();
 					params.put(Analytics.SEARCH_TYPE_PROPERTY, Analytics.SEARCH_TYPES.Filter.toString());
 					params.put(Analytics.SEARCH_FILTER_TYPE_PROPERTY,label);
@@ -687,7 +684,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 						localData.add(data);
 					}
 				}
-				mMainActivity.setActionBarTitle(label/*+" ("+localData.size()+"+)"*/);
+//				mMainActivity.setActionBarTitle(label/*+" ("+localData.size()+"+)"*/);
 				Map<String,String> params=new HashMap<String, String>();
 				params.put(Analytics.SEARCH_TYPE_PROPERTY, Analytics.SEARCH_TYPES.Filter.toString());
 				params.put(Analytics.SEARCH_NUMBER_FOUND_PROPERTY, String.valueOf(localData.size()));
@@ -1088,7 +1085,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		dataBundle.requestType = CardExplorerData.REQUEST_RECOMMENDATION;
 		
 		BaseFragment fragment = mMainActivity.createFragment(NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION);
-		mMainActivity.setActionBarTitle("myplex");
+		mMainActivity.setActionBarTitle("myplex home");
 		mMainActivity.bringFragment(fragment);
 		
 	}

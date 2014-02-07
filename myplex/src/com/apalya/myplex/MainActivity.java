@@ -112,6 +112,7 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 	private Handler handler= new Handler();
 
 	NavigationOptionsMenuAdapter mNavigationAdapter;
+	private TextView mFilterLevle;
 	
 	@Override
 	protected void onStart() {
@@ -361,6 +362,8 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 	}
 	public String mLastActionBarTitle = new String();
 	public void setActionBarTitle(String title) {
+//		mFilterLevle.setVisibility(View.GONE);
+		mFilterLevle.setText("All");
 		this.mTitle = title;
 		if (mTitleTextView != null) {
 			mTitleTextView.setText(mTitle);
@@ -404,6 +407,9 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 		
 		mTitleTextView = (TextView) v.findViewById(R.id.customactionbar_filter_text);
 		mTitleTextView.setTypeface(FontUtil.Roboto_Regular);
+		
+		mFilterLevle = (TextView)v.findViewById(R.id.filter_levle);
+		mFilterLevle.setTypeface(FontUtil.Roboto_Regular);
 		
 		mTitleFilterSymbol = (TextView)v.findViewById(R.id.customactionbar_filter_text1);
 		changeVisibility(mTitleFilterSymbol,View.GONE);		
@@ -582,9 +588,9 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 			}
 			if(HideSearchView())
 				return;
-			showActionBar();
-			setSearchBarVisibilty(View.INVISIBLE);
-			setSearchViewVisibilty(View.VISIBLE);
+//			showActionBar();
+			//			setSearchBarVisibilty(View.INVISIBLE);
+			//			setSearchViewVisibilty(View.VISIBLE);
 			BaseFragment fragment = mFragmentStack.peek();
 			if (fragment instanceof CardExplorer) {
 				
@@ -742,7 +748,7 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.RECOMMENDED)){
 				showLiveTvOrMovieIcon("recommended");
 				data.requestType = CardExplorerData.REQUEST_RECOMMENDATION;
-				setActionBarTitle("myplex");				
+				setActionBarTitle("myplex home");				
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.MOVIES)){
 				showLiveTvOrMovieIcon("movies");
 				data.requestType = CardExplorerData.REQUEST_BROWSE;
@@ -944,6 +950,11 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 				long arg3) {
 			if (mFilterDelegate != null) {
 				mFilterDelegate.onClick(arg1);
+				
+				mFilterLevle.setTypeface(FontUtil.Roboto_Light);
+				mFilterLevle.setTextSize(12);
+				mFilterLevle.setVisibility(View.VISIBLE);
+				mFilterLevle.setText(mMenuDataList.get(arg2).label);
 			}
 			dismissFilterMenuPopupWindow();
 		}
@@ -1027,9 +1038,11 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 		if(datalist != null && datalist.size() > 0){
 			enableFilterAction(true);
 			changeVisibility(mTitleFilterSymbol,View.VISIBLE);
+			mFilterLevle.setVisibility(View.VISIBLE);
 		}else{
 			enableFilterAction(false);
 			changeVisibility(mTitleFilterSymbol,View.GONE);
+			mFilterLevle.setVisibility(View.GONE);
 		}
 		mFilterDelegate = listener;
 		
