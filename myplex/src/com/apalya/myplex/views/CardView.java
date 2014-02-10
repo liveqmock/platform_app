@@ -441,7 +441,7 @@ public class CardView extends ScrollView {
 		dataHolder.mFavLayout.setBackgroundColor(Color.TRANSPARENT);
 		Util.showFeedback(dataHolder.mFavLayout);
 		//17 chars
-		float price = 999.99f;
+		float price = 10000.99f;
 		if(myplexapplication.getCardExplorerData().requestType == CardExplorerData.REQUEST_PURCHASES)
 		{
 			dataHolder.mRentText.setText(mContext.getString(R.string.cardstatuspaid));
@@ -479,7 +479,7 @@ public class CardView extends ScrollView {
 						{
 							dataHolder.mRentText.setText(mContext.getString(R.string.cardstatustempfree));
 							dataHolder.mRentLayout.setOnClickListener(null);
-						}else if(price  == 999.99f){
+						}else if(price  == 10000.99f){
 							dataHolder.mRentText.setText(mContext.getString(R.string.cardstatusfree));
 							dataHolder.mRentLayout.setOnClickListener(null);
 						}

@@ -296,7 +296,7 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 		dataHolder.mFavLayout.setBackgroundColor(Color.TRANSPARENT);
 		Util.showFeedback(dataHolder.mFavLayout);
 		//17 chars
-		float price = 999.99f;
+		float price = 10000.99f;
 		if(data.packages == null|| data.packages.size() == 0){
 			dataHolder.mRentText.setText(mContext.getString(R.string.cardstatusfree));
 			dataHolder.mRentLayout.setOnClickListener(null);
@@ -328,7 +328,7 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 						{
 							dataHolder.mRentText.setText(mContext.getString(R.string.cardstatustempfree));
 							dataHolder.mRentLayout.setOnClickListener(null);
-						}else if(price  == 999.99f){
+						}else if(price  == 10000.99f){
 							dataHolder.mRentText.setText(mContext.getString(R.string.cardstatusfree));
 							dataHolder.mRentLayout.setOnClickListener(null);
 						}
