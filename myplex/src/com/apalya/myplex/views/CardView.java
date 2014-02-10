@@ -250,7 +250,7 @@ public class CardView extends ScrollView {
 	public View createCardView() {
 		return mInflater.inflate(R.layout.card, null);		
 	}
-	private String mPriceStarts = "Starts from ";
+	private String mPriceStarts = "starts from ";
 	private String mRupeeCode  = null;
 	private HashMap<String,String> ImageUrlMap = new HashMap<String, String>();
 	public void updateDownloadStatus(CardData data,CardDownloadData downloadData){
@@ -442,9 +442,19 @@ public class CardView extends ScrollView {
 		Util.showFeedback(dataHolder.mFavLayout);
 		//17 chars
 		float price = 10000.99f;
+		dataHolder.mRentText.setText("");
 		if(myplexapplication.getCardExplorerData().requestType == CardExplorerData.REQUEST_PURCHASES)
 		{
-			dataHolder.mRentText.setText(mContext.getString(R.string.cardstatuspaid));
+			List<CardDataPurchaseItem> purchase = data.currentUserData.purchase;
+			String validity = "";
+			for(CardDataPurchaseItem item : purchase){
+				 validity = Util.getExpiry(item.validity).toLowerCase();
+			}
+			if(validity.length()>0)
+				dataHolder.mRentText.setText(validity);
+			else
+				dataHolder.mRentText.setText(mContext.getString(R.string.cardstatuspaid));
+//			dataHolder.mRentText.setText(mContext.getString(R.string.cardstatuspaid));
 			dataHolder.mRentLayout.setOnClickListener(null);
 			Log.i("CacheManager", "in purchases");
 		}

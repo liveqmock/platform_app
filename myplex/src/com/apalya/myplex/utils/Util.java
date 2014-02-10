@@ -138,7 +138,7 @@ public class Util {
 			toast.setView(v);
 			toast.setDuration(Toast.LENGTH_LONG);
 			toast.show();*/
-			Toast.makeText(mContext, msg,type).show();
+			Toast.makeText(context, msg,type).show();
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
@@ -1120,16 +1120,19 @@ public class Util {
 			long days = hours / 24;
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTime(date);
-			Log.d(TAG," difference ="+difference+ "sec"+seconds+"min"+minutes+"hours"+hours+"days"+days);
+			Log.d(TAG," difference ="+difference+ "		sec"+seconds+"	min"+minutes+"	hours"+hours+"	days"+days);
 			if(days > 365){
+				Log.d(TAG,"Watch anytime");
 				return "watch anytime";
 			}else if(days>7){
 				return "watch before "+calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault())
 						+" "+calendar.get(Calendar.DAY_OF_MONTH);
 			}else if(days >3){
 				return "watch before "+days;
-			}else if(days<3 && days >0){
-				return "watch before "+((int)(24*days)+(calendar.get(Calendar.HOUR)))+" hrs";
+			}/*else if(days >0){
+				return "watch for "+((int)(24*days)+(calendar.get(Calendar.HOUR)))+" hrs";
+			}*/else if(days>=0 && hours>2){
+				return "watch for "+(int)((24*days)+hours)+ "hrs";
 			}else if(hours<=2){
 				return "watch now (expires in"+calendar.get(Calendar.MINUTE)+"mins)";
 			}else if(minutes<=1){
