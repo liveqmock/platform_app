@@ -656,7 +656,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			Iterator<Entry<String, Integer>> iterator = genreCounter.entrySet().iterator();
 			while (iterator.hasNext()) {
 				Map.Entry<String, Integer> entry = iterator.next();
-				String filterName  = entry.getKey()+"("+entry.getValue()+")";
+				String filterName  = entry.getKey()+" ("+entry.getValue()+")";
 				filteroptions.add(new FilterMenudata(FilterMenudata.SECTION, filterName, 0));
 			}
 		}else{
@@ -677,7 +677,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		@Override
 		public void onClick(View v) {
 			if (v.getTag() instanceof FilterMenudata) {
-				String label = ((FilterMenudata) v.getTag()).label.replaceAll("\\(.*?\\)","");
+				String label = ((FilterMenudata) v.getTag()).label.replaceAll("\\(.*?\\)","").trim();
 				if (label != null && label.equalsIgnoreCase("All")) {
 //					mMainActivity.setActionBarTitle("All");
 					Map<String,String> params=new HashMap<String, String>();
@@ -1104,7 +1104,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		dataBundle.requestType = CardExplorerData.REQUEST_RECOMMENDATION;
 		
 		BaseFragment fragment = mMainActivity.createFragment(NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION);
-		mMainActivity.setActionBarTitle("myplex home");
+		mMainActivity.setActionBarTitle("myplex picks");
 		mMainActivity.bringFragment(fragment);
 		
 	}

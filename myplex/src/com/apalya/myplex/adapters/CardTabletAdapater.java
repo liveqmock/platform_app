@@ -164,7 +164,7 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 		// TODO Auto-generated method stub
 		return position;
 	}
-	private String mPriceStarts = "Starts from ";
+	private String mPriceStarts = "starts from ";
 	private String mRupeeCode  = null;
 	private int cardColor = -1;
 	@Override
@@ -304,7 +304,7 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 			if(data.currentUserData != null && data.currentUserData.purchase != null && data.currentUserData.purchase.size() != 0){
 				String validity = "";
 				for(CardDataPurchaseItem item : data.currentUserData.purchase){
-					 validity = Util.getExpiry(item.validity);
+					 validity = Util.getExpiry(item.validity).toLowerCase();
 //					 validity = item.validity;
 				}
 				if(validity.length()>0)

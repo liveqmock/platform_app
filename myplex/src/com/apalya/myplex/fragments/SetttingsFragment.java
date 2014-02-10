@@ -45,7 +45,7 @@ public class SetttingsFragment extends BaseFragment {
 	private String TANDC = "terms & conditions";
 	private String PRIVACYPOLIY ="privacy policy";
 	private String HELP = "help";
-	private String DOWNLOAD_OR_STREAM_MSG = "play rental movies ";
+	private String DOWNLOAD_OR_STREAM_MSG = "movie rental options: ";
 	public static final String DRM_STATUS_STRING="WVDRM status";
 	public static final String DRM_LEVAL_STRING="WVDRM statusKey";
 	public static final String ROOT_STATUS_STRING="root status";
@@ -118,13 +118,15 @@ public class SetttingsFragment extends BaseFragment {
 						
 					}, profileData);
 				}else if(data.mSettingName.contains(DOWNLOAD_OR_STREAM_MSG)){	
-				DownloadStreamDialog dialog = new DownloadStreamDialog(mContext, "Movie rental options");			
+				DownloadStreamDialog dialog = new DownloadStreamDialog(mContext, "Movie rental options");	
+				dialog.setAlwaysAskAsDefault();
 				dialog.showAlwaysAskOption();	
 				dialog.setListener(new DownloadListener() {                                                			
 				@Override			
 				public void onOptionSelected(boolean isDownload)			
-				{			
-				
+				{
+					PreapreSettingsData();
+					mListAdapter.notifyDataSetChanged();
 				}			
 				});			
 				dialog.showDialog();
@@ -151,8 +153,14 @@ public class SetttingsFragment extends BaseFragment {
 	}
 
 	private void PreapreSettingsData() {
-		String currentRentalOptions = SharedPrefUtils.getBoolFromSharedPreference(mContext, mContext.getString(R.string.isDownload))?
-				mContext.getString(R.string.download):mContext.getString(R.string.stream);
+		String currentRentalOptions  ="";
+		if(!SharedPrefUtils.getBoolFromSharedPreference(mContext, mContext.getString(R.string.is_dont_ask_again))){
+				currentRentalOptions = "always ask";
+		}else{
+			currentRentalOptions = SharedPrefUtils.getBoolFromSharedPreference(mContext, mContext.getString(R.string.isDownload),true)?
+					mContext.getString(R.string.download):mContext.getString(R.string.stream);
+		}
+					
 		mSettingsList = new ArrayList<SettingsData>();		
 		mSettingsList.add(new SettingsData(SettingsData.SECTION, "App Settings", 0,SettingsData.VIEWTYPE_NORMAL));
 		mSettingsList.add(new SettingsData(SettingsData.ITEM, DOWNLOAD_OR_STREAM_MSG+"\t\t"+currentRentalOptions, 0,SettingsData.VIEWTYPE_NORMAL));

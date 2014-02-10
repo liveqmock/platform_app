@@ -113,10 +113,10 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 	}
 	@Override
 	protected void onResume() {
-		if(myplexapplication.mSelectedOption_Tablet == NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION){
+		if(myplexapplication.mSelectedOption_Tablet != NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION){
 			createCardExplorer();
 		}else{
-			OnSelectedOption(myplexapplication.mSelectedOption_Tablet, "");
+			OnSelectedOption(myplexapplication.mSelectedOption_Tablet, "live tv");
 		}
 		super.onResume();
 	}

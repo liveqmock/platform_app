@@ -878,7 +878,7 @@ public class CardDetailViewFactory {
 		addSpace(layout,(int)mContext.getResources().getDimension(R.dimen.margin_gap_12));
 		return v;
 	}
-	private String mPriceStarts = "Starts from ";
+	private String mPriceStarts = "starts from ";
 	private String mRupeeCode  = null;
 	private View createBriefDescriptionView() {
 		mCredits = null;

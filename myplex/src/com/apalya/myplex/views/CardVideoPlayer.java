@@ -1515,6 +1515,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		String videoType = mData.generalInfo.type;		
 		Log.d(TAG,"Video type "+ videoType);
 		
+//		initPlayBack("https://myplexv2betadrmstreaming.s3.amazonaws.com/813/813_sd_est_1391082325821.wvm");
 		if(videoType.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_MOVIE)){		
 			chooseStreamOrDownload(items);
 		}else if(videoType.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
