@@ -85,13 +85,13 @@ public class DownloadStreamDialog  implements OnClickListener
 			});
 			best.setOnClickListener(null);
 		}
-		if(SharedPrefUtils.getBoolFromSharedPreference(context, context.getString(R.string.isDownload))){
-			best.setChecked(true);
-			good.setChecked(false);
-		}else{
+		/*if(!SharedPrefUtils.getBoolFromSharedPreference(context, context.getString(R.string.isDownload))){
 			good.setChecked(true);
 			best.setChecked(false);
-		}	
+		}else{
+			best.setChecked(true);
+			good.setChecked(false);
+		}*/	
 	}
 
 	public void setListener(DownloadListener listener) {

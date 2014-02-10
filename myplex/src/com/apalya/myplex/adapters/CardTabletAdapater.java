@@ -37,6 +37,7 @@ import com.apalya.myplex.data.CardDataHolder;
 import com.apalya.myplex.data.CardDataImagesItem;
 import com.apalya.myplex.data.CardDataPackagePriceDetailsItem;
 import com.apalya.myplex.data.CardDataPackages;
+import com.apalya.myplex.data.CardDataPurchaseItem;
 import com.apalya.myplex.data.CardDownloadData;
 import com.apalya.myplex.data.CardImageView;
 import com.apalya.myplex.data.CardViewHolder;
@@ -301,7 +302,16 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 			dataHolder.mRentLayout.setOnClickListener(null);
 		}else{
 			if(data.currentUserData != null && data.currentUserData.purchase != null && data.currentUserData.purchase.size() != 0){
-				dataHolder.mRentText.setText(mContext.getString(R.string.cardstatuspaid));
+				String validity = "";
+				for(CardDataPurchaseItem item : data.currentUserData.purchase){
+					 validity = Util.getExpiry(item.validity);
+//					 validity = item.validity;
+				}
+				if(validity.length()>0)
+					dataHolder.mRentText.setText(validity);
+				else
+					dataHolder.mRentText.setText(mContext.getString(R.string.cardstatuspaid));
+//				dataHolder.mRentText.setText(mContext.getString(R.string.cardstatuspaid));
 				dataHolder.mRentLayout.setOnClickListener(null);
 			}else{
 				for(CardDataPackages packageitem:data.packages){

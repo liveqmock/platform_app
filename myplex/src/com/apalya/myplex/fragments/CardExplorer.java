@@ -3,8 +3,10 @@ package com.apalya.myplex.fragments;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import android.animation.Animator;
@@ -632,21 +634,38 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	}
 	
 	private void prepareFilterData() {
+		HashMap<String , Integer> genreCounter = new HashMap<String, Integer>();
 		List<FilterMenudata> filteroptions = new ArrayList<FilterMenudata>();
 		List<String> tempList = new ArrayList<String>();
 		for (CardData data : mData.mMasterEntries) {
 			if(data.content != null && data.content.genre != null){
 				for(CardDataGenre genreData:data.content.genre){
-					if(genreData.name != null && !tempList.contains(genreData.name))
+					if(genreData.name != null && !tempList.contains(genreData.name)){
 						tempList.add(genreData.name);
+						genreCounter.put(genreData.name,1);
+					}else if(mData.searchQuery.equalsIgnoreCase("live")){
+						genreCounter.put(genreData.name, genreCounter.get(genreData.name)+1);
+					}
 				}
 			}
 		}
+		if(mData.searchQuery.equalsIgnoreCase("live")){
+			if(tempList.size() > 1){
+				filteroptions.add(new FilterMenudata(FilterMenudata.SECTION, "All", 0));
+			}
+			Iterator<Entry<String, Integer>> iterator = genreCounter.entrySet().iterator();
+			while (iterator.hasNext()) {
+				Map.Entry<String, Integer> entry = iterator.next();
+				String filterName  = entry.getKey()+"("+entry.getValue()+")";
+				filteroptions.add(new FilterMenudata(FilterMenudata.SECTION, filterName, 0));
+			}
+		}else{
 		if(tempList.size() > 1){
 			filteroptions.add(new FilterMenudata(FilterMenudata.SECTION, "All", 0));
 		}
 		for(String filterName:tempList){
 			filteroptions.add(new FilterMenudata(FilterMenudata.SECTION, filterName, 0));
+		}
 		}
 		if(isVisible()){
 			mMainActivity.addFilterData(filteroptions, mFilterMenuClickListener);
@@ -658,7 +677,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		@Override
 		public void onClick(View v) {
 			if (v.getTag() instanceof FilterMenudata) {
-				String label = ((FilterMenudata) v.getTag()).label;
+				String label = ((FilterMenudata) v.getTag()).label.replaceAll("\\(.*?\\)","");
 				if (label != null && label.equalsIgnoreCase("All")) {
 //					mMainActivity.setActionBarTitle("All");
 					Map<String,String> params=new HashMap<String, String>();

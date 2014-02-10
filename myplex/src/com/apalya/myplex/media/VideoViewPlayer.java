@@ -810,6 +810,16 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 		}
 		
 	}
+	public interface OnLicenseExpiry {
+		public void licenseExpired();
+	}
+	
+	private OnLicenseExpiry onLicenseExpiryListener=null;
+	
+	public void setOnLicenseExpiryListener(
+			OnLicenseExpiry onLicenseExpiryListener) {
+		this.onLicenseExpiryListener = onLicenseExpiryListener;
+	}
 	
 	private void prepareDrmManager(String url){
 		
@@ -918,7 +928,11 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 				params.put(Analytics.PLAY_CONTENT_ERROR_PROPERTY,Analytics.PLAY_CONTENT_WIDEVINE_ERROR);
 				Analytics.trackEvent(Analytics.EVENT_PLAY,params);
 			}
-			
+			if(status == 608){
+				 if(onLicenseExpiryListener != null ){
+					 onLicenseExpiryListener.licenseExpired();
+				 }
+			}
 			if(drmManager!=null)
 				drmManager.unRegisterLogListener();
 		
