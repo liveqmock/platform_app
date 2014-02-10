@@ -100,6 +100,7 @@
 	<string name="no_internet_connection">no internet connection</string>			
 	<string name="download_or_stream_msg">play rental movies  download, stream</string>	
 	<string name="switch_to_download_in_setting_msg">you can switch to download in settings</string>
+	<string name="error_network_not_available">network is not available</string>
     
     <string name="moredetails">more details</string>
     

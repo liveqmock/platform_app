@@ -59,6 +59,7 @@ import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.media.PlayerListener;
 import com.apalya.myplex.media.VideoViewExtn;
 import com.apalya.myplex.media.VideoViewPlayer;
+import com.apalya.myplex.media.VideoViewPlayer.OnLicenseExpiry;
 import com.apalya.myplex.media.VideoViewPlayer.StreamType;
 import com.apalya.myplex.utils.AlertDialogUtil;
 import com.apalya.myplex.utils.Analytics;
@@ -120,7 +121,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 	private String  download_link,adaptive_link;
 
 	private SportsStatusRefresh sportsStatusRefresh;
-	private boolean isFullScreen;
+	private boolean isFullScreen,isTriler;
 
 	public void setFullScreenListener(PlayerFullScreen mListener){
 		this.mPlayerFullScreen = mListener;
@@ -220,7 +221,8 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 										params.put(Analytics.CONTENT_CATEGORY_PROPERTY,Analytics.CONTENT_ACTION_TYPES.PlayTrailer.toString());
 										Analytics.trackEvent(Analytics.EVENT_PLAY,params);
 										//FetchTrailerUrl(mmItem.generalInfo._id);
-										if(canBePlayed(true)){			
+										if(canBePlayed(true)){	
+											isTriler = true;
 											fetchUrl(mmItem.generalInfo._id);			
 											mVideoViewParent.setOnClickListener(null);		
 										}
@@ -304,7 +306,10 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 	        			
         
 	private boolean checkForLocalPlayback() {
-
+		
+		if(isTriler)
+			return false;
+		
 		if (myplexapplication.mDownloadList == null) {
 			return false;
 		}
@@ -370,6 +375,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 			Analytics.trackEvent(Analytics.EVENT_PLAY,params);
 			
 			if(canBePlayed(true)){
+				isTriler = false;
 				//FetchUrl();
 				 fetchUrl(null);
 				mVideoViewParent.setOnClickListener(null);
@@ -732,7 +738,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 			mVideoViewPlayer.setPlayerListener(CardVideoPlayer.this);
 			mVideoViewPlayer.setUri(uri, streamType);
 		}
-		
+		mVideoViewPlayer.setOnLicenseExpiryListener(onLicenseExpiryListener);		
 		mVideoViewPlayer.hideMediaController();
 		mVideoViewPlayer.setPlayerStatusUpdateListener(mPlayerStatusListener);
 		mVideoView.setOnTouchListener(new OnTouchListener() {
@@ -787,6 +793,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		mVideoViewPlayer.setPlayerListener(CardVideoPlayer.this);
 		mVideoViewPlayer.setUri(uri, streamType);
 	}
+	mVideoViewPlayer.setOnLicenseExpiryListener(onLicenseExpiryListener);
 	mVideoViewPlayer.hideMediaController();
 	mVideoViewPlayer.setPlayerStatusUpdateListener(mPlayerStatusListener);
 	mVideoView.setOnTouchListener(new OnTouchListener() {
@@ -1049,6 +1056,9 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			mPlayerState = PLAYER_PLAY;
 			if(mPlayerStatusListener != null){
 				mPlayerStatusListener.playerStatusUpdate("Buffering ended");
+			}
+			if(!mContext.getResources().getBoolean(R.bool.isTablet)){
+				((MainBaseOptions) mContext).setOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
 			}
 		}
 	}
@@ -1338,9 +1348,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 					CardVideoPlayer.this);
 			return false;
 		}
-		if(mData.generalInfo.type.equalsIgnoreCase("live"))	
-			return true;
-
+		
 		if (myplexapplication.mDownloadList != null && mData != null) {
 			
 			CardDownloadData mDownloadData = myplexapplication.mDownloadList.mDownloadedList
@@ -1349,6 +1357,14 @@ private void playVideoFile(CardDownloadData mDownloadData){
 				return true;
 			}
 		}
+		
+		if(!Util.isNetworkAvailable(mContext)){
+			Util.showToast(mContext, mContext.getString(R.string.error_network_not_available), Util.TOAST_TYPE_ERROR);								
+			return false;
+		}	
+		
+		if(mData.generalInfo.type.equalsIgnoreCase("live"))	
+			return true;
 
 		String networkInfo = Util.getInternetConnectivity(mContext);
 		if (networkInfo.equalsIgnoreCase("2G")) {
@@ -1736,6 +1752,16 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			mVideoViewPlayer.setmPositionWhenPaused(ellapseTime*1000);			
 			}			
 	}
+	OnLicenseExpiry onLicenseExpiryListener = new VideoViewPlayer.OnLicenseExpiry() {
+		
+		@Override
+		public void licenseExpired() {
+			Util.showToast(mContext,"License Expired.",Util.TOAST_TYPE_INFO);
+			PackagePopUp popup = new PackagePopUp(mContext,(View)mParentLayout.getParent());
+			myplexapplication.getCardExplorerData().cardDataToSubscribe =  mData;
+			popup.showPackDialog(mData, ((Activity)mContext).getActionBar().getCustomView());				
+		}
+	};
 	
 	
 }

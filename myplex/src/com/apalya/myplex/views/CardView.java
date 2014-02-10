@@ -441,7 +441,7 @@ public class CardView extends ScrollView {
 		dataHolder.mFavLayout.setBackgroundColor(Color.TRANSPARENT);
 		Util.showFeedback(dataHolder.mFavLayout);
 		//17 chars
-		float price = 10000f;
+		float price = 10000.99f;
 		if(myplexapplication.getCardExplorerData().requestType == CardExplorerData.REQUEST_PURCHASES)
 		{
 			dataHolder.mRentText.setText(mContext.getString(R.string.cardstatuspaid));
@@ -456,10 +456,11 @@ public class CardView extends ScrollView {
 				List<CardDataPurchaseItem> purchase = data.currentUserData.purchase;
 				String validity = "";
 				for(CardDataPurchaseItem item : purchase){
-					 validity = Util.getDate(item.validity);
+					 validity = Util.getExpiry(item.validity);
+//					validity = item.validity;
 				}
 				if(validity.length()>0)
-					dataHolder.mRentText.setText(mContext.getString(R.string.card_watch_before)+" "+validity);
+					dataHolder.mRentText.setText(validity);
 				else
 					dataHolder.mRentText.setText(mContext.getString(R.string.cardstatuspaid));					
 				dataHolder.mRentLayout.setOnClickListener(null);
@@ -477,6 +478,9 @@ public class CardView extends ScrollView {
 						if(price == 0)
 						{
 							dataHolder.mRentText.setText(mContext.getString(R.string.cardstatustempfree));
+							dataHolder.mRentLayout.setOnClickListener(null);
+						}else if(price  == 10000.99f){
+							dataHolder.mRentText.setText(mContext.getString(R.string.cardstatusfree));
 							dataHolder.mRentLayout.setOnClickListener(null);
 						}
 						else

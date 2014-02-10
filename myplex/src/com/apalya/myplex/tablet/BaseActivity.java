@@ -497,6 +497,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		}
 		case NavigationOptionsMenuAdapter.LOGOUT_ACTION: {
 			LogOutUtil.onClickLogout(this);
+			myplexapplication.getUserProfileInstance().setUserEmail("NA");
 			return;
 		}
 		case NavigationOptionsMenuAdapter.SETTINGS_ACTION:{

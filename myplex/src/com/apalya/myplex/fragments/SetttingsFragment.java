@@ -16,6 +16,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.TextView;
 
 import com.apalya.myplex.BaseFragment;
+import com.apalya.myplex.LiveScoreWebView;
 import com.apalya.myplex.R;
 import com.apalya.myplex.SubscriptionView;
 import com.apalya.myplex.TwitterWebView;
@@ -130,7 +131,7 @@ public class SetttingsFragment extends BaseFragment {
 				}
 				else
 				{
-				Intent i = new Intent(mContext,SubscriptionView.class);
+				Intent i = new Intent(mContext,LiveScoreWebView.class);
 				
 				Bundle b = new Bundle();
 				if(data.mSettingName.equals(TANDC))

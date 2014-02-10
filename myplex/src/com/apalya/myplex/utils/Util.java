@@ -15,9 +15,11 @@ import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -65,6 +67,7 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.MonthDisplayHelper;
 import android.util.Patterns;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -1094,6 +1097,48 @@ public class Util {
 			return sdf.format(date).toString();
 		}else 
 			return null;
+	}
+	
+	public static String getExpiry(String dateInString) {
+		Log.d(TAG," got time ="+dateInString);
+		String expiryMessage =  "";
+		Date now  = new Date();
+		long difference = 0;
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		format.setTimeZone(TimeZone.getTimeZone("UTC"));
+		Date date = null;
+		try {
+			date = format.parse(dateInString);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		if(date!=null){
+			difference = (date.getTime() - now.getTime() );
+			long seconds = difference / 1000;
+			long minutes = seconds / 60;
+			long hours = minutes / 60;
+			long days = hours / 24;
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(date);
+			Log.d(TAG," difference ="+difference+ "sec"+seconds+"min"+minutes+"hours"+hours+"days"+days);
+			if(days > 365){
+				return "watch anytime";
+			}else if(days>7){
+				return "watch before "+calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault())
+						+" "+calendar.get(Calendar.DAY_OF_MONTH);
+			}else if(days >3){
+				return "watch before "+days;
+			}else if(days<3 && days >0){
+				return "watch before "+((int)(24*days)+(calendar.get(Calendar.HOUR)))+" hrs";
+			}else if(hours<=2){
+				return "watch now (expires in"+calendar.get(Calendar.MINUTE)+"mins)";
+			}else if(minutes<=1){
+				return "watch in "+calendar.get(Calendar.SECOND);
+			}else{
+				return "watch now";
+			}
+		}		
+		return expiryMessage;
 	}
 	
 	public static void showNotification(Context context, String title) {	
