@@ -91,7 +91,7 @@ import com.apalya.myplex.views.RatingDialog;
 import com.facebook.Session;
 import com.flurry.android.FlurryAgent;
 
-public class MainActivity extends Activity implements MainBaseOptions, SearchView.OnQueryTextListener, CacheManagerCallback {
+public class MainActivity extends Activity implements MainBaseOptions, CacheManagerCallback {
 	private SearchView mSearchView;
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
@@ -587,7 +587,6 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 				return;
 			}
 			if(HideSearchView()){
-				mCustomActionBarTitleLayout.setOnClickListener(mOnFilterClickListener);
 				return;
 			}
 //			showActionBar();
@@ -750,7 +749,7 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.RECOMMENDED)){
 				showLiveTvOrMovieIcon("recommended");
 				data.requestType = CardExplorerData.REQUEST_RECOMMENDATION;
-				setActionBarTitle("myplex home");				
+				setActionBarTitle(mContext.getString(R.string.myplex_home));				
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.MOVIES)){
 				showLiveTvOrMovieIcon("movies");
 				data.requestType = CardExplorerData.REQUEST_BROWSE;
@@ -1119,25 +1118,12 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 			
 		}
 	}
-
-	@Override
-	public boolean onQueryTextChange(String newText) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean onQueryTextSubmit(String query) {
-		// TODO Auto-generated method stub
-		return false;
-	}
 	
 	private void setupSearchView(final SearchView searchView) {
 
         if (isAlwaysExpanded()) {
         	searchView.setIconifiedByDefault(false);
         } 
-        searchView.setOnQueryTextListener(this);
         searchView.setOnSearchClickListener(new OnClickListener() {
 			
 			@Override
@@ -1191,9 +1177,13 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 			
 			@Override
 			public boolean onQueryTextChange(String newText) {
+				String type = null;
+				if(myplexapplication.getCardExplorerData().searchQuery.equals(ConsumerApi.VIDEO_TYPE_LIVE)){
+					type = ConsumerApi.VIDEO_TYPE_LIVE;
+				}
 				//Addanalytics just record textchanges
 				if(mSearchSuggestionFrag!=null && newText.length() >0)
-					mSearchSuggestionFrag.setQuery(newText);
+					mSearchSuggestionFrag.setQuery(newText,type);
 				return false;
 			}
 		});
@@ -1340,7 +1330,7 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 					tvOrMovie.setEnabled(true);
 				}
 			}, 3000);
-			selectItem(3);
+			selectItem(1);
 		}		
 	};
 	private class  MovieListener implements OnClickListener{
@@ -1354,7 +1344,7 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 					tvOrMovie.setEnabled(true);
 				}
 			}, 3000);
-			selectItem(1);
+			selectItem(3);
 		}		
 	};
 	
