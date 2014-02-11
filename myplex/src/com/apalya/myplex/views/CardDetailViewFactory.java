@@ -969,7 +969,7 @@ public class CardDetailViewFactory {
 		packageButton.setOnClickListener(packageButtonListener);
 		Util.showFeedbackOnSame(packageButton);
 		packageButton.setTypeface(FontUtil.Roboto_Medium);
-		float price = 10000f;
+		float price = 10000.99f;
 		if(mData.packages == null || mData.packages.size() == 0){
 			packageButton.setText(mContext.getString(R.string.cardstatusfree));
 			packageButton.setOnClickListener(null);
@@ -992,6 +992,9 @@ public class CardDetailViewFactory {
 						if(price == 0)
 						{
 							packageButton.setText(mContext.getString(R.string.cardstatustempfree));
+							packageButton.setOnClickListener(null);
+						}else if(price  == 10000.99f){
+							packageButton.setText(mContext.getString(R.string.cardstatusfree));
 							packageButton.setOnClickListener(null);
 						}
 						else
