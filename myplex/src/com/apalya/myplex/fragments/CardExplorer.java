@@ -505,11 +505,15 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			{
 				Log.i(TAG,"Seachscope: "+ mData.searchScope);
 				searchScope = mData.searchScope;
-			}
-			else
-				searchScope = "movie";//+","+ConsumerApi.CONTENT_SPORTS_LIVE+","+ConsumerApi.CONTENT_SPORTS_VOD;
-			
 				requestUrl = ConsumerApi.getSearch(mData.searchQuery,ConsumerApi.LEVELDYNAMIC,mData.mStartIndex,searchScope);
+			}else if(mData.searchScope.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
+				
+				requestUrl = ConsumerApi.getSearch(mData.searchQuery,ConsumerApi.LEVELDYNAMIC,mData.mStartIndex,ConsumerApi.VIDEO_TYPE_LIVE);
+			}
+			else{
+				searchScope = "movie";//+","+ConsumerApi.CONTENT_SPORTS_LIVE+","+ConsumerApi.CONTENT_SPORTS_VOD;			
+				requestUrl = ConsumerApi.getSearch(mData.searchQuery,ConsumerApi.LEVELDYNAMIC,mData.mStartIndex,searchScope);
+			}
 			screenName="Search";
 			mMainActivity.setActionBarTitle(mData.searchQuery.toLowerCase());
 		}else if(mData.requestType == CardExplorerData.REQUEST_RECOMMENDATION){

@@ -1178,7 +1178,9 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 			@Override
 			public boolean onQueryTextChange(String newText) {
 				String type = null;
-				if(myplexapplication.getCardExplorerData().searchQuery.equals(ConsumerApi.VIDEO_TYPE_LIVE)){
+				if((myplexapplication.getCardExplorerData()!=null) &&
+						(myplexapplication.getCardExplorerData().searchScope!=null) &&
+						(myplexapplication.getCardExplorerData().searchScope.equals(ConsumerApi.VIDEO_TYPE_LIVE))){
 					type = ConsumerApi.VIDEO_TYPE_LIVE;
 				}
 				//Addanalytics just record textchanges
@@ -1239,11 +1241,21 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 			return;
 		}
 
+		String localSearchScope = null;
 		CardExplorerData dataBundle = myplexapplication.getCardExplorerData();
 
-		dataBundle.reset();
-		dataBundle.searchQuery = mSearchQuery;
-		dataBundle.requestType = CardExplorerData.REQUEST_SEARCH;
+		if(dataBundle!=null){			
+			if((dataBundle.searchScope!=null) &&dataBundle.searchScope.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
+				localSearchScope =  ConsumerApi.VIDEO_TYPE_LIVE;
+			}
+			dataBundle.reset();
+			if(localSearchScope!=null){
+				dataBundle.searchScope = localSearchScope;
+			}
+			dataBundle.searchQuery = mSearchQuery;
+			dataBundle.requestType = CardExplorerData.REQUEST_SEARCH;
+		}
+		
 
 		addFilterData(new ArrayList<FilterMenudata>(), null);
 
