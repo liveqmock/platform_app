@@ -1178,13 +1178,13 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 			@Override
 			public boolean onQueryTextChange(String newText) {
 				String type = null;
-				if((myplexapplication.getCardExplorerData()!=null) &&
+				if((myplexapplication.getCardExplorerData() != null) &&
 						(myplexapplication.getCardExplorerData().searchScope!=null) &&
 						(myplexapplication.getCardExplorerData().searchScope.equals(ConsumerApi.VIDEO_TYPE_LIVE))){
 					type = ConsumerApi.VIDEO_TYPE_LIVE;
 				}
 				//Addanalytics just record textchanges
-				if(mSearchSuggestionFrag!=null && newText.length() >0)
+				if(mSearchSuggestionFrag != null && newText.length() >0)
 					mSearchSuggestionFrag.setQuery(newText,type);
 				return false;
 			}
@@ -1244,12 +1244,12 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		String localSearchScope = null;
 		CardExplorerData dataBundle = myplexapplication.getCardExplorerData();
 
-		if(dataBundle!=null){			
-			if((dataBundle.searchScope!=null) &&dataBundle.searchScope.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
-				localSearchScope =  ConsumerApi.VIDEO_TYPE_LIVE;
+		if(dataBundle != null){			
+			if((dataBundle.searchScope!=null) && dataBundle.searchScope.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
+				localSearchScope = ConsumerApi.VIDEO_TYPE_LIVE;
 			}
 			dataBundle.reset();
-			if(localSearchScope!=null){
+			if(localSearchScope != null){
 				dataBundle.searchScope = localSearchScope;
 			}
 			dataBundle.searchQuery = mSearchQuery;
