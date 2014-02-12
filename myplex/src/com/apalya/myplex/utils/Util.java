@@ -1135,9 +1135,9 @@ public class Util {
 			}*/else if(days>=0 && hours>=2){
 				return "watch for next "+(int)((24*days)+hours)+ " hrs";
 			}else if(hours<=2 && minutes>1){
-				return "watch now (expires in "+calendar.get(Calendar.MINUTE)+" mins)";
+				return "watch now (expires in "+minutes+" mins)";
 			}else if(minutes<=1 && seconds >1 ){
-				return "watch in "+calendar.get(Calendar.SECOND)+" secs";
+				return "watch in "+seconds+" secs";
 			}else{
 				return "watch now";
 			}

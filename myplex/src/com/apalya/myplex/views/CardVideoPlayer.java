@@ -1757,10 +1757,22 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		
 		@Override
 		public void licenseExpired() {
-			Util.showToast(mContext,"License Expired.",Util.TOAST_TYPE_INFO);
-			PackagePopUp popup = new PackagePopUp(mContext,(View)mParentLayout.getParent());
-			myplexapplication.getCardExplorerData().cardDataToSubscribe =  mData;
-			popup.showPackDialog(mData, ((Activity)mContext).getActionBar().getCustomView());				
+			
+			if(mContext == null || ! (mContext instanceof Activity)){
+				return;
+			}
+			
+			((Activity)mContext).runOnUiThread(new Runnable() {
+				
+				@Override
+				public void run() {
+					Util.showToast(mContext,"License Expired.",Util.TOAST_TYPE_INFO);
+					PackagePopUp popup = new PackagePopUp(mContext,(View)mParentLayout.getParent());
+					myplexapplication.getCardExplorerData().cardDataToSubscribe =  mData;
+					popup.showPackDialog(mData, ((Activity)mContext).getActionBar().getCustomView());	
+					
+				}
+			});			
 		}
 	};
 	

@@ -928,7 +928,8 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 				params.put(Analytics.PLAY_CONTENT_ERROR_PROPERTY,Analytics.PLAY_CONTENT_WIDEVINE_ERROR);
 				Analytics.trackEvent(Analytics.EVENT_PLAY,params);
 			}
-			if(status == 608){
+			if(status == 608 || status == 607){
+				 iPlayerStarted=false;
 				 if(onLicenseExpiryListener != null ){
 					 onLicenseExpiryListener.licenseExpired();
 				 }
