@@ -48,6 +48,7 @@ import com.apalya.myplex.data.ApplicationConfig;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDataHolder;
 import com.apalya.myplex.data.CardDataImagesItem;
+import com.apalya.myplex.data.CardDataPurchaseItem;
 import com.apalya.myplex.data.CardDownloadData;
 import com.apalya.myplex.data.CardDownloadedDataList;
 import com.apalya.myplex.data.CardExplorerData;
@@ -255,7 +256,7 @@ public class CardView extends ScrollView {
 	public View createCardView() {
 		return mInflater.inflate(R.layout.card, null);		
 	}
-	private String mPriceStarts = "Starts from ";
+	private String mPriceStarts = "starts from ";
 	private String mRupeeCode  = null;
 	private HashMap<String,String> ImageUrlMap = new HashMap<String, String>();
 	public void updateDownloadStatus(CardData data,CardDownloadData downloadData){
@@ -446,10 +447,20 @@ public class CardView extends ScrollView {
 		dataHolder.mFavLayout.setBackgroundColor(Color.TRANSPARENT);
 		Util.showFeedback(dataHolder.mFavLayout);
 		//17 chars
-		float price = 10000f;
+		float price = 10000.99f;
+		dataHolder.mRentText.setText("");
 		if(myplexapplication.getCardExplorerData().requestType == CardExplorerData.REQUEST_PURCHASES)
 		{
-			dataHolder.mRentText.setText(mContext.getString(R.string.cardstatuspaid));
+			List<CardDataPurchaseItem> purchase = data.currentUserData.purchase;
+			String validity = "";
+			for(CardDataPurchaseItem item : purchase){
+				 validity = Util.getExpiry(item.validity).toLowerCase();
+			}
+			if(validity.length()>0)
+				dataHolder.mRentText.setText(validity);
+			else
+				dataHolder.mRentText.setText(mContext.getString(R.string.cardstatuspaid));
+//			dataHolder.mRentText.setText(mContext.getString(R.string.cardstatuspaid));
 			dataHolder.mRentLayout.setOnClickListener(null);
 			Log.i("CacheManager", "in purchases");
 		}
@@ -458,7 +469,16 @@ public class CardView extends ScrollView {
 			dataHolder.mRentLayout.setOnClickListener(null);
 		}else{
 			if(data.currentUserData != null && data.currentUserData.purchase != null && data.currentUserData.purchase.size() != 0){
-				dataHolder.mRentText.setText(mContext.getString(R.string.cardstatuspaid));
+				List<CardDataPurchaseItem> purchase = data.currentUserData.purchase;
+				String validity = "";
+				for(CardDataPurchaseItem item : purchase){
+					 validity = Util.getExpiry(item.validity);
+//					validity = item.validity;
+				}
+				if(validity.length()>0)
+					dataHolder.mRentText.setText(validity);
+				else
+					dataHolder.mRentText.setText(mContext.getString(R.string.cardstatuspaid));					
 				dataHolder.mRentLayout.setOnClickListener(null);
 			}else{
 				for(CardDataPackages packageitem:data.packages){
@@ -474,6 +494,9 @@ public class CardView extends ScrollView {
 						if(price == 0)
 						{
 							dataHolder.mRentText.setText(mContext.getString(R.string.cardstatustempfree));
+							dataHolder.mRentLayout.setOnClickListener(null);
+						}else if(price  == 10000.99f){
+							dataHolder.mRentText.setText(mContext.getString(R.string.cardstatusfree));
 							dataHolder.mRentLayout.setOnClickListener(null);
 						}
 						else

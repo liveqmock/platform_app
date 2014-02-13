@@ -37,6 +37,7 @@ import com.apalya.myplex.data.CardDataHolder;
 import com.apalya.myplex.data.CardDataImagesItem;
 import com.apalya.myplex.data.CardDataPackagePriceDetailsItem;
 import com.apalya.myplex.data.CardDataPackages;
+import com.apalya.myplex.data.CardDataPurchaseItem;
 import com.apalya.myplex.data.CardDownloadData;
 import com.apalya.myplex.data.CardExplorerData;
 import com.apalya.myplex.data.CardImageView;
@@ -171,7 +172,7 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 		// TODO Auto-generated method stub
 		return position;
 	}
-	private String mPriceStarts = "Starts from ";
+	private String mPriceStarts = "starts from ";
 	private String mRupeeCode  = null;
 	private int cardColor = -1;
 	@Override
@@ -303,13 +304,22 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 		dataHolder.mFavLayout.setBackgroundColor(Color.TRANSPARENT);
 		Util.showFeedback(dataHolder.mFavLayout);
 		//17 chars
-		float price = 10000f;
+		float price = 10000.99f;
 		if(data.packages == null|| data.packages.size() == 0){
 			dataHolder.mRentText.setText(mContext.getString(R.string.cardstatusfree));
 			dataHolder.mRentLayout.setOnClickListener(null);
 		}else{
 			if(data.currentUserData != null && data.currentUserData.purchase != null && data.currentUserData.purchase.size() != 0){
-				dataHolder.mRentText.setText(mContext.getString(R.string.cardstatuspaid));
+				String validity = "";
+				for(CardDataPurchaseItem item : data.currentUserData.purchase){
+					 validity = Util.getExpiry(item.validity).toLowerCase();
+//					 validity = item.validity;
+				}
+				if(validity.length()>0)
+					dataHolder.mRentText.setText(validity);
+				else
+					dataHolder.mRentText.setText(mContext.getString(R.string.cardstatuspaid));
+//				dataHolder.mRentText.setText(mContext.getString(R.string.cardstatuspaid));
 				dataHolder.mRentLayout.setOnClickListener(null);
 			}else{
 				for(CardDataPackages packageitem:data.packages){
@@ -325,6 +335,9 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 						if(price == 0)
 						{
 							dataHolder.mRentText.setText(mContext.getString(R.string.cardstatustempfree));
+							dataHolder.mRentLayout.setOnClickListener(null);
+						}else if(price  == 10000.99f){
+							dataHolder.mRentText.setText(mContext.getString(R.string.cardstatusfree));
 							dataHolder.mRentLayout.setOnClickListener(null);
 						}
 						else

@@ -94,7 +94,7 @@ import com.facebook.Session;
 
 import com.google.analytics.tracking.android.EasyTracker;
 
-public class MainActivity extends Activity implements MainBaseOptions, SearchView.OnQueryTextListener, CacheManagerCallback {
+public class MainActivity extends Activity implements MainBaseOptions, CacheManagerCallback {
 	private SearchView mSearchView;
 	private DrawerLayout mDrawerLayout;
 	private ListView mDrawerList;
@@ -115,6 +115,7 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 	private Handler handler= new Handler();
 
 	NavigationOptionsMenuAdapter mNavigationAdapter;
+	private TextView mFilterLevle;
 	
 	@Override
 	protected void onStart() {
@@ -173,9 +174,9 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
     {
             screenType = NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION;
     }
-    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.RECOMMENDED,R.string.iconhome, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.MOVIES,R.string.iconmovie, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
     mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LIVETV,R.string.iconlivetv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.MOVIES,R.string.iconmovie, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.RECOMMENDED,R.string.iconhome, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 //    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.SPORTS,R.string.iconcricket, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
     mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGO,R.string.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
 
@@ -365,6 +366,8 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 	}
 	public String mLastActionBarTitle = new String();
 	public void setActionBarTitle(String title) {
+//		mFilterLevle.setVisibility(View.GONE);
+		mFilterLevle.setText("All");
 		this.mTitle = title;
 		if (mTitleTextView != null) {
 			mTitleTextView.setText(mTitle);
@@ -431,6 +434,9 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 		
 		mTitleTextView = (TextView) v.findViewById(R.id.customactionbar_filter_text);
 		mTitleTextView.setTypeface(FontUtil.Roboto_Regular);
+		
+		mFilterLevle = (TextView)v.findViewById(R.id.filter_levle);
+		mFilterLevle.setTypeface(FontUtil.Roboto_Regular);
 		
 		mTitleFilterSymbol = (TextView)v.findViewById(R.id.customactionbar_filter_text1);
 		changeVisibility(mTitleFilterSymbol,View.GONE);		
@@ -609,11 +615,12 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 				mNavigationDrawerOpened = false;
 				return;
 			}
-			if(HideSearchView())
+			if(HideSearchView()){
 				return;
-			showActionBar();
-			setSearchBarVisibilty(View.INVISIBLE);
-			setSearchViewVisibilty(View.VISIBLE);
+			}
+//			showActionBar();
+			//			setSearchBarVisibilty(View.INVISIBLE);
+			//			setSearchViewVisibilty(View.VISIBLE);
 			BaseFragment fragment = mFragmentStack.peek();
 			if (fragment instanceof CardExplorer) {
 				
@@ -771,7 +778,7 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.RECOMMENDED)){
 				showLiveTvOrMovieIcon("recommended");
 				data.requestType = CardExplorerData.REQUEST_RECOMMENDATION;
-				setActionBarTitle("myplex");				
+				setActionBarTitle(mContext.getString(R.string.myplex_home));				
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.MOVIES)){
 				showLiveTvOrMovieIcon("movies");
 				data.requestType = CardExplorerData.REQUEST_BROWSE;
@@ -973,6 +980,11 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 				long arg3) {
 			if (mFilterDelegate != null) {
 				mFilterDelegate.onClick(arg1);
+				
+				mFilterLevle.setTypeface(FontUtil.Roboto_Light);
+				mFilterLevle.setTextSize(12);
+				mFilterLevle.setVisibility(View.VISIBLE);
+				mFilterLevle.setText(mMenuDataList.get(arg2).label);
 			}
 			dismissFilterMenuPopupWindow();
 		}
@@ -1056,9 +1068,11 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 		if(datalist != null && datalist.size() > 0){
 			enableFilterAction(true);
 			changeVisibility(mTitleFilterSymbol,View.VISIBLE);
+			mFilterLevle.setVisibility(View.VISIBLE);
 		}else{
 			enableFilterAction(false);
 			changeVisibility(mTitleFilterSymbol,View.GONE);
+			mFilterLevle.setVisibility(View.GONE);
 		}
 		mFilterDelegate = listener;
 		
@@ -1133,25 +1147,12 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 			
 		}
 	}
-
-	@Override
-	public boolean onQueryTextChange(String newText) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean onQueryTextSubmit(String query) {
-		// TODO Auto-generated method stub
-		return false;
-	}
 	
 	private void setupSearchView(final SearchView searchView) {
 
         if (isAlwaysExpanded()) {
         	searchView.setIconifiedByDefault(false);
         } 
-        searchView.setOnQueryTextListener(this);
         searchView.setOnSearchClickListener(new OnClickListener() {
 			
 			@Override
@@ -1207,9 +1208,15 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 			
 			@Override
 			public boolean onQueryTextChange(String newText) {
+				String type = null;
+				if((myplexapplication.getCardExplorerData() != null) &&
+						(myplexapplication.getCardExplorerData().searchScope!=null) &&
+						(myplexapplication.getCardExplorerData().searchScope.equals(ConsumerApi.VIDEO_TYPE_LIVE))){
+					type = ConsumerApi.VIDEO_TYPE_LIVE;
+				}
 				//Addanalytics just record textchanges
-				if(mSearchSuggestionFrag!=null && newText.length() >0)
-					mSearchSuggestionFrag.setQuery(newText);
+				if(mSearchSuggestionFrag != null && newText.length() >0)
+					mSearchSuggestionFrag.setQuery(newText,type);
 				return false;
 			}
 		});
@@ -1258,11 +1265,21 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 			return;
 		}
 
+		String localSearchScope = null;
 		CardExplorerData dataBundle = myplexapplication.getCardExplorerData();
 
-		dataBundle.reset();
-		dataBundle.searchQuery = mSearchQuery;
-		dataBundle.requestType = CardExplorerData.REQUEST_SEARCH;
+		if(dataBundle != null){			
+			if((dataBundle.searchScope!=null) && dataBundle.searchScope.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
+				localSearchScope = ConsumerApi.VIDEO_TYPE_LIVE;
+			}
+			dataBundle.reset();
+			if(localSearchScope != null){
+				dataBundle.searchScope = localSearchScope;
+			}
+			dataBundle.searchQuery = mSearchQuery;
+			dataBundle.requestType = CardExplorerData.REQUEST_SEARCH;
+		}
+		
 
 		addFilterData(new ArrayList<FilterMenudata>(), null);
 
@@ -1349,7 +1366,7 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 					tvOrMovie.setEnabled(true);
 				}
 			}, 3000);
-			selectItem(3);
+			selectItem(1);
 		}		
 	};
 	private class  MovieListener implements OnClickListener{
@@ -1363,7 +1380,7 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 					tvOrMovie.setEnabled(true);
 				}
 			}, 3000);
-			selectItem(1);
+			selectItem(3);
 		}		
 	};
 	

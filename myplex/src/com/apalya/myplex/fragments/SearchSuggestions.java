@@ -83,19 +83,21 @@ public class SearchSuggestions extends BaseFragment {
 		return rootView;
 	}
 	
-	public void setQuery(String searchString)
+	public void setQuery(String searchString,String type)
 	{
 		mSearchQuery = searchString;
-		doInlineSearch(searchString);
+		doInlineSearch(searchString,type);
 	}
 
 	
-	private void doInlineSearch(String searchQuery) {
+	private void doInlineSearch(String searchQuery,String type) {
 		// TODO Auto-generated method stub
 		RequestQueue queue = MyVolley.getRequestQueue();
 
 		String requestUrl = new String();
 		requestUrl = ConsumerApi.getInlineSearch(searchQuery,ConsumerApi.LEVELDYNAMIC);
+		if(type!=null)
+			requestUrl += ConsumerApi.AMPERSAND+ConsumerApi.BROWSETYPE+type;
 		StringRequest myReq = new StringRequest(requestUrl, searchResults(), searchResultsError());
 		myReq.setShouldCache(true);
 		queue.add(myReq);

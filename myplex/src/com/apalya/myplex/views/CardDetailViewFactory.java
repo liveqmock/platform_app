@@ -286,7 +286,14 @@ public class CardDetailViewFactory {
 					}, mData);
 				}else{
 					RatingDialog dialog = new RatingDialog(mContext);
-					dialog.prepareRating();
+					if(mData.generalInfo.type.equalsIgnoreCase("live")){
+						dialog.prepareRating(mData.generalInfo.title,
+								mContext.getString(R.string.rate_this)+" "+mData.generalInfo.title,
+								mContext.getString(R.string.add_live_tv_review)
+								);
+					}else{
+						dialog.prepareRating();
+					}
 					dialog.showDialog(new MessagePostCallback() {
 						
 						@Override
@@ -551,7 +558,13 @@ public class CardDetailViewFactory {
 		}
 		else
 		{
-			groupname.setText(mContext.getString(R.string.similarcontent));	
+			if(mData.generalInfo.type.equalsIgnoreCase("live")){				
+				groupname.setText(mContext.getString(R.string.similar_live_tv));	
+			}else if(mData.generalInfo.type.equalsIgnoreCase("movie")){
+				groupname.setText(mContext.getString(R.string.similar_movies));
+			}else{
+				groupname.setText(mContext.getString(R.string.similarcontent));
+			}
 		}
 	
 		if(mData.generalInfo != null && mData.generalInfo.type != null && mData.generalInfo.type.equalsIgnoreCase(ConsumerApi.CONTENT_SPORTS_LIVE)){
@@ -883,7 +896,7 @@ public class CardDetailViewFactory {
 		addSpace(layout,(int)mContext.getResources().getDimension(R.dimen.margin_gap_12));
 		return v;
 	}
-	private String mPriceStarts = "Starts from ";
+	private String mPriceStarts = "starts from ";
 	private String mRupeeCode  = null;
 	private View createBriefDescriptionView() {
 		mCredits = null;
@@ -974,7 +987,7 @@ public class CardDetailViewFactory {
 		packageButton.setOnClickListener(packageButtonListener);
 		Util.showFeedbackOnSame(packageButton);
 		packageButton.setTypeface(FontUtil.Roboto_Medium);
-		float price = 10000f;
+		float price = 10000.99f;
 		if(mData.packages == null || mData.packages.size() == 0){
 			packageButton.setText(mContext.getString(R.string.cardstatusfree));
 			packageButton.setOnClickListener(null);
@@ -997,6 +1010,9 @@ public class CardDetailViewFactory {
 						if(price == 0)
 						{
 							packageButton.setText(mContext.getString(R.string.cardstatustempfree));
+							packageButton.setOnClickListener(null);
+						}else if(price  == 10000.99f){
+							packageButton.setText(mContext.getString(R.string.cardstatusfree));
 							packageButton.setOnClickListener(null);
 						}
 						else

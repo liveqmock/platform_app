@@ -21,6 +21,7 @@ import com.apalya.myplex.adapters.CacheManagerCallback;
 import com.apalya.myplex.cache.CacheManager;
 import com.apalya.myplex.cache.IndexHandler;
 import com.apalya.myplex.data.CardData;
+import com.apalya.myplex.data.CardDataPurchaseItem;
 import com.apalya.myplex.data.CardDownloadData;
 import com.apalya.myplex.data.CardDownloadedDataList;
 import com.apalya.myplex.data.myplexapplication;
@@ -79,7 +80,8 @@ public class DownloadUtil {
 				}
 				
 				notifyDownloadComplete(contentId);
-				acquireRights(cardDownloadData,context,contentId);
+				showNotification(context,contentId,cardDownloadData);
+				
 				
 				break;
 			}
@@ -98,7 +100,18 @@ public class DownloadUtil {
 		Log.e(TAG, "requestUrl: " + url);
 
 	}
-	private void acquireRights(CardDownloadData cardDownloadData, Context context,String contentId) {
+	private void acquireRights(CardDownloadData cardDownloadData, Context context,String contentId, CardData cardData) {
+		
+		if(cardData != null && cardData.currentUserData != null &&
+				cardData.currentUserData.purchase != null && !cardData.currentUserData.purchase.isEmpty()){
+			
+			CardDataPurchaseItem  purchaseitem = cardData.currentUserData.purchase.get(0);
+			
+			if(purchaseitem.type != null && purchaseitem.type.equalsIgnoreCase("Rental")){
+				Log.e(TAG, "skiping acquireRights for DTR");
+				return;
+			}
+		}
 		
 		String url="file://"+cardDownloadData.mDownloadPath;
 		WidevineDrm drmManager = new WidevineDrm(context);
@@ -113,12 +126,11 @@ public class DownloadUtil {
 			}else {
 				Util.showToast(context, "accquired rights failed", Util.TOAST_TYPE_INFO);
 			}
-		}
+		}		
 		
-		showNotification(context,contentId);
 	}
 
-	public static  void showNotification(final Context context,final String id) {
+	public  void showNotification(final Context context,final String id, final CardDownloadData cardDownloadData) {
 		List<CardData> list =  new ArrayList<CardData>();
 		CardData data = new CardData();
 		data._id = id;
@@ -149,7 +161,8 @@ public class DownloadUtil {
 				if(obj!= null && obj.containsKey(id)){
 					CardData cardDatas = (CardData) obj.get(id);
 					String title   = cardDatas.generalInfo.title;
-					Log.d(TAG,"title ="+title);			
+					Log.d(TAG,"title ="+title);
+					acquireRights(cardDownloadData,context,id, cardDatas);
 					Util.showNotification(context, title);		
 				}
 			}

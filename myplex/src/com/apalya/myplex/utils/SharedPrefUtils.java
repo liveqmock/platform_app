@@ -93,6 +93,13 @@ public class SharedPrefUtils {
 					null, Context.MODE_PRIVATE);
 		return myPrefs.getBoolean(key, false);
 	}
+	public static boolean getBoolFromSharedPreference(Context context, String key,boolean defaultValue) {
+
+		if (myPrefs == null)
+			myPrefs = context.getSharedPreferences(
+					null, Context.MODE_PRIVATE);
+		return myPrefs.getBoolean(key, defaultValue);
+	}
 	public static void writeList(Context context, List<String> list, String key)
 	{
 		if (myPrefs == null)

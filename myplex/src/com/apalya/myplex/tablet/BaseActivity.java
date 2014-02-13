@@ -101,6 +101,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 
 	NavigationOptionsMenuAdapter mNavigationAdapter;
 	private TextView socialShare;
+	private TextView mFilterLevle;
 
 	@Override
 	public void setOrientation(int value){
@@ -201,9 +202,9 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 			screenType = NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION;
 		}
 		
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.RECOMMENDED,R.string.iconhome, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.MOVIES,R.string.iconmovie, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LIVETV,R.string.iconlivetv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.MOVIES,R.string.iconmovie, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.RECOMMENDED,R.string.iconhome, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 //		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.SPORTS,R.string.iconcricket, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGO,R.string.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
 
@@ -232,6 +233,8 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 	}
 	public String mLastActionBarTitle = new String();
 	public void setActionBarTitle(String title) {
+//		mFilterLevle.setVisibility(View.GONE);
+		mFilterLevle.setText("All");
 		this.mTitle = title;
 		if (mTitleTextView != null) {
 			mTitleTextView.setText(mTitle);
@@ -308,6 +311,9 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		
 		mTitleTextView = (TextView) v.findViewById(R.id.customactionbar_filter_text);
 		mTitleTextView.setTypeface(FontUtil.Roboto_Regular);
+		
+		mFilterLevle = (TextView)v.findViewById(R.id.filter_levle);
+		mFilterLevle.setTypeface(FontUtil.Roboto_Regular);
 		
 		mTitleFilterSymbol = (TextView)v.findViewById(R.id.customactionbar_filter_text1);
 		changeVisibility(mTitleFilterSymbol,View.GONE);		
@@ -491,6 +497,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		}
 		case NavigationOptionsMenuAdapter.LOGOUT_ACTION: {
 			LogOutUtil.onClickLogout(this);
+			myplexapplication.getUserProfileInstance().setUserEmail("NA");
 			return;
 		}
 		case NavigationOptionsMenuAdapter.SETTINGS_ACTION:{
@@ -609,7 +616,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		// transaction.setCustomAnimations(android.R.animator.fade_in,
 		// android.R.animator.fade_out);
 		// transaction.
-		setActionBarTitle("myplex");
+		setActionBarTitle("myplex home");
 		transaction.replace(R.id.content_frame, mCurrentFragment);
 		transaction.addToBackStack(null);
 		transaction.commit();
@@ -673,6 +680,11 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 				long arg3) {
 			if (mFilterDelegate != null) {
 				mFilterDelegate.onClick(arg1);
+				
+				mFilterLevle.setTypeface(FontUtil.Roboto_Light);
+				mFilterLevle.setTextSize(12);
+				mFilterLevle.setVisibility(View.VISIBLE);
+				mFilterLevle.setText(mMenuDataList.get(arg2).label);
 			}
 			dismissFilterMenuPopupWindow();
 		}

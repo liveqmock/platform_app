@@ -3,8 +3,10 @@ package com.apalya.myplex.fragments;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import android.animation.Animator;
@@ -507,11 +509,15 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			{
 				Log.i(TAG,"Seachscope: "+ mData.searchScope);
 				searchScope = mData.searchScope;
-			}
-			else
-				searchScope = "movie";//+","+ConsumerApi.CONTENT_SPORTS_LIVE+","+ConsumerApi.CONTENT_SPORTS_VOD;
-			
 				requestUrl = ConsumerApi.getSearch(mData.searchQuery,ConsumerApi.LEVELDYNAMIC,mData.mStartIndex,searchScope);
+			}else if(mData.searchScope.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
+				
+				requestUrl = ConsumerApi.getSearch(mData.searchQuery,ConsumerApi.LEVELDYNAMIC,mData.mStartIndex,ConsumerApi.VIDEO_TYPE_LIVE);
+			}
+			else{
+				searchScope = "movie";//+","+ConsumerApi.CONTENT_SPORTS_LIVE+","+ConsumerApi.CONTENT_SPORTS_VOD;			
+				requestUrl = ConsumerApi.getSearch(mData.searchQuery,ConsumerApi.LEVELDYNAMIC,mData.mStartIndex,searchScope);
+			}
 			screenName="Search";
 			mMainActivity.setActionBarTitle(mData.searchQuery.toLowerCase());
 		}else if(mData.requestType == CardExplorerData.REQUEST_RECOMMENDATION){
@@ -576,9 +582,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 //					Log.d(TAG,"server response "+response);
 //					updateText("parsing results");
 					if(minResultSet ==  null){showNoDataMessage(false);return;}
-					long startTime=System.currentTimeMillis();
 //					CardResponseData minResultSet  =(CardResponseData) Util.fromJson(response, CardResponseData.class);
-					Log.d(TAG,"reponse process time taken-1 :"+(System.currentTimeMillis()-startTime));
 					if(minResultSet.code != 200){
 						Util.showToast(getContext(), minResultSet.message,Util.TOAST_TYPE_ERROR);
 //						Toast.makeText(getContext(), minResultSet.message, Toast.LENGTH_SHORT).show();
@@ -600,7 +604,6 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 						if(minResultSet.results ==  null){showNoDataMessage(false);return;}
 						if(minResultSet.results.size() ==  0){showNoDataMessage(false);return;}
 						mCacheManager.getCardDetails(minResultSet.results,IndexHandler.OperationType.IDSEARCH,CardExplorer.this);
-						Log.d(TAG,"reponse process time taken-2 :"+(System.currentTimeMillis()-startTime));
 					}
 				} catch (Exception e) {
 					showNoDataMessage(false);
@@ -634,21 +637,38 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	}
 	
 	private void prepareFilterData() {
+		HashMap<String , Integer> genreCounter = new HashMap<String, Integer>();
 		List<FilterMenudata> filteroptions = new ArrayList<FilterMenudata>();
 		List<String> tempList = new ArrayList<String>();
 		for (CardData data : mData.mMasterEntries) {
 			if(data.content != null && data.content.genre != null){
 				for(CardDataGenre genreData:data.content.genre){
-					if(genreData.name != null && !tempList.contains(genreData.name))
+					if(genreData.name != null && !tempList.contains(genreData.name)){
 						tempList.add(genreData.name);
+						genreCounter.put(genreData.name,1);
+					}else if(mData.searchQuery.equalsIgnoreCase("live")){
+						genreCounter.put(genreData.name, genreCounter.get(genreData.name)+1);
+					}
 				}
 			}
 		}
+		if(mData.searchQuery.equalsIgnoreCase("live")){
+			if(tempList.size() > 1){
+				filteroptions.add(new FilterMenudata(FilterMenudata.SECTION, "All", 0));
+			}
+			Iterator<Entry<String, Integer>> iterator = genreCounter.entrySet().iterator();
+			while (iterator.hasNext()) {
+				Map.Entry<String, Integer> entry = iterator.next();
+				String filterName  = entry.getKey()+" ("+entry.getValue()+")";
+				filteroptions.add(new FilterMenudata(FilterMenudata.SECTION, filterName, 0));
+			}
+		}else{
 		if(tempList.size() > 1){
 			filteroptions.add(new FilterMenudata(FilterMenudata.SECTION, "All", 0));
 		}
 		for(String filterName:tempList){
 			filteroptions.add(new FilterMenudata(FilterMenudata.SECTION, filterName, 0));
+		}
 		}
 		if(isVisible()){
 			mMainActivity.addFilterData(filteroptions, mFilterMenuClickListener);
@@ -660,9 +680,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		@Override
 		public void onClick(View v) {
 			if (v.getTag() instanceof FilterMenudata) {
-				String label = ((FilterMenudata) v.getTag()).label;
+				String label = ((FilterMenudata) v.getTag()).label.replaceAll("\\(.*?\\)","").trim();
 				if (label != null && label.equalsIgnoreCase("All")) {
-					mMainActivity.setActionBarTitle("All");
 					sort(mData.mMasterEntries);
 					return;
 				}
@@ -682,9 +701,9 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 						localData.add(data);
 					}
 				}
-				mMainActivity.setActionBarTitle(label/*+" ("+localData.size()+"+)"*/);
-				//mixPanelFilter(label,localData);
+
 				Analytics.mixPanelFilter(mData,label,localData);
+//				mMainActivity.setActionBarTitle(label/*+" ("+localData.size()+"+)"*/);
 				sort(localData);
 			}
 		}
@@ -1050,7 +1069,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		dataBundle.requestType = CardExplorerData.REQUEST_RECOMMENDATION;
 		
 		BaseFragment fragment = mMainActivity.createFragment(NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION);
-		mMainActivity.setActionBarTitle("myplex");
+		mMainActivity.setActionBarTitle("myplex picks");
 		mMainActivity.bringFragment(fragment);
 		
 	}

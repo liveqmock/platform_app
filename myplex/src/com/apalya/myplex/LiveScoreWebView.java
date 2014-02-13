@@ -47,7 +47,7 @@ public class LiveScoreWebView extends Activity implements
 			Bundle b = this.getIntent().getExtras();
 			url = b.getString("url");
 			isProgressDialogCancelable = b.getBoolean(
-					"isProgressDialogCancelable", false);
+					"isProgressDialogCancelable", true);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

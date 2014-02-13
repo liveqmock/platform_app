@@ -15,9 +15,11 @@ import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
@@ -65,6 +67,7 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.MonthDisplayHelper;
 import android.util.Patterns;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -136,7 +139,7 @@ public class Util {
 			toast.setView(v);
 			toast.setDuration(Toast.LENGTH_LONG);
 			toast.show();*/
-			Toast.makeText(mContext, msg,type).show();
+			Toast.makeText(context, msg,type).show();
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
@@ -418,6 +421,7 @@ public class Util {
 			
 			
 
+			try{
 			lastDownloadId=
 					manager.enqueue(new DownloadManager.Request(uri)
 					.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI)
@@ -426,7 +430,11 @@ public class Util {
 							.setDescription(aMovieName)
 							.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN)
 							.setDestinationInExternalFilesDir(mContext, "", aFileName+".wvm"));
-			
+			}catch(Throwable t){
+				lastDownloadId=0;
+				Log.d(TAG,"downl;oad failed");
+				Util.showToast(mContext, "Some error occured during downloading.",Util.TOAST_TYPE_INFO);
+			}
 			
 			if(lastDownloadId>0)
 			{
@@ -965,7 +973,8 @@ public class Util {
 		    	break;
 		    } catch (ParseException pe) {
 		    	pe.printStackTrace();
-		    }
+		    }catch (Exception e) {
+			}
 		}
 		Date currentDate = new Date();
 		if(convertedDate.compareTo(currentDate)>0)
@@ -1088,8 +1097,6 @@ public class Util {
 		Date date = null;
 		try {
 			date = format.parse(dateInString);
-			System.out.println(date);			
-			System.out.println(format.format(date));
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
@@ -1099,6 +1106,51 @@ public class Util {
 			return sdf.format(date).toString();
 		}else 
 			return null;
+	}
+	
+	public static String getExpiry(String dateInString) {
+		Log.d(TAG," got time ="+dateInString);
+		String expiryMessage =  "";
+		Date now  = new Date();
+		long difference = 0;
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		format.setTimeZone(TimeZone.getTimeZone("UTC"));
+		Date date = null;
+		try {
+			date = format.parse(dateInString);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		if(date!=null){
+			difference = (date.getTime() - now.getTime() );
+			long seconds = difference / 1000;
+			long minutes = seconds / 60;
+			long hours = minutes / 60;
+			long days = hours / 24;
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTime(date);
+			Log.d(TAG," difference ="+difference+ "		sec"+seconds+"	min"+minutes+"	hours"+hours+"	days"+days);
+			if(days > 365){
+				Log.d(TAG,"Watch anytime");
+				return "watch anytime";
+			}else if(days>7){
+				return "watch until "+calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault())
+						+" "+calendar.get(Calendar.DAY_OF_MONTH);
+			}else if(days >2){
+				return "watch for next "+days+" days";
+			}/*else if(days >0){
+				return "watch for "+((int)(24*days)+(calendar.get(Calendar.HOUR)))+" hrs";
+			}*/else if(days>=0 && hours>=2){
+				return "watch for next "+(int)((24*days)+hours)+ " hrs";
+			}else if(hours<=2 && minutes>1){
+				return "watch now (expires in "+minutes+" mins)";
+			}else if(minutes<=1 && seconds >1 ){
+				return "watch in "+seconds+" secs";
+			}else{
+				return "watch now";
+			}
+		}		
+		return expiryMessage;
 	}
 	
 	public static void showNotification(Context context, String title) {	

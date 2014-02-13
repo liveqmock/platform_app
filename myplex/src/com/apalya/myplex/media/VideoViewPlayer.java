@@ -808,6 +808,16 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 		}
 		
 	}
+	public interface OnLicenseExpiry {
+		public void licenseExpired();
+	}
+	
+	private OnLicenseExpiry onLicenseExpiryListener=null;
+	
+	public void setOnLicenseExpiryListener(
+			OnLicenseExpiry onLicenseExpiryListener) {
+		this.onLicenseExpiryListener = onLicenseExpiryListener;
+	}
 	
 	private void prepareDrmManager(String url){
 		
@@ -902,7 +912,12 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 				//mixPanelUnableToPlayVideo(Analytics.WIDEVINE_AUTH_FAILED);
 				Analytics.mixPanelUnableToPlayVideo2(Analytics.WIDEVINE_AUTH_FAILED);
 			}
-			
+			if(status == 608 || status == 607){
+				 iPlayerStarted=false;
+				 if(onLicenseExpiryListener != null ){
+					 onLicenseExpiryListener.licenseExpired();
+				 }
+			}
 			if(drmManager!=null)
 				drmManager.unRegisterLogListener();
 		

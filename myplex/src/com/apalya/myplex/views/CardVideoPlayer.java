@@ -59,6 +59,7 @@ import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.media.PlayerListener;
 import com.apalya.myplex.media.VideoViewExtn;
 import com.apalya.myplex.media.VideoViewPlayer;
+import com.apalya.myplex.media.VideoViewPlayer.OnLicenseExpiry;
 import com.apalya.myplex.media.VideoViewPlayer.StreamType;
 import com.apalya.myplex.utils.AlertDialogUtil;
 import com.apalya.myplex.utils.Analytics;
@@ -122,7 +123,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 	private String  download_link,adaptive_link;
 
 	private SportsStatusRefresh sportsStatusRefresh;
-	private boolean isFullScreen;
+	private boolean isFullScreen,isTriler;
 
 	public void setFullScreenListener(PlayerFullScreen mListener){
 		this.mPlayerFullScreen = mListener;
@@ -218,7 +219,8 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 
 										Map<String,String> params=new HashMap<String, String>();
 										//FetchTrailerUrl(mmItem.generalInfo._id);
-										if(canBePlayed(true)){			
+										if(canBePlayed(true)){	
+											isTriler = true;
 											fetchUrl(mmItem.generalInfo._id);			
 											mVideoViewParent.setOnClickListener(null);		
 										}
@@ -287,6 +289,9 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		mVideoView.setVisibility(View.VISIBLE);			
 		mPreviewImage.setVisibility(View.INVISIBLE);			
 
+		if(checkForLocalPlayback()){
+			return;
+		}
 		MediaUtility utility ;                			
 		if(id==null){			
 			utility = new MediaUtility(mContext,this,false);			
@@ -299,6 +304,57 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 	}			
 	        			
         
+	private boolean checkForLocalPlayback() {
+		
+		if(isTriler)
+			return false;
+		
+		if (myplexapplication.mDownloadList == null) {
+			return false;
+		}
+
+		CardDownloadData mDownloadData = myplexapplication.mDownloadList.mDownloadedList
+				.get(mData._id);
+
+		if (mDownloadData == null) {
+			return false;
+		}
+
+		boolean isFileExist = Util.isFileExist(mData._id + ".wvm");
+
+		if (!isFileExist) {
+			if (mPlayerStatusListener != null) {
+				mPlayerStatusListener
+						.playerStatusUpdate("Download Completed and file doesn't exists, starting player.....");
+			}
+			Util.removeDownload(mDownloadData.mDownloadId, mContext);			
+			return false;
+		}
+		
+		if (mDownloadData.mCompleted && mDownloadData.mPercentage == 0) {
+			if (mPlayerStatusListener != null) {
+				mPlayerStatusListener
+						.playerStatusUpdate("Download failed and removing request and deleting the file");
+			}
+			closePlayer();
+			Util.removeDownload(mDownloadData.mDownloadId, mContext);
+			Util.showToast(
+					mContext,
+					"Download has failed, Please check if sufficent memory is available.",
+					Util.TOAST_TYPE_ERROR);
+			return false;
+		}
+
+		if (mPlayerStatusListener != null) {
+			mPlayerStatusListener
+					.playerStatusUpdate("file exists, starting player.....per download :"
+							+ mDownloadData.mPercentage);
+		}
+
+		playVideoFile(mDownloadData);
+		return true;
+
+	}
 	private OnClickListener mPlayerClickListener = new OnClickListener() {
 
 		@Override
@@ -306,6 +362,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 			
 			//This event is handled in CardDEtails
 			if(canBePlayed(true)){
+				isTriler = false;
 				//FetchUrl();
 				 fetchUrl(null);
 				mVideoViewParent.setOnClickListener(null);
@@ -662,7 +719,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 			mVideoViewPlayer.setPlayerListener(CardVideoPlayer.this);
 			mVideoViewPlayer.setUri(uri, streamType);
 		}
-		
+		mVideoViewPlayer.setOnLicenseExpiryListener(onLicenseExpiryListener);		
 		mVideoViewPlayer.hideMediaController();
 		mVideoViewPlayer.setPlayerStatusUpdateListener(mPlayerStatusListener);
 		mVideoView.setOnTouchListener(new OnTouchListener() {
@@ -717,6 +774,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		mVideoViewPlayer.setPlayerListener(CardVideoPlayer.this);
 		mVideoViewPlayer.setUri(uri, streamType);
 	}
+	mVideoViewPlayer.setOnLicenseExpiryListener(onLicenseExpiryListener);
 	mVideoViewPlayer.hideMediaController();
 	mVideoViewPlayer.setPlayerStatusUpdateListener(mPlayerStatusListener);
 	mVideoView.setOnTouchListener(new OnTouchListener() {
@@ -991,6 +1049,9 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			mPlayerState = PLAYER_PLAY;
 			if(mPlayerStatusListener != null){
 				mPlayerStatusListener.playerStatusUpdate("Buffering ended");
+			}
+			if(!mContext.getResources().getBoolean(R.bool.isTablet)){
+				((MainBaseOptions) mContext).setOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
 			}
 		}
 	}
@@ -1280,9 +1341,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 					CardVideoPlayer.this);
 			return false;
 		}
-		if(mData.generalInfo.type.equalsIgnoreCase("live"))	
-			return true;
-
+		
 		if (myplexapplication.mDownloadList != null && mData != null) {
 			
 			CardDownloadData mDownloadData = myplexapplication.mDownloadList.mDownloadedList
@@ -1291,6 +1350,14 @@ private void playVideoFile(CardDownloadData mDownloadData){
 				return true;
 			}
 		}
+		
+		if(!Util.isNetworkAvailable(mContext)){
+			Util.showToast(mContext, mContext.getString(R.string.error_network_not_available), Util.TOAST_TYPE_ERROR);								
+			return false;
+		}	
+		
+		if(mData.generalInfo.type.equalsIgnoreCase("live"))	
+			return true;
 
 		String networkInfo = Util.getInternetConnectivity(mContext);
 		if (networkInfo.equalsIgnoreCase("2G")) {
@@ -1441,6 +1508,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		String videoType = mData.generalInfo.type;		
 		Log.d(TAG,"Video type "+ videoType);
 		
+//		initPlayBack("https://myplexv2betadrmstreaming.s3.amazonaws.com/813/813_sd_est_1391082325821.wvm");
 		if(videoType.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_MOVIE)){		
 			chooseStreamOrDownload(items);
 		}else if(videoType.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
@@ -1489,9 +1557,13 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		for(CardDataVideosItem item : items){
 			if(item.profile.equalsIgnoreCase(ConsumerApi.STREAMADAPTIVE)){
 				profileMap.put(item.profile+item.format, item.link);
+			}else if((item.profile.equalsIgnoreCase(ConsumerApi.VIDEOQUALTYVERYHIGH)) && (item.format.equalsIgnoreCase(ConsumerApi.STREAMINGFORMATHTTP))){
+				profileMap.put(item.profile+item.format, item.link);
 			}else if((item.profile.equalsIgnoreCase(ConsumerApi.VIDEOQUALTYVERYHIGH)) && (item.format.equalsIgnoreCase(ConsumerApi.STREAMINGFORMATHLS))){
 				profileMap.put(item.profile+item.format, item.link);
 			}else if((item.profile.equalsIgnoreCase(ConsumerApi.VIDEOQUALTYVERYHIGH)) && (item.format.equalsIgnoreCase(ConsumerApi.STREAMINGFORMATRTSP))){
+				profileMap.put(item.profile+item.format, item.link);
+			}else if((item.profile.equalsIgnoreCase(ConsumerApi.VIDEOQUALTYHIGH)) && (item.format.equalsIgnoreCase(ConsumerApi.STREAMINGFORMATHTTP))){
 				profileMap.put(item.profile+item.format, item.link);
 			}else if((item.profile.equalsIgnoreCase(ConsumerApi.VIDEOQUALTYHIGH)) && (item.format.equalsIgnoreCase(ConsumerApi.STREAMINGFORMATHLS))){
 				profileMap.put(item.profile+item.format, item.link);
@@ -1516,7 +1588,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			if(mConnectivity.equalsIgnoreCase("wifi")){
 				initPlayBack(getLink(profileMap, ConsumerApi.STREAMINGFORMATHTTP,
 						ConsumerApi.STREAMINGFORMATRTSP,
-						new String[]{ConsumerApi.VIDEOQUALTYVERYHIGH,ConsumerApi.VIDEOQUALTYHIGH,ConsumerApi.VIDEOQUALTYLOW}));
+						new String[]{ConsumerApi.VIDEOQUALTYHIGH,ConsumerApi.VIDEOQUALTYLOW}));
 			}else if(mConnectivity.equalsIgnoreCase("3G")){
 				initPlayBack(getLink(profileMap, ConsumerApi.STREAMINGFORMATHTTP,
 						ConsumerApi.STREAMINGFORMATRTSP,
@@ -1575,6 +1647,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 					onLastPausedTimeFetched(adaptive.elapsedTime);			
 				}
 			}else{
+				 Util.showToast(mContext, mContext.getString(R.string.switch_to_download_in_setting_msg), Util.TOAST_TYPE_INFO);
 				 if(adaptive_link!=null)			
 					 initPlayBack(adaptive_link);
 				else if(download_link!=null)			
@@ -1584,7 +1657,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 				DownloadStreamDialog dialog = new DownloadStreamDialog(mContext,mData.generalInfo.title+" rental options");
 				dialog.setListener(new DownloadListener() {			
 					@Override
-					public void onOptionSelected(boolean isDownload) {	
+					public void onOptionSelected(boolean isDownload) {
 						if(isDownload){
 							initPlayBack(download_link);
 						}else{
@@ -1606,7 +1679,8 @@ private void playVideoFile(CardDownloadData mDownloadData){
 	@Override
 	public void onUrlFetchFailed(String message) 
 	{
-		if(message != null && message.equalsIgnoreCase("ERR_USER_NOT_SUBSCRIBED")){			
+		if(message != null && message.equalsIgnoreCase("ERR_USER_NOT_SUBSCRIBED")){
+			closePlayer();
 			PackagePopUp popup = new PackagePopUp(mContext,(View)mParentLayout.getParent());
 			myplexapplication.getCardExplorerData().cardDataToSubscribe =  mData;
 			popup.showPackDialog(mData, ((Activity)mContext).getActionBar().getCustomView());	
@@ -1691,6 +1765,28 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			mVideoViewPlayer.setmPositionWhenPaused(ellapseTime*1000);			
 			}			
 	}
+	OnLicenseExpiry onLicenseExpiryListener = new VideoViewPlayer.OnLicenseExpiry() {
+		
+		@Override
+		public void licenseExpired() {
+			
+			if(mContext == null || ! (mContext instanceof Activity)){
+				return;
+			}
+			
+			((Activity)mContext).runOnUiThread(new Runnable() {
+				
+				@Override
+				public void run() {
+					Util.showToast(mContext,"License Expired.",Util.TOAST_TYPE_INFO);
+					PackagePopUp popup = new PackagePopUp(mContext,(View)mParentLayout.getParent());
+					myplexapplication.getCardExplorerData().cardDataToSubscribe =  mData;
+					popup.showPackDialog(mData, ((Activity)mContext).getActionBar().getCustomView());	
+					
+				}
+			});			
+		}
+	};
 	
 	
 }
