@@ -1549,9 +1549,13 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		for(CardDataVideosItem item : items){
 			if(item.profile.equalsIgnoreCase(ConsumerApi.STREAMADAPTIVE)){
 				profileMap.put(item.profile+item.format, item.link);
+			}else if((item.profile.equalsIgnoreCase(ConsumerApi.VIDEOQUALTYVERYHIGH)) && (item.format.equalsIgnoreCase(ConsumerApi.STREAMINGFORMATHTTP))){
+				profileMap.put(item.profile+item.format, item.link);
 			}else if((item.profile.equalsIgnoreCase(ConsumerApi.VIDEOQUALTYVERYHIGH)) && (item.format.equalsIgnoreCase(ConsumerApi.STREAMINGFORMATHLS))){
 				profileMap.put(item.profile+item.format, item.link);
 			}else if((item.profile.equalsIgnoreCase(ConsumerApi.VIDEOQUALTYVERYHIGH)) && (item.format.equalsIgnoreCase(ConsumerApi.STREAMINGFORMATRTSP))){
+				profileMap.put(item.profile+item.format, item.link);
+			}else if((item.profile.equalsIgnoreCase(ConsumerApi.VIDEOQUALTYHIGH)) && (item.format.equalsIgnoreCase(ConsumerApi.STREAMINGFORMATHTTP))){
 				profileMap.put(item.profile+item.format, item.link);
 			}else if((item.profile.equalsIgnoreCase(ConsumerApi.VIDEOQUALTYHIGH)) && (item.format.equalsIgnoreCase(ConsumerApi.STREAMINGFORMATHLS))){
 				profileMap.put(item.profile+item.format, item.link);
@@ -1576,7 +1580,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			if(mConnectivity.equalsIgnoreCase("wifi")){
 				initPlayBack(getLink(profileMap, ConsumerApi.STREAMINGFORMATHTTP,
 						ConsumerApi.STREAMINGFORMATRTSP,
-						new String[]{ConsumerApi.VIDEOQUALTYVERYHIGH,ConsumerApi.VIDEOQUALTYHIGH,ConsumerApi.VIDEOQUALTYLOW}));
+						new String[]{ConsumerApi.VIDEOQUALTYHIGH,ConsumerApi.VIDEOQUALTYLOW}));
 			}else if(mConnectivity.equalsIgnoreCase("3G")){
 				initPlayBack(getLink(profileMap, ConsumerApi.STREAMINGFORMATHTTP,
 						ConsumerApi.STREAMINGFORMATRTSP,
