@@ -105,7 +105,8 @@ public class FetchDownloadProgress {
 						mDownloadData.mCompleted = true;
 						mDownloadData.mPercentage = 100;
 						//for Analytics //Util.java startDownload() method the Analytics.downloadStartTime is initialized
-						long timetakenForDownload = System.currentTimeMillis() - Analytics.downloadStartTime;
+						long startTime = SharedPrefUtils.getLongFromSharedPreference(mContext, Analytics.downLoadStartTime);
+						long timetakenForDownload = System.currentTimeMillis() - startTime;
 						long timeInMinutes = TimeUnit.MILLISECONDS.toMinutes(timetakenForDownload);
 						long mb=1024L*1024L;
 						long bytesinMB = 0;
@@ -113,7 +114,8 @@ public class FetchDownloadProgress {
 							bytesinMB = (bytes_total/mb);
 						}
 						Analytics.mixPanelDownloadsMovie(mCardData.generalInfo.title,mCardData._id,bytesinMB+"",timeInMinutes+"");
-						Analytics.downloadStartTime = 0;//setting the starting time to zero
+						//Analytics.downloadStartTime = 0;//setting the starting time to zero
+						SharedPrefUtils.writeToSharedPref(mContext, Analytics.downLoadStartTime, 0);
 						
 					}else if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_FAILED) {
 						mDownloadData.mCompleted = true;

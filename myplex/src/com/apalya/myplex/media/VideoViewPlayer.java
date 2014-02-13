@@ -861,10 +861,6 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 			if(status==0 && value== DrmInfoEvent.TYPE_RIGHTS_INSTALLED)
 			{
 				iPlayerStarted=true;
-				
-				Map<String,String> params=new HashMap<String, String>();
-				params.put(Analytics.PLAY_CONTENT_STATUS_PROPERTY,Analytics.PLAY_CONTENT_STATUS_TYPES.PlayerRightsAcquisition.toString());
-				params.put(Analytics.PLAY_CONTENT_STATUS_PROPERTY,Analytics.PLAY_CONTENT_STATUS_TYPES.Playing.toString());
 				startPlayer(true);
 			}
 			if(status!=0 ){

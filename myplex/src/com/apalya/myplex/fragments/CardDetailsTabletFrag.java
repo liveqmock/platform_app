@@ -87,8 +87,8 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		EasyTracker easyTracker2 = EasyTracker.getInstance(getActivity());	
-		Analytics.createScreenGA(easyTracker2, Analytics.SCREEN_NAMES.CardDetailsTabletFrag.toString());
+		/*EasyTracker easyTracker2 = EasyTracker.getInstance(getActivity());	
+		Analytics.createScreenGA(easyTracker2, Analytics.SCREEN_NAMES.CardDetailsTabletFrag.toString());*/
 			
 	}
 	@Override
@@ -121,6 +121,7 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		if(mCardData.generalInfo != null){
 			mMainActivity.setActionBarTitle(mCardData.generalInfo.title.toLowerCase());
 		}
+		Analytics.mixPanelcardSelected(mCardData);
 		prepareContent();
 		return rootView;
 	}
@@ -130,6 +131,8 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		if(mPlayer!=null){
 			if(mPlayer.isMediaPlaying()){
 				mPlayer.onStateChanged(PlayerListener.STATE_PAUSED, mPlayer.getStopPosition());
+				Analytics.stoppedAt();
+				Analytics.mixPanelVideoTimeCalculation(mCardData);
 			}
 			mPlayer.stopSportsStatusRefresh();
 		}
@@ -196,6 +199,7 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 	}
 
 	private void showAlbumDialog() {
+		Analytics.mixPanelCastCrewPopup(mCardData);
 		mAlbumDialog = new CustomDialog(getContext());
 		mAlbumDialog.setContentView(R.layout.albumview);
 		setupJazziness(TransitionEffect.CubeOut);

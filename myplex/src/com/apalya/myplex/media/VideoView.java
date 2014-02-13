@@ -379,7 +379,7 @@ public class VideoView extends SurfaceView implements MediaPlayerControl {
                
                 //mixPanelUnableToPlayVideo("Cannot play video");
                 Analytics.mixPanelUnableToPlayVideo("Cannot play video");
-        		
+        		Analytics.createExceptionGA("Cannot play video", false);
                 new AlertDialog.Builder(mContext)
                         .setTitle("Error")
                         .setMessage("Cannot play video")
@@ -400,24 +400,7 @@ public class VideoView extends SurfaceView implements MediaPlayerControl {
             return true;
         }
     };
-    
-    //Already in Analytics
-    /*private void mixPanelUnableToPlayVideo(String error) {
-    	
-        EasyTracker easyTracker = myplexapplication.getGaTracker();
-    	int selected = myplexapplication.getCardExplorerData().currentSelectedCard;
-		CardData  cardData = myplexapplication.getCardExplorerData().mMasterEntries.get(selected);
-		String contentName = cardData.generalInfo.title;
-		Map<String,String> params = new HashMap<String, String>();
-		params.put(Analytics.CONTENT_NAME_PROPERTY,contentName);
-		params.put(Analytics.CONTENT_ID_PROPERTY,cardData._id);
-		params.put(Analytics.CONTENT_TYPE_PROPERTY,Analytics.movieOrLivetv(cardData.generalInfo.type));
-		params.put(Analytics.REASON_FAILURE,error);
-		String event = Analytics.EVENT_UNABLE_TO_PLAY + Analytics.EMPTY_SPACE + contentName;
-		Analytics.trackEvent(event,params);
-		//Analytics.createEventGA(easyTracker, Analytics.EVENT_PLAY,Analytics.CONTENT_PLAY_ERROR,contentName );
-    }*/
-
+   
     private MediaPlayer.OnBufferingUpdateListener mBufferingUpdateListener =
         new MediaPlayer.OnBufferingUpdateListener() {
         public void onBufferingUpdate(MediaPlayer mp, int percent) {

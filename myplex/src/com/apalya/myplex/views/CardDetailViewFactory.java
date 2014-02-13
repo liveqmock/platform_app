@@ -56,6 +56,7 @@ public class CardDetailViewFactory {
 	public static final String SECTION_RELATEDMULTIMEDIA = "Related Multimedia";
 	
 	public static String COMMENT_POSTED = null; //useful to getdata from MessagePost to CardDetailViewFactory
+	public static String RATING_POSTED = null; //useful to getdata from MessagePost to CardDetailViewFactory
 	
 	private View mDetails;
 	private View mDescription;
@@ -266,13 +267,17 @@ public class CardDetailViewFactory {
 								Util.showToast(mContext, "Comment has been posted successfully.",Util.TOAST_TYPE_INFO);
 								if(COMMENT_POSTED != null) {
 									//mixPanelEneteredCommentsReviews(COMMENT_POSTED,"comment");
-									Analytics.mixPanelEnteredCommentsReviews(mData,COMMENT_POSTED,"comment");
+									Analytics.mixPanelEnteredCommentsReviews(mData,COMMENT_POSTED,"comment","0");
 								}
 								//final String label = (String) editBox.getText();
 								//Toast.makeText(mContext, "Comment has posted successfully.", Toast.LENGTH_SHORT).show();
 								mCurrentCommentViewType = COMMENTSECTION_COMMENTS;
 								refreshSection();
 							}else{
+								//remove this
+								if(COMMENT_POSTED != null) {
+									Analytics.mixPanelEnteredCommentsReviews(mData,COMMENT_POSTED,"comment","0");
+								}
 								Util.showToast(mContext, "Unable to post your comment.",Util.TOAST_TYPE_ERROR);
 //								Toast.makeText(mContext, "Unable to post your comment.", Toast.LENGTH_SHORT).show();
 							}
@@ -289,13 +294,16 @@ public class CardDetailViewFactory {
 							if(status){
 								Util.showToast(mContext, "Review has posted successfully.",Util.TOAST_TYPE_INFO);
 								if(COMMENT_POSTED != null) {
-									//mixPanelEneteredCommentsReviews(COMMENT_POSTED,"review");
-									Analytics.mixPanelEnteredCommentsReviews(mData,COMMENT_POSTED,"review");
+									Analytics.mixPanelEnteredCommentsReviews(mData,COMMENT_POSTED,"review",RATING_POSTED);
 								}
 //								Toast.makeText(mContext, "Review has posted successfully.", Toast.LENGTH_SHORT).show();
 								mCurrentCommentViewType = COMMENTSECTION_REVIEW;
 								refreshSection();
 							}else{
+								//remove this
+								if(COMMENT_POSTED != null) {
+									Analytics.mixPanelEnteredCommentsReviews(mData,COMMENT_POSTED,"review",RATING_POSTED);
+								}
 								Util.showToast(mContext, "Unable to post your review.",Util.TOAST_TYPE_ERROR);
 //								Toast.makeText(mContext, "Unable to post your review.", Toast.LENGTH_SHORT).show();
 							}

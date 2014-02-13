@@ -50,7 +50,7 @@ public class DeviceRegUtil {
 		myReg.setShouldCache(false);
 		queue.add(myReg);
 		//mixPanelDeviceRegisterInitiated(1);
-		Analytics.mixPanelDeviceRegisterInitiated(1);
+		Analytics.mixPanelDeviceDeRegisterInitiated(1);
 		mProgressDialog = ProgressDialog.show(mContext,"", "UnRegistering device..", true,false);
 		
 		Log.e(TAG, "requestUrl: "+url);
@@ -80,13 +80,14 @@ public class DeviceRegUtil {
 
 					{
 						String msg =jsonResponse.getString("message");
+						Analytics.mixPanelDeviceDeRegisterInitiated(2);
 						if(!TextUtils.isEmpty(msg)){
 							Util.showToast(mContext, msg, Util.TOAST_TYPE_ERROR);
 							LogOutUtil.onClickLogout(mContext);
 							return;
 						}
 						//mixPanelDeviceRegisterInitiated(2);
-						Analytics.mixPanelDeviceRegisterInitiated(2);
+						
 						
 					}
 					

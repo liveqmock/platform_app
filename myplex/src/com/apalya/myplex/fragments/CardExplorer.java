@@ -78,7 +78,6 @@ import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.views.CardView;
 import com.apalya.myplex.views.PackagePopUp;
 import com.fasterxml.jackson.core.JsonParseException;
-import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.Fields;
 import com.google.analytics.tracking.android.GoogleAnalytics;
 import com.google.analytics.tracking.android.HitTypes;
@@ -127,6 +126,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		super.onCreate(savedInstanceState);
 		mData = myplexapplication.getCardExplorerData();
 		mfirstTime = true;
+		Analytics.createScreenGA(Analytics.SCREEN_CARD_EXPLORER);
 	}
 
 	public void showProgressBar() {
@@ -417,7 +417,14 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	@Override
 	public void onPause() {
 		// TODO Auto-generated method stub
-		//mCardView.mixpanelBrowsing(false);
+		//mCardView.mixpanelBrowsing();
+		//for analytics
+		CardView cardView = getmCardView();
+    	if(cardView != null) {
+    		if(cardView.swipeCount > 1) {
+    			cardView.mixpanelBrowsing();
+    		}
+    	}
 		super.onPause();
 	}
 	public void fillDownloadList(){
@@ -696,7 +703,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		if(mData.mMasterEntries == null || mData.mMasterEntries.size() == 0){
 			return;
 		}
-		Analytics.mixPanelBrowsingEvents(mData,mfirstTime);
+		//Analytics.mixPanelBrowsingEvents(mData,mfirstTime);
 		if(!isAdded())
 		{
 			Log.e(TAG, "acitivty is NULL");
@@ -714,7 +721,6 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		prepareFilterData();
 		dismissProgressBar();
 		mMainActivity.hideActionBarProgressBar();
-		//mixPanelBrowsingEvents(); //can be improved
 		//Analytics.mixPanelBrowsingEvents(mData,mfirstTime);
 	}
 
@@ -912,6 +918,9 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		if(mData.mMasterEntries.size() != 0){
 			showNoDataMessage(issuedRequest);
 		}
+		if(mData.requestType != CardExplorerData.REQUEST_SEARCH){
+			Analytics.mixPanelBrowsingEvents(mData,mfirstTime);
+		}
 		applyData();
 		if(mOldDataAdded){
 			mOldDataAdded = false;
@@ -989,8 +998,10 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			
 			
 		showNoDataMessage(false);
+		if(mData.requestType == CardExplorerData.REQUEST_SEARCH){
+			Analytics.mixPanelBrowsingEvents(mData,mfirstTime);
+		}
 		applyData();
-		//mixPanel();
 		if(mOldDataAdded){
 			mOldDataAdded = false;
 			if(itemsAdded){
@@ -1071,6 +1082,10 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		mMainActivity.hideActionBarProgressBar();
 		dismissProgressBar();
 		Util.showToast(mContext, message, Util.TOAST_TYPE_INFO);
+	}
+	//analytics
+	public CardView getmCardView() {
+		return mCardView;
 	}
 	
 }

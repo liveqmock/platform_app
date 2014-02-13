@@ -88,10 +88,7 @@ public class SettingsAdapter extends ArrayAdapter<SettingsData> implements Pinne
 		public void onCheckedChanged(CompoundButton buttonView,
 				boolean isChecked) {
 			try {
-				if(isChecked) {
-					//mixPanelWifiOnly();
-					Analytics.mixPanelWifiOnly();
-				}
+				Analytics.mixPanelWifiOnly(isChecked);
 				SettingsData obj = (SettingsData)buttonView.getTag();
 				if(obj != null){
 					if(obj.mSettingName.equalsIgnoreCase("Download only on Wifi")){

@@ -36,7 +36,6 @@ import com.apalya.myplex.views.DownloadStreamDialog;
 import com.apalya.myplex.views.DownloadStreamDialog.DownloadListener;
 import com.apalya.myplex.views.PinnedSectionListView;
 import com.apalya.myplex.views.RatingDialog;
-import com.google.analytics.tracking.android.EasyTracker;
 
 public class SetttingsFragment extends BaseFragment {
 
@@ -53,7 +52,8 @@ public class SetttingsFragment extends BaseFragment {
 	public static final String DRM_LEVAL_STRING="WVDRM StatusKey";
 	public static final String ROOT_STATUS_STRING="Root Status";
 	public static final String DERIGISTER_DEVICE="DeRegister Device";
-	
+	public static String RATING_POSTED = null; //analytics useful to getdata from MessagePost to CardDetailViewFactory
+	public static String FEEDBACK_POSTED = null; //analytics useful to getdata from MessagePost to CardDetailViewFactory
 	private int debug_mode_counter=0;
 
 	@Override
@@ -66,6 +66,7 @@ public class SetttingsFragment extends BaseFragment {
 		debug_mode_counter=0;
 		
 		Analytics.mixPanelBrowsedSettings();
+		Analytics.createScreenGA(Analytics.SCREEN_SETTINGS);
 		mSettingsListView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
@@ -116,8 +117,7 @@ public class SetttingsFragment extends BaseFragment {
 						@Override
 						public void sendMessage(boolean status) {
 							if(status){
-								//Map<String,String> params=new HashMap<String, String>();
-								//Analytics.trackEvent(Analytics.EVENT_PROVIDED_FEEDBACK,params);
+								Analytics.mixPanelProvidedFeedback(FEEDBACK_POSTED, RATING_POSTED);
 								Util.showToast(mContext, "Thanks for your feedback.",Util.TOAST_TYPE_INFO);
 								
 							}else{

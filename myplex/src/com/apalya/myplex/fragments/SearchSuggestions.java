@@ -41,7 +41,6 @@ import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.Fields;
 import com.google.analytics.tracking.android.MapBuilder;
 
@@ -61,9 +60,7 @@ public class SearchSuggestions extends BaseFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		EasyTracker easyTracker2 = EasyTracker.getInstance(getActivity());	
-		Analytics.createScreenGA(easyTracker2, Analytics.SCREEN_NAMES.SearchSuggestions.toString());
-		
+			
 	}
 
 	@Override

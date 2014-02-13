@@ -35,6 +35,7 @@ import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -87,6 +88,7 @@ import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.LogOutUtil;
 import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.utils.Util;
+import com.apalya.myplex.views.CardView;
 import com.apalya.myplex.views.RatingDialog;
 import com.facebook.Session;
 
@@ -119,19 +121,16 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 		// TODO Auto-generated method stub
 		super.onStart();
 		
-		easyTracker = myplexapplication.getGaTracker();
-		Analytics.startActivity(easyTracker, this);
+		/*easyTracker = myplexapplication.getGaTracker();
+		Analytics.startActivity(easyTracker, this);*/
 		//easyTracker.activityStart(this);
 	}
 	
 	@Override
 	protected void onStop() {
 		// TODO Auto-generated method stub
-		
-		
-		
 		super.onStop();
-		EasyTracker.getInstance(this).activityStop(this); 
+		//EasyTracker.getInstance(this).activityStop(this); 
 	}
 	
 	@Override
@@ -1158,7 +1157,7 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 			@Override
 			public void onClick(View v) {
 				Log.i(TAG,"onClick");
-				Analytics.mixPanelInlineSearchInitiated();
+				Analytics.mixPanelInlineSearchInitiated(getCurrentScreen());
 				
 //				changeVisibility(mCustomActionBarTitleLayout,View.GONE);
 				if (mDrawerLayout!=null && mNavigationDrawerOpened) {
@@ -1383,6 +1382,22 @@ public class MainActivity extends Activity implements MainBaseOptions, SearchVie
 		tvOrMovie.setVisibility(View.GONE);
 	}
 	
-	
-	
+	//for analytics
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event)  {
+		Log.d(TAG, "Back button pressed");
+	    if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+			Log.d(TAG, "Testing"); 
+	    	if(mCardExplorer != null) {
+	    		CardView cardView = mCardExplorer.getmCardView();
+	    		if(cardView != null) {
+	    			if(cardView.swipeCount > 1) {
+	    				cardView.mixpanelBrowsing();
+	    			}
+	    		}//if(cardView != null)
+	    	}//if(mCardExplorer != null)
+		}
+	    return super.onKeyDown(keyCode, event);
+	}
+			
 }

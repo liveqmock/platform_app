@@ -84,6 +84,7 @@ public class SearchActivity extends BaseFragment implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Analytics.mixPanelDiscoveryOptionSelected();
+		Analytics.createScreenGA(Analytics.SCREEN_DISCOVER);
 	}
 
 	@Override

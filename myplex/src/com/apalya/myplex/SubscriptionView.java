@@ -32,12 +32,14 @@ import android.webkit.WebViewClient;
 import com.apalya.myplex.cache.InsertionResult;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardResponseData;
+import com.apalya.myplex.data.UserProfile;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.AlertDialogUtil;
 import com.apalya.myplex.utils.AlertDialogUtil.NoticeDialogListener;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FetchCardField;
+import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.utils.FetchCardField.FetchComplete;
 import com.apalya.myplex.utils.Util;
 
@@ -125,31 +127,60 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 	}
 	
 	private void mixPanelPaySuccess(CardData subscribedData) {
-		
+			if(subscribedData == null ) return;
+			if(subscribedData.generalInfo == null ) return;
 			Map<String,String> params=new HashMap<String, String>();
-			params.put(Analytics.CONTENT_ID_PROPERTY, subscribedData._id);
-			params.put(Analytics.CONTENT_NAME_PROPERTY, subscribedData.generalInfo.title);
-			//params.put(Analytics.PAY_CONTENT_PRICE, contentPrice.toString());
-			params.put(Analytics.PAY_PURCHASE_TYPE, commercialModel); //Rental or buy
-			params.put(Analytics.PAYMENT_METHOD, paymentModel); //cc or dc
-			params.put(Analytics.CONTENT_QUALITY, contentType); //SD or HD
-			String ctype = Analytics.movieOrLivetv(subscribedData.generalInfo.type); //movie or livetv
-			String event = Analytics.EVENT_PAID_FOR + Analytics.EMPTY_SPACE+subscribedData.generalInfo.title;
+			String str = "analytics";
+			String value = commercialModel+":"+contentType;
+			SharedPrefUtils.writeToSharedPref(this, "subscribedData._id"+str, value);//storing rental/buy &SD/HD info for analytics
+			params.put(Analytics.CONTENT_ID_PROPERTY, subscribedData._id);//1
+			params.put(Analytics.CONTENT_NAME_PROPERTY, subscribedData.generalInfo.title);//2
+			String ctype = Analytics.movieOrLivetv(subscribedData.generalInfo.type); //movie or livetv //3
+			params.put(Analytics.CONTENT_TYPE_PROPERTY, ctype); //4
+			params.put(Analytics.PAY_PURCHASE_TYPE, commercialModel); //Rental or buy //5
+			params.put(Analytics.PAYMENT_METHOD, paymentModel); //cc or dc //6
+			params.put(Analytics.CONTENT_QUALITY, contentType); //SD or HD //7
+			params.put(Analytics.USER_ID,Analytics.getUserEmail());//8
+			String event = Analytics.EVENT_PAID_FOR_CONTENT;
+			//String event = Analytics.EVENT_PAID_FOR + Analytics.EMPTY_SPACE+subscribedData.generalInfo.title;
+			if("live tv".equals(ctype)) {
+				Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_LIVETV_PURCHASED_FOR,contentPrice);
+				Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_TOTAL_PURCHASES,contentPrice);
+				Analytics.trackEvent(event,params);
+				Analytics.createTransactionGA(transactionid, paymentModel,contentPrice, 0.0,0.0);
+				Analytics.createItemGA(transactionid, contentName,contentId, ctype, contentPrice, 1L);
+				return;
+			}
+			
 			if(couponCode != null && couponCode.length() > 0) { //coupon is applied
+				params.put(Analytics.COUPON_USED,"TRUE");
+				params.put(Analytics.COUPON_DISCOUNT,Analytics.couponDiscountINR+"");
 				if(priceTobecharged > 0) {
-					params.put(Analytics.PAY_CONTENT_PRICE,priceTobecharged+"");
+					params.put(Analytics.PAY_CONTENT_PRICE,priceTobecharged+""); //8
 					Analytics.trackEvent(event,params);
 					Analytics.trackCharge(priceTobecharged);
+					Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_MOVIES_PURCHASED_FOR,priceTobecharged);
+					Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_TOTAL_PURCHASES,priceTobecharged);
+					Analytics.createTransactionGA(transactionid, paymentModel,contentPrice, 0.0,0.0);
+					Analytics.createItemGA(transactionid, contentName,contentId, ctype, contentPrice, 1L);
+					return;
 				}	
 				if(priceTobecharged == 0) {
-					event = Analytics.EVENT_SUBSCRIBED_FREE_FOR + Analytics.EMPTY_SPACE+subscribedData.generalInfo.title;
+					event = Analytics.EVENT_SUBSCRIBED_FREE + Analytics.EMPTY_SPACE+subscribedData.generalInfo.title;
 					Analytics.trackEvent(event,params);
+					return;
 				}
 			}
 			else { //regular price
-				params.put(Analytics.PAY_CONTENT_PRICE, contentPrice.toString());
+				params.put(Analytics.COUPON_USED,"FALSE"); //regular price
+				params.put(Analytics.COUPON_DISCOUNT,0.0+"");
+				params.put(Analytics.PAY_CONTENT_PRICE, contentPrice.toString()); //8
 				Analytics.trackEvent(event,params);
 				Analytics.trackCharge(contentPrice);
+				Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_MOVIES_PURCHASED_FOR,contentPrice);
+				Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_TOTAL_PURCHASES,priceTobecharged);
+				Analytics.createTransactionGA(transactionid, paymentModel,contentPrice, 0.0,0.0);
+				Analytics.createItemGA(transactionid, contentName,contentId, ctype, contentPrice, 1L);
 			}
 				
 	}
@@ -204,8 +235,8 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 		params.put(Analytics.PAYMENT_METHOD, paymentModel); //cc or dc
 		params.put(Analytics.CONTENT_QUALITY, contentType); //SD or HD
 		String ctype = Analytics.movieOrLivetv(subscribedData.generalInfo.type); //movie or livetv
-		//String event = Analytics.EVENT_PAY + Analytics.EMPTY_SPACE+ctype;
-		String event = Analytics.EVENT_SUBSCRIPTION_FAILURE + Analytics.EMPTY_SPACE+subscribedData.generalInfo.title;
+		//String event = Analytics.EVENT_SUBSCRIPTION_FAILURE + Analytics.EMPTY_SPACE+subscribedData.generalInfo.title;
+		String event = Analytics.EVENT_SUBSCRIPTION_FAILURE;
 		params.put(Analytics.REASON_FAILURE,error);
 		Analytics.trackEvent(event,params);
 	}

@@ -38,10 +38,12 @@ import com.apalya.myplex.data.CardDataImagesItem;
 import com.apalya.myplex.data.CardDataPackagePriceDetailsItem;
 import com.apalya.myplex.data.CardDataPackages;
 import com.apalya.myplex.data.CardDownloadData;
+import com.apalya.myplex.data.CardExplorerData;
 import com.apalya.myplex.data.CardImageView;
 import com.apalya.myplex.data.CardViewHolder;
 import com.apalya.myplex.data.CardViewMeta;
 import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.fragments.CardExplorer;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.CardImageLoader;
 import com.apalya.myplex.utils.ConsumerApi;
@@ -69,7 +71,13 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 				this.mDataList.add(data);
 			}
 		}
+		//for analytics
 		mNumberofItems = mDataList.size();
+		CardExplorerData mData = myplexapplication.mCardExplorerData;
+		int requestType = myplexapplication.mCardExplorerData.requestType;
+		String searchQuery = myplexapplication.mCardExplorerData.searchQuery;
+		boolean bool = CardExplorer.mfirstTime;
+		//Analytics.mixPanelTabletBrowsingEvents(mNumberofItems);
 		notifyDataSetChanged();
 	}
 	public void forceUpdateData(List<CardData> datalist){

@@ -390,7 +390,8 @@ public class Util {
 	
 	public static String startDownload(String aUrl,CardData aMovieData,Context mContext)
 	{
-		Analytics.downloadStartTime = System.currentTimeMillis();
+		long downloadStartTime = System.currentTimeMillis();
+		SharedPrefUtils.writeToSharedPref(mContext, Analytics.downLoadStartTime, downloadStartTime);
 		long lastDownloadId=-1L;
 		String aMovieName=aMovieData.generalInfo.title.toLowerCase();
 		String aFileName=aMovieData._id;

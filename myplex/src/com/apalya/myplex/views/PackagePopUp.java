@@ -92,6 +92,7 @@ public class PackagePopUp {
 	private static String COUPON_CODE ="";
 	private ScrollView pkgScrollView;
 	private RelativeLayout couponLayout;
+	CardData cardDataAnalytics;
 	
 	public PackagePopUp(Context cxt,View background){
 		this.mContext = cxt;
@@ -113,8 +114,7 @@ public class PackagePopUp {
 			RegisterUserReq(mContext.getString(R.string.signuppath), params);
 		}
 		
-		//mixPanelPaymentOptionsPresented();
-		Analytics.mixPanelPaymentOptionsPresented();
+		//Analytics.mixPanelPaymentOptionsPresented();
 	}
 	
 	/*private void mixPanelPaymentOptionsPresented() {
@@ -185,19 +185,8 @@ public class PackagePopUp {
 //		else
 //			hideCouponFunctionality(v);
 		showPopup(v,anchorView);
-		
+		cardDataAnalytics = data;
 	}
-	
-	/*private void mixPanelCouponEntered() {
-		
-		Map<String,String> params=new HashMap<String, String>();
-		int selected = myplexapplication.getCardExplorerData().currentSelectedCard;
-		CardData  mData = myplexapplication.getCardExplorerData().mMasterEntries.get(selected);
-		params.put(Analytics.CONTENT_ID_PROPERTY, mData._id);
-		params.put(Analytics.CONTENT_NAME_PROPERTY, mData.generalInfo.title);
-		params.put(Analytics.PAY_COUPON_CODE, COUPON_CODE);
-		Analytics.trackEvent(Analytics.EVENT_COUPON_ENTERED,params);
-	}*/
 	
 	private void setUpCouponFunctionality(View view,CardData data) {	
 		couponLayout = (RelativeLayout)view.findViewById(R.id.couponLayout);
@@ -334,6 +323,8 @@ public class PackagePopUp {
 
 	private void addPack(CardData data,LinearLayout parentlayout) {
 		if(data.packages == null){return;}
+		List<String> qualityList = new ArrayList<String>(); //analytics
+		List<String> purchaseOptionsList = new ArrayList<String>(); //analytics
 		for(CardDataPackages packageitem:data.packages){
 			if(packageitem.priceDetails != null && packageitem.priceDetails.size() > 0){
 				if(packageitem.priceDetails.size() == 1 && packageitem.priceDetails.get(0)!=null && packageitem.priceDetails.get(0).paymentChannel.equalsIgnoreCase("INAPP"))
@@ -342,6 +333,9 @@ public class PackagePopUp {
 					continue;
 				}
 				createPackItem(packageitem.priceDetails.get(0),packageitem,parentlayout);
+				qualityList.add(packageitem.contentType);
+				purchaseOptionsList.add(packageitem.commercialModel);
+				Log.d(TAG, packageitem.contentType+"  "+ packageitem.commercialModel);
 			}
 		}
 	}
@@ -376,6 +370,7 @@ public class PackagePopUp {
 				v.setAlpha(1.0f);
 				
 				CardDataPackages packageitem = (CardDataPackages)subLayout.getTag();
+				Analytics.mixPanelPaymentOptionsPresented2(cardDataAnalytics,packageitem);//
 				if(packageitem == null){return;}
 				if(packageitem.priceDetails == null){return;}
 				int count = 0;
@@ -692,7 +687,8 @@ public class PackagePopUp {
 					Animation anim = AnimationUtils.loadAnimation(mContext, R.anim.shake);
 					new_price.startAnimation(anim);
 					String oldPrice = new_price.getText().toString().trim();
-					double couponPrice = Double.parseDouble(oldPrice) - priceTobecharged;
+					double couponPrice = Double.parseDouble(oldPrice) - priceTobecharged; //for analytics
+					Analytics.couponDiscountINR = couponPrice; 
 					Analytics.mixPanelCouponEntered(COUPON_CODE,couponPrice+"");
 					StrikeTextView oldprice = (StrikeTextView) layout2.findViewById(R.id.purchasepackItem1_price_before_coupon);
 					oldprice.setVisibility(View.VISIBLE);

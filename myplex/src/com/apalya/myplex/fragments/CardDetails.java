@@ -73,7 +73,6 @@ import com.apalya.myplex.views.JazzyViewPager;
 import com.apalya.myplex.views.JazzyViewPager.TransitionEffect;
 import com.apalya.myplex.views.OutlineContainer;
 import com.apalya.myplex.views.docketVideoWidget;
-import com.google.analytics.tracking.android.EasyTracker;
 
 public class CardDetails extends BaseFragment implements
 		ItemExpandListenerCallBackListener, CardDetailViewFactoryListener,
@@ -108,9 +107,7 @@ public class CardDetails extends BaseFragment implements
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		EasyTracker easyTracker2 = EasyTracker.getInstance(getActivity());	
-		Analytics.createScreenGA(easyTracker2, Analytics.SCREEN_NAMES.CardDetails.toString());
-			
+		Analytics.createScreenGA(Analytics.SCREEN_CARDDETAILS);
 	}
 
 	@Override
@@ -223,7 +220,8 @@ public class CardDetails extends BaseFragment implements
 		});*/
 		
 		//mixPanelcardSelected();
-		Analytics.mixPanelcardSelected(mCardData);
+		if(mCardData != null)
+			Analytics.mixPanelcardSelected(mCardData);
 		return rootView;
 	}
 	
@@ -273,6 +271,7 @@ public class CardDetails extends BaseFragment implements
 			if(mPlayer.isMediaPlaying()){
 				mPlayer.onStateChanged(PlayerListener.STATE_PAUSED, mPlayer.getStopPosition());
 				Analytics.stoppedAt();
+				Analytics.gaStopPauseMediaTime("stop",mPlayer.getStopPosition());
 				Analytics.mixPanelVideoTimeCalculation(mCardData);
 				mPlayer.stopSportsStatusRefresh();
 				if(ApplicationSettings.ENABLE_FB_SHARE_FREE_MOVIE){
@@ -899,6 +898,9 @@ public class CardDetails extends BaseFragment implements
 			}
 			if(mPlayer.isMediaPlaying()){
 				mPlayer.closePlayer();
+				Analytics.stoppedAt();
+				Analytics.mixPanelVideoTimeCalculation(mCardData);
+				Analytics.gaStopPauseMediaTime("stop",mPlayer.getStopPosition());
 				return true;
 			}
 			return false;

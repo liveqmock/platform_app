@@ -28,6 +28,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -67,9 +68,9 @@ import com.apalya.myplex.data.UserProfile;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.AccountUtils;
 import com.apalya.myplex.utils.Analytics;
-import com.apalya.myplex.utils.Analytics.LOGIN_TYPES;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FontUtil;
+import com.apalya.myplex.utils.LocationUtil;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.PlayServicesUtils;
 import com.apalya.myplex.utils.SharedPrefUtils;
@@ -87,6 +88,7 @@ import com.facebook.SessionState;
 import com.facebook.Settings;
 import com.facebook.model.GraphUser;
 
+import com.google.analytics.tracking.android.CampaignTrackingReceiver;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.Fields;
 import com.google.analytics.tracking.android.MapBuilder;
@@ -96,6 +98,7 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.plus.PlusClient;
 import com.google.android.gms.plus.model.people.Person;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
+import com.google.analytics.tracking.android.GoogleAnalytics;
 
 
 
@@ -211,15 +214,21 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		// to dispatch people data.
 
 		mMixpanel.getPeople().initPushHandling(myplexapplication.ANDROID_PUSH_SENDER_ID);
-		easyTracker = myplexapplication.getGaTracker();
-		Analytics.startActivity(easyTracker, this);
+		/*easyTracker = myplexapplication.getGaTracker();
+		Analytics.startActivity(easyTracker, this);*/
 		
 		Map<String,String> params1 = new HashMap<String, String>();
+		params1.put(Analytics.ALL_LOGIN_OPTIONS,"facebook google twitter myplex");
 		Analytics.trackEvent(Analytics.EVENT_LOGIN_OPTIONS_PRESENTED,params1);
-		//easyTracker.activityStart(this);
+		//Analytics.startActivity(easyTracker, this);
+		Analytics.createScreenGA(Analytics.SCREEN_LOGINACTIVITY);
 		
-
-		// You can call enableLogAboutMessagesToMixpanel to see
+		Intent intent = this.getIntent();
+	    Uri uri = intent.getData();
+	    Map camPaignMap = getReferrerMapFromUri(uri);
+	    setSuperProperties(camPaignMap);
+	    
+	    // You can call enableLogAboutMessagesToMixpanel to see
 		// how messages are queued and sent to the Mixpanel servers.
 		// This is useful for debugging, but should be disabled in
 		// production code.
@@ -343,23 +352,17 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				
 				
 						
-				Map<String,String> param1=new HashMap<String, String>();
-				param1.put(Analytics.LOGIN_TYPE_PROPERTY, LOGIN_TYPES.Guest.toString());
-				param1.put(Analytics.LOGIN_DATE_PROPERTY, new Date().toString());
 				
 				if(mDevInfo.getClientKey()!=null)
 				{
+					Map<String,String> param1=new HashMap<String, String>();
 					Analytics.trackEvent(Analytics.EVENT_BROWSING_AS_GUEST,param1);
-					EasyTracker easyTracker = EasyTracker.getInstance(LoginActivity.this);	
-					Analytics.createEventGA(easyTracker, Analytics.EVENT_LOGIN, Analytics.LOGIN_TYPES.Guest.toString(),Analytics.LOGIN_STATUS_TYPES.Success.toString());
 					mUserInfo.setName(Analytics.LOGIN_AS_GUEST);
 					finish();
 					Util.launchMainActivity(LoginActivity.this);
 				}
 				else
 				{
-					param1.put(Analytics.LOGIN_STATUS_PROPERTY,Analytics.LOGIN_STATUS_TYPES.Failure.toString());
-					Analytics.trackEvent(Analytics.EVENT_LOGIN,param1);
 					Util.showToast(LoginActivity.this, getString(R.string.loginconerr),Util.TOAST_TYPE_ERROR);
 //					Util.showToast("Your device registration has been failed, Please check your internet connectivity and reopen the app",  LoginActivity.this);
 				}
@@ -486,6 +489,56 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		myplexapplication.isInitlized=true;		
 
 	}
+	
+	private void setSuperProperties(Map  camPaignMap) {
+		JSONObject properties = new JSONObject();
+		try {
+			if(camPaignMap != null) {
+				if(camPaignMap.containsKey("utm_source")) properties.put("utm_source", camPaignMap.get("utm_source"));
+				if(camPaignMap.containsKey("utm_medium")) properties.put("utm_medium", camPaignMap.get("utm_medium"));
+				if(camPaignMap.containsKey("utm_campaign")) properties.put("utm_campaign", camPaignMap.get("utm_campaign"));
+				if(camPaignMap.containsKey("utm_term")) properties.put("utm_term", camPaignMap.get("utm_term"));
+				if(camPaignMap.containsKey("utm_content")) properties.put("utm_content", camPaignMap.get("utm_content"));				
+			}
+			properties.put("app version.release", Util.getAppVersionName(this));
+			properties.put("browser version", "native app");
+			properties.put("gps", "tobedone");
+						
+			} catch (JSONException e) {
+			e.printStackTrace();
+		} // default value
+		mMixpanel.registerSuperProperties(properties);
+		
+	}
+	Map<String,String> getReferrerMapFromUri(Uri uri) {
+		
+	    MapBuilder paramMap = new MapBuilder();
+	    
+	    // If no URI, return an empty Map.
+	    if (uri == null) { 
+	    	  	return paramMap.build(); 
+	    	}
+	    // Source is the only required campaign field. No need to continue if not
+	    // present.
+	    if (uri.getQueryParameter("utm_source") != null) {
+	    	String str = uri.getQueryParameter("utm_source");
+	    	Log.d(TAG, "campaign hyd "+str );
+	      // MapBuilder.setCampaignParamsFromUrl parses Google Analytics campaign
+	      // ("UTM") parameters from a string URL into a Map that can be set on
+	      // the Tracker.
+	      paramMap.setCampaignParamsFromUrl(uri.toString());
+
+	     // If no source parameter, set authority to source and medium to
+	     // "referral".
+	     } else if (uri.getAuthority() != null) {
+
+	       paramMap.set(Fields.CAMPAIGN_MEDIUM, "referral");
+	       paramMap.set(Fields.CAMPAIGN_SOURCE, uri.getAuthority());
+
+	     }
+
+	     return paramMap.build();
+	  }
 
 	/*
 	 * added by sreedhar for capturing login screen options
@@ -767,7 +820,6 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		try {
 			JSONObject properties = new JSONObject();
 			properties.put("first viewed on", nowInHours);
-			properties.put("user domain", "(unknown)"); // default value
 			mMixpanel.registerSuperPropertiesOnce(properties);
 		} catch (JSONException e) {
 			throw new RuntimeException("Could not encode hour first viewed as JSON");
@@ -958,10 +1010,14 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			public void onErrorResponse(VolleyError error) {
 				dismissProgressBar();
 				Map<String,String> params=new HashMap<String, String>();
-				params.put(Analytics.ACCOUNT_TYPE, Analytics.ALL_LOGIN_TYPES.facebook.toString());
+				params.put(Analytics.ACCOUNT_TYPE, "social: google");
 				params.put(Analytics.USER_ID,mUserInfo.getUserEmail());
 				params.put(Analytics.REASON_FAILURE,error.toString());
 				Analytics.trackEvent(Analytics.EVENT_FACEBOOK_LOGIN_FAILURE,params);
+				MixpanelAPI.People people = Analytics.getMixpanelPeople();
+				people.set(Analytics.ACCOUNT_TYPE, "social: facebook");
+				people.set(Analytics.USER_ID, mUserInfo.getUserEmail());
+				people.set(Analytics.LAST_LOGGED_IN_FAILURE_DATE, Analytics.getCurrentDate()); 
 								
 				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 				Log.d(TAG,"Error: "+error.toString());
@@ -1016,7 +1072,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		
 						}
 						Map<String,String> attribs=new HashMap<String, String>();
-						attribs.put(Analytics.ACCOUNT_TYPE, Analytics.ALL_LOGIN_TYPES.facebook.toString());
+						attribs.put(Analytics.ACCOUNT_TYPE, "social: facebook");
 						attribs.put(Analytics.USER_ID,mUserInfo.getUserEmail());
 						Analytics.trackEvent(Analytics.EVENT_FACEBOOK_LOGIN_SUCCESS,attribs);
 						
@@ -1039,10 +1095,14 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 						}
 									
 						Map<String,String> attribs2=new HashMap<String, String>();
-						attribs2.put(Analytics.ACCOUNT_TYPE, Analytics.ALL_LOGIN_TYPES.facebook.toString());
+						attribs2.put(Analytics.ACCOUNT_TYPE, "social: facebook");
 						attribs2.put(Analytics.USER_ID,mUserInfo.getUserEmail());
 						attribs2.put(Analytics.REASON_FAILURE,jsonResponse.getString("message"));
 						Analytics.trackEvent(Analytics.EVENT_FACEBOOK_LOGIN_FAILURE,attribs2);
+						MixpanelAPI.People people = Analytics.getMixpanelPeople();
+						people.set(Analytics.ACCOUNT_TYPE, "social: facebook");
+						people.set(Analytics.USER_ID, mUserInfo.getUserEmail());
+						people.set(Analytics.LAST_LOGGED_IN_FAILURE_DATE, Analytics.getCurrentDate()); 
 						
 						if(jsonResponse.getString("code").equalsIgnoreCase("401"))
 						{
@@ -1745,6 +1805,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
 						
+						params.put(Analytics.REASON_FAILURE, jsonResponse.getString("message"));
 						Analytics.trackEvent(Analytics.EVENT_DEVICE_REGISTRATION_FAILED,params);
 						Util.showToast(LoginActivity.this, "Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),Util.TOAST_TYPE_ERROR);
 //						Util.showToast("Code: "+jsonResponse.getString("code")+" Msg: "+jsonResponse.getString("message"),LoginActivity.this);
@@ -1905,7 +1966,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			mProgressDialog.setMessage("Logging in, Please wait...");
 		
 		Map<String,String> attribs=new HashMap<String, String>();
-		attribs.put(Analytics.ACCOUNT_TYPE, Analytics.ALL_LOGIN_TYPES.twitter.toString());
+		attribs.put(Analytics.ACCOUNT_TYPE, "social: twitter");
 		Analytics.trackEvent(Analytics.EVENT_TWITTER_LOGIN_SELECTED,attribs); 
 
 		String url=ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+ConsumerApi.USER_CONTEXT+ConsumerApi.SLASH+contextPath;
@@ -1931,7 +1992,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			public void onErrorResponse(VolleyError error) {
 				dismissProgressBar();
 				Map<String,String> params1 = new HashMap<String, String>();
-				params1.put(Analytics.ACCOUNT_TYPE, Analytics.ALL_LOGIN_TYPES.twitter.toString());
+				params1.put(Analytics.ACCOUNT_TYPE, "social: twitter");
 				params1.put(Analytics.USER_ID,mUserInfo.getUserId());
 				params1.put(Analytics.REASON_FAILURE, error.toString());
 				Analytics.trackEvent(Analytics.EVENT_TWITTER_LOGIN_FAILURE, params1);
@@ -1961,7 +2022,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				try {	
 					dismissProgressBar();
 					Map<String,String> params1 = new HashMap<String, String>();
-					params1.put(Analytics.ACCOUNT_TYPE, Analytics.ALL_LOGIN_TYPES.twitter.toString());
+					params1.put(Analytics.ACCOUNT_TYPE, "social: twitter");
 					params1.put(Analytics.USER_ID,mUserInfo.getUserId());					
 					
 					Log.d(TAG, "########################################################");

@@ -195,8 +195,8 @@ public class SubcriptionEngine {
 		params.put(Analytics.CONTENT_QUALITY, mSelectedPackageItem.contentType); //SD or HD
 		String ctype = Analytics.movieOrLivetv(subscribedData.generalInfo.type); //movie or livetv
 		params.put(Analytics.REASON_FAILURE,error);
-		//String event = Analytics.EVENT_PAY + Analytics.EMPTY_SPACE+ctype;
-		String event = Analytics.EVENT_SUBSCRIPTION_FAILURE + Analytics.EMPTY_SPACE+subscribedData.generalInfo.title;
+		//String event = Analytics.EVENT_SUBSCRIPTION_FAILURE + Analytics.EMPTY_SPACE+subscribedData.generalInfo.title;
+		String event = Analytics.EVENT_SUBSCRIPTION_FAILURE;
 		Analytics.trackEvent(event,params);
 	}
 	
@@ -213,30 +213,31 @@ public class SubcriptionEngine {
 	}
 	
 	private void mixPanelSubscriptionSuccess() {
-		CardData subscribedData = myplexapplication.getCardExplorerData().cardDataToSubscribe;
-		Map<String,String> params=new HashMap<String, String>();
-		params.put(Analytics.CONTENT_ID_PROPERTY, subscribedData._id);
-		params.put(Analytics.CONTENT_NAME_PROPERTY, subscribedData.generalInfo.title);
-		params.put(Analytics.PAY_CONTENT_PRICE, mSelectedPriceItem.price+"");
-		params.put(Analytics.PAY_PURCHASE_TYPE, mSelectedPackageItem.commercialModel); //Rental or buy
-		params.put(Analytics.PAYMENT_METHOD, mSelectedPriceItem.paymentChannel); //cc or dc
-		params.put(Analytics.CONTENT_QUALITY, mSelectedPackageItem.contentType); //SD or HD
-		String ctype2 = Analytics.movieOrLivetv(subscribedData.generalInfo.type); //movie or livetv
-		//String event = Analytics.EVENT_PAY + Analytics.EMPTY_SPACE+ctype2;
-		String event = Analytics.EVENT_PAID_FOR + Analytics.EMPTY_SPACE+subscribedData.generalInfo.title;
-		Analytics.trackEvent(event,params);
-		Analytics.trackCharge(mSelectedPriceItem.price);
-		
 		String transactionId = "Vodafone999";
-		EasyTracker easyTracker = myplexapplication.getGaTracker();	
-		Analytics.createTransactionGA(easyTracker, transactionId, Analytics.GA_AFFILIATION,
-	    		new Double(mSelectedPriceItem.price), 0.0,0.0);
-		String type =  mSelectedPackageItem.contentType;
-		String ctype = Analytics.movieOrLivetv(mSelectedPackageItem.contentType); //Movie or LiveTv
-		Analytics.createItemGA(easyTracker, transactionId, subscribedData.generalInfo.title, 
-				subscribedData.generalInfo._id, ctype, new Double(mSelectedPriceItem.price), 1L);
-		Analytics.createEventGA(easyTracker, mSelectedPackageItem.commercialModel, Analytics.EVENT_PAY, transactionId);
-		Analytics.createEventGA(easyTracker, mSelectedPriceItem.paymentChannel, Analytics.EVENT_PAY, transactionId);
+		CardData subscribedData = myplexapplication.getCardExplorerData().cardDataToSubscribe;
+		if(subscribedData != null) {
+			Map<String,String> params=new HashMap<String, String>();
+			params.put(Analytics.CONTENT_ID_PROPERTY, subscribedData._id);
+			params.put(Analytics.CONTENT_NAME_PROPERTY, subscribedData.generalInfo.title);
+			params.put(Analytics.PAY_CONTENT_PRICE, mSelectedPriceItem.price+"");
+			params.put(Analytics.PAY_PURCHASE_TYPE, mSelectedPackageItem.commercialModel); //Rental or buy
+			params.put(Analytics.PAYMENT_METHOD, mSelectedPriceItem.paymentChannel); //cc or dc
+			params.put(Analytics.CONTENT_QUALITY, mSelectedPackageItem.contentType); //SD or HD
+			String ctype2 = Analytics.movieOrLivetv(subscribedData.generalInfo.type); //movie or livetv
+			//String event = Analytics.EVENT_PAID_FOR + Analytics.EMPTY_SPACE+subscribedData.generalInfo.title;
+			String event = Analytics.EVENT_PAID_FOR_CONTENT;
+			Analytics.trackEvent(event,params);
+			Analytics.trackCharge(mSelectedPriceItem.price);
+			if("live tv".equals(ctype2)) {
+				Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_LIVETV_PURCHASED_FOR,mSelectedPriceItem.price);
+			}
+			if("movies".equals(ctype2)) {
+				Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_MOVIES_PURCHASED_FOR,mSelectedPriceItem.price);
+			}
+			Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_TOTAL_PURCHASES,mSelectedPriceItem.price);
+			Analytics.createTransactionGA(transactionId, mSelectedPackageItem.commercialModel,new Double(mSelectedPriceItem.price), 0.0,0.0);
+			Analytics.createItemGA(transactionId, subscribedData.generalInfo.title,subscribedData._id, ctype2, new Double(mSelectedPriceItem.price), 1L);
+		}
 	}
 	
 	//invoked only for operator billing.not for webbased-subscription
@@ -304,18 +305,7 @@ public class SubcriptionEngine {
 		//sendMixPanelMessage();
 		((Activity) mContext).startActivityForResult(i, ConsumerApi.SUBSCRIPTIONREQUEST);
 	}
-	private void sendMixPanelMessage(){
-		
-		Map<String,String> params=new HashMap<String, String>();
-		
-		params.put(Analytics.PAY_PACKAGE_ID,mSelectedPackageItem.packageId);
-		params.put(Analytics.PAY_PACKAGE_NAME, mSelectedPackageItem.packageName);
-		params.put(Analytics.PAY_PACKAGE_CHANNEL, mSelectedPriceItem.paymentChannel);
-		params.put(Analytics.PAY_STATUS_PROPERTY, Analytics.PAY_COMMERCIAL_TYPES.Buy.toString());
-		Analytics.trackEvent(Analytics.PAY_PACKAGE_PURCHASE_STATUS,params);
-		
-		
-	}
+	
 	public void showProgressBar() {
 		if (mProgressDialog != null) {
 			mProgressDialog.dismiss();

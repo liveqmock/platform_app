@@ -25,6 +25,7 @@ import android.graphics.drawable.shapes.OvalShape;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -98,12 +99,15 @@ public class CardView extends ScrollView {
 	
 	public int swipeCount = 1;
 	
+	public static String ScreenName = null;
+	
     public CardView(Context context) {
     	super(context);
     }
 
     public CardView(Context context, AttributeSet attrs) {
     	super(context, attrs);
+    	setScreenNameForAnalytics();
     }
 
     public CardView(Context context, AttributeSet attrs, int defStyle) {
@@ -553,7 +557,9 @@ public class CardView extends ScrollView {
 			        	if(trackClickForOpen(ev) && mCardActionListener != null){
 			    			Log.e(TAG,"click on open");
 			    			//mixpanelBrowsing(true);
-			    			mixpanelBrowsing();
+			    			if(swipeCount > 1) {
+			    				mixpanelBrowsing();
+			    			}
 			    			mCardActionListener.open(mDataList.get(mCurrentSelectedIndex));			
 			    		}
 //			        	customSmoothScroll(getScrollX(), i * mCardPositions[1]);
@@ -565,17 +571,29 @@ public class CardView extends ScrollView {
 		return eventStealed;
 	}
 	//invoked when 1) card is selected 2) purchase on card is clicked 
-	public void mixpanelBrowsing() {
-		String event = null;
-		Map<String,String> params=new HashMap<String, String>();
+	
+	private static void setScreenNameForAnalytics() {
 		CardExplorerData data = myplexapplication.getCardExplorerData();
-		
 		String ctype = data.searchQuery;
-		
 		if(ctype == null || ctype.length() == 0) {
 			int requestType = data.requestType;
 			ctype = Analytics.getRequestType(requestType);
 		}
+		ScreenName = ctype;		
+	}
+	
+	public void mixpanelBrowsing() {
+		String event = null;
+		/*
+		CardExplorerData data = myplexapplication.getCardExplorerData();		
+		String ctype = data.searchQuery;		
+		if(ctype == null || ctype.length() == 0) {
+			int requestType = data.requestType;
+			ctype = Analytics.getRequestType(requestType);
+		}*/
+		
+		Map<String,String> params=new HashMap<String, String>();
+		String ctype = ScreenName;
 		if(	"recommendations".equalsIgnoreCase(ctype) )  {
 			event = Analytics.EVENT_BROWSED_RECOMMENDATIONS;
 			params.put(Analytics.NUMBER_OF_MOVIE_CARDS,swipeCount+"");
@@ -592,9 +610,10 @@ public class CardView extends ScrollView {
 		}
 		if("recommendations".equalsIgnoreCase(ctype) || "movie".equalsIgnoreCase(ctype) || "live".equalsIgnoreCase(ctype)) {
 				Analytics.trackEvent(event,params);
-				swipeCount = 1;
-			
+				Analytics.gaBrowse(ctype,swipeCount);
+				swipeCount = 1;			
 		}
+				
 	}
 	public void sendViewReadyMsg(boolean value){
 		mCardsLayout.sendViewReadyMsg(value);
@@ -698,7 +717,9 @@ public class CardView extends ScrollView {
 		params.put(Analytics.CONTENT_NAME_PROPERTY,mCardData.generalInfo.title);
 		params.put(Analytics.CONTENT_TYPE_PROPERTY,ctype);
 		params.put(Analytics.CONTENT_ID_PROPERTY,mCardData._id);
-		String event = Analytics.EVENT_DELETED+Analytics.EMPTY_SPACE+ mCardData.generalInfo.title+Analytics.EMPTY_SPACE+Analytics.FROM_CARDS;
+		params.put(Analytics.USER_ID,Analytics.getUserEmail());
+		//String event = Analytics.EVENT_DELETED+Analytics.EMPTY_SPACE+ mCardData.generalInfo.title+Analytics.EMPTY_SPACE+Analytics.FROM_CARDS;
+		String event = Analytics.EVENT_DELETED_FROM_CARDS;
 		Analytics.trackEvent(event,params);
     }
 	// CallBack Listeners
@@ -1115,5 +1136,25 @@ class CardsLayout extends RelativeLayout {
 		}
 
 		setMeasuredDimension(w, h);
+	}
+	
+	/*@Override
+	public boolean dispatchKeyEvent(KeyEvent event) {
+		int keyCode = event.getKeyCode();
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+           Log.d(TAG, "ScrollView Back button pressed");
+        }
+		return super.dispatchKeyEvent(event);
+	}*/
+	
+	//for analytics
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event)  {
+		 Log.d(TAG, "ScrollView Back button pressed");
+	    if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+	        // do something on back.
+	        return true;
+	    }
+	    return super.onKeyDown(keyCode, event);
 	}
 }

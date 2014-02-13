@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.apalya.myplex.R;
 import com.apalya.myplex.data.CardData;
+import com.apalya.myplex.fragments.SetttingsFragment;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MessagePost;
@@ -106,7 +107,10 @@ public class RatingDialog {
 				if(str == null || str.length() == 0) {
 					str = "Good";
 				}
-				Analytics.mixPanelProvidedFeedback(str, mRatingBar.getProgress()+"");
+				CardDetailViewFactory.RATING_POSTED = mRatingBar.getProgress()+"";
+				SetttingsFragment.RATING_POSTED = mRatingBar.getProgress()+"";
+				SetttingsFragment.FEEDBACK_POSTED = str;
+				//Analytics.mixPanelProvidedFeedback(str, mRatingBar.getProgress()+"");
 				post.sendComment(mMessageBox.getEditableText().toString(), mRatingBar.getProgress(), data,MessagePost.POST_RATING, new MessagePostCallback() {
 					
 					@Override

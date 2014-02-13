@@ -217,15 +217,6 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 										FetchTrailerUrl(mmItem.generalInfo._id);
 
 										Map<String,String> params=new HashMap<String, String>();
-										/*
-										params.put("CardId", mmItem.generalInfo._id);
-										params.put("CardCategory", mmItem.content.categoryName);
-										Analytics.trackEvent(Analytics.PlayerPlaySelect,params);*/
-										//???
-										params.put(Analytics.CONTENT_ID_PROPERTY, mmItem.generalInfo._id);
-										params.put(Analytics.CONTENT_NAME_PROPERTY, mmItem.content.categoryName);
-										params.put(Analytics.CONTENT_CATEGORY_PROPERTY,Analytics.CONTENT_ACTION_TYPES.PlayTrailer.toString());
-										Analytics.trackEvent(Analytics.EVENT_PLAY,params);
 										//FetchTrailerUrl(mmItem.generalInfo._id);
 										if(canBePlayed(true)){			
 											fetchUrl(mmItem.generalInfo._id);			
@@ -846,8 +837,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 	
 	private void mixPanelUnableToPlayVideo(String error) {
     	
-        EasyTracker easyTracker = myplexapplication.getGaTracker();
-    	int selected = myplexapplication.getCardExplorerData().currentSelectedCard;
+       	int selected = myplexapplication.getCardExplorerData().currentSelectedCard;
 		CardData  cardData = myplexapplication.getCardExplorerData().mMasterEntries.get(selected);
 		String contentName = cardData.generalInfo.title;
 		Map<String,String> params = new HashMap<String, String>();
@@ -1458,6 +1448,21 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		}
 		
 	}
+	
+	/*@Override
+	public void onUrlFetched(List<CardDataVideosItem> items) 
+	{
+		String videoType = mData.generalInfo.type;		
+		Log.d(TAG,"Video type "+ videoType);
+		
+		initPlayBack("https://myplexv2betadrmstreaming.s3.amazonaws.com/813/813_sd_est_1391082325821.wvm");
+		if(videoType.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_MOVIE)){		
+			chooseStreamOrDownload(items);
+		}else if(videoType.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
+			chooseLiveStreamType(items,false);			
+		}
+		
+	}*/
 	@Override
 	public void onTrailerUrlFetched(List<CardDataVideosItem> videos) {
 		chooseLiveStreamType(videos,true);

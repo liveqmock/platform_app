@@ -36,7 +36,7 @@ public class myplexapplication extends Application {
 	private static CacheHolder mCache ;
 	private static MixpanelAPI mixPanel;
 	public static int mSelectedOption_Tablet = NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION;
-
+	private static Context context;
 	
 	private static EasyTracker mTracker;
 	
@@ -89,7 +89,13 @@ public class myplexapplication extends Application {
 		init();
 		initializeGa();
 		mixPanel = MixpanelAPI.getInstance(this, MIXPANEL_API_TOKEN);
+		myplexapplication.context = getApplicationContext();
 	}
+	
+	public static Context getAppContext() {
+        return myplexapplication.context;
+    }
+	
 	private void init() {
 		MyVolley.init(this);
 		locationUtil = LocationUtil.getInstance(this);
