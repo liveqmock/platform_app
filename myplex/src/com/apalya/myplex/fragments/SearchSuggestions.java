@@ -147,8 +147,18 @@ public class SearchSuggestions extends BaseFragment {
 						List<CardData> searchResults = mSearchlistAdapter.getSearchResults();
 						if(position < searchResults.size())
 						{
+							String localSearchScope = null;
 							CardExplorerData dataBundle = myplexapplication.getCardExplorerData();
-							dataBundle.reset();
+//							dataBundle.reset();
+							if(dataBundle != null){			
+								if((dataBundle.searchScope!=null) && dataBundle.searchScope.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
+									localSearchScope = ConsumerApi.VIDEO_TYPE_LIVE;
+								}
+								dataBundle.reset();
+								if(localSearchScope != null){
+									dataBundle.searchScope = localSearchScope;
+								}
+							}
 							dataBundle.searchQuery = searchResults.get(position)._id;
 							dataBundle.requestType = CardExplorerData.REQUEST_INLINESEARCH;
 							BaseFragment fragment = mMainActivity.createFragment(NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION);

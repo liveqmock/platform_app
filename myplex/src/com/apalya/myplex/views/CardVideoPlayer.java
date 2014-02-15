@@ -1768,5 +1768,12 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		}
 	};
 	
-	
+	public void updateCardPreviewImage(CardData data){
+		if(data == null || data.images==null || data.images.values==null)
+			return;
+		mData = data;
+		for(CardDataImagesItem imageItem : mData.images.values) {
+			mPreviewImage.setImageUrl(imageItem.link,MyVolley.getImageLoader());
+		}
+	}
 }

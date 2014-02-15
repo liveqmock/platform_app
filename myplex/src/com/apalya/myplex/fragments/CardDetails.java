@@ -32,6 +32,7 @@ import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.NumberPicker;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -61,10 +62,14 @@ import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.media.PlayerListener;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.ConsumerApi;
+import com.apalya.myplex.utils.EpgView;
 import com.apalya.myplex.utils.FavouriteUtil;
 import com.apalya.myplex.utils.FavouriteUtil.FavouriteCallback;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
+import com.apalya.myplex.utils.SeasonFetchHelper;
+import com.apalya.myplex.utils.SeasonFetchHelper.ShowFetchListener;
+import com.apalya.myplex.utils.SlidingUpPanelLayout;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.views.CardDetailViewFactory;
 import com.apalya.myplex.views.CardDetailViewFactory.CardDetailViewFactoryListener;
@@ -77,6 +82,8 @@ import com.apalya.myplex.views.ItemExpandListener.ItemExpandListenerCallBackList
 import com.apalya.myplex.views.JazzyViewPager;
 import com.apalya.myplex.views.JazzyViewPager.TransitionEffect;
 import com.apalya.myplex.views.OutlineContainer;
+import com.apalya.myplex.views.TVShowView;
+import com.apalya.myplex.views.TVShowView.TVShowSelectListener;
 import com.apalya.myplex.views.docketVideoWidget;
 
 public class CardDetails extends BaseFragment implements
@@ -91,6 +98,8 @@ public class CardDetails extends BaseFragment implements
 	private LinearLayout mMediaContentLayout;
 	private LinearLayout mPlayerLogsLayout;
 	private LinearLayout mCommentsContentLayout;
+	private LinearLayout mEPGLayout,mBottomDrawerlayout,mBottom_drawer_layout;
+	private SlidingUpPanelLayout mSlidingUpPanelLayout;
 
 	private CustomScrollView mScrollView;
 //	private RelativeLayout mBottomActionBar;
@@ -107,6 +116,9 @@ public class CardDetails extends BaseFragment implements
 	public View rootView;
 	public boolean mPlayStarted = false;
 	private CacheManager mCacheManager = new CacheManager();
+	private List<CardData> childSubList = new ArrayList<CardData>();
+	private SeasonFetchHelper helper = null;
+	private TVShowView mTVShowView = null;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -128,6 +140,12 @@ public class CardDetails extends BaseFragment implements
 		mScrollView = (CustomScrollView) rootView
 				.findViewById(R.id.carddetail_scroll_view);
 		mProgressBar =(ProgressBar)rootView.findViewById(R.id.carddetail_progressBar);
+		SlidingUpPanelLayout layout = (SlidingUpPanelLayout) rootView
+				.findViewById(R.id.sliding_layout);
+		layout.setShadowDrawable(getResources().getDrawable(
+				R.drawable.above_shadow));
+
+		layout.setAnchorPoint(0.7f);
 		/*mBottomActionBar = (RelativeLayout) rootView
 				.findViewById(R.id.carddetail_bottomactionbar);
 		if (mCardData._id == null || mCardData._id.equalsIgnoreCase("0")) {
@@ -155,12 +173,27 @@ public class CardDetails extends BaseFragment implements
 		mCardDetailViewFactory.setOnCardDetailExpandListener(this);
 		mMainActivity.setSearchBarVisibilty(View.INVISIBLE);
 		mMainActivity.setSearchViewVisibilty(View.VISIBLE);
+		mBottomDrawerlayout=(LinearLayout) rootView.findViewById(R.id.linear_layout_bottom_drawer);
+		
 		mMainActivity.setUpShareButton(mCardData.generalInfo.title.toLowerCase());
 		// prepareContent();
 		if (mCardData.generalInfo != null) {
 			mMainActivity.setActionBarTitle(mCardData.generalInfo.title.toLowerCase());
 		}
 		prepareContent();
+		if(mCardData.generalInfo.type != null && mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
+			createEPGView(rootView);
+		}else{
+			if(mEPGLayout!=null)
+				mEPGLayout.setVisibility(View.GONE);
+		}
+		if(mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_SERIES)){
+			helper  = new SeasonFetchHelper(mCardData,new TvShowManager());
+			helper.fetchSeason();
+			
+			mBottomDrawerlayout.setVisibility(View.VISIBLE);			
+			mBottom_drawer_layout =(LinearLayout) rootView.findViewById(R.id.linear_layout_bottom_drawer);
+		}
 		/*mFavButton.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -236,6 +269,7 @@ public class CardDetails extends BaseFragment implements
 		return rootView;
 	}
 
+	
 	private CardVideoPlayer mPlayer;
 	private CardData mCardData;
 
@@ -293,9 +327,12 @@ public class CardDetails extends BaseFragment implements
 				}*/
 			}
 		}
+		if( helper != null){
+			helper.cancelAllRequests();
+		}
 	}
 
-	private void prepareContent() {
+	private void prepareContent() {		
 		fillData();
 	}
 
@@ -345,7 +382,7 @@ public class CardDetails extends BaseFragment implements
 		commentParams.topMargin = (int) getContext().getResources()
 				.getDimension(R.dimen.margin_gap_12);
 		mCommentsContentLayout.setLayoutParams(commentParams);
-
+		
 		View v = mCardDetailViewFactory.CreateView(mCardData,
 				CardDetailViewFactory.CARDDETAIL_BRIEF_DESCRIPTION);
 		if (v != null) {
@@ -941,5 +978,76 @@ public class CardDetails extends BaseFragment implements
 		}catch(Throwable e){			
 			return false;
 		}
+	}
+	
+	private void createEPGView(View rootView) {
+		mEPGLayout = (LinearLayout) rootView.findViewById(R.id.epg_linear_layout);
+		
+		LayoutTransition epgtransition = new LayoutTransition();
+		epgtransition.setStartDelay(LayoutTransition.CHANGE_APPEARING, 0);
+		mEPGLayout.setLayoutTransition(epgtransition);
+		RelativeLayout.LayoutParams params = (LayoutParams) mEPGLayout.getLayoutParams();
+				
+		View epgView  = new EpgView(mCardData, mContext).createEPGView();		
+		if(epgView != null){
+			mEPGLayout.setVisibility(View.VISIBLE);
+			params.topMargin = (int) getContext().getResources()
+					.getDimension(R.dimen.margin_gap_12);
+			mEPGLayout.addView(epgView);
+		}else{
+			mEPGLayout.setVisibility(View.GONE);
+		}
+	}
+	
+	private void selectEpisode(CardData card){
+		this.mCardData=card;		
+		mParentContentLayout.removeAllViews();
+		fillData();
+		mPlayer.updateCardPreviewImage(card);
+	}
+
+
+	private class TvShowManager implements ShowFetchListener{
+		@Override
+		public void onSeasonDataFetched(List<CardData> seasons) {
+			childSubList.addAll(seasons);
+			if(mTVShowView==null)
+				mTVShowView = new TVShowView(mContext , childSubList , mBottom_drawer_layout,new TvShowSelectorCallBack());
+			mTVShowView.createTVShowView();
+		}
+		@Override
+		public void onEpisodeFetched(CardData season, List<CardData> episodes) 
+		{		
+			mTVShowView.onEpisodeFetchComplete(season, episodes);
+			selectEpisode(episodes.get(0));
+		}
+		@Override
+		public void onFailed(VolleyError error) {
+			
+		}
+		
+	}	
+		
+	/*public void setProgrammLoading(NumberPicker programmePicker){
+			programmePicker.invalidate();
+			programmePicker.requestLayout();
+			
+			programmePicker.setMinValue(0);
+			programmePicker.setValue(0);
+			programmePicker.setMaxValue(3);
+			programmePicker.setDisplayedValues(new String[]{mContext.getString(R.string.loading),"",""});
+	}*/
+	private class TvShowSelectorCallBack implements TVShowSelectListener{
+
+		@Override
+		public void onEpisodeSelect(CardData carddata) {
+			selectEpisode(carddata);
+		}
+
+		@Override
+		public void fetchEpisode(CardData season) {
+			helper.fetchEpisodes(season);	
+		}
+	
 	}
 }
