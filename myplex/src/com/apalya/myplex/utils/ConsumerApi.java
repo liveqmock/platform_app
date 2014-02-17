@@ -113,10 +113,9 @@ public class ConsumerApi {
 	
 	// for tv shows
 	public static final String CONTENT_RELATED_CONTEXT = "contentRelated";
-	public static final String TV_SEASON = "tv%20season";
-	public static final String TYPE_TV_SERIES = "tv series";
-	public static final String TYPE_TV_SEASON= "tv season";
-	public static final String TYPE_TV_EPISODE = "tv%20episode";
+	public static final String TYPE_TV_SERIES = "tvseries";
+	public static final String TYPE_TV_SEASON= "tvseason";
+	public static final String TYPE_TV_EPISODE = "tvepisode";
 		
 	public static String getSearch(String queryStr, String level,int startIndex, String searchType) {
 		if(queryStr == null||(queryStr != null && queryStr.length() ==0)){
@@ -280,12 +279,12 @@ public class ConsumerApi {
 		
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH + CONTENT_RELATED_CONTEXT + SLASH + contentId 
 				+ SLASH + QUESTION_MARK+ CLIENTKEY + DEBUGCLIENTKEY + AMPERSAND + LEVEL + LEVELDYNAMIC 
-				+ AMPERSAND + BROWSETYPE + TV_SEASON;
+				+ AMPERSAND + BROWSETYPE + TYPE_TV_SEASON;
 	}
 	
 	public static String getEpisodesUrl(String contentId){
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH + CONTENT_RELATED_CONTEXT + SLASH + contentId 
 				+ SLASH + QUESTION_MARK+ CLIENTKEY + DEBUGCLIENTKEY + AMPERSAND + LEVEL + LEVELDEVICEMAX +
-				AMPERSAND + BROWSETYPE + TYPE_TV_EPISODE +"&pretty=1";
+				AMPERSAND + BROWSETYPE + TYPE_TV_EPISODE ;
 	}
 }

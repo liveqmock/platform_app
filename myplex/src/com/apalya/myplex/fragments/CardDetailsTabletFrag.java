@@ -145,7 +145,7 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 			mCardData = myplexapplication.getCardExplorerData().cardDataToSubscribe;
 		}
 		if(mCardDetailViewFactory != null){
-			mCardDetailViewFactory.UpdateSubscriptionStatus();
+			mCardDetailViewFactory.UpdateSubscriptionStatus(mCardData);
 		}
 	}
 	private void prepareContent() {

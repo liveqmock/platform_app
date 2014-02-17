@@ -4,14 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
-import android.os.Handler;
+import android.util.Log;
 import android.view.View;
-import android.widget.NumberPicker.OnValueChangeListener;
+import android.widget.NumberPicker.OnScrollListener;
 
 import com.apalya.myplex.R;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.utils.NumberPicker;
-import com.apalya.myplex.utils.SeasonFetchHelper;
 
 public class TVShowView  {
 	private List<CardData> mCardDataList;
@@ -20,16 +19,14 @@ public class TVShowView  {
 	private NumberPicker npEpisode;
 	private NumberPicker npSeason;
 
-	private Handler handler = new Handler();
-	private View rootView;
-	private static int DELAY = 2000;
-	public int seasonIndex = 1;
-	private SeasonFetchHelper helper = null;
+	
+	public int seasonIndex = 0;
 	private List<CardData> episodes = new ArrayList<CardData>();
+	private List<CardData> seasons = new ArrayList<CardData>();
 
 	public interface TVShowSelectListener{
-		public void onEpisodeSelect(CardData carddata);
-		public void fetchEpisode(CardData season);
+		public void onEpisodeSelect(CardData carddata,CardData season);
+		public void onSeasonChange(CardData season);
 	}
 
 	private TVShowSelectListener tvShowSelectListener;
@@ -37,7 +34,6 @@ public class TVShowView  {
 
 	public TVShowView(Context context, List<CardData> mCardDataList,View rootView,TVShowSelectListener listener) {
 		this.mCardDataList = mCardDataList;
-		this.rootView = rootView;
 		tvShowSelectListener =  listener;
 		
 		npSeason = (NumberPicker) rootView.findViewById(R.id.numberPickerSeason);
@@ -62,7 +58,6 @@ public class TVShowView  {
 
 	{
 		fillSeasons(mCardDataList, npSeason);
-		npSeason.setOnValueChangedListener(new OnSeasonchangeListener());
 
 	}
 
@@ -76,12 +71,19 @@ public class TVShowView  {
 
 	public void onEpisodeFetchComplete(CardData season, List<CardData> episodes)
 	{
+		for(CardData data : mCardDataList){
+			if(data.equals(season)){
+				data.chields = episodes;
+			}
+		}
+//		mCardData.chields = cardDatas;
 		fillEpisode(episodes, npEpisode);	
 
 	}
 
 	public void fillSeasons(List<CardData> contents, NumberPicker npSeason){
 
+		seasons = contents;
 		npSeason.invalidate();
 		npSeason.requestLayout();
 
@@ -90,7 +92,7 @@ public class TVShowView  {
 		for (int i = 0; i < contents.size(); i++) {
 			CardData content = contents.get(i);
 
-			seasons[i] = content.generalInfo.title;
+			seasons[i] = content.generalInfo.title;/*+"("+content._id+")";*/
 		}
 		int max = npSeason.getMaxValue();
 
@@ -104,50 +106,36 @@ public class TVShowView  {
 			npSeason.setValue(0);
 			npSeason.setMaxValue(contents.size() - 1);
 			npSeason.setDisplayedValues(seasons);
-		}
-
-		npSeason.setOnValueChangedListener(new OnSeasonchangeListener());
-
-
+		}		
+		
+		npSeason.setOnScrollListener(new OnSeasonChangeListener(npSeason.getValue()));
+//		npSeason.setOnValueChangedListener(new OnSeasonchangeListener());
 
 	}
 
-	private class OnSeasonchangeListener implements OnValueChangeListener {
-		@Override
-		public void onValueChange(android.widget.NumberPicker picker, int oldVal, int newVal) {
-			
-			setProgrammLoading();
-			if(mCardDataList.get(newVal).chields == null){
-				if(tvShowSelectListener != null){
-					tvShowSelectListener.fetchEpisode(mCardDataList.get(newVal));
-					return;
-				}
-			}
-			
-			handler.postDelayed(new Runnable() {				
-				@Override
-				public void run() {
-					// if no episode
-//					if(tvShowSelectListener != null){
-//						tvShowSelectListener.fetchEpisode(mCardDataList.get(loc));
-//					}
-
-				}
-			}, DELAY);
-
-
-		};
+	public void fillChilds(List<CardData>  cardDatas){
+		mCardDataList.get(0).chields = cardDatas;
 	}
-
 	public void fillEpisode(List<CardData> contents, NumberPicker npEpisode) {
 
 		episodes = contents;
+		
+		
 		
 		npEpisode.setEnabled(true);
 		npEpisode.invalidate();
 		npEpisode.requestLayout();
 
-		String programmes[] = new String[contents.size()];
+		String programmes[];
+		if(contents.size() == 1){
+			programmes = new String[3];
+			for(int i=0;i<3;i++){
+				CardData content = contents.get(0);
+				programmes[i] = content.generalInfo.title+"("+content._id+")";
+			}
+		}else{
+			programmes = new String[contents.size()];
+		}
 		for (int i = 0; i < contents.size(); i++) {
 			CardData content = contents.get(i);
 			programmes[i] = content.generalInfo.title;
@@ -165,29 +153,9 @@ public class TVShowView  {
 			npEpisode.setMaxValue(contents.size() - 1);
 			npEpisode.setDisplayedValues(programmes);
 		}
-		npEpisode.setOnValueChangedListener(new OnEpisodeChangeListener());
+//		npEpisode.setOnValueChangedListener(new OnEpisodeChangeListener());
+		npEpisode.setOnScrollListener(new EpisodeScrollerManager());
 	}
-
-
-
-
-	private class OnEpisodeChangeListener implements OnValueChangeListener {
-		@Override
-		public void onValueChange(android.widget.NumberPicker picker,int oldVal, int newVal) {
-
-			final int location = newVal;
-			handler.postDelayed(new Runnable() {				
-				@Override
-				public void run() {
-					if(tvShowSelectListener != null){
-						tvShowSelectListener.onEpisodeSelect(episodes.get(location));
-					}
-				}
-			}, DELAY);
-		}
-
-	};
-
 	public void fetchEpisodeData(CardData season) {
 
 	}
@@ -214,9 +182,6 @@ public class TVShowView  {
 			npEpisode.setDisplayedValues(episodeValues);
 			
 		}
-		
-		
-
 	}
 	public void initEpisodesWithLoading() {
 		
@@ -234,5 +199,50 @@ public class TVShowView  {
 			npSeason.setDisplayedValues(seasonValues);
 			
 		}
+	}
+	private class OnSeasonChangeListener implements OnScrollListener {
+		private int oldValue ;
+		
+        public OnSeasonChangeListener(int initialValue) {
+            oldValue = initialValue;
+        }
+		
+        @Override
+		public void onScrollStateChange(android.widget.NumberPicker picker,	int scrollState){
+        	final android.widget.NumberPicker picker2 = picker;
+			 if (scrollState == NumberPicker.OnScrollListener.SCROLL_STATE_IDLE ){				 
+									
+						Log.d("amlan","fetched");
+						//We get the different between oldValue and the new value
+							setProgrammLoading();				 
+			                int newVal = picker2.getValue() ;	                
+			                if(mCardDataList.get(newVal).chields == null){
+			    				if(tvShowSelectListener != null){
+			    					tvShowSelectListener.onSeasonChange(mCardDataList.get(newVal));
+			    					return;
+			    				}
+			    			}else{
+			    				tvShowSelectListener.onSeasonChange(mCardDataList.get(newVal));
+			    				fillEpisode(mCardDataList.get(newVal).chields, npEpisode);
+			    			}                
+			                //Update oldValue to the new value for the next scroll
+			                oldValue = picker2.getValue();
+					
+				}			 
+			 
+		};
+	}
+	
+	private class EpisodeScrollerManager implements OnScrollListener{
+
+		@Override
+		public void onScrollStateChange(android.widget.NumberPicker view,int scrollState) {
+			if (scrollState == NumberPicker.OnScrollListener.SCROLL_STATE_IDLE ){
+				if(tvShowSelectListener != null){					
+					tvShowSelectListener.onEpisodeSelect(episodes.get(view.getValue()),seasons.get(seasonIndex));
+				}		
+			}			
+		}
+		
 	}
 }

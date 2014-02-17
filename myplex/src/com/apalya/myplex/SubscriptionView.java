@@ -76,7 +76,6 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 				+ "/callback/evergent/";
 		setContentView(R.layout.layout_webview);
 		mWebView= (WebView)findViewById(R.id.webview);
-		
 		try{		
 			setUpWebView(url);
 		}catch(Exception e){
@@ -126,12 +125,11 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 					params.put(Analytics.PAY_STATUS_PROPERTY, Analytics.PAY_CONTENT_STATUS_TYPES.Success.toString());
 					Analytics.trackEvent(Analytics.EVENT_PAY,params);
 					
-					
 					List<CardData> dataToSave = new ArrayList<CardData>();
 					dataToSave.add(subscribedData);
 					
 					String requestUrl = ConsumerApi.getBundleUrl(subscribedData._id);
-					BundleUpdateHelper helper = new BundleUpdateHelper(requestUrl, dataToSave);
+					/*BundleUpdateHelper helper = new BundleUpdateHelper(requestUrl, dataToSave);
 					helper.getConnectIds(new InsertionResult() {						
 						@Override
 						public void updateComplete(Boolean updateStatus) {							
@@ -140,9 +138,8 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 //							Toast.makeText(SubscriptionView.this, "Subscription Info updated", Toast.LENGTH_SHORT).show();
 						}
 					});
-					helper.updatecurrentUserData();
-					
-					/*myplexapplication.getCacheHolder().UpdataDataAsync(dataToSave, new InsertionResult() {
+					helper.updatecurrentUserData();*/					
+					myplexapplication.getCacheHolder().UpdataDataAsync(dataToSave, new InsertionResult() {
 						
 						@Override
 						public void updateComplete(Boolean updateStatus) {
@@ -153,7 +150,7 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 							Util.showToast(SubscriptionView.this, "Subscription Info updated",Util.TOAST_TYPE_INFO);
 //							Toast.makeText(SubscriptionView.this, "Subscription Info updated", Toast.LENGTH_SHORT).show();
 						}
-					});	*/				
+					});					
 				}
 			});
 		}else{
@@ -162,7 +159,6 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 			closeSession(response);
 		}
 	}
-	
 	private void closeSession(int response){
 		setResult(response);
 		finish();

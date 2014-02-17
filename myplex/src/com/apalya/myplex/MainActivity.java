@@ -763,14 +763,13 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 				data.requestType = CardExplorerData.REQUEST_BROWSE;
 				data.searchQuery ="live";
 				data.searchScope = "live";
-//				
 				setActionBarTitle(NavigationOptionsMenuAdapter.LIVETV);
 				setSearchviewHint("search live tv");
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.TVSHOWS)){
 				removeLiveTvActionBarIcon();
 				data.requestType = CardExplorerData.REQUEST_TV_SHOWS;
-				data.searchQuery ="tv series";
-				data.searchScope = "tv series";
+				data.searchQuery = ConsumerApi.TYPE_TV_SERIES;
+				data.searchScope = ConsumerApi.TYPE_TV_SERIES;
 				setActionBarTitle(NavigationOptionsMenuAdapter.TVSHOWS);
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.DOWNLOADS)){
 				removeLiveTvActionBarIcon();
