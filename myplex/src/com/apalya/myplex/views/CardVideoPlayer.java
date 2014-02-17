@@ -1690,6 +1690,28 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		
 	}
 	
+	private void setBitrateForTrailer(String url) {
+		if(url == null) return;
+		String bitrateTrailer = null;
+		if(Analytics.isTrailer) {
+			if(url.contains("high")) bitrateTrailer = "high";
+			if(url.contains("low")) bitrateTrailer = "low";
+			if(url.contains("veryhigh")) bitrateTrailer = "veryhigh";
+			if(url.contains("medium")) bitrateTrailer = "medium";
+		}
+		else {
+			if(url.contains("vhigh")) bitrateTrailer = "vhigh";
+			if(url.contains("low")) bitrateTrailer = "low";
+			if(url.contains("medium")) bitrateTrailer = "medium";
+		}
+		if(bitrateTrailer != null) {
+			if(mData != null && mData.generalInfo != null) {
+				String cardId = mData.generalInfo._id;
+				String key = Analytics.TRAILER_BITRATE+cardId;
+				SharedPrefUtils.writeToSharedPref(myplexapplication.getAppContext(), key, bitrateTrailer);
+			}			
+		}
+	}
 	public void initPlayBack(String url){
 		Log.d(TAG,"Got the link for playback = "+url);
 		if (url == null) {
@@ -1748,6 +1770,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		if(mPlayerStatusListener != null){
 			mPlayerStatusListener.playerStatusUpdate("Playing :: "+url);
 		}
+		setBitrateForTrailer(url);//url not uri
 		initializeVideoPlay(uri);
 	}
 	

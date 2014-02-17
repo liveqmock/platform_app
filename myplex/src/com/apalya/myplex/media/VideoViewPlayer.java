@@ -513,35 +513,6 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 		}
 	}
 	
-	//Already in Analytics
-	/*private void mixPanelVideoTimeCalculationOnCompletion() {
-		int selected = myplexapplication.getCardExplorerData().currentSelectedCard;
-		CardData  mData = myplexapplication.getCardExplorerData().mMasterEntries.get(selected);
-		String contentName = mData.generalInfo.title;
-		String contentType = mData.generalInfo.type; //movie or livetv
-		String ctype = Analytics.movieOrLivetv(contentType);
-		
-		Map<String,String> params=new HashMap<String, String>();
-		params.put(Analytics.CONTENT_ID_PROPERTY, mData._id);
-		params.put(Analytics.CONTENT_NAME_PROPERTY, mData.generalInfo.title);
-		params.put(Analytics.TIME_PLAYED_PROPERTY, ""+Analytics.getTotalPlayedTime());
-		String event = null;
-		if("movies".equalsIgnoreCase(ctype))  {
-			event = Analytics.EVENT_PLAY+ Analytics.EMPTY_SPACE+mData.generalInfo.title+Analytics.EMPTY_SPACE+Analytics.MOVIE;
-		}
-		
-		if("live tv".equalsIgnoreCase(ctype))  {
-			event = Analytics.EVENT_PLAY+ Analytics.EMPTY_SPACE+mData.generalInfo.title+Analytics.EMPTY_SPACE+Analytics.TV_CHANNEL;
-		}
-		
-		if(Analytics.isTrailer)  {
-			event = Analytics.EVENT_PLAY+ Analytics.EMPTY_SPACE+mData.generalInfo.title+Analytics.EMPTY_SPACE+Analytics.TRAILER;
-			Analytics.isTrailer = false;
-		}
-		Analytics.trackEvent(event,params);
-		Analytics.totalPlayedTime = 0;
-	}*/
-
 	@Override
 	public void onPrepared(MediaPlayer mp) {
 		Log.d("PlayerScreen", "VideoViewPlayer onPrepared End");
@@ -923,22 +894,6 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 		
 		}
 	}
-	
-	/*private void mixPanelUnableToPlayVideo(String error) {
-    	
-        EasyTracker easyTracker = myplexapplication.getGaTracker();
-    	int selected = myplexapplication.getCardExplorerData().currentSelectedCard;
-		CardData  cardData = myplexapplication.getCardExplorerData().mMasterEntries.get(selected);
-		String contentName = cardData.generalInfo.title;
-		Map<String,String> params = new HashMap<String, String>();
-		params.put(Analytics.CONTENT_NAME_PROPERTY,contentName);
-		params.put(Analytics.CONTENT_ID_PROPERTY,cardData._id);
-		params.put(Analytics.CONTENT_TYPE_PROPERTY,Analytics.movieOrLivetv(cardData.generalInfo.type));
-		params.put(Analytics.REASON_FAILURE,error);
-		String event = Analytics.EVENT_UNABLE_TO_PLAY + Analytics.EMPTY_SPACE + contentName;
-		Analytics.trackEvent(event,params);
-		//Analytics.createEventGA(easyTracker, Analytics.EVENT_PLAY,Analytics.CONTENT_PLAY_ERROR,contentName );
-    }*/
 	
 	public void setmPositionWhenPaused(int mPositionWhenPaused) {
 		this.mPositionWhenPaused = mPositionWhenPaused;

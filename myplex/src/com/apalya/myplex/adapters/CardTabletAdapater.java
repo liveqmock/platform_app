@@ -61,10 +61,26 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 	private LayoutInflater mInflater;
 	private CardActionListener mCardActionListener;
 	private int mNumberofItems;
+	
+	public int swipeCount = 1; //analytics
+	public static String ScreenName = null; //analytics
+	
 	public CardTabletAdapater(Context context){
 		this.mContext = context;
 		mInflater = LayoutInflater.from(context);
+		setScreenNameForAnalytics();
 	}
+	
+	private static void setScreenNameForAnalytics() {
+		CardExplorerData data = myplexapplication.getCardExplorerData();
+		String ctype = data.searchQuery;
+		if(ctype == null || ctype.length() == 0) {
+			int requestType = data.requestType;
+			ctype = Analytics.getRequestType(requestType);
+		}
+		ScreenName = ctype;		
+	}
+	
 	public void setData(List<CardData> datalist){
 		mDataList = new ArrayList<CardData>();
 		if (datalist != null) {
@@ -371,6 +387,7 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 			/*****************************DELTEING DOWNLOAD DATA************************************/
 			
 			if(myplexapplication.mDownloadList != null){
+				mixPanelDeleteCard(dataHolder.mDataObject);
 				CardDownloadData mDownloadData = myplexapplication.mDownloadList.mDownloadedList.get(mDataList.get(index)._id);
 				if(mDownloadData!=null){
 					Util.removeDownload(mDownloadData.mDownloadId,mContext);
@@ -394,6 +411,18 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 			notifyDataSetChanged();
 		}
 	};
+	
+	 private void mixPanelDeleteCard(CardData mCardData) {
+	    	String ctype = Analytics.movieOrLivetv(mCardData.generalInfo.type);
+			Map<String,String> params=new HashMap<String, String>();
+			params.put(Analytics.CONTENT_NAME_PROPERTY,mCardData.generalInfo.title);
+			params.put(Analytics.CONTENT_TYPE_PROPERTY,ctype);
+			params.put(Analytics.CONTENT_ID_PROPERTY,mCardData._id);
+			params.put(Analytics.USER_ID,Analytics.getUserEmail());
+			//String event = Analytics.EVENT_DELETED+Analytics.EMPTY_SPACE+ mCardData.generalInfo.title+Analytics.EMPTY_SPACE+Analytics.FROM_CARDS;
+			String event = Analytics.EVENT_DELETED_FROM_CARDS;
+			Analytics.trackEvent(event,params);
+	  }
 
 private void prepareDrmManager(String url){
 		
@@ -488,6 +517,7 @@ private void prepareDrmManager(String url){
 				CardDataHolder dataHolder = (CardDataHolder) v.getTag();
 				if(dataHolder == null){return;}
 				if(dataHolder.mDataObject == null){return;}
+				mixpanelBrowsingTablet();
 				mCardActionListener.purchase(dataHolder.mDataObject);
 			}
 		}
@@ -503,6 +533,7 @@ private void prepareDrmManager(String url){
 					if(dataHolder == null){return;}
 					if(dataHolder.mDataObject == null){return;}
 					mCardActionListener.open(dataHolder.mDataObject);
+					mixpanelBrowsingTablet();
 				}
 			}
 		}
@@ -523,6 +554,41 @@ private void prepareDrmManager(String url){
 	@Override
 	public void onScrollStateChanged(AbsListView view, int scrollState) {
 		// TODO Auto-generated method stub
+		Log.d(TAG, "tablet fling onScrollStateChanged");
+		swipeCount = swipeCount + 1;
+	}
+	
+	public void mixpanelBrowsingTablet() {
+		String event = null;
+		/*
+		CardExplorerData data = myplexapplication.getCardExplorerData();		
+		String ctype = data.searchQuery;		
+		if(ctype == null || ctype.length() == 0) {
+			int requestType = data.requestType;
+			ctype = Analytics.getRequestType(requestType);
+		}*/
 		
+		Map<String,String> params=new HashMap<String, String>();
+		String ctype = ScreenName;
+		if(	"recommendations".equalsIgnoreCase(ctype) )  {
+			event = Analytics.EVENT_BROWSED_RECOMMENDATIONS;
+			params.put(Analytics.NUMBER_OF_MOVIE_CARDS,swipeCount+"");
+		}
+		
+		if(	"movie".equalsIgnoreCase(ctype) )  {
+			params.put(Analytics.NUMBER_OF_MOVIE_CARDS,swipeCount+"");
+			event = Analytics.EVENT_BROWSED_MOVIES;
+		}
+		
+		if("live".equalsIgnoreCase(ctype) )  {
+			params.put(Analytics.NUMBER_OF_LIVETV_CARDS,swipeCount+"");
+			event = Analytics.EVENT_BROWSED_TV_CHANNELS;
+		}
+		if("recommendations".equalsIgnoreCase(ctype) || "movie".equalsIgnoreCase(ctype) || "live".equalsIgnoreCase(ctype)) {
+				Analytics.trackEvent(event,params);
+				Analytics.gaBrowse(ctype,swipeCount);
+				swipeCount = 1;			
+		}
+				
 	}
 }

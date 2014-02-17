@@ -1,6 +1,5 @@
 package com.apalya.myplex.fragments;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -13,7 +12,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.animation.Animator.AnimatorListener;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -26,11 +24,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.animation.Animation;
-import android.view.animation.Animation.AnimationListener;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.TranslateAnimation;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.AbsListView;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -46,7 +41,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.GZipRequest;
 import com.apalya.myplex.BaseFragment;
-import com.apalya.myplex.MainActivity;
 import com.apalya.myplex.R;
 import com.apalya.myplex.adapters.CacheManagerCallback;
 import com.apalya.myplex.adapters.CardActionListener;
@@ -56,7 +50,6 @@ import com.apalya.myplex.cache.CacheManager;
 import com.apalya.myplex.cache.IndexHandler;
 import com.apalya.myplex.data.ApplicationSettings;
 import com.apalya.myplex.data.CardData;
-import com.apalya.myplex.data.CardDataGenralInfo;
 import com.apalya.myplex.data.CardDataGenre;
 import com.apalya.myplex.data.CardDownloadData;
 import com.apalya.myplex.data.CardExplorerData;
@@ -71,20 +64,14 @@ import com.apalya.myplex.utils.AlertDialogUtil;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FavouriteUtil;
-import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.FavouriteUtil.FavouriteCallback;
 import com.apalya.myplex.utils.FetchDownloadProgress;
 import com.apalya.myplex.utils.FetchDownloadProgress.DownloadProgressStatus;
+import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.views.CardView;
 import com.apalya.myplex.views.PackagePopUp;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.google.analytics.tracking.android.Fields;
-import com.google.analytics.tracking.android.GoogleAnalytics;
-import com.google.analytics.tracking.android.HitTypes;
-import com.google.analytics.tracking.android.MapBuilder;
-import com.google.analytics.tracking.android.Tracker;
 
 public class CardExplorer extends BaseFragment implements CardActionListener,CacheManagerCallback,DownloadProgressStatus,
 		OnDismissCallback, AlertDialogUtil.NoticeDialogListener,Util.KeyRenewListener {
@@ -425,6 +412,11 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
     	if(cardView != null) {
     		if(cardView.swipeCount > 1) {
     			cardView.mixpanelBrowsing();
+    		}
+    	}
+    	if(mTabletAdapter != null) {
+    		if(mTabletAdapter.swipeCount > 1) {
+    			mTabletAdapter.mixpanelBrowsingTablet();
     		}
     	}
 		super.onPause();

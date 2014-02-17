@@ -138,7 +138,7 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 			return;
 		}
 //		mMainActivity.showActionBarProgressBar();
-
+		Analytics.SEARCH_TYPE = "actionbar";
 		String searchQuery = new String();
 		final List<CardData> searchString = new ArrayList<CardData>();
 		for (ButtonData data : mSearchbleTags) {

@@ -84,7 +84,7 @@ public class LocationUtil
 		}
 		return params;
 	}
-	private  Location getLocation() 
+	public  Location getLocation() 
 	{
 		if(client!=null){
 			if(client.isConnected())

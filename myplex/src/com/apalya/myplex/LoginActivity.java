@@ -28,6 +28,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -196,7 +197,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		};
 		task.execute();
 
-		Crashlytics.start(this);
+		//Crashlytics.start(this);
 
 		FontUtil.loadFonts(getAssets());
 		String trackingDistinctId = getTrackingDistinctId();
@@ -218,7 +219,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		Analytics.startActivity(easyTracker, this);*/
 		
 		Map<String,String> params1 = new HashMap<String, String>();
-		params1.put(Analytics.ALL_LOGIN_OPTIONS,"facebook google twitter myplex");
+		params1.put(Analytics.ALL_LOGIN_OPTIONS,"facebook,google,twitter,myplex");
 		Analytics.trackEvent(Analytics.EVENT_LOGIN_OPTIONS_PRESENTED,params1);
 		//Analytics.startActivity(easyTracker, this);
 		Analytics.createScreenGA(Analytics.SCREEN_LOGINACTIVITY);
@@ -500,15 +501,19 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				if(camPaignMap.containsKey("utm_term")) properties.put("utm_term", camPaignMap.get("utm_term"));
 				if(camPaignMap.containsKey("utm_content")) properties.put("utm_content", camPaignMap.get("utm_content"));				
 			}
-			properties.put("app version.release", Util.getAppVersionName(this));
+			properties.put("app version.release", Util.getAppVersionNumber(this));
+			//properties.put("app version.code", Util.getAppVersionNumber(this));
 			properties.put("browser version", "native app");
-			properties.put("gps", "tobedone");
-						
+			Location location = LocationUtil.getInstance(this).getLocation();
+			if(location != null) {
+				properties.put("gps", location.getLatitude()+","+location.getLongitude());
+			}
+			
 			} catch (JSONException e) {
 			e.printStackTrace();
 		} // default value
 		mMixpanel.registerSuperProperties(properties);
-		
+		mMixpanel.unregisterSuperProperty("app version.code");
 	}
 	Map<String,String> getReferrerMapFromUri(Uri uri) {
 		

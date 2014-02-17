@@ -15,10 +15,12 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.util.Log;
 
+import com.apalya.myplex.R;
 import com.apalya.myplex.data.ApplicationSettings;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDataPackagePriceDetailsItem;
 import com.apalya.myplex.data.CardDataPackages;
+import com.apalya.myplex.data.CardDataPurchaseItem;
 import com.apalya.myplex.data.CardDownloadData;
 import com.apalya.myplex.data.CardExplorerData;
 import com.apalya.myplex.data.DeviceDetails;
@@ -282,6 +284,7 @@ public class Analytics {
 	public static String JOINED_ON = "joined on";
 	public static String LAST_LOGGED_IN_DATE = "last logged in date";
 	public static String LAST_LOGGED_IN_FAILURE_DATE = "last log in failure date";
+	public static String GOOGLE_LOG_IN_FAILURE_DATE = "google log in failure date";
 	public static String EMPTY_SPACE = " ";
 	
 	public static String CONTENT_ID_PROPERTY = "content id";
@@ -361,6 +364,9 @@ public class Analytics {
 	public static String PEOPLE_TOTAL_PURCHASES = "total purchases";
 	public static String PEOPLE_ENTERED_REVIEWS = "entered reviews";
 	public static String PEOPLE_SHARED_ABOUT_MYPLEX = "shared about myplex";
+	public static String PEOPLE_FREE_MOVIE_RENTALS = "free movie rentals";
+	public static String PEOPLE_FREE_TV_SUBSCRIPTIONS = "free tv subscriptions (w)";
+	public static String PEOPLE_FREE_DOWNLOADS_TO_OWN = "free downloads to own";
 	
 	//Google Analytics
 	public static String GA_AFFILIATION = "GoogleStore";
@@ -389,8 +395,13 @@ public class Analytics {
 	public static String SCREEN_CARDDETAILS = "card details";
 	public static String SCREEN_SETTINGS = "settings";
 	public static String SCREEN_CARD_EXPLORER = "card explorer";
+	public static String SCREEN_SUBSCRIPTION_VIEW = "subscription view";
 	public static String SCREEN_DISCOVER = "discover";
 	public static String SCREEN_SIGNUP = "sign up";
+	public static String SCREEN_SEARCH_SUGGESTIONS = "search suggestions";
+	
+	public static String TRAILER_BITRATE = "trailer_bitrate_";
+	
 	
 	private static MixpanelAPI mMixPanel = myplexapplication.getMixPanel();
 	private static EasyTracker easyTracker = myplexapplication.getGaTracker();
@@ -516,6 +527,20 @@ public class Analytics {
 		return ctype;
 	}
 	
+	public static String movieOrLivetv2(String contentType) {
+		String ctype = null;
+		if("movie".equalsIgnoreCase(contentType) ) {
+			ctype = "movies";
+		}
+		else if("live".equalsIgnoreCase(contentType)) {
+			ctype = "live tv";
+		}
+		else {
+			ctype = null;
+		}
+		return ctype;
+	}
+	
 	public static String getRequestType(int rType) {
 		String ctype = "cards";
 		switch (rType) {
@@ -608,12 +633,15 @@ public class Analytics {
 		Log.d(TAG, "checktime totalPlayedTime() totalPlayedTime in minutes "+TimeUnit.SECONDS.toMinutes(totalPlayedTime));
 		
 	}
-	
+	//returns in seconds
 	public static long getTotalPlayedTime() {
-		//Log.d(TAG, "checktime Player closed total time is in seconds "+totalPlayedTime);
 		Log.d(TAG, "checktime Player closed total time is in minutes"+TimeUnit.SECONDS.toMinutes(totalPlayedTime));
-		//return TimeUnit.SECONDS.toMinutes(totalPlayedTime)+1;
 		return totalPlayedTime+1;
+	}
+	
+	public static long getTotalPlayedTimeInMinutes() {
+		Log.d(TAG, "checktime Player closed total time is in minutes"+TimeUnit.SECONDS.toMinutes(totalPlayedTime));
+		return TimeUnit.SECONDS.toMinutes(totalPlayedTime)+1;
 	}
 	
 	//CardDetails
@@ -630,13 +658,14 @@ public class Analytics {
 		params.put(Analytics.TIME_PLAYED_PROPERTY, ""+Analytics.getTotalPlayedTime()); //3
 		String event = null;
 		long ptime = Analytics.getTotalPlayedTime();
-		
+		long ptimeMinutes = Analytics.getTotalPlayedTimeInMinutes();
 		if("live tv".equalsIgnoreCase(ctype))  {
 			params.put(Analytics.TV_CHANNEL_NAME, mData.generalInfo.title); //3
-			params.put(Analytics.TRAILER_DATA_RATE, "256kbps");
+			String bitrate = SharedPrefUtils.getFromSharedPreference(myplexapplication.getAppContext(), Analytics.TRAILER_BITRATE+mCardData.generalInfo._id);
+			params.put(Analytics.TRAILER_DATA_RATE, bitrate);
 			event =  Analytics.EVENT_PLAYED_TV_CHANNEL;
 			Analytics.trackEvent(event,params);
-			mMixPanel.getPeople().increment(Analytics.PEOPLE_TV_STREAMED,ptime);
+			mMixPanel.getPeople().increment(Analytics.PEOPLE_TV_STREAMED,ptimeMinutes);
 			mMixPanel.getPeople().increment(Analytics.TIME_PLAYED_PROPERTY,ptime);
 			Analytics.gaPlayedLiveTvTimings(ptime, mData.generalInfo.title); 
 			Analytics.createEventGA("live tv", "play", mData.generalInfo.title, ptime);//ga
@@ -646,13 +675,14 @@ public class Analytics {
 		params.put(Analytics.CONTENT_NAME_PROPERTY, mData.generalInfo.title); //4
 		
 		if(Analytics.isTrailer)  {
-			params.put(Analytics.TRAILER_DATA_RATE, "256kbps");
+			String bitrate = SharedPrefUtils.getFromSharedPreference(myplexapplication.getAppContext(), Analytics.TRAILER_BITRATE+mCardData.generalInfo._id);
+			params.put(Analytics.TRAILER_DATA_RATE, bitrate);
 			event = Analytics.EVENT_PLAYED_TRAILER;
-			mMixPanel.getPeople().increment(Analytics.PEOPLE_TRAILERS_PLAYED,ptime);
+			mMixPanel.getPeople().increment(Analytics.PEOPLE_TRAILERS_PLAYED,getTotalPlayedTimeInMinutes());
 			Analytics.trackEvent(event,params);	
 			Analytics.isTrailer = false;
 			mMixPanel.getPeople().increment(Analytics.TIME_PLAYED_PROPERTY,ptime);
-			mMixPanel.getPeople().increment("testcount",333);
+			//mMixPanel.getPeople().increment("testcount",333);
 			Analytics.gaPlayedTrailerTimings(ptime, mData.generalInfo.title);
 			return;
 		}
@@ -663,12 +693,21 @@ public class Analytics {
 			
 			if(localPlayback) {
 				//people data remove comments later
-				mMixPanel.getPeople().increment(Analytics.PEOPLE_MOVIES_PLAYED_LOCALLY_FOR,ptime);
+				mMixPanel.getPeople().increment(Analytics.PEOPLE_MOVIES_PLAYED_LOCALLY_FOR,getTotalPlayedTimeInMinutes());
 				event = Analytics.EVENT_PLAYED_DOWNLOADED_MOVIE; //5
 				params.put(Analytics.MOVIE_SIZE,getDownloadedMovieSize(mData._id)+"");
 				String key = mData._id+"analytics";
 				String purchaseType = null; //rent or buy
-				//String contentQuality = null;
+				/*
+				 * if(mCardData.currentUserData != null) {
+					if(mCardData.currentUserData.purchase != null && mCardData.currentUserData.purchase.size() >0) {
+						CardDataPurchaseItem cardDataPurchaseItem = mCardData.currentUserData.purchase.get(0);
+						purchaseType = cardDataPurchaseItem.type;
+					}
+				}
+				params.put(Analytics.PAY_PURCHASE_TYPE, purchaseType); 
+				*/
+				//Data is stored while purchase in SubscriptionView -mixPanelPaySuccess()
 				String value = SharedPrefUtils.getFromSharedPreference(myplexapplication.getAppContext(), key);
 				if(value != null) {
 					String[] sArray = value.split(":");
@@ -676,19 +715,19 @@ public class Analytics {
 						purchaseType = sArray[0];
 						contentQuality = sArray[1];
 					}
-					params.put(Analytics.PAY_PURCHASE_TYPE, getUserEmail()); //6 //to be reviewed
+					
+					params.put(Analytics.PAY_PURCHASE_TYPE, purchaseType); //6 //to be reviewed
 					params.put(Analytics.CONTENT_QUALITY, contentQuality); //7
 				}
 			}
 			else { //streaming
-				params.put(Analytics.DOWNLOAD_OPTION_AVAILABLE,"TRUE"); //5
-				params.put(Analytics.MOVIE_SIZE,"1000mb"); //6
+				params.put(Analytics.DOWNLOAD_OPTION_AVAILABLE,"TRUE"); //5 to-be-done
+				params.put(Analytics.MOVIE_SIZE,"1000mb"); //6 to-be-done
 				event = Analytics.EVENT_STREAMED_MOVIE;
 				//people data remove comments later
-				mMixPanel.getPeople().increment(Analytics.PEOPLE_MOVIES_STREAMED_FOR,ptime);
+				mMixPanel.getPeople().increment(Analytics.PEOPLE_MOVIES_STREAMED_FOR,getTotalPlayedTimeInMinutes());
 			}
-			Analytics.gaPlayedMovieTimings(ptime, mData.generalInfo.title, contentQuality);
-			
+			Analytics.gaPlayedMovieTimings(ptime, mData.generalInfo.title, contentQuality);			
 		}
 		Analytics.trackEvent(event,params);		
 		mMixPanel.getPeople().increment(Analytics.TIME_PLAYED_PROPERTY,ptime);
@@ -700,11 +739,17 @@ public class Analytics {
 	 *  and this one gets the CardData from myplexapplication
 	 */
 	public static void mixPanelVideoTimeCalculationOnCompletion() {
-		if(myplexapplication.getCardExplorerData() == null) return;
-		if(myplexapplication.getCardExplorerData().mMasterEntries == null || myplexapplication.getCardExplorerData().mMasterEntries.size() == 0 ) return;
-		int selected = myplexapplication.getCardExplorerData().currentSelectedCard;
-		CardData  mData = myplexapplication.getCardExplorerData().mMasterEntries.get(selected);
-		//CardData  mData = myplexapplication.mSelectedCard;
+		boolean bool = myplexapplication.getAppContext().getResources().getBoolean(R.bool.isTablet);
+		CardData  mData = null;
+		if(bool) { //for tablet
+			mData = myplexapplication.mSelectedCard; //for tablet
+		}
+		else{
+			if(myplexapplication.getCardExplorerData() == null) return;
+			if(myplexapplication.getCardExplorerData().mMasterEntries == null || myplexapplication.getCardExplorerData().mMasterEntries.size() == 0 ) return;
+			int selected = myplexapplication.getCardExplorerData().currentSelectedCard;
+			mData = myplexapplication.getCardExplorerData().mMasterEntries.get(selected);
+		}
 		if(mData == null ) return;
 		if(mData.generalInfo == null ) return;
 		String contentName = mData.generalInfo.title;
@@ -718,9 +763,13 @@ public class Analytics {
 		String event = null;
 		long ptime = Analytics.getTotalPlayedTime();
 		
+		//not necessary //for any eventuality
 		if("live tv".equalsIgnoreCase(ctype))  {
+			if(ptime == 0) return;
 			params.put(Analytics.TV_CHANNEL_NAME, mData.generalInfo.title); //3
-			params.put(Analytics.TRAILER_DATA_RATE, "256kbps");
+			String bitrate = SharedPrefUtils.getFromSharedPreference(myplexapplication.getAppContext(), Analytics.TRAILER_BITRATE+mData.generalInfo._id);
+			params.put(Analytics.TRAILER_DATA_RATE, bitrate);
+			//params.put(Analytics.TRAILER_DATA_RATE, "256kbps");
 			event =  Analytics.EVENT_PLAYED_TV_CHANNEL;
 			Analytics.trackEvent(event,params);
 			mMixPanel.getPeople().increment(Analytics.PEOPLE_TV_STREAMED,ptime);
@@ -733,7 +782,9 @@ public class Analytics {
 		params.put(Analytics.CONTENT_NAME_PROPERTY, mData.generalInfo.title); //4
 		
 		if(Analytics.isTrailer)  {
-			params.put(Analytics.TRAILER_DATA_RATE, "256kbps");
+			String bitrate = SharedPrefUtils.getFromSharedPreference(myplexapplication.getAppContext(), Analytics.TRAILER_BITRATE+mData.generalInfo._id);
+			params.put(Analytics.TRAILER_DATA_RATE, bitrate);
+			//params.put(Analytics.TRAILER_DATA_RATE, "256kbps");
 			event = Analytics.EVENT_PLAYED_TRAILER;
 			mMixPanel.getPeople().increment(Analytics.PEOPLE_TRAILERS_PLAYED,ptime);
 			Analytics.trackEvent(event,params);	
@@ -755,7 +806,13 @@ public class Analytics {
 				params.put(Analytics.MOVIE_SIZE,getDownloadedMovieSize(mData._id)+"");
 				String key = mData._id+"analytics";
 				String purchaseType = null; //rent or buy
-				
+				if(mData.currentUserData != null) {
+					if(mData.currentUserData.purchase != null && mData.currentUserData.purchase.size() >0) {
+						CardDataPurchaseItem cardDataPurchaseItem = mData.currentUserData.purchase.get(0);
+						purchaseType = cardDataPurchaseItem.type;
+					}
+				}
+				params.put(Analytics.PAY_PURCHASE_TYPE, purchaseType); //6 
 				String value = SharedPrefUtils.getFromSharedPreference(myplexapplication.getAppContext(), key);
 				if(value != null) {
 					String[] sArray = value.split(":");
@@ -781,74 +838,16 @@ public class Analytics {
 		mMixPanel.getPeople().increment(Analytics.TIME_PLAYED_PROPERTY,ptime);
 		mMixPanel.getPeople().increment("testcount",333);
 	}
-	/*public static void mixPanelVideoTimeCalculationOnCompletion() {
-		int selected = myplexapplication.getCardExplorerData().currentSelectedCard;
-		CardData  mData = myplexapplication.getCardExplorerData().mMasterEntries.get(selected);
-		//CardData  mData = myplexapplication.mSelectedCard;
-		String contentName = mData.generalInfo.title;
-		String contentType = mData.generalInfo.type; //movie or livetv
-		String ctype = Analytics.movieOrLivetv(contentType);
-		
-		Map<String,String> params=new HashMap<String, String>();
-		params.put(Analytics.CONTENT_ID_PROPERTY, mData._id);
-		params.put(Analytics.CONTENT_NAME_PROPERTY, mData.generalInfo.title);
-		params.put(Analytics.TIME_PLAYED_PROPERTY, ""+Analytics.getTotalPlayedTime());
-		String event = null;
-		long ptime = Analytics.getTotalPlayedTime();
-		
-		if(Analytics.isTrailer)  {
-			event = Analytics.EVENT_PLAYED_TRAILER;
-			mMixPanel.getPeople().increment(Analytics.PEOPLE_TRAILERS_PLAYED,ptime);
-			Analytics.trackEvent(event,params);	
-			Analytics.isTrailer = false;
-			mMixPanel.getPeople().increment(Analytics.TIME_PLAYED_PROPERTY,ptime);
-			mMixPanel.getPeople().increment("testcount",333);
-			return;
-		}
-		
-		if("movies".equalsIgnoreCase(ctype))  {
-			boolean localPlayback = isLocalPlayBack(mData._id);
-			if(localPlayback) {
-				event = Analytics.EVENT_PLAYED_DOWNLOADED_MOVIE;
-			}
-			else {
-				event = Analytics.EVENT_STREAMED_MOVIE;
-			}
-			String key = mData._id+"analytics";
-			String purchaseType = null; //rent or buy
-			String contentQuality = null;
-			String value = SharedPrefUtils.getFromSharedPreference(myplexapplication.getAppContext(), key);
-			if(value != null) {
-				String[] sArray = value.split(":");
-				if(sArray != null && sArray.length == 2) {
-					purchaseType = sArray[0];
-					contentQuality = sArray[1];
-				}
-				params.put(Analytics.PAY_PURCHASE_TYPE, getUserEmail());
-				params.put(Analytics.CONTENT_QUALITY, contentQuality);
-			}
-			
-		}
-		
-		if("live tv".equalsIgnoreCase(ctype))  {
-			event =  Analytics.EVENT_PLAYED_TV_CHANNEL;
-			mMixPanel.getPeople().increment(Analytics.PEOPLE_TV_STREAMED,ptime);
-		}
-		
-		
-		Analytics.trackEvent(event,params);
-		Analytics.totalPlayedTime = 0;
-		mMixPanel.getPeople().increment(Analytics.TIME_PLAYED_PROPERTY,ptime);
-		mMixPanel.getPeople().increment("testcount",333);
-	}*/
+	
 	private static double getDownloadedMovieSize(String contentId) {
+		if(myplexapplication.mDownloadList == null ) return 0;
+		if(myplexapplication.mDownloadList.mDownloadedList == null || myplexapplication.mDownloadList.mDownloadedList.size() == 0) return 0;
 		HashMap<String,CardDownloadData> mDownloadedList = myplexapplication.mDownloadList.mDownloadedList;
-		if(mDownloadedList != null && mDownloadedList.size() > 0) {
-			CardDownloadData cardDownloadData = mDownloadedList.get(contentId);
-			return cardDownloadData.mDownloadedBytes;
-		}
-		return 0;
+		CardDownloadData cardDownloadData = mDownloadedList.get(contentId);
+		if(cardDownloadData == null) return 0;
+		return cardDownloadData.mDownloadedBytes;
 	}
+	
 	public static boolean isLocalPlayBack(String id) {
 		CardDownloadData mDownloadData = myplexapplication.mDownloadList.mDownloadedList.get(id);
 		if (mDownloadData == null) {
@@ -869,9 +868,7 @@ public class Analytics {
 		//String event = Analytics.EVENT_EXPLORING_SIMILAR_CONTENT +Analytics.EMPTY_SPACE+ mCardData.generalInfo.title;
 		String event = Analytics.EVENT_EXPLORING_SIMILAR_CONTENT;
 		Analytics.trackEvent(event,params);
-		EasyTracker easyTracker = myplexapplication.getGaTracker();		
-		
-		//Analytics.createEventGA(easyTracker,ctype, Analytics.EVENT_BROWSE,mCardData.generalInfo.title);
+			
 	}
 	
 	public static void mixPanelCastCrewPopup(CardData mCardData) {
@@ -909,8 +906,6 @@ public class Analytics {
 		params.put(Analytics.DISCOVER_KEYWORD, searchQuery);
 		//params.put(Analytics.NUMBER_OF_KEYWORDS, mSearchbleTags.size()+"");
 		Analytics.trackEvent(Analytics.EVENT_CONTENT_DISCOVERY_INITIATED,params);
-		/*EasyTracker easyTracker = myplexapplication.getGaTracker();
-		Analytics.createEventGA(easyTracker, Analytics.EVENT_CONTENT_DISCOVERY_INITIATED, Analytics.SEARCH_TYPES.Discover.toString(),Analytics.SEARCH_TYPES.Discover.toString());*/
 	}
 	
 	/*
@@ -1052,56 +1047,6 @@ public class Analytics {
 
 	}
 	
-	public static void mixPanelTabletBrowsingEvents(int mNumberofItems) {
-		if(CardExplorer.mfirstTime) {
-			CardExplorerData mData = myplexapplication.mCardExplorerData;
-			Map<String,String> params=new HashMap<String, String>();
-			String ctype = Analytics.movieOrLivetv(mData.searchQuery);
-			int rtype = mData.requestType;
-			String reqtype = Analytics.getRequestType(rtype);
-			if(ctype == null) {
-				ctype = reqtype;
-			}
-				
-			if("favorites".equalsIgnoreCase(ctype)) {
-				params.put(Analytics.NUMBER_OF_FAVORITES, mNumberofItems+"");
-			}
-			else if("downloads".equalsIgnoreCase(ctype)) {
-				params.put(Analytics.NUMBER_OF_DOWNLOADS, mNumberofItems+"");
-			}
-			else if("purchases".equalsIgnoreCase(ctype)) {
-				params.put(Analytics.NUMBER_OF_PURCHASES, mNumberofItems+"");
-			}
-			else if("live tv".equalsIgnoreCase(ctype)) {
-				//ctype = Analytics.TV_CHANNELS;
-				params.put(Analytics.NUMBER_OF_LIVETV_CARDS,1+"");
-			}
-			else if("movies".equalsIgnoreCase(ctype)) {
-				ctype = Analytics.MOVIES;
-				params.put(Analytics.NUMBER_OF_MOVIE_CARDS,1+"");
-			}
-			else if("recommendations".equalsIgnoreCase(ctype)) {
-				params.put(Analytics.NUMBER_OF_MOVIE_CARDS,1+"");
-			}
-			//params.put(Analytics.NUMBER_OF_MOVIE_CARDS,swipeCount+"");
-			String event = Analytics.EVENT_BROWSED +Analytics.EMPTY_SPACE+ ctype;
-			
-			if("discover".equalsIgnoreCase(ctype)) {
-				params.put(Analytics.NUMBER_OF_RESULTS, mNumberofItems+"");
-				event = Analytics.EVENT_CONTENT_DISCOVERY_RESULTS;
-			}
-				
-			if(ctype != null && (!"recommendations".equalsIgnoreCase(ctype)) && (!"movies".equalsIgnoreCase(ctype)) && (!"live tv".equalsIgnoreCase(ctype))) {
-				Analytics.trackEvent(event,params);
-				//Analytics.SEARCH_TYPE = null;
-				//Analytics.SELECTED_INLINE_WORD = null;
-				CardExplorer.mfirstTime = false;
-			}
-		    }
-		//CardExplorer.mfirstTime = false;
-	}
-
-	
 	public static void mixPanelAddFavorite(final CardData data,int type) {
 		if(data == null ) return;
 		if(data.generalInfo == null ) return;
@@ -1115,11 +1060,9 @@ public class Analytics {
 		
 				String event = null;
 				if(type == 1) {
-					//event = Analytics.EVENT_ADDED + Analytics.EMPTY_SPACE+data.generalInfo.title+Analytics.EMPTY_SPACE+Analytics.TO_FAVORITES;
 					event = Analytics.EVENT_ADDED_TO_FAVORITES;
 				}
 				else {
-					//event = Analytics.EVENT_REMOVED + Analytics.EMPTY_SPACE+data.generalInfo.title+Analytics.EMPTY_SPACE+Analytics.FROM_FAVORITES;
 					event = Analytics.EVENT_REMOVED_FROM_FAVORITES;
 					//mMixPanel.getPeople().increment(Analytics.PEOPLE_ENTERED_REVIEWS,1);
 				}
@@ -1180,7 +1123,7 @@ public class Analytics {
 			Analytics.trackEvent(Analytics.EVENT_ENTERED_COMMENTS,params); 
 			Analytics.gaComments(mData.generalInfo.title);
 		}
-		else if ("review".equalsIgnoreCase(type)) {
+		else if ("review".equalsIgnoreCase(type)) { 
 			params.put(Analytics.REVIEW_TEXT,comment);
 			params.put(Analytics.RATING,rating);
 			Analytics.trackEvent(Analytics.EVENT_ENTERED_REVIEW,params);
@@ -1257,6 +1200,9 @@ public class Analytics {
 	
 	private static String getQualityAvailableForPackage(CardData cardData) {
 		if(cardData == null ) return "";
+		if(cardData.generalInfo == null ) return "";
+		String ctype = movieOrLivetv(cardData.generalInfo.type);
+		if("live tv".equalsIgnoreCase(ctype)) return "not applicable";
 		List<String> qualityList = new ArrayList<String>(); //analytics
 		StringBuffer strBuffer = new StringBuffer();
 		for(CardDataPackages packageitem:cardData.packages){
@@ -1340,8 +1286,6 @@ public class Analytics {
 	public static void mixPanelBrowsedSettings() {
 		Map<String,String> params = new HashMap<String, String>();
 		Analytics.trackEvent(Analytics.EVENT_BROWSED_SETTINGS,params);
-		//EasyTracker easyTracker2 = EasyTracker.getInstance(getActivity());	
-		//Analytics.createScreenGA(easyTracker2, Analytics.SCREEN_NAMES.Settings.toString());
 	}
 	
 	public static void mixPanelFeedbackInitiation() {
@@ -1362,12 +1306,8 @@ public class Analytics {
 	}
 	
 	public static void mixPanelDiscoveryOptionSelected() {
-		/*EasyTracker easyTracker = myplexapplication.getGaTracker();
-		 Analytics.createEventGA(easyTracker, Analytics.EVENT_DISCOVERY_OPTION, Analytics.SEARCH_TYPES.Discover.toString(), "DiscoverScreen");
-		*/
 		Map<String,String> params=new HashMap<String, String>();
-		Analytics.trackEvent(Analytics.EVENT_DISCOVERY_OPTION,params);
-		
+		Analytics.trackEvent(Analytics.EVENT_DISCOVERY_OPTION,params);		
 	}
 	
 	public static void mixPanelProvidedFeedback(String feedBackText,String rating) {
@@ -1495,6 +1435,7 @@ public class Analytics {
 		Analytics.createSocialGA(CATEGORY_SOCIAL_NETWORK_TYPES.facebook.toString(), ACTION_LOGIN, "");
 	}
 	
+	//ONLY FOR FACEBOOK
 	public static void mixPanelInviteFriends(String socialNetwork,String number,String status) {
 		Map<String,String> params = new HashMap<String, String>();
 		params.put(Analytics.SOCIAL_NETWORK,socialNetwork);
@@ -1531,17 +1472,20 @@ public class Analytics {
 		params.put(Analytics.REASON_FAILURE, error);
 		Analytics.trackEvent(Analytics.EVENT_GOOGLE_LOGIN_FAILURE,params);
 		
+		SharedPrefUtils.writeToSharedPref(myplexapplication.getAppContext(), GOOGLE_LOG_IN_FAILURE_DATE, getCurrentDate());
+		String lastLogFailedDate = SharedPrefUtils.getFromSharedPreference(myplexapplication.getAppContext(), GOOGLE_LOG_IN_FAILURE_DATE);
 		MixpanelAPI.People people = getMixpanelPeople();
 		people.set(Analytics.ACCOUNT_TYPE, "social: google");
 		people.set(Analytics.USER_ID, googleId);
-		people.set(Analytics.LAST_LOGGED_IN_FAILURE_DATE, getCurrentDate()); 
+		if(lastLogFailedDate == null) {
+			lastLogFailedDate = "not available";
+		}
+		people.set(Analytics.LAST_LOGGED_IN_FAILURE_DATE, lastLogFailedDate); 
 	}
 	
 	public static void mixPanelJoinMyplexInitiated() {
 		Map<String,String> params = new HashMap<String, String>();
-		//params.put(Analytics.EVENT_MYPLEX_SIGNUP_OPTION, Analytics.ACCOUNT_TYPE_MYPLEX);
-		//Analytics.trackEvent(Analytics.EVENT_JOIN_MYPLEX_INITIATED,params);
-		params.put(Analytics.ALL_SIGN_UP_OPTIONS, Analytics.ACCOUNT_TYPE_MYPLEX);
+		params.put(Analytics.ALL_SIGN_UP_OPTIONS, "facebook,google,twitter,myplex");
 		Analytics.trackEvent(Analytics.EVENT_SIGN_UP_OPTIONS_PRESENTED,params);
 	}
 	
@@ -1636,12 +1580,17 @@ public class Analytics {
 	}
 	
 	public static void gaStopPauseMediaTime(String action,long stopPauseLocation) {
-		//only for movies if-condition
-		if(myplexapplication.getCardExplorerData() == null) return;
-		if(myplexapplication.getCardExplorerData().mMasterEntries == null || myplexapplication.getCardExplorerData().mMasterEntries.size() == 0 ) return;
-		int selected = myplexapplication.getCardExplorerData().currentSelectedCard;
-		CardData  mData = myplexapplication.getCardExplorerData().mMasterEntries.get(selected);
-		//CardData  mData = myplexapplication.mSelectedCard;
+		boolean bool = myplexapplication.getAppContext().getResources().getBoolean(R.bool.isTablet);
+		CardData  mData = null;
+		if(bool) { //for tablet
+			mData = myplexapplication.mSelectedCard; //for tablet
+		}
+		else{
+			if(myplexapplication.getCardExplorerData() == null) return;
+			if(myplexapplication.getCardExplorerData().mMasterEntries == null || myplexapplication.getCardExplorerData().mMasterEntries.size() == 0 ) return;
+			int selected = myplexapplication.getCardExplorerData().currentSelectedCard;
+			mData = myplexapplication.getCardExplorerData().mMasterEntries.get(selected);
+		}
 		if(mData == null ) return;
 		if(mData.generalInfo == null ) return;
 		String contentType = mData.generalInfo.type; //movie or livetv
@@ -1665,22 +1614,6 @@ public class Analytics {
 	public static void gaPlayedLiveTvEvent(String contentName,long timeInSeconds) {
 		Analytics.createEventGA("live tv", "play", contentName, timeInSeconds);
 	}
-	
 		
-	/*final MixpanelAPI mMixPanel = myplexapplication.getMixPanel();
-	mMixPanel.getPeople().identify("556678987");
-	mMixPanel.getPeople().checkForSurvey(new SurveyCallbacks() {
-	    public void foundSurvey(final Survey s) {
-	        if (null != s) {
-	           // View view = getActivity().findViewById(android.R.id.content);
-	           // mMixPanel.getPeople().showSurvey(s, view);
-	        	Log.d("Survey Tag", ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-	        }
-	        else {
-	        	Log.d("no Survey Tag", ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-	        	//Util.showToast(getActivity(), "survey is null",Util.TOAST_TYPE_ERROR);
-	        }
-	    }
-	});*/
 }
 

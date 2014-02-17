@@ -26,6 +26,7 @@ import android.widget.TextView;
 
 import com.android.volley.VolleyError;
 import com.apalya.myplex.BaseFragment;
+import com.apalya.myplex.MainBaseOptions;
 import com.apalya.myplex.R;
 import com.apalya.myplex.adapters.CacheManagerCallback;
 import com.apalya.myplex.adapters.NavigationOptionsMenuAdapter;
@@ -87,9 +88,7 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		/*EasyTracker easyTracker2 = EasyTracker.getInstance(getActivity());	
-		Analytics.createScreenGA(easyTracker2, Analytics.SCREEN_NAMES.CardDetailsTabletFrag.toString());*/
-			
+		Analytics.createScreenGA(Analytics.SCREEN_CARDDETAILS);
 	}
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -131,7 +130,7 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		if(mPlayer!=null){
 			if(mPlayer.isMediaPlaying()){
 				mPlayer.onStateChanged(PlayerListener.STATE_PAUSED, mPlayer.getStopPosition());
-				Analytics.stoppedAt();
+				Analytics.stoppedAt(); //when back button clicked
 				Analytics.mixPanelVideoTimeCalculation(mCardData);
 			}
 			mPlayer.stopSportsStatusRefresh();
@@ -467,6 +466,7 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		data.requestType = CardExplorerData.REQUEST_SIMILARCONTENT;
 		data.searchQuery = mCardData._id;
 //		data.mMasterEntries =  (ArrayList<CardData>) mCardData.similarContent.values;
+		Analytics.mixPanelSimilarContent(mCardData);
 		getActivity().startActivity(new Intent(getActivity(),MultiPaneActivity.class));
 		getActivity().finish();
 	}
@@ -496,5 +496,35 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 	public void onProgressBarVisibility(int value) {
 		// TODO Auto-generated method stub
 		
+	}
+	//copied from CardDetails for Analytics
+	@Override
+	public boolean onBackClicked() {
+		try{
+			if(mPlayer.isFullScreen()){
+				if (!mContext.getResources().getBoolean(R.bool.isTablet)) {
+					if(mPlayer.getScreenOrientation() == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE){
+						((MainBaseOptions) mContext).setOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+						mPlayer.resumePreviousOrientaionTimer();
+					}
+					else {
+						((MainBaseOptions) mContext).setOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+						mPlayer.resumePreviousOrientaionTimer();
+					} 
+				}
+				mPlayer.setFullScreen(!mPlayer.isFullScreen());
+				return true;
+			}
+			if(mPlayer.isMediaPlaying()){
+				mPlayer.closePlayer();
+				Analytics.stoppedAt();
+				Analytics.mixPanelVideoTimeCalculation(mCardData);
+				Analytics.gaStopPauseMediaTime("stop",mPlayer.getStopPosition());
+				return true;
+			}
+			return false;
+		}catch(Throwable e){			
+			return false;
+		}
 	}
 }

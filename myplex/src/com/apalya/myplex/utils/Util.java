@@ -1200,7 +1200,22 @@ public class Util {
 		return version;
 	}
 
-	
+	public static String getAppVersionNumber(Context context){
+		
+		String versionCode = "";
+		PackageManager manager = context.getPackageManager();
+		PackageInfo info;
+		try {
+			info = manager.getPackageInfo(
+					context.getPackageName(), 0);
+			if(info.versionCode != 0){
+				versionCode = info.versionCode+"";
+			}
+		} catch (Exception e) {			
+			return "";
+		}
+		return versionCode;
+	}
 
 	public static boolean isInvalidSession(Context context, String response,KeyRenewListener keyRenewListener) {
 		try {

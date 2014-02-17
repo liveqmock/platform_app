@@ -60,7 +60,7 @@ public class SearchSuggestions extends BaseFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-			
+		Analytics.createScreenGA(Analytics.SCREEN_SEARCH_SUGGESTIONS);	
 	}
 
 	@Override

@@ -294,13 +294,14 @@ public class SubcriptionEngine {
 		b.putString("paymentMode", paymentMode); 
 		b.putString("contentType", contentType);//SD or HD
 		b.putString("ctype", ctype);//LiveTv or Movie
+		b.putString("packageId", mSelectedPackageItem.packageId); 
 		Analytics.mixPanelPaymentOptionsSelected(subscribedData.generalInfo._id, subscribedData.generalInfo.title, paymentMode, mSelectedPriceItem.price+"");
 		String cCode = getCouponCode(); //couponCode
 		if(cCode != null && cCode.length() > 0  ) {
 			b.putString("couponCode", cCode);
 			b.putDouble("priceAfterCoupon", Analytics.priceTobecharged);
 		}
-		 Analytics.priceTobecharged = 0.0;
+		//Analytics.priceTobecharged = 0.0;
 		i.putExtras(b);
 		//sendMixPanelMessage();
 		((Activity) mContext).startActivityForResult(i, ConsumerApi.SUBSCRIPTIONREQUEST);

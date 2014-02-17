@@ -780,7 +780,6 @@ public class CardDetails extends BaseFragment implements
 	public void onFullDetailCastAction() {
 		mRelatedCastList = mCardData.relatedCast.values;
 		popupType = MainAdapter.PAGE_CASTVIEW;
-		//mixPanelCastCrewPopup();
 		Analytics.mixPanelCastCrewPopup(mCardData);
 		showAlbumDialog();
 	}
