@@ -875,7 +875,7 @@ public class CardDetailViewFactory {
 			layout.addView(createCastCrewView());
 		}
 		mFullDescPackageButton = (Button)v.findViewById(R.id.carddetaildesc_purchasebutton);
-		UpdateSubscriptionStatus();
+		UpdateSubscriptionStatus(mData);
 //		createPlayInPlaceView(layout);
 		addSpace(layout,(int)mContext.getResources().getDimension(R.dimen.margin_gap_12));
 		return v;
@@ -945,7 +945,7 @@ public class CardDetailViewFactory {
 		}
 		moviedescription.setTypeface(FontUtil.Roboto_Regular);
 		mBriefDescPackageButton = (Button)v.findViewById(R.id.carddetailbriefdescription_purchasebutton);
-		UpdateSubscriptionStatus();
+		UpdateSubscriptionStatus(mData);
 		
 		
 		
@@ -962,13 +962,31 @@ public class CardDetailViewFactory {
 		Util.showFeedback(expand);
 		return v;
 	}
-	public void UpdateSubscriptionStatus(){
-		UpdatePackageButton(mBriefDescPackageButton);
-		UpdatePackageButton(mFullDescPackageButton);
+	public void UpdateSubscriptionStatus(CardData data){
+		UpdatePackageButton(mBriefDescPackageButton,data);
+		UpdatePackageButton(mFullDescPackageButton,data);
 	}
-	private void UpdatePackageButton(Button packageButton){
+	private void UpdatePackageButton(Button packageButton,CardData data){
+		final CardData mData = data;
 		if(packageButton == null){return;}
-		packageButton.setOnClickListener(packageButtonListener);
+		packageButton.setOnClickListener(new OnClickListener() {			
+			@Override
+			public void onClick(View v) {
+				final View view = v;
+					view.setEnabled(false);
+					view.postDelayed(new Runnable() {					
+						@Override
+						public void run() {
+							view.setEnabled(true);
+						}
+					}, 2000);
+					PackagePopUp popup = new PackagePopUp(mContext,mParentView);
+					myplexapplication.getCardExplorerData().cardDataToSubscribe =  mData;
+					popup.showPackDialog(mData, ((Activity)mContext).getActionBar().getCustomView());	
+							
+			
+			}
+		});
 		Util.showFeedbackOnSame(packageButton);
 		packageButton.setTypeface(FontUtil.Roboto_Medium);
 		float price = 10000.99f;

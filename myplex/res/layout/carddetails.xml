@@ -44,9 +44,9 @@
 				android:id="@+id/epg_linear_layout"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:layout_below="@+id/carddetail_videolayout" 
+				android:layout_below="@+id/carddetail_videolayout"
 				android:layout_marginLeft="@dimen/margin_gap_12"
-				android:layout_marginRight="@dimen/margin_gap_12" 
+				android:layout_marginRight="@dimen/margin_gap_12"			
 				android:visibility="gone">
 			</LinearLayout>	
 
@@ -54,7 +54,7 @@
                 android:id="@+id/carddetail_scroll_view"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/carddetail_videolayout"
+                android:layout_below="@+id/epg_linear_layout"
                 android:layout_marginTop="@dimen/margin_gap_12"
                 android:background="#e6e6e6"
                 android:scrollbars="none" >

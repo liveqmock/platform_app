@@ -1520,6 +1520,8 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			chooseStreamOrDownload(items);
 		}else if(videoType.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
 			chooseLiveStreamType(items,false);			
+		}else if(videoType.equalsIgnoreCase(ConsumerApi.TYPE_TV_EPISODE)){
+			chooseStreamOrDownload(items);
 		}
 		
 	}
@@ -1673,6 +1675,10 @@ private void playVideoFile(CardDownloadData mDownloadData){
 	{
 		if(message != null && message.equalsIgnoreCase("ERR_USER_NOT_SUBSCRIBED")){
 			closePlayer();
+			if(mData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_EPISODE)){
+				mPlayerStatusListener.playerStatusUpdate("ERR_USER_NOT_SUBSCRIBED");
+				return;
+			}
 			PackagePopUp popup = new PackagePopUp(mContext,(View)mParentLayout.getParent());
 			myplexapplication.getCardExplorerData().cardDataToSubscribe =  mData;
 			popup.showPackDialog(mData, ((Activity)mContext).getActionBar().getCustomView());	
@@ -1784,6 +1790,8 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		if(data == null || data.images==null || data.images.values==null)
 			return;
 		mData = data;
+		if(isMediaPlaying())
+			return;
 		for(CardDataImagesItem imageItem : mData.images.values) {
 			mPreviewImage.setImageUrl(imageItem.link,MyVolley.getImageLoader());
 		}

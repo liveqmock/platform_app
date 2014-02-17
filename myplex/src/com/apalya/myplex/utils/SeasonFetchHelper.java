@@ -20,11 +20,9 @@ import com.apalya.myplex.data.CardResponseData;
 public class SeasonFetchHelper implements CacheManagerCallback {
 
 	private CardData rootCard;
-//	private String seasonRequestUrl = "";
 	private static String TAG = SeasonFetchHelper.class.getSimpleName();
 	private List<CardData> cardDatas = new ArrayList<CardData>();
 	private ShowFetchListener showFetchListener;
-	private CardData season = new CardData();
 
 	public SeasonFetchHelper(CardData cardData, ShowFetchListener listener) {
 		rootCard = cardData;
@@ -40,6 +38,7 @@ public class SeasonFetchHelper implements CacheManagerCallback {
 			return;
 		GZipRequest seasonRequest = new GZipRequest(seasonRequestUrl,
 				new SeasonFetched(), new SeasonFetchFailed());
+//		seasonRequest.setShouldCache(false);
 		RequestQueue queue = MyVolley.getRequestQueue();
 		queue.add(seasonRequest);
 		
@@ -72,7 +71,7 @@ public class SeasonFetchHelper implements CacheManagerCallback {
 	private class SeasonFetchFailed implements Response.ErrorListener {
 		@Override
 		public void onErrorResponse(VolleyError error) {
-			Log.d("amlan", "error occured" + error.getMessage());
+			Log.d(TAG, "error occured" + error.getMessage());
 			if (showFetchListener != null)
 				showFetchListener.onFailed(error);
 		}
@@ -122,21 +121,24 @@ public class SeasonFetchHelper implements CacheManagerCallback {
 	 * @param season
 	 */
 	public void fetchEpisodes(CardData season) {
-		this.season = season;
 		String _id = season._id;
 		String episodeRequestUrl = ConsumerApi.getEpisodesUrl(_id);
 		Log.d(TAG, "episodeRequestUrl=" + episodeRequestUrl);
 		if (episodeRequestUrl == null)
 			return;
 		GZipRequest seasonRequest = new GZipRequest(episodeRequestUrl,
-				new EpisodeFetched(), new EpisodeFetchFailed());
+				new EpisodeFetched(season), new EpisodeFetchFailed());
 		RequestQueue queue = MyVolley.getRequestQueue();
 		queue.add(seasonRequest);
 
 	}
 
 	private class EpisodeFetched implements Listener<CardResponseData> {
-
+		private CardData season;
+		public EpisodeFetched(CardData season) {
+			this.season = season;
+		}
+		
 		@Override
 		public void onResponse(CardResponseData responseData) {
 			if (responseData == null) {
@@ -153,14 +155,14 @@ public class SeasonFetchHelper implements CacheManagerCallback {
 
 			if (showFetchListener != null)
 				showFetchListener.onEpisodeFetched(season, datas);
-			Log.d("amlan", "got response " + responseData);
+			Log.d(TAG, "got episodes" + responseData.results.size());
 		}
 	}
 
 	private class EpisodeFetchFailed implements Response.ErrorListener {
 		@Override
 		public void onErrorResponse(VolleyError error) {
-			Log.d("amlan", "error occured" + error.getMessage());
+			Log.d(TAG, "error occured" + error.getMessage());
 			if (showFetchListener != null)
 				showFetchListener.onFailed(error);
 		}
