@@ -56,4 +56,11 @@
         </attr>
         <attr name="is_cropped" format="boolean" />
     </declare-styleable>
+    <declare-styleable name="SlidingUpPanelLayout">
+        <attr name="collapsedHeight" format="dimension" />
+        <attr name="shadowHeight" format="dimension" />
+        <attr name="fadeColor" format="color" />
+        <attr name="flingVelocity" format="integer" />
+        <attr name="dragView" format="reference" />
+    </declare-styleable>
 </resources>

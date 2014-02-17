@@ -82,6 +82,8 @@
     <string name="myplex_home">myplex picks</string>
     <string name="rate_this">rate </string>
     <string name="add_live_tv_review">add a live tv review</string>
+    <string name="loading">loading</string>
+    <string name="jump_to_episode">jump to episode</string>
     
     <string name="stream">stream</string>	
     <string name="download">download</string>			

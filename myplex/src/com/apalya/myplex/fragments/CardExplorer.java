@@ -554,6 +554,9 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			}
 			requestUrl = ConsumerApi.getSimilarContent(mData.searchQuery,ConsumerApi.LEVELDYNAMIC);
 			
+		}else if(mData.requestType == CardExplorerData.REQUEST_TV_SHOWS){
+			screenName="Browse" + mData.searchQuery;
+			requestUrl = ConsumerApi.getBrowse(mData.searchQuery,ConsumerApi.LEVELDYNAMIC, mData.mStartIndex);
 		}
 		
 		
