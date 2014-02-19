@@ -217,7 +217,7 @@ public class EpgView {
 		
 		programmePicker.setMinValue(0);
 		programmePicker.setValue(0);
-		programmePicker.setMaxValue(3);
+		programmePicker.setMaxValue(2);
 		programmePicker.setDisplayedValues(new String[]{mContext.getString(R.string.loading),"",""});
 	}
 	
