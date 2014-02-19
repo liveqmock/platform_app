@@ -2,6 +2,7 @@ package com.apalya.myplex.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,6 +26,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.EPGRequest;
 import com.apalya.myplex.R;
 import com.apalya.myplex.data.CardData;
+import com.apalya.myplex.views.CardVideoPlayer;
 
 public class EpgView {
 	private CardData mData;
@@ -35,7 +37,8 @@ public class EpgView {
 	private Context mContext;
 	private int newDateValue;
 	private static int DELAY = 2000;// FOR date change listener
-	
+	private List<EpgContent> epgContents  = new ArrayList<EpgContent>();
+	private CardVideoPlayer player;	
 	public EpgView(CardData data,Context context) {
 		mContext = context;
 		mData  =  data;		
@@ -92,6 +95,7 @@ public class EpgView {
 		programmePicker.invalidate();
 		programmePicker.requestLayout();
 		
+		epgContents = contents;
 		String programmes[] = new String[contents.size()];
 		for(int i=0;i<contents.size();i++){
 			EpgContent content = contents.get(i);
@@ -135,6 +139,12 @@ public class EpgView {
 	private class ProgrammChangeListener implements OnValueChangeListener{		
 		@Override
 		public void onValueChange(android.widget.NumberPicker picker, int oldVal,int newVal) {
+			Log.d("amlan","assert url"+epgContents.get(newVal).assetUrl);
+			String assertUrl = epgContents.get(newVal).assetUrl;
+			if(assertUrl!=null){
+//				player.initPlayBack(assertUrl);
+				Log.d("amlan","got url for playback ="+assertUrl);
+			}
 			
 		}
 	};
@@ -167,16 +177,18 @@ public class EpgView {
 		Date date = new Date();
 		fillDates(datePicker);
 		fillProgrammes(contents,programmePicker);
+		int index = 0;
 		for(EpgContent content : contents){
 			Date startDate  =  getDate(content.StartTime);
 			Date endDate	=  getDate(content.EndTime);
 			
 			if(startDate == null || endDate == null)
 				continue;
-			
 			if(date.before(endDate) && date.after(startDate)){
-				epgView.setVisibility(View.VISIBLE);
+				programmePicker.setValue(index);
+				break;
 			}				
+			index++;
 		}	
 	}
 	
@@ -209,5 +221,8 @@ public class EpgView {
 		programmePicker.setDisplayedValues(new String[]{mContext.getString(R.string.loading),"",""});
 	}
 	
-	private Handler handler = new Handler();
+	public void setCardVideoPlayer(CardVideoPlayer player){
+		this.player = player;
+	}
+	private Handler handler = new Handler();	
 }

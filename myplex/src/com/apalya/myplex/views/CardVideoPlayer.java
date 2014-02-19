@@ -1365,6 +1365,8 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		
 		if(mData.generalInfo.type.equalsIgnoreCase("live"))	
 			return true;
+		if(mData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_SEASON) || mData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_SERIES))
+			return false;
 
 		String networkInfo = Util.getInternetConnectivity(mContext);
 		if (networkInfo.equalsIgnoreCase("2G")) {
@@ -1632,6 +1634,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		if(adaptive!=null){			
 			adaptive_link = adaptive.link;
 		}
+		final int ellapseTime = adaptive.elapsedTime;
 		if(SharedPrefUtils.getBoolFromSharedPreference(mContext, mContext.getString(R.string.is_dont_ask_again))){
 			if(SharedPrefUtils.getBoolFromSharedPreference(mContext, mContext.getString(R.string.isDownload))){
 				if(download_link!=null)					
@@ -1656,6 +1659,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 							initPlayBack(download_link);
 						}else{
 							initPlayBack(adaptive_link);
+							onLastPausedTimeFetched(ellapseTime);
 						}					
 					}
 				});
@@ -1673,8 +1677,8 @@ private void playVideoFile(CardDownloadData mDownloadData){
 	@Override
 	public void onUrlFetchFailed(String message) 
 	{
+		closePlayer();
 		if(message != null && message.equalsIgnoreCase("ERR_USER_NOT_SUBSCRIBED")){
-			closePlayer();
 			if(mData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_EPISODE)){
 				mPlayerStatusListener.playerStatusUpdate("ERR_USER_NOT_SUBSCRIBED");
 				return;
