@@ -38,7 +38,8 @@ public class EpgView {
 	private int newDateValue;
 	private static int DELAY = 2000;// FOR date change listener
 	private List<EpgContent> epgContents  = new ArrayList<EpgContent>();
-	private CardVideoPlayer player;	
+	private CardVideoPlayer player;
+	private static String TAG = "EpgView";	
 	public EpgView(CardData data,Context context) {
 		mContext = context;
 		mData  =  data;		
@@ -58,7 +59,7 @@ public class EpgView {
 	}
 	public void fetchEPGData(String date){
 		String requestString = ConsumerApi.getEpgUrl(mData.generalInfo.title.split(" ")[0], "1", date);
-		Log.d("amlan",requestString);
+		Log.d(TAG ,requestString);
 		EPGRequest request = new EPGRequest(requestString,new OnEPGfetched(), new OnEPGFetchFailed());
 		request.setShouldCache(false);
 		RequestQueue queue = MyVolley.getRequestQueue();
@@ -85,7 +86,7 @@ public class EpgView {
 			
 			@Override
 			public void onScrollStateChange(NumberPicker picker, int arg1) {
-				Log.d("amlan","scoll"+arg1);
+				Log.d(TAG,"scoll"+arg1);
 			}
 		});
 	}
@@ -139,11 +140,11 @@ public class EpgView {
 	private class ProgrammChangeListener implements OnValueChangeListener{		
 		@Override
 		public void onValueChange(android.widget.NumberPicker picker, int oldVal,int newVal) {
-			Log.d("amlan","assert url"+epgContents.get(newVal).assetUrl);
+			Log.d(TAG,"assert url"+epgContents.get(newVal).assetUrl);
 			String assertUrl = epgContents.get(newVal).assetUrl;
 			if(assertUrl!=null){
 //				player.initPlayBack(assertUrl);
-				Log.d("amlan","got url for playback ="+assertUrl);
+				Log.d(TAG,"got url for playback ="+assertUrl);
 			}
 			
 		}
@@ -160,7 +161,6 @@ public class EpgView {
 					return;
 				}
 				List<EpgContent> contents = response.contents;	
-//				Log.d("amlan","got response"+contents.size());
 				showEPGData(contents);
 						
 			}
