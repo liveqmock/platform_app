@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent" android:background="@color/black" >
 
     <com.apalya.myplex.views.FadeInNetworkImageView
         android:id="@+id/cardmediasubitemvideo_imagepreview"
@@ -26,7 +26,7 @@
         android:layout_marginRight="14dp"
         android:layout_marginTop="14dp"
         android:text="@string/card_play_font"
-        android:textSize="32sp"
+        android:textSize="28sp"
         android:textColor="@color/white"
         android:gravity="center"
         android:shadowColor="@color/black"
@@ -44,13 +44,24 @@
         android:layout_marginLeft="14dp"
         android:layout_marginTop="14dp"
         android:text="@string/card_trailer_font"
-        android:textSize="32sp"
+        android:textSize="28sp"
         android:textColor="@color/white"
         android:shadowColor="@color/black"
         android:shadowDx="-1"
         android:shadowDy="1"
         android:shadowRadius="0.01"
         android:hint="@string/trailerhint" />
+     <TextView 
+         android:id="@+id/recordedProgName"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_toRightOf="@+id/cardmediasubitemtrailer_play"
+         android:layout_alignBaseline="@+id/cardmediasubitemtrailer_play"
+         android:visibility="gone"
+         android:textColor="@android:color/white"
+         android:layout_marginLeft="10dp"
+         android:layout_marginBottom="15dp"
+         />   
 
      <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"

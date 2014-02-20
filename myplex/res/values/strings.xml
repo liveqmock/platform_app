@@ -117,6 +117,7 @@
     <string name="similar_movies">similar movies</string>
 
     <string name="listempty">no data</string>
+    <string name="no_url">No URL</string>
     
     <string name="userprofilename">profilename</string>
     <string name="userpic">userpicurl</string>
@@ -136,6 +137,7 @@
     <string name="iconcricket">&#x26BE;</string>
     <string name="icontv">&#x1F4FA;</string>
     <string name="iconshare">&#xF601;</string>
+    <string name="record_play">&#x25B6;</string>
     <!--Navigation drawer icons-->
     
     <string-array name="hometabletanim">

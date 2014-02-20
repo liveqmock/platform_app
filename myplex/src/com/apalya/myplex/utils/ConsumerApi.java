@@ -103,7 +103,8 @@ public class ConsumerApi {
 
 	
 	// for live tv epg
-	public static final String EPG_BASE_URL = "http://d2capp.apalya-auth.com/recording/epg/whatsOnIndiaXml.action?serviceId=";
+//	public static final String EPG_BASE_URL = "http://d2capp.apalya-auth.com/recording/epg/whatsOnIndiaXml.action?serviceId=";
+	public static final String EPG_BASE_URL = "http://220.226.22.120:8080/recording/epg/getEPGScheduleXML.action?serviceId=";
 	public static final String DAYS  = "days=";
 	public static final String DATE  = "rdate=";
 	// list of content types
@@ -284,7 +285,7 @@ public class ConsumerApi {
 	
 	public static String getEpisodesUrl(String contentId){
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH + CONTENT_RELATED_CONTEXT + SLASH + contentId 
-				+ SLASH + QUESTION_MARK+ CLIENTKEY + DEBUGCLIENTKEY + AMPERSAND + LEVEL + LEVELDEVICEMAX +
-				AMPERSAND + BROWSETYPE + TYPE_TV_EPISODE ;
+				+ SLASH + QUESTION_MARK+ CLIENTKEY + DEBUGCLIENTKEY + 
+				AMPERSAND + BROWSETYPE + TYPE_TV_EPISODE + "&fields=images,generalInfo,contents,comments,reviews/user,_id,relatedMedia" ;
 	}
 }

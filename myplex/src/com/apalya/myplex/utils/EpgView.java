@@ -2,6 +2,7 @@ package com.apalya.myplex.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,6 +26,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.EPGRequest;
 import com.apalya.myplex.R;
 import com.apalya.myplex.data.CardData;
+import com.apalya.myplex.views.CardVideoPlayer;
 
 public class EpgView {
 	private CardData mData;
@@ -35,11 +37,16 @@ public class EpgView {
 	private Context mContext;
 	private int newDateValue;
 	private static int DELAY = 2000;// FOR date change listener
+	private List<EpgContent> epgContents  = new ArrayList<EpgContent>();
+	private CardVideoPlayer player;
+	private static String TAG = "EpgView";	
+	private Calendar calendar;
 	
 	public EpgView(CardData data,Context context) {
 		mContext = context;
 		mData  =  data;		
 		mInflator = LayoutInflater.from(context);
+		calendar = Calendar.getInstance();
 	}
 
 	public View createEPGView() {
@@ -49,13 +56,21 @@ public class EpgView {
 		datePicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
 		programmePicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
 		
-		epgView.setVisibility(View.GONE);		
-		fetchEPGData(null);				
+		epgView.setVisibility(View.GONE);
+		String dayString  = calendar.get(Calendar.YEAR)+"-"+(calendar.get(Calendar.MONTH)+1)+"-"+calendar.get(Calendar.DAY_OF_MONTH);
+		fetchEPGData(dayString.trim());
+		fillDates(datePicker);
+		datePicker.setValue(3);
 		return epgView;
 	}
 	public void fetchEPGData(String date){
-		String requestString = ConsumerApi.getEpgUrl(mData.generalInfo.title.split(" ")[0], "1", date);
-		Log.d("amlan",requestString);
+		String requestString = "";
+		Log.d(TAG,"title="+mData.generalInfo.title);
+		if(mData.generalInfo.title.equalsIgnoreCase("headlines today"))
+			 requestString = ConsumerApi.getEpgUrl(mData.generalInfo.title.replace(" ", ""), "1", date);
+		else
+			 requestString = ConsumerApi.getEpgUrl(mData.generalInfo.title.trim().split(" ")[0], "1", date);
+		Log.d(TAG ,requestString);
 		EPGRequest request = new EPGRequest(requestString,new OnEPGfetched(), new OnEPGFetchFailed());
 		request.setShouldCache(false);
 		RequestQueue queue = MyVolley.getRequestQueue();
@@ -66,32 +81,32 @@ public class EpgView {
 
 	private void fillDates(NumberPicker picker) {
 		String days[] = new String[7];
-		Calendar calendar = Calendar.getInstance();
-		int day = calendar.get(Calendar.DAY_OF_MONTH);
-		String month = calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT,
-				Locale.getDefault());
-		for (int i = 0; i < 7; i++) {
-			days[i] = (int) (day + i) + month;
-		}
+		
+		for(int i=-3;i<=3;i++){
+			days[i+3] = getMonthAndDate(i);
+		}		
 		picker.setMinValue(0);
 		picker.setMaxValue(6);
 		picker.setDisplayedValues(days);
 		datePicker.setDividerPadding(10);
 		datePicker.setOnValueChangedListener(new OnDatechangeListener());
-		datePicker.setOnScrollListener(new OnScrollListener() {
-			
-			@Override
-			public void onScrollStateChange(NumberPicker picker, int arg1) {
-				Log.d("amlan","scoll"+arg1);
-			}
-		});
 	}
 	
+	private String getMonthAndDate(int days) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.add(Calendar.DATE, days);
+		String month = calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT,
+				Locale.getDefault());
+		int day = calendar.get(Calendar.DAY_OF_MONTH);
+		return day+" "+month;
+	}
+
 	protected void fillProgrammes(List<EpgContent> contents, NumberPicker programmePicker) {
 		
 		programmePicker.invalidate();
 		programmePicker.requestLayout();
 		
+		epgContents = contents;
 		String programmes[] = new String[contents.size()];
 		for(int i=0;i<contents.size();i++){
 			EpgContent content = contents.get(i);
@@ -135,6 +150,17 @@ public class EpgView {
 	private class ProgrammChangeListener implements OnValueChangeListener{		
 		@Override
 		public void onValueChange(android.widget.NumberPicker picker, int oldVal,int newVal) {
+			Log.d(TAG,"assert url"+epgContents.get(newVal).assetUrl);
+			String assertUrl = epgContents.get(newVal).assetUrl;
+			String assetType = epgContents.get(newVal).assetType;
+			if(player.isMediaPlaying())
+				return;
+			if(assetType.equals("1") && assertUrl!=null  && (!assertUrl.equalsIgnoreCase(mContext.getString(R.string.no_url)))){
+				Log.d(TAG,"got url for playback ="+assertUrl);
+				player.createRecordPlayView(assertUrl,epgContents.get(newVal).Name);
+			}else{
+				player.removeRecordPay();
+			}
 			
 		}
 	};
@@ -150,7 +176,6 @@ public class EpgView {
 					return;
 				}
 				List<EpgContent> contents = response.contents;	
-//				Log.d("amlan","got response"+contents.size());
 				showEPGData(contents);
 						
 			}
@@ -164,19 +189,20 @@ public class EpgView {
 	
 	private void showEPGData(List<EpgContent>  contents) {
 		epgView.setVisibility(View.VISIBLE);
-		Date date = new Date();
-		fillDates(datePicker);
+		Date date = new Date();		
 		fillProgrammes(contents,programmePicker);
+		int index = 0;
 		for(EpgContent content : contents){
 			Date startDate  =  getDate(content.StartTime);
 			Date endDate	=  getDate(content.EndTime);
 			
 			if(startDate == null || endDate == null)
 				continue;
-			
 			if(date.before(endDate) && date.after(startDate)){
-				epgView.setVisibility(View.VISIBLE);
+				programmePicker.setValue(index);
+				break;
 			}				
+			index++;
 		}	
 	}
 	
@@ -205,9 +231,12 @@ public class EpgView {
 		
 		programmePicker.setMinValue(0);
 		programmePicker.setValue(0);
-		programmePicker.setMaxValue(3);
+		programmePicker.setMaxValue(2);
 		programmePicker.setDisplayedValues(new String[]{mContext.getString(R.string.loading),"",""});
 	}
 	
-	private Handler handler = new Handler();
+	public void setCardVideoPlayer(CardVideoPlayer player){
+		this.player = player;
+	}
+	private Handler handler = new Handler();	
 }

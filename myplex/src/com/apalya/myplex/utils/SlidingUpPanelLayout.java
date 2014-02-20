@@ -1056,26 +1056,44 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
         @Override
         public void onViewReleased(View releasedChild, float xvel, float yvel) {
+        	
+        	
             int top = mIsSlidingUp
                     ? getSlidingTop()
                     : getSlidingTop() - mSlideRange;
+                    
+                	Log.i("DEVESH", " Slide Range ="+mSlideRange + " Top=" + top +" Sliding Top=" + getSlidingTop());
+
+                    
 
             if (mAnchorPoint != 0) {
                 int anchoredTop;
                 float anchorOffset;
                 if (mIsSlidingUp) {
+
+                	
                     anchoredTop = (int)(mAnchorPoint*mSlideRange);
                     anchorOffset = (float)anchoredTop/(float)mSlideRange;
+                	Log.i("DEVESH", " mIsSlidingUp=true"+mSlideRange + " anchoredTop=" + anchoredTop +" anchorOffset=" +anchorOffset);
+
                 } else {
                     anchoredTop = mPanelHeight - (int)(mAnchorPoint*mSlideRange);
                     anchorOffset = (float)(mPanelHeight - anchoredTop)/(float)mSlideRange;
+                	Log.i("DEVESH", " mIsSlidingUp=false"+mSlideRange + " anchoredTop=" + anchoredTop +" anchorOffset=" +anchorOffset);
+
                 }
 
-                if (yvel > 0 || (yvel == 0 && mSlideOffset >= (1f+anchorOffset)/2)) {
+                if (yvel > 0 || (yvel == 0 &&( mSlideOffset >= (1f+anchorOffset)/2 ))) {
                     top += mSlideRange;
-                } else if (yvel == 0 && mSlideOffset < (1f+anchorOffset)/2
-                                    && mSlideOffset >= anchorOffset/2) {
+                    
+                    
+                    Log.i("DEVESH", "new full top according to    top += mSlideRange in mSlideOffset >= (1f+anchorOffset)/2 :"+ top + " And mIsSidingUp="+ mIsSlidingUp);
+                } else if( (yvel == 0 && mSlideOffset < (1f+anchorOffset)/2
+                                    && mSlideOffset >= anchorOffset/2) || mSlideOffset< (anchorOffset)/2 ) {
                     top += mSlideRange * mAnchorPoint;
+                    Log.i("DEVESH", "new anchor top according to  : top += mSlideRange * mAnchorPoint;"+ top+ " And mIsSidingUp="+ mIsSlidingUp);
+                    
+
                 }
 
             } else if (yvel > 0 || (yvel == 0 && mSlideOffset > 0.5f)) {
