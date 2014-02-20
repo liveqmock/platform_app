@@ -145,7 +145,9 @@ public class CacheDispatcher extends Thread {
                         @Override
                         public void run() {
                             try {
-                                mNetworkQueue.put(request);
+                            	if(ConnectivityReceiver.isConnected){
+                            		mNetworkQueue.put(request);
+                            	}
                             } catch (InterruptedException e) {
                                 // Not much we can do about this.
                             }
