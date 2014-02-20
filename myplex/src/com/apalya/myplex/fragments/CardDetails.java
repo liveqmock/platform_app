@@ -340,15 +340,20 @@ public class CardDetails extends BaseFragment implements
 			/*if (mBottomActionBar != null) {
 				mBottomActionBar.setVisibility(View.INVISIBLE);
 			}*/
+			
 			mPlayer.playInLandscape();
-			if((mBottomDrawerlayout!=null) && (mBottomDrawerlayout.getVisibility() == View.VISIBLE))
+			if( mCardData.generalInfo.type != null && 
+				(mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_SERIES)||mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_EPISODE)) 
+						&&(mBottomDrawerlayout!=null) && (mBottomDrawerlayout.getVisibility() == View.VISIBLE))
 				mBottomDrawerlayout.setVisibility(View.GONE);
 		} else {
 			/*if (mBottomActionBar != null) {
 				mBottomActionBar.setVisibility(View.VISIBLE);
 			}*/
 			mPlayer.playInPortrait();
-			if((mBottomDrawerlayout!=null) && (mBottomDrawerlayout.getVisibility() == View.GONE))
+			if(mCardData.generalInfo.type != null && 
+					(mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_SERIES)||mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_EPISODE))
+					&& (mBottomDrawerlayout!=null) && (mBottomDrawerlayout.getVisibility() == View.GONE))
 				mBottomDrawerlayout.setVisibility(View.VISIBLE);
 		}
 		super.onConfigurationChanged(newConfig);

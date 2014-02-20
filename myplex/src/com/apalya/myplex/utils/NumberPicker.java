@@ -1,7 +1,5 @@
 package com.apalya.myplex.utils;
 
-import java.lang.reflect.Field;
-
 import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
@@ -36,10 +34,10 @@ public class NumberPicker extends android.widget.NumberPicker {
 
 	private void updateView(View view) {
 		if(view instanceof EditText){
-			((EditText) view).setTextSize(10);
+			((EditText) view).setTextSize(12);
 			((EditText) view).setTextColor(Color.parseColor("#333333"));
 
-			((EditText) view).setTypeface(FontUtil.Roboto_Regular);
+			((EditText) view).setTypeface(FontUtil.Roboto_Bold);
 		}
 	}
 
