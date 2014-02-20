@@ -142,11 +142,23 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 			params.put(Analytics.CONTENT_QUALITY, "not applicable");
 		}
 		else if("movies".equalsIgnoreCase(ctype)){
-		params.put(Analytics.CONTENT_QUALITY, contentType); //SD or HD //7
+			params.put(Analytics.CONTENT_QUALITY, contentType); //SD or HD //7
+			String str = "analytics";
+			String value = commercialModel+":"+contentType;
+			String key = subscribedData._id+"analytics";
+			SharedPrefUtils.writeToSharedPref(myplexapplication.getAppContext(), key, value);//storing rental/buy &SD/HD info for analytics
 		}
 		params.put(Analytics.USER_ID,Analytics.getUserEmail());//8
+		
 		//studio
-		//language
+		if(subscribedData.content != null && subscribedData.content.language != null && subscribedData.content.language.size()>0) {
+			params.put(Analytics.LANGUAGE,subscribedData.content.language.get(0));
+		}
+		else {
+			params.put(Analytics.LANGUAGE,"Not available");
+		}
+		params.put(Analytics.PAYMENT_METHOD, paymentModel); 
+		
 		return params;
 	}
 	
@@ -154,16 +166,13 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 			if(subscribedData == null ) return;
 			if(subscribedData.generalInfo == null ) return;
 			
-			//Map<String,String> params = new HashMap<String, String>();
 			String str = "analytics";
 			String value = commercialModel+":"+contentType;
 			//This data will be used to capture storing rental/buy &SD/HD info while playing video
 			SharedPrefUtils.writeToSharedPref(this, "subscribedData._id"+str, value);
 			
 			String ctype = Analytics.movieOrLivetv(subscribedData.generalInfo.type);
-			//to-be-removed
-			//String event = Analytics.EVENT_PAID_FOR_CONTENT;
-			
+						
 			if("live tv".equals(ctype)) {
 				String eventlive = Analytics.EVENT_PAID_FOR_CONTENT;
 				Map<String,String> paramslive = new HashMap<String, String>();
@@ -177,6 +186,7 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 						Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_LIVETV_PURCHASED_FOR,priceTobecharged2); //mixpanel people
 						Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_TOTAL_PURCHASES,priceTobecharged2); //mixpanel people
 						Analytics.trackEvent(eventlive,paramslive);
+						Analytics.trackCharge(priceTobecharged2);
 						Analytics.createTransactionGA(transactionid, paymentModel,priceTobecharged2, 0.0,0.0); //GA transaction
 						Analytics.createItemGA(transactionid, contentName,contentId, ctype, priceTobecharged2, 1L); //GA transaction
 						Analytics.priceTobecharged = 0;
@@ -195,6 +205,7 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 					Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_LIVETV_PURCHASED_FOR,contentPrice); //mixpanel people
 					Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_TOTAL_PURCHASES,contentPrice); //mixpanel people
 					Analytics.trackEvent(eventlive,paramslive);
+					Analytics.trackCharge(priceTobecharged2);
 					Analytics.createTransactionGA(transactionid, paymentModel,contentPrice, 0.0,0.0); //GA transaction
 					Analytics.createItemGA(transactionid, contentName,contentId, ctype, contentPrice, 1L); //GA transaction
 					return;
@@ -384,14 +395,15 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 		Map<String,String> params=new HashMap<String, String>();
 		params.put(Analytics.CONTENT_ID_PROPERTY, subscribedData._id);
 		params.put(Analytics.CONTENT_NAME_PROPERTY, subscribedData.generalInfo.title);
-		params.put(Analytics.PAY_CONTENT_PRICE, contentPrice.toString());
+		String ctype = Analytics.movieOrLivetv(subscribedData.generalInfo.type); 
+		params.put(Analytics.CONTENT_TYPE_PROPERTY, contentType);//movie or livetv
 		params.put(Analytics.PAY_PURCHASE_TYPE, commercialModel); //Rental or buy
-		params.put(Analytics.PAYMENT_METHOD, paymentModel); //cc or dc
 		params.put(Analytics.CONTENT_QUALITY, contentType); //SD or HD
-		String ctype = Analytics.movieOrLivetv(subscribedData.generalInfo.type); //movie or livetv
-		//String event = Analytics.EVENT_SUBSCRIPTION_FAILURE + Analytics.EMPTY_SPACE+subscribedData.generalInfo.title;
+		params.put(Analytics.PAY_CONTENT_PRICE, contentPrice.toString());
+		//params.put(Analytics.PAYMENT_METHOD, paymentModel); //cc or dc
 		String event = Analytics.EVENT_SUBSCRIPTION_FAILURE;
 		params.put(Analytics.REASON_FAILURE,error);
+		params.put(Analytics.USER_ID,Analytics.getUserEmail());
 		Analytics.trackEvent(event,params);
 	}
 	private void closeSession(int response){

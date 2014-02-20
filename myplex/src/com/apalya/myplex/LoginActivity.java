@@ -210,16 +210,15 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		// will be sent with events. If you choose not to set this,
 		// the SDK will generate one for you
 
-		mMixpanel.getPeople().identify(trackingDistinctId); //this is the distinct_id
+		//mMixpanel.getPeople().identify(trackingDistinctId); //this is the distinct_id
 		// that will be used for people analytics. You must set this explicitly in order
 		// to dispatch people data.
+		
+		mMixpanel.getPeople().identify(trackingDistinctId);
 
 		mMixpanel.getPeople().initPushHandling(myplexapplication.ANDROID_PUSH_SENDER_ID);
-		/*easyTracker = myplexapplication.getGaTracker();
-		Analytics.startActivity(easyTracker, this);*/
-		
 		Map<String,String> params1 = new HashMap<String, String>();
-		params1.put(Analytics.ALL_LOGIN_OPTIONS,"facebook,google,twitter,myplex");
+		params1.put(Analytics.ALL_LOGIN_OPTIONS,"facebook google twitter myplex");
 		Analytics.trackEvent(Analytics.EVENT_LOGIN_OPTIONS_PRESENTED,params1);
 		//Analytics.startActivity(easyTracker, this);
 		Analytics.createScreenGA(Analytics.SCREEN_LOGINACTIVITY);
@@ -502,7 +501,6 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				if(camPaignMap.containsKey("utm_content")) properties.put("utm_content", camPaignMap.get("utm_content"));				
 			}
 			properties.put("app version.release", Util.getAppVersionNumber(this));
-			//properties.put("app version.code", Util.getAppVersionNumber(this));
 			properties.put("browser version", "native app");
 			Location location = LocationUtil.getInstance(this).getLocation();
 			if(location != null) {
@@ -512,14 +510,13 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			} catch (JSONException e) {
 			e.printStackTrace();
 		} // default value
-		mMixpanel.registerSuperProperties(properties);
+		mMixpanel.registerSuperPropertiesOnce(properties);
 		mMixpanel.unregisterSuperProperty("app version.code");
 	}
 	Map<String,String> getReferrerMapFromUri(Uri uri) {
 		
 	    MapBuilder paramMap = new MapBuilder();
 	    
-	    // If no URI, return an empty Map.
 	    if (uri == null) { 
 	    	  	return paramMap.build(); 
 	    	}
@@ -825,7 +822,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		try {
 			JSONObject properties = new JSONObject();
 			properties.put("first viewed on", nowInHours);
-			mMixpanel.registerSuperPropertiesOnce(properties);
+			mMixpanel.unregisterSuperProperty("first viewed on");
+			//mMixpanel.registerSuperPropertiesOnce(properties);
 		} catch (JSONException e) {
 			throw new RuntimeException("Could not encode hour first viewed as JSON");
 		}
@@ -1014,15 +1012,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			@Override
 			public void onErrorResponse(VolleyError error) {
 				dismissProgressBar();
-				Map<String,String> params=new HashMap<String, String>();
-				params.put(Analytics.ACCOUNT_TYPE, "social: google");
-				params.put(Analytics.USER_ID,mUserInfo.getUserEmail());
-				params.put(Analytics.REASON_FAILURE,error.toString());
-				Analytics.trackEvent(Analytics.EVENT_FACEBOOK_LOGIN_FAILURE,params);
-				MixpanelAPI.People people = Analytics.getMixpanelPeople();
-				people.set(Analytics.ACCOUNT_TYPE, "social: facebook");
-				people.set(Analytics.USER_ID, mUserInfo.getUserEmail());
-				people.set(Analytics.LAST_LOGGED_IN_FAILURE_DATE, Analytics.getCurrentDate()); 
+				Analytics.mixPanelFacebookLoginFailure(null, error.toString());
 								
 				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 				Log.d(TAG,"Error: "+error.toString());
@@ -1076,11 +1066,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 								getString(R.string.userpic), "https://graph.facebook.com/"+fbUserId+"/picture?width=480&height=320");
 		
 						}
-						Map<String,String> attribs=new HashMap<String, String>();
-						attribs.put(Analytics.ACCOUNT_TYPE, "social: facebook");
-						attribs.put(Analytics.USER_ID,mUserInfo.getUserEmail());
-						Analytics.trackEvent(Analytics.EVENT_FACEBOOK_LOGIN_SUCCESS,attribs);
-						
+						Analytics.mixPanelFacebookLoginSuccess(mUserInfo.getUserEmail());
 						Log.d(TAG, "status: "+jsonResponse.getString("status"));
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
@@ -1098,16 +1084,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 							mUserInfo.setGoogleId(null);
 							mUserInfo.setName("NA");
 						}
-									
-						Map<String,String> attribs2=new HashMap<String, String>();
-						attribs2.put(Analytics.ACCOUNT_TYPE, "social: facebook");
-						attribs2.put(Analytics.USER_ID,mUserInfo.getUserEmail());
-						attribs2.put(Analytics.REASON_FAILURE,jsonResponse.getString("message"));
-						Analytics.trackEvent(Analytics.EVENT_FACEBOOK_LOGIN_FAILURE,attribs2);
-						MixpanelAPI.People people = Analytics.getMixpanelPeople();
-						people.set(Analytics.ACCOUNT_TYPE, "social: facebook");
-						people.set(Analytics.USER_ID, mUserInfo.getUserEmail());
-						people.set(Analytics.LAST_LOGGED_IN_FAILURE_DATE, Analytics.getCurrentDate()); 
+						
+						Analytics.mixPanelFacebookLoginFailure(mUserInfo.getUserEmail(), jsonResponse.getString("message"));
 						
 						if(jsonResponse.getString("code").equalsIgnoreCase("401"))
 						{
@@ -1410,7 +1388,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 	@Override
 	public void onDisconnected() {
-		
+		Log.d(TAG, "Testing onDisconnected ");
 	}
 
 	@Override
@@ -1495,6 +1473,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					});
 				} else {
 					mCanRemoveAuthProgressFragment = true;
+					Analytics.mixPanelGoogleLoginFailure(null, Analytics.USER_ABANDONMENT_LOGIN_FAILURE);
 				}
 			}
 		} else {
@@ -1590,7 +1569,9 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			}
 		} else {
 			Log.e(TAG, "Got " + connectionResult.getErrorCode() + ". Could not load plus profile.");
+			int err = connectionResult.getErrorCode();
 			dismissProgressBar();
+			Analytics.mixPanelGoogleConnectionFailure(null, Analytics.NETWORK_ERROR);
 			/*if(connectionResult.getErrorCode()==7)
 			{
 				Util.showToast("No Internet Connection...", LoginActivity.this);
@@ -1747,7 +1728,12 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					Util.showToast(LoginActivity.this, error.toString(),Util.TOAST_TYPE_ERROR);
 //					Util.showToast(error.toString(),LoginActivity.this);	
 				}
-
+				Map<String,String> params = new HashMap<String, String>();
+				String str = "not available";
+				params.put(Analytics.DEVICE_ID, str);
+				params.put(Analytics.DEVICE_DESC, str);
+				params.put(Analytics.REASON_FAILURE, error.toString());
+				Analytics.trackEvent(Analytics.EVENT_DEVICE_REGISTRATION_FAILED,params);
 				Log.d(TAG, "@@@@@@@@@@@@@@@ BASE ACTIVITY @@@@@@@@@@@@@@@@@@@@");
 			}
 		};
@@ -1887,6 +1873,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					
 					if(username != null){
 						mMixpanel.getPeople().set("$email", username);
+						//mMixpanel.getPeople().identify(username);
 					}
 					
 					finish();

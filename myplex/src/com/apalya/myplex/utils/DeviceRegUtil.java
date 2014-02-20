@@ -112,6 +112,7 @@ public class DeviceRegUtil {
 					msg=""+error.networkResponse.statusCode+":";
 				}
 				dismissProgressBar();
+				Analytics.mixPanelDeviceDeRegisterfailed(error.toString());
 				Util.showToast(mContext, msg+error.toString(),Util.TOAST_TYPE_ERROR);
 				
 			}

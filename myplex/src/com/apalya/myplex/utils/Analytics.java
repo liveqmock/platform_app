@@ -48,110 +48,7 @@ public class Analytics {
 	public static String downLoadStartTime;
 		
 	private static String TAG = "Analytics";
-	/*public static String EVENT_LOGIN = "login";
-	public static String EVENT_LOGIN_SOCIAL = "login social";
-	public static String EVENT_SIGNUP = "signed up";
-	public static String EVENT_BROWSE = "browsed";
-	//public static String EVENT_CONTENT = "Content";
-	public static String EVENT_SEARCH = "search";
-	public static String EVENT_PLAY_TRAILER = "played trailer";
-	public static String EVENT_PAY = "paid";
-	public static String EVENT_SHARE = "share";
-	public static String EVENT_CLICK = "Click";
 	
-	public static String EVENT_TYPE = "event type";
-	public static String EVENT_SELECTED = "selected";
-	
-	public static String APOS = "'";
-	public static String EVENT_FILTERED = "filtered";
-	//public static String EVENT_SEARCH_DISCOVERY = "discovery search";
-	public static String EVENT_SEARCH_INLINE = "inline search";
-	
-	public static enum GA_CATEGORY_TYPES {Movies,LiveTv,Trailer};
-		
-	public static String LOGIN_TYPE_PROPERTY = "LoginType";
-	public static enum LOGIN_TYPES {FaceBook,Twitter,Google,myplex,Guest};
-	public static String LOGIN_DATE_PROPERTY = "LoginDate";
-	public static String LOGIN_EMAIL_PROPERTY = "LoginEmail";
-	public static String LOGIN_STATUS_PROPERTY = "LoginStatus";
-	public static String LOGIN_STATUS_MESSAGE_PROPERTY = "LoginMessage";
-	public static enum LOGIN_STATUS_TYPES {Clicked,Success,Failure,Cancel,Error};
-	public static String LOGIN_FORGOT_PASSWORD_PROPERTY = "ForgotPassword";
-	public static String LOGIN_AS_GUEST = "Guest";
-	public static String LOGIN_FACEBOOK = "FacebookLogin";
-	public static String LOGIN_TWITTER = "TwitterLogin";
-	public static String LOGIN_GOOGLE = "GoogleLogin";
-	public static String LOGIN_CLICK = "Click";
-	
-	public static String SIGNUP_TYPE_PROPERTY = "SignupType";
-	public static String SIGNUP_DATE_PROPERTY = "SignupDate";
-	public static String SIGNUP_EMAIL_PROPERTY = "SignEmail";
-	public static enum SIGNUP_TYPES {myplex};
-	public static String SIGNUP_STATUS_PROPERTY = "SignupStatus";
-	public static enum SIGNUP_STATUS_TYPES {Success,Failure};
-	
-	public static String BROWSE_TYPE_PROPERTY = "BrowseType";
-	public static enum BROWSE_TYPES {cards,navigation,filter,relatedcontent};
-	public static enum BROWSE_CARDACTION_TYPES {Delete,Swipe};
-	public static enum BROWSE_NAVIGATION_TYPES {Favourites,Purchases,Downloads,Discover,Settings,Logout,Home,Movies,LiveTv};
-	
-	
-	
-	//public static String CONTENT_CATEGORY_PROPERTY = "ContentCategory";
-	public static String CONTENT_DETAILS_PROPERTY = "ContentDetails";
-	public static String CONTENT_CARD_STATUS = "ContentCardStatus";
-	public static String CONTENT_CARD_OPENED = "ContentCardExpanded";
-	//public static String CONTENT_CARD_DETAILS = "ContentCardExpanded";
-	public static String CONTENT_CARD_DETAILS_PROPERTY = "ContentCardDescriptionExpanded";
-	public static enum CONTENT_ACTION_TYPES {Favourite,Detailed,PlayTrailer,Share,movie};
-	public static enum CONTENT_SHARE_TYPES {Facebook,Google};
-	public static String CONTENT_PLAY_ERROR_Property = "ContentPlayError";
-	public static String CONTENT_PLAY_ERROR = "Cannot Play Video";
-	
-	
-	public static String SEARCH_TYPE_PROPERTY = "SearchType";
-	public static String SEARCH_FILTER_TYPE_PROPERTY = "SearchFilterLabel";
-	public static enum SEARCH_TYPES {DropDown,Discover,Filter,Inline};
-	public static enum DROPDOWN_STATUS_TYPES {Success,Failure};
-	public static enum DISCOVER_STATUS_TYPES {tag};
-	public static String SEARCH_NUMBER_FOUND_PROPERTY = "NumberOfCardsFound";
-	public static String SEARCH_QUERY_PROPERTY = "SearchQuery";
-	public static String SEARCH_SCREEN_PROPERTY = "SearchScreen";
-		
-	public static String FILTERED_ALL = "all";
-	
-	
-	public static String PLAY_CONTENT_ID_PROPERTY = "ContentId Playing";
-	public static String PLAY_CONTENT_NAME_PROPERTY = "ContentName Playing";
-	public static String PLAY_CONTENT_STATUS_PROPERTY = "Content Play Status";
-	public static String PLAY_CONTENT_START_TIME_PROPERTY = "Content Start Time";
-	public static String PLAY_CONTENT_END_TIME_PROPERTY = "Content End Time";
-	public static String PLAY_CONTENT_PAUSE_TIME_PROPERTY = "Content Pause Time";
-	public static String PLAY_CONTENT_RESUME_TIME_PROPERTY = "Content Resume Time";
-	public static String PLAY_CONTENT_SEEK_TIME_PROPERTY = "Content Seek Time";
-	public static String PLAY_CONTENT_ERROR_PROPERTY = "ErrorMessage";
-	public static String PLAY_CONTENT_WIDEVINE_ERROR = "Widevine Authorization Failed";
-	public static enum PLAY_CONTENT_STATUS_TYPES {Start,End,Pause,Resume,Seek,Playing,SeekComplete,PlayerRightsAcquisition,Error};
-	
-	public static enum PAY_MODEL_TYPES {CreditCard,DebitCard,InternetBanking,OperatorBilling,InAppPurchase};
-	public static enum PAY_COMMERCIAL_TYPES {Rental,Buy};
-	public static enum PAY_CONTENT_TYPES {SD,HD};
-	public static enum PAY_CONTENT_STATUS_TYPES {Success,Failure};
-	public static String PAY_STATUS_PROPERTY = "PayStatus";
-	public static String PAY_COMMERCIAL_TYPE_PROPERTY =  "CommercialModel";
-	public static String PAY_PAYMENT_MODEL =  "PaymentModel";
-	
-	public static String PAY_PACKAGE_ID = "PackageId";
-	public static String PAY_PACKAGE_NAME = "PackageName";
-	public static String PAY_PACKAGE_CHANNEL = "PackageChannel";
-	public static String PAY_PACKAGE_PURCHASE_STATUS = "Status";
-	
-	
-	public static String GA_AFFILIATION = "GoogleStore";
-	public static String GA_CURRENCY = "INR";
-	
-	//public static String COMMENT_TEXT = "CommentEntered";
-	*/
 	public static enum SCREEN_NAMES {CardExplorer,Settings,CardDetails,CardDetailsTabletFrag,SearchSuggestions};
 	
 	public static long currentTime = 0;
@@ -332,12 +229,15 @@ public class Analytics {
 	public static String PAYMENT_OPTION =  "payment option";
 	public static String PAYMENT_OPTIONS_PRESENTED =  "payment options presented";
 	public static String PURCHASE_OPTIONS_AVAILABLE =  "purchase options available";
+	public static String PRICING_OPTIONS_AVAILABLE =  "pricing options";
 	public static String CONTENT_QUALITY_AVAILABLE =  "content quality available";
 	public static String STUDIO =  "studio";
 	public static String LANGUAGE =  "language";
 	public static String TOP_RESULT =  "top result";
 	public static String INITIATED_FROM =  "initiated from";
 	public static String DOWNLOAD_OPTION_AVAILABLE =  "download option available";
+	public static String USERID_NOT_AVAILABLE =  "unavaliable";
+	public static String UNAVAILABLE =  "unavaliable";
 	
 	public static String SCREEN_OPENED_FROM = "opened from";
 	public static String DETAILS = "details";
@@ -351,6 +251,8 @@ public class Analytics {
 	public static String WIFI_OPTION_1 = "wifi only";
 	public static String WIFI_OPTION_2 = "not limited to wifi";
 	public static String WIFI_ONLY_STATUS = "wifi only status";
+	public static String NETWORK_ERROR = "network error";
+	public static String USER_ABANDONMENT_LOGIN_FAILURE = "User abandonment due to failure login";
 	
 	
 	//people data
@@ -367,6 +269,7 @@ public class Analytics {
 	public static String PEOPLE_FREE_MOVIE_RENTALS = "free movie rentals";
 	public static String PEOPLE_FREE_TV_SUBSCRIPTIONS = "free tv subscriptions (w)";
 	public static String PEOPLE_FREE_DOWNLOADS_TO_OWN = "free downloads to own";
+	public static String PEOPLE_JOINING_DATE = "joining date";
 	
 	//Google Analytics
 	public static String GA_AFFILIATION = "GoogleStore";
@@ -428,7 +331,7 @@ public class Analytics {
 	}
 
 	private static JSONObject getJSON(Map<String, String> params){
-		JSONObject data= new JSONObject();
+		JSONObject data = new JSONObject();
 		Set<String> keySet = params.keySet();
 		
 		for(String key:keySet){
@@ -570,16 +473,6 @@ public class Analytics {
 		return ctype;
 	}
 	
-	/*
-	 * begin at 10.00 currentTime = ct, totalPlayedTime = 0
-	 * pause at 10.10 pausedAt=10.10  playedTime = 10.10 - x = 10 mts, totalPlayedTime = 0 + 10 = 10 mts
-	 * resume at 10.20 currentTime = ct 
-	 * one of the below could happen
-	 * pause at 10.35 playedTime = 10.35 - ct = 15 mts totalPlayedTime = 10 + 15 = 25 mts
-	 * stop at 10.45 playedTime = 10.35 - x(20) = 15 mts totalPlayedTime = 10 + 15 = 25 mts
-	 *  
-	 * 
-	 */
 	public static boolean isPlaying = false;
 	public static boolean playerClosed = false;
 	
@@ -644,7 +537,6 @@ public class Analytics {
 		return TimeUnit.SECONDS.toMinutes(totalPlayedTime)+1;
 	}
 	
-	//CardDetails
 	public static void mixPanelVideoTimeCalculation(CardData mCardData) {
 		if(mCardData == null ) return;
 		if(mCardData.generalInfo == null ) return;
@@ -698,15 +590,7 @@ public class Analytics {
 				params.put(Analytics.MOVIE_SIZE,getDownloadedMovieSize(mData._id)+"");
 				String key = mData._id+"analytics";
 				String purchaseType = null; //rent or buy
-				/*
-				 * if(mCardData.currentUserData != null) {
-					if(mCardData.currentUserData.purchase != null && mCardData.currentUserData.purchase.size() >0) {
-						CardDataPurchaseItem cardDataPurchaseItem = mCardData.currentUserData.purchase.get(0);
-						purchaseType = cardDataPurchaseItem.type;
-					}
-				}
-				params.put(Analytics.PAY_PURCHASE_TYPE, purchaseType); 
-				*/
+				
 				//Data is stored while purchase in SubscriptionView -mixPanelPaySuccess()
 				String value = SharedPrefUtils.getFromSharedPreference(myplexapplication.getAppContext(), key);
 				if(value != null) {
@@ -1168,15 +1052,43 @@ public class Analytics {
 	}
 	
 	public static  void mixPanelPaymentOptionsPresented2(CardData mData, CardDataPackages packageItem) {
+		if(mData == null ) return;
+		if(mData.generalInfo == null ) return;
 		Map<String,String> params=new HashMap<String, String>();
 		params.put(Analytics.CONTENT_ID_PROPERTY, mData._id);
 		params.put(Analytics.CONTENT_NAME_PROPERTY, mData.generalInfo.title);
 		String paymentChannels = getPaymentChannelsForPackage(packageItem);
 		String contentQuality = getQualityAvailableForPackage(mData);
 		String purchaseOptions = getPurchaseOptionsForPackage(mData);
-		params.put(Analytics.PAYMENT_OPTIONS_PRESENTED,paymentChannels );
-		params.put(Analytics.CONTENT_QUALITY_AVAILABLE, contentQuality);
-		params.put(Analytics.PURCHASE_OPTIONS_AVAILABLE, purchaseOptions);
+		String priceOptions = "{" + getPriceOptionsForContent(mData) + "}";
+		if(paymentChannels != null && paymentChannels.length() >0 ) {
+			params.put(Analytics.PAYMENT_OPTIONS_PRESENTED,paymentChannels );
+		}
+		else {
+			params.put(Analytics.PAYMENT_OPTIONS_PRESENTED,Analytics.UNAVAILABLE );
+		}
+		
+		if(contentQuality != null && contentQuality.length() >0 ) {
+			params.put(Analytics.CONTENT_QUALITY_AVAILABLE, contentQuality);
+		}
+		else {
+			params.put(Analytics.CONTENT_QUALITY_AVAILABLE, Analytics.UNAVAILABLE);
+		}
+		
+		if(purchaseOptions != null && purchaseOptions.length() >0 ) {
+			params.put(Analytics.PURCHASE_OPTIONS_AVAILABLE, purchaseOptions);
+		}
+		else {
+			params.put(Analytics.PURCHASE_OPTIONS_AVAILABLE, Analytics.UNAVAILABLE);
+		}
+		
+		if(priceOptions != null && priceOptions.length() >0 ) {
+			params.put(Analytics.PRICING_OPTIONS_AVAILABLE, priceOptions);
+		}
+		else {
+			params.put(Analytics.PRICING_OPTIONS_AVAILABLE, Analytics.UNAVAILABLE);
+		}
+		
 		Analytics.trackEvent(Analytics.EVENT_PAYMENT_OPTIONS_PRESENTED,params);
 	}
 	
@@ -1232,6 +1144,24 @@ public class Analytics {
 		return null;
 	}
 	
+	private static String getPriceOptionsForContent(CardData cardData) {
+		StringBuffer strBuffer = new StringBuffer();
+		if(cardData == null ) return "";
+		if(cardData.packages == null || cardData.packages.size() == 0) return "";
+		List<CardDataPackages> listCardDataPackages = cardData.packages;
+		for(CardDataPackages cdpackage: listCardDataPackages) {
+			if(cdpackage.priceDetails != null && cdpackage.priceDetails.size() > 0) {
+				strBuffer.append(cdpackage.priceDetails.get(0).price+"");
+				strBuffer.append(",");
+			}			
+		}
+		if(strBuffer.length() > 0) {
+			String str = trimCommaFromEndOfString(strBuffer.toString());
+			return str;
+		}
+		return null;
+	}
+	
 	private static String trimCommaFromEndOfString(String str) {
 		int lastIndex = str.lastIndexOf(",");
 		str = str.substring(0,lastIndex);
@@ -1254,7 +1184,7 @@ public class Analytics {
 		Analytics.trackEvent(event,params);
 	}
 	
-	public static void mixPanelDeviceRegisterfailed(String error) {
+	public static void mixPanelDeviceDeRegisterfailed(String error) {
 		try{
 			UserProfile mUserInfo = myplexapplication.getUserProfileInstance();
 			DeviceDetails mDevInfo = myplexapplication.getDevDetailsInstance();
@@ -1468,7 +1398,12 @@ public class Analytics {
 	public static void mixPanelGoogleLoginFailure(String googleId,String error) {
 		Map<String,String> params = new HashMap<String, String>();
 		params.put(Analytics.ACCOUNT_TYPE, "social: google");
-		params.put(Analytics.USER_ID, googleId);
+		if(googleId != null && googleId.length() > 0) {
+			params.put(Analytics.USER_ID, googleId);
+		}
+		else {
+			params.put(Analytics.USER_ID, Analytics.USERID_NOT_AVAILABLE);
+		}
 		params.put(Analytics.REASON_FAILURE, error);
 		Analytics.trackEvent(Analytics.EVENT_GOOGLE_LOGIN_FAILURE,params);
 		
@@ -1483,10 +1418,64 @@ public class Analytics {
 		people.set(Analytics.LAST_LOGGED_IN_FAILURE_DATE, lastLogFailedDate); 
 	}
 	
+	public static void mixPanelGoogleConnectionFailure(String googleId,String error) {
+		Map<String,String> params = new HashMap<String, String>();
+		params.put(Analytics.ACCOUNT_TYPE, "social: google");
+		params.put(Analytics.USER_ID, Analytics.USERID_NOT_AVAILABLE);
+		params.put(Analytics.REASON_FAILURE, error);
+		Analytics.trackEvent(Analytics.EVENT_GOOGLE_LOGIN_FAILURE,params);
+		
+		SharedPrefUtils.writeToSharedPref(myplexapplication.getAppContext(), GOOGLE_LOG_IN_FAILURE_DATE, getCurrentDate());
+		String lastLogFailedDate = SharedPrefUtils.getFromSharedPreference(myplexapplication.getAppContext(), GOOGLE_LOG_IN_FAILURE_DATE);
+		MixpanelAPI.People people = getMixpanelPeople();
+		people.set(Analytics.ACCOUNT_TYPE, "social: google");
+		people.set(Analytics.USER_ID, Analytics.USERID_NOT_AVAILABLE);
+		if(lastLogFailedDate == null) {
+			lastLogFailedDate = "not available";
+		}
+		people.set(Analytics.LAST_LOGGED_IN_FAILURE_DATE, lastLogFailedDate); 
+	}
+	
+	public static void mixPanelFacebookLoginFailure(String facebookId,String error) {
+		
+		Map<String,String> params = new HashMap<String, String>();
+		params.put(Analytics.ACCOUNT_TYPE, "social: facebook");
+		if(facebookId != null && facebookId.length() > 0) {
+			params.put(Analytics.USER_ID, facebookId);
+		}
+		else {
+			params.put(Analytics.USER_ID, Analytics.USERID_NOT_AVAILABLE);
+		}
+		params.put(Analytics.REASON_FAILURE,error);
+		Analytics.trackEvent(Analytics.EVENT_FACEBOOK_LOGIN_FAILURE,params);
+		MixpanelAPI.People people = Analytics.getMixpanelPeople();
+		people.set(Analytics.ACCOUNT_TYPE, "social: facebook");
+		if(facebookId != null && facebookId.length() > 0) {
+			people.set(Analytics.USER_ID, facebookId);
+		}
+		else {
+			people.set(Analytics.USER_ID, Analytics.USERID_NOT_AVAILABLE);
+		}		
+		people.set(Analytics.LAST_LOGGED_IN_FAILURE_DATE, Analytics.getCurrentDate()); 
+	}
+	
 	public static void mixPanelJoinMyplexInitiated() {
 		Map<String,String> params = new HashMap<String, String>();
-		params.put(Analytics.ALL_SIGN_UP_OPTIONS, "facebook,google,twitter,myplex");
+		params.put(Analytics.ALL_SIGN_UP_OPTIONS, "facebook google twitter myplex");
 		Analytics.trackEvent(Analytics.EVENT_SIGN_UP_OPTIONS_PRESENTED,params);
+	}
+	
+	public static void mixPanelMyplexJoinedSuccess2(String email) {
+		Map<String,String> params1 = new HashMap<String, String>();
+		params1.put(Analytics.ACCOUNT_TYPE, Analytics.ACCOUNT_TYPE_MYPLEX);
+		params1.put(Analytics.USER_ID,email);
+		params1.put(Analytics.JOINED_ON, getCurrentDate());
+		Analytics.trackEvent(Analytics.EVENT_JOINED_MYPLEX_SUCCESSFULLY, params1);
+		
+		MixpanelAPI.People people = getMixpanelPeople();
+		people.set(Analytics.ACCOUNT_TYPE, Analytics.ACCOUNT_TYPE_MYPLEX);
+		people.set(Analytics.USER_ID, email);
+		people.set(Analytics.PEOPLE_JOINING_DATE, getCurrentDate());
 	}
 	
 	public static void mixPanelMyplexJoinedSuccess(String email) {
@@ -1499,7 +1488,7 @@ public class Analytics {
 		MixpanelAPI.People people = getMixpanelPeople();
 		people.set(Analytics.ACCOUNT_TYPE, Analytics.ACCOUNT_TYPE_MYPLEX);
 		people.set(Analytics.USER_ID, email);
-		people.set(Analytics.JOINED_ON, getCurrentDate());
+		people.set(Analytics.PEOPLE_JOINING_DATE, getCurrentDate());
 	}
 	
 	public static void mixPanelMyplexJoinedFailure(String email,String error) {
@@ -1524,20 +1513,26 @@ public class Analytics {
 	}
 	
 	public static void mixPanelForgotPasswordFailed(String email,String error) {
-		Map<String,String> attribs=new HashMap<String, String>();
+		Map<String,String> attribs = new HashMap<String, String>();
 		attribs.put(Analytics.USER_ID, email);
 		attribs.put(Analytics.REASON_FAILURE, error);
-		Analytics.trackEvent(Analytics.EVENT_FORGOT_PASSWORD_FAILED,attribs); 
+		Analytics.trackEvent(Analytics.EVENT_FORGOT_PASSWORD_FAILED,attribs);
 		
+		String lastFailedDate = SharedPrefUtils.getFromSharedPreference(myplexapplication.getAppContext(), EVENT_FORGOT_PASSWORD_FAILED);
+		if (lastFailedDate == null ) {
+			lastFailedDate = "Not Available";
+		}
+		SharedPrefUtils.writeToSharedPref(myplexapplication.getAppContext(), EVENT_FORGOT_PASSWORD_FAILED, getCurrentDate());
+			
 		MixpanelAPI.People people = getMixpanelPeople();
 		people.set(Analytics.ACCOUNT_TYPE, Analytics.ACCOUNT_TYPE_MYPLEX);
 		people.set(Analytics.USER_ID, email);
-		people.set(Analytics.FORGOT_PASSWORD_FAILED_ON, getCurrentDate());
+		people.set(Analytics.FORGOT_PASSWORD_FAILED_ON, lastFailedDate);
 	}
 	
 	public static String getCurrentDate() {
-		//SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy");
+		//SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		String date = sdf.format(new Date()); 
 		return date;		
 	}

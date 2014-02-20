@@ -1161,15 +1161,6 @@ class CardsLayout extends RelativeLayout {
 		setMeasuredDimension(w, h);
 	}
 	
-	/*@Override
-	public boolean dispatchKeyEvent(KeyEvent event) {
-		int keyCode = event.getKeyCode();
-		if (keyCode == KeyEvent.KEYCODE_BACK) {
-           Log.d(TAG, "ScrollView Back button pressed");
-        }
-		return super.dispatchKeyEvent(event);
-	}*/
-	
 	//for analytics
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event)  {
