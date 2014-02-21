@@ -942,6 +942,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		mTrailerButton = (TextView)v.findViewById(R.id.cardmediasubitemtrailer_play);
 		mTrailerButton.setTypeface(FontUtil.ss_symbolicons_line);
 		mTrailerButton.setVisibility(mTrailerAvailable == true ? View.VISIBLE : View.GONE);
+		recordedProgName = (TextView)v.findViewById(R.id.recordedProgName);
 		
 //		initSportsStatusLayout(v);
 		mTrailerButton.setOnClickListener(new OnClickListener() {
@@ -1250,6 +1251,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			mPlayerFullScreen.playerInFullScreen(true);
 		}
 		// mParentLayout.setLayoutParams(mParentLayoutParams);
+		mParentLayout.setBackgroundColor(Color.BLACK);
 	}
 	public void playInPortrait() {
 		if(mPlayerStatusListener != null){
@@ -1834,9 +1836,9 @@ private void playVideoFile(CardDownloadData mDownloadData){
 				}
 			}
 		}
-		mTrailerButton.setVisibility(mTrailerAvailable == true ? View.VISIBLE : View.GONE);
 		if(isMediaPlaying())
 			return;
+		mTrailerButton.setVisibility(mTrailerAvailable == true ? View.VISIBLE : View.GONE);
 		for(CardDataImagesItem imageItem : mData.images.values) {
 			mPreviewImage.setImageUrl(imageItem.link,MyVolley.getImageLoader());
 		}
