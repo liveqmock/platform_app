@@ -80,6 +80,8 @@ public class EpgParser
 	    String title = null;
 	    String summary = null;
 	    String link = null;
+	    String assetType = null;
+	    String assetUrl = null;
 	    while (parser.next() != XmlPullParser.END_TAG) {
 	        if (parser.getEventType() != XmlPullParser.START_TAG) {
 	            continue;
@@ -91,11 +93,15 @@ public class EpgParser
 	            summary = readStartTime(parser);
 	        } else if (name.equals("EndTime")) {
 	            link = readEndTime(parser);
-	        } else {
+	        }else if(name.equals("assetType")){
+	        	assetType = readAssetType(parser);
+	        }else if(name.equals("assetUrl")){
+	        	assetUrl = readAssetUrl(parser);
+	        }else {
 	            skip(parser);
 	        }
 	    }
-	    return new EpgContent(title, summary, link);
+	    return new EpgContent(title, summary, link,assetType,assetUrl);
 	}
 
 	private String readName(XmlPullParser parser) throws IOException, XmlPullParserException {
@@ -118,10 +124,18 @@ public class EpgParser
 		parser.require(XmlPullParser.END_TAG, ns, "EndTime");
 		return EndTime;
 	}
-
-
-
-	// For the tags title and summary, extracts their text values.
+	private String readAssetType(XmlPullParser parser) throws IOException, XmlPullParserException {
+		parser.require(XmlPullParser.START_TAG, ns, "assetType");
+		String EndTime = readText(parser);
+		parser.require(XmlPullParser.END_TAG, ns, "assetType");
+		return EndTime;
+	}
+	private String readAssetUrl(XmlPullParser parser) throws IOException, XmlPullParserException {
+		parser.require(XmlPullParser.START_TAG, ns, "assetUrl");
+		String EndTime = readText(parser);
+		parser.require(XmlPullParser.END_TAG, ns, "assetUrl");
+		return EndTime;
+	}	
 	private String readText(XmlPullParser parser) throws IOException, XmlPullParserException {
 		String result = "";
 		if (parser.next() == XmlPullParser.TEXT) {
