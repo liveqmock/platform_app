@@ -1052,6 +1052,7 @@ public class CardDetails extends BaseFragment implements
 				return true;
 			}
 			if(mPlayer.isMediaPlaying()){
+				mPlayer.onStateChanged(PlayerListener.STATE_PAUSED, mPlayer.getStopPosition());
 				mPlayer.closePlayer();
 				return true;
 			}
