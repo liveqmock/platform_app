@@ -432,6 +432,7 @@ public class Util {
 				lastDownloadId=0;
 				Log.d(TAG,"downl;oad failed");
 				Util.showToast(mContext, "Some error occured during downloading.",Util.TOAST_TYPE_INFO);
+				t.printStackTrace();
 			}
 			
 			if(lastDownloadId>0)
