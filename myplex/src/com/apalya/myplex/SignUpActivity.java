@@ -181,6 +181,11 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 				@Override
 				public void onClick(View v) {		
 					
+					if(!Util.isNetworkAvailable(SignUpActivity.this)){
+						sendNotification(getString(R.string.error_network_not_available));						
+						return;
+					}	
+					
 					mSubmit.setEnabled(false);
 					mSubmit.setClickable(false);
 					mSubmit.postDelayed(new Runnable() {						
@@ -330,6 +335,11 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 
 				@Override
 				public void onClick(View v) {
+					
+					if(!Util.isNetworkAvailable(SignUpActivity.this)){
+						sendNotification(getString(R.string.error_network_not_available));						
+						return;
+					}
 					
 					mSubmit.setEnabled(false);
 					mSubmit.setClickable(false);
