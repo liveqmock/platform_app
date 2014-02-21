@@ -202,7 +202,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		FontUtil.loadFonts(getAssets());
 		String trackingDistinctId = getTrackingDistinctId();
 		Analytics.trackingId = trackingDistinctId;
-		mMixpanel=myplexapplication.getMixPanel();
+		mMixpanel = myplexapplication.getMixPanel();
 		// We also identify the current user with a distinct ID, and
 		// register ourselves for push notifications from Mixpanel.
 
@@ -210,12 +210,14 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		// will be sent with events. If you choose not to set this,
 		// the SDK will generate one for you
 
-		//mMixpanel.getPeople().identify(trackingDistinctId); //this is the distinct_id
+		mMixpanel.getPeople().identify(trackingDistinctId); //this is the distinct_id
 		// that will be used for people analytics. You must set this explicitly in order
 		// to dispatch people data.
 		
-		mMixpanel.getPeople().identify(trackingDistinctId);
-
+		//mMixpanel.getPeople().identify(trackingDistinctId);
+		/*String distinctId = mMixpanel.getDistinctId();
+		Log.d(TAG, "Mixpanel generated distinctid "+distinctId);*/
+		
 		mMixpanel.getPeople().initPushHandling(myplexapplication.ANDROID_PUSH_SENDER_ID);
 		Map<String,String> params1 = new HashMap<String, String>();
 		params1.put(Analytics.ALL_LOGIN_OPTIONS,"facebook google twitter myplex");
@@ -511,7 +513,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			e.printStackTrace();
 		} // default value
 		mMixpanel.registerSuperPropertiesOnce(properties);
-		mMixpanel.unregisterSuperProperty("app version.code");
+		//mMixpanel.unregisterSuperProperty("app version.code");
 	}
 	Map<String,String> getReferrerMapFromUri(Uri uri) {
 		
@@ -1861,7 +1863,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 							getString(R.string.userprofilename));
 					String profilePic=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
 							getString(R.string.userpic));
-					
+					//mMixpanel.getPeople().identify(username);
 					if(profilename!=null)
 					{
 						mUserInfo.setName(profilename);

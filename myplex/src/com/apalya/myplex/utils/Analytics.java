@@ -169,6 +169,7 @@ public class Analytics {
 	public static String NUMBER_OF_LIVETV_CARDS = "number of live TV cards";
 	public static String NUMBER_OF_KEYWORDS = "number of keywords";
 	public static String NUMBER_OF_INVITEES = "number of invitees";
+	public static String INVITED_FRIENDS = "invited friends";
 		
 	public static String ACCOUNT_TYPE = "account type";
 	public static String USER_ID = "user id";
@@ -270,6 +271,7 @@ public class Analytics {
 	public static String PEOPLE_FREE_TV_SUBSCRIPTIONS = "free tv subscriptions (w)";
 	public static String PEOPLE_FREE_DOWNLOADS_TO_OWN = "free downloads to own";
 	public static String PEOPLE_JOINING_DATE = "joining date";
+	public static String PEOPLE_FAVORITES = "favorites";
 	
 	//Google Analytics
 	public static String GA_AFFILIATION = "GoogleStore";
@@ -318,8 +320,12 @@ public class Analytics {
 	
 	public static MixpanelAPI.People getMixpanelPeople() {
 		MixpanelAPI.People people = mMixPanel.getPeople();
-		//people.identify(trackingId);
+		people.identify(getUserEmail());
 		return people;
+	}
+	
+	public static MixpanelAPI getMixpanelAPI() {
+		 return mMixPanel;
 	}
 	public static void trackCharge(double price){
 		
@@ -936,6 +942,7 @@ public class Analytics {
 		if(data.generalInfo == null ) return;
 		try{
 			Map<String,String> params=new HashMap<String, String>();
+			MixpanelAPI.People people = Analytics.getMixpanelPeople();
 			params.put(Analytics.CONTENT_ID_PROPERTY, data._id);
 			if(data.generalInfo != null) {
 				params.put(Analytics.CONTENT_TYPE_PROPERTY, Analytics.movieOrLivetv(data.generalInfo.type));
@@ -945,10 +952,11 @@ public class Analytics {
 				String event = null;
 				if(type == 1) {
 					event = Analytics.EVENT_ADDED_TO_FAVORITES;
+					people.increment(Analytics.PEOPLE_FAVORITES, 1);
 				}
 				else {
 					event = Analytics.EVENT_REMOVED_FROM_FAVORITES;
-					//mMixPanel.getPeople().increment(Analytics.PEOPLE_ENTERED_REVIEWS,1);
+					people.increment(Analytics.PEOPLE_FAVORITES, -1);
 				}
 				Analytics.trackEvent(event,params);
 			}
@@ -1373,6 +1381,9 @@ public class Analytics {
 		params.put(Analytics.STATUS,status);
 		params.put(Analytics.USER_ID,getUserEmail());
 		Analytics.trackEvent(Analytics.EVENT_INVITE_FRIENDS,params);
+		
+		MixpanelAPI.People people = getMixpanelPeople();
+		people.set(Analytics.INVITED_FRIENDS, 1);
 		Analytics.createSocialGA(socialNetwork, ACTION_INVITE_FRIENDS, "");
 	}
 	
@@ -1465,19 +1476,6 @@ public class Analytics {
 		Analytics.trackEvent(Analytics.EVENT_SIGN_UP_OPTIONS_PRESENTED,params);
 	}
 	
-	public static void mixPanelMyplexJoinedSuccess2(String email) {
-		Map<String,String> params1 = new HashMap<String, String>();
-		params1.put(Analytics.ACCOUNT_TYPE, Analytics.ACCOUNT_TYPE_MYPLEX);
-		params1.put(Analytics.USER_ID,email);
-		params1.put(Analytics.JOINED_ON, getCurrentDate());
-		Analytics.trackEvent(Analytics.EVENT_JOINED_MYPLEX_SUCCESSFULLY, params1);
-		
-		MixpanelAPI.People people = getMixpanelPeople();
-		people.set(Analytics.ACCOUNT_TYPE, Analytics.ACCOUNT_TYPE_MYPLEX);
-		people.set(Analytics.USER_ID, email);
-		people.set(Analytics.PEOPLE_JOINING_DATE, getCurrentDate());
-	}
-	
 	public static void mixPanelMyplexJoinedSuccess(String email) {
 		Map<String,String> params1 = new HashMap<String, String>();
 		params1.put(Analytics.ACCOUNT_TYPE, Analytics.ACCOUNT_TYPE_MYPLEX);
@@ -1486,9 +1484,9 @@ public class Analytics {
 		Analytics.trackEvent(Analytics.EVENT_JOINED_MYPLEX_SUCCESSFULLY, params1);
 		
 		MixpanelAPI.People people = getMixpanelPeople();
-		people.set(Analytics.ACCOUNT_TYPE, Analytics.ACCOUNT_TYPE_MYPLEX);
-		people.set(Analytics.USER_ID, email);
-		people.set(Analytics.PEOPLE_JOINING_DATE, getCurrentDate());
+		people.setOnce(Analytics.ACCOUNT_TYPE, Analytics.ACCOUNT_TYPE_MYPLEX);
+		people.setOnce(Analytics.USER_ID, email);
+		people.setOnce(Analytics.PEOPLE_JOINING_DATE, getCurrentDate());
 	}
 	
 	public static void mixPanelMyplexJoinedFailure(String email,String error) {

@@ -571,8 +571,8 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 					
 					if(jsonResponse.getString("status").equalsIgnoreCase("SUCCESS"))
 					{
+						//myplexapplication.getMixPanel().getPeople().identify(mEmail.getText().toString());
 						Analytics.mixPanelMyplexJoinedSuccess(mEmail.getText().toString());
-												
 						Log.d(TAG, "status: "+jsonResponse.getString("status"));
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
@@ -796,7 +796,7 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 
 					if(jsonResponse.getString("status").equalsIgnoreCase("SUCCESS"))
 					{
-
+						//myplexapplication.getMixPanel().getPeople().identify(mEmail.getText().toString());
 						Map<String,String> attribs=new HashMap<String, String>();
 						attribs.put(Analytics.ACCOUNT_TYPE, Analytics.ALL_LOGIN_TYPES.myplex.toString());
 						attribs.put(Analytics.USER_ID,mEmail.getText().toString());
