@@ -14,10 +14,13 @@ import java.util.Random;
 import java.util.Set;
 
 import android.animation.LayoutTransition;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -33,6 +36,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 
 import com.android.volley.VolleyError;
@@ -58,8 +62,18 @@ import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.media.PlayerListener;
 import com.apalya.myplex.utils.Analytics;
+import com.apalya.myplex.utils.Blur;
+import com.apalya.myplex.utils.ConsumerApi;
+import com.apalya.myplex.utils.EpgView;
+import com.apalya.myplex.utils.FavouriteUtil;
+import com.apalya.myplex.utils.FavouriteUtil.FavouriteCallback;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
+import com.apalya.myplex.utils.NumberPicker;
+import com.apalya.myplex.utils.SeasonFetchHelper;
+import com.apalya.myplex.utils.SeasonFetchHelper.ShowFetchListener;
+import com.apalya.myplex.utils.SlidingUpPanelLayout;
+import com.apalya.myplex.utils.SlidingUpPanelLayout.PanelSlideListener;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.views.CardDetailViewFactory;
 import com.apalya.myplex.views.CardDetailViewFactory.CardDetailViewFactoryListener;
@@ -68,10 +82,13 @@ import com.apalya.myplex.views.CardVideoPlayer.PlayerStatusUpdate;
 import com.apalya.myplex.views.CustomDialog;
 import com.apalya.myplex.views.CustomScrollView;
 import com.apalya.myplex.views.FadeInNetworkImageView;
+import com.apalya.myplex.views.PackagePopUp;
 import com.apalya.myplex.views.ItemExpandListener.ItemExpandListenerCallBackListener;
 import com.apalya.myplex.views.JazzyViewPager;
 import com.apalya.myplex.views.JazzyViewPager.TransitionEffect;
 import com.apalya.myplex.views.OutlineContainer;
+import com.apalya.myplex.views.TVShowView;
+import com.apalya.myplex.views.TVShowView.TVShowSelectListener;
 import com.apalya.myplex.views.docketVideoWidget;
 
 public class CardDetails extends BaseFragment implements
@@ -86,7 +103,8 @@ public class CardDetails extends BaseFragment implements
 	private LinearLayout mMediaContentLayout;
 	private LinearLayout mPlayerLogsLayout;
 	private LinearLayout mCommentsContentLayout;
-
+	private LinearLayout mEPGLayout;
+   // private SlidingUpPanelLayout slidingUpPanelLayout;
 	private CustomScrollView mScrollView;
 //	private RelativeLayout mBottomActionBar;
 //	private ImageView mShareButton;
@@ -103,6 +121,13 @@ public class CardDetails extends BaseFragment implements
 	public boolean mPlayStarted = false;
 	
 	private CacheManager mCacheManager = new CacheManager();
+	private List<CardData> childSubList = new ArrayList<CardData>();
+	private SeasonFetchHelper helper = null;
+	private TVShowView mTVShowView = null;
+	private NumberPicker seasonPicker,episodePicker;
+	private LinearLayout mTvShowLinear;
+
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -125,6 +150,8 @@ public class CardDetails extends BaseFragment implements
 		mScrollView = (CustomScrollView) rootView
 				.findViewById(R.id.carddetail_scroll_view);
 		mProgressBar =(ProgressBar)rootView.findViewById(R.id.carddetail_progressBar);
+		
+		
 		/*mBottomActionBar = (RelativeLayout) rootView
 				.findViewById(R.id.carddetail_bottomactionbar);
 		if (mCardData._id == null || mCardData._id.equalsIgnoreCase("0")) {
@@ -152,6 +179,10 @@ public class CardDetails extends BaseFragment implements
 		mCardDetailViewFactory.setOnCardDetailExpandListener(this);
 		mMainActivity.setSearchBarVisibilty(View.INVISIBLE);
 		mMainActivity.setSearchViewVisibilty(View.VISIBLE);
+		Drawable bg = new ColorDrawable(Color.parseColor("#10000000"));
+		mTvShowLinear =(LinearLayout) rootView.findViewById(R.id.tvshow_linear_layout);
+		
+		
 		mMainActivity.setUpShareButton(mCardData.generalInfo.title.toLowerCase());
 		Analytics.cardData = mCardData;
 		// prepareContent();
@@ -159,6 +190,36 @@ public class CardDetails extends BaseFragment implements
 			mMainActivity.setActionBarTitle(mCardData.generalInfo.title.toLowerCase());
 		}
 		prepareContent();
+		if(mCardData.generalInfo.type != null && mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
+			createEPGView(rootView);
+		}else{
+			if(mEPGLayout!=null)
+				mEPGLayout.setVisibility(View.GONE);
+		}		
+		if( mCardData.generalInfo.type != null && mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_SERIES)){
+			helper  = new SeasonFetchHelper(mCardData,new TvShowManager());
+			helper.fetchSeason();
+			initialiseTVShow(rootView);
+			
+//			mBottom_drawer_layout =(LinearLayout) rootView.findViewById(R.id.linear_layout_bottom_drawer);
+			seasonPicker = (NumberPicker)rootView.findViewById(R.id.numberPickerSeason);
+			episodePicker = (NumberPicker)rootView.findViewById(R.id.numberPickerEpisode);
+			initNumberPickerWithLoading(seasonPicker);
+			initNumberPickerWithLoading(episodePicker);
+		}else if( mCardData.generalInfo.type != null && mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_SEASON)){
+			if(mTVShowView==null){
+				List<CardData> datas = new ArrayList<CardData>();
+				datas.add(mCardData);
+				mTVShowView = new TVShowView(mContext , datas, mTvShowLinear,new TvShowSelectorCallBack());
+			}
+			mTVShowView.createTVShowView();
+			seasonPicker = (NumberPicker)rootView.findViewById(R.id.numberPickerSeason);
+			episodePicker = (NumberPicker)rootView.findViewById(R.id.numberPickerEpisode);			
+			initNumberPickerWithLoading(episodePicker);
+			helper  = new SeasonFetchHelper(mCardData,new TvShowManager());
+			helper.fetchEpisodes(mCardData);
+		}
+
 		/*mFavButton.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -222,6 +283,7 @@ public class CardDetails extends BaseFragment implements
 		//mixPanelcardSelected();
 		if(mCardData != null)
 			Analytics.mixPanelcardSelected(mCardData);
+
 		return rootView;
 	}
 	
@@ -229,8 +291,9 @@ public class CardDetails extends BaseFragment implements
 	
 	
 
+	
 	private CardVideoPlayer mPlayer;
-	private CardData mCardData;
+	private CardData mCardData,mSeasonData,mEpisodeData;
 
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
@@ -238,13 +301,20 @@ public class CardDetails extends BaseFragment implements
 			/*if (mBottomActionBar != null) {
 				mBottomActionBar.setVisibility(View.INVISIBLE);
 			}*/
+			
 			mPlayer.playInLandscape();
+			
+			
+		
+		
 		} else {
 			/*if (mBottomActionBar != null) {
 				mBottomActionBar.setVisibility(View.VISIBLE);
 			}*/
 			mPlayer.playInPortrait();
-		}
+			
+			
+			}
 		super.onConfigurationChanged(newConfig);
 	}
 
@@ -259,7 +329,9 @@ public class CardDetails extends BaseFragment implements
 			}
 		}
 		if (mCardDetailViewFactory != null) {
-			mCardDetailViewFactory.UpdateSubscriptionStatus();
+			mCardDetailViewFactory.UpdateSubscriptionStatus(mCardData);
+			if(mSeasonData!=null)
+				mCardDetailViewFactory.UpdateSubscriptionStatus(mSeasonData);
 		}
 	}
 	
@@ -290,9 +362,12 @@ public class CardDetails extends BaseFragment implements
 				}*/
 			}
 		}
+		if( helper != null){
+			helper.cancelAllRequests();
+		}
 	}
 
-	private void prepareContent() {
+	private void prepareContent() {		
 		fillData();
 	}
 
@@ -319,6 +394,7 @@ public class CardDetails extends BaseFragment implements
 		LayoutTransition transition = new LayoutTransition();
 		transition.setStartDelay(LayoutTransition.CHANGE_APPEARING, 0);
 		mPlayerLogsLayout.setLayoutTransition(transition);
+		mPlayerLogsLayout.setVisibility(View.GONE);
 		mParentContentLayout.addView(mPlayerLogsLayout);
 
 		mDescriptionContentLayout = new LinearLayout(getContext());
@@ -342,7 +418,7 @@ public class CardDetails extends BaseFragment implements
 		commentParams.topMargin = (int) getContext().getResources()
 				.getDimension(R.dimen.margin_gap_12);
 		mCommentsContentLayout.setLayoutParams(commentParams);
-
+		
 		View v = mCardDetailViewFactory.CreateView(mCardData,
 				CardDetailViewFactory.CARDDETAIL_BRIEF_DESCRIPTION);
 		if (v != null) {
@@ -796,12 +872,21 @@ public class CardDetails extends BaseFragment implements
 	private List<String> playerLogs = new ArrayList<String>();
 	@Override
 	public void playerStatusUpdate(String value) {
+		if(value==null)
+			return;
+		if(value.equalsIgnoreCase("ERR_USER_NOT_SUBSCRIBED") &&
+				(mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_EPISODE))){
+			PackagePopUp popup = new PackagePopUp(mContext,(View)mParentContentLayout.getParent());
+			myplexapplication.getCardExplorerData().cardDataToSubscribe =  mSeasonData;
+			popup.showPackDialog(mSeasonData, ((Activity)mContext).getActionBar().getCustomView());
+		}
 		if(value != null){
 			SimpleDateFormat sdf = new SimpleDateFormat("MMM dd,yyyy HH:mm:ss");
 			Date resultdate = new Date(System.currentTimeMillis());
 			value = sdf.format(resultdate)+"::"+ value;
 			playerLogs.add(value);	
 		}
+		
 		if (mPlayerLogsLayout != null) {
 			if(!saveButtonAdded){
 				RelativeLayout subLayout = new RelativeLayout(getContext());
@@ -896,6 +981,7 @@ public class CardDetails extends BaseFragment implements
 				return true;
 			}
 			if(mPlayer.isMediaPlaying()){
+				mPlayer.onStateChanged(PlayerListener.STATE_PAUSED, mPlayer.getStopPosition());
 				mPlayer.closePlayer();
 				Analytics.stoppedAt();
 				Analytics.mixPanelVideoTimeCalculation(mCardData);
@@ -907,4 +993,119 @@ public class CardDetails extends BaseFragment implements
 			return false;
 		}
 	}
+	
+	private void createEPGView(View rootView) {
+		mEPGLayout = (LinearLayout) rootView.findViewById(R.id.epg_linear_layout);
+		
+		LayoutTransition epgtransition = new LayoutTransition();
+		epgtransition.setStartDelay(LayoutTransition.CHANGE_APPEARING, 0);
+		mEPGLayout.setLayoutTransition(epgtransition);
+		RelativeLayout.LayoutParams params = (LayoutParams) mEPGLayout.getLayoutParams();
+				
+		EpgView epgview =new EpgView(mCardData, mContext);
+		epgview.setCardVideoPlayer(mPlayer);
+		View epgView  = epgview.createEPGView();
+		
+		if(epgView != null){
+			Log.d("amlan","card view visible");
+			mEPGLayout.setVisibility(View.VISIBLE);
+//			params.topMargin = (int) getContext().getResources()
+//					.getDimension(R.dimen.margin_gap_12);
+			mEPGLayout.addView(epgView);
+		}else{
+			mEPGLayout.setVisibility(View.GONE);
+		}
+	}
+	
+	
+	
+	private void fillEpisodeData(CardData card){
+		if(mCardData._id.equals(card._id))
+			return;
+		this.mCardData=card;		
+		mParentContentLayout.removeAllViews();
+		fillData();
+		mPlayer.updateCardPreviewImage(card);
+	}
+	
+	
+	
+	private void initialiseTVShow(View rootView) {
+		
+		LayoutTransition tvshowtransition = new LayoutTransition();
+		tvshowtransition.setStartDelay(LayoutTransition.CHANGE_APPEARING, 0);
+		mTvShowLinear.setLayoutTransition(tvshowtransition);
+		RelativeLayout.LayoutParams params = (LayoutParams) mTvShowLinear.getLayoutParams();
+				
+		
+		mTvShowLinear.setVisibility(View.VISIBLE);
+	
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	private class TvShowManager implements ShowFetchListener{
+		@Override
+		public void onSeasonDataFetched(List<CardData> seasons) {
+			childSubList.addAll(seasons);
+			if(mTVShowView==null)
+				mTVShowView = new TVShowView(mContext , childSubList , mTvShowLinear,new TvShowSelectorCallBack());
+			mTVShowView.createTVShowView();
+			mSeasonData = seasons.get(0);
+			mCardDetailViewFactory.UpdateSubscriptionStatus(mSeasonData);
+		}
+		@Override
+		public void onEpisodeFetched(CardData season, List<CardData> episodes) 
+		{		
+			if(mTVShowView.onEpisodeFetchComplete(season, episodes)){			
+				mSeasonData = season;
+				mEpisodeData = episodes.get(0);			
+				fillEpisodeData(mEpisodeData);
+				mCardDetailViewFactory.UpdateSubscriptionStatus(mSeasonData);			}
+		}
+		@Override
+		public void onFailed(VolleyError error) {
+			
+		}
+		
+	}	
+	private class TvShowSelectorCallBack implements TVShowSelectListener{
+
+		@Override
+		public void onEpisodeSelect(CardData carddata,CardData season) {
+			fillEpisodeData(carddata);
+			mCardDetailViewFactory.UpdateSubscriptionStatus(season);
+		}
+
+		@Override
+		public void onSeasonChange(CardData season) {
+			helper.fetchEpisodes(season);	
+		}
+	
+	}	
+	
+	public void initNumberPickerWithLoading(NumberPicker np) {
+		
+		String seasonValues[]  = new String[] { "Loading...", "Loading...","Loading..." };
+		int maxSeason  = np.getMaxValue();
+		if( seasonValues.length > maxSeason){
+			np.setMinValue(0);
+			np.setDisplayedValues(seasonValues);
+			np.setMaxValue(2);	
+		}else{
+			np.setMinValue(0);
+			np.setMaxValue(2);
+			np.setDisplayedValues(seasonValues);
+			
+		}
+	}
+	
 }

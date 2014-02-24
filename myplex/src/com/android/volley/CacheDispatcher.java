@@ -17,8 +17,11 @@
 package com.android.volley;
 
 import android.os.Process;
+import android.util.Log;
 
 import java.util.concurrent.BlockingQueue;
+
+import com.apalya.myplex.receivers.ConnectivityReceiver;
 
 /**
  * Provides a thread for performing cache triage on a queue of requests.
@@ -100,6 +103,7 @@ public class CacheDispatcher extends Thread {
                 // Attempt to retrieve this item from cache.
                 Cache.Entry entry = mCache.get(request.getCacheKey());
                 if (entry == null) {
+                	Log.d("volley", "cache-miss for "+request.getUrl());
                     request.addMarker("cache-miss");
                     // Cache miss; send off to the network dispatcher.
                     mNetworkQueue.put(request);
@@ -107,13 +111,15 @@ public class CacheDispatcher extends Thread {
                 }
 
                 // If it is completely expired, just send it to the network.
-                if (entry.isExpired()) {
+                if (entry.isExpired() && ConnectivityReceiver.isConnected) {
+                	Log.d("volley", "cache-hit-expire for "+request.getUrl());
                     request.addMarker("cache-hit-expired");
                     request.setCacheEntry(entry);
                     mNetworkQueue.put(request);
                     continue;
                 }
 
+                Log.d("volley", "cache-found for "+request.getUrl());
                 // We have a cache hit; parse its data for delivery back to the request.
                 request.addMarker("cache-hit");
                 Response<?> response = request.parseNetworkResponse(
@@ -139,7 +145,9 @@ public class CacheDispatcher extends Thread {
                         @Override
                         public void run() {
                             try {
-                                mNetworkQueue.put(request);
+                            	if(ConnectivityReceiver.isConnected){
+                            		mNetworkQueue.put(request);
+                            	}
                             } catch (InterruptedException e) {
                                 // Not much we can do about this.
                             }

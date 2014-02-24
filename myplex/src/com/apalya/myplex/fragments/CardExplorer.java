@@ -550,6 +550,9 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			}
 			requestUrl = ConsumerApi.getSimilarContent(mData.searchQuery,ConsumerApi.LEVELDYNAMIC);
 			
+		}else if(mData.requestType == CardExplorerData.REQUEST_TV_SHOWS){
+			screenName="Browse" + mData.searchQuery;
+			requestUrl = ConsumerApi.getBrowse(mData.searchQuery,ConsumerApi.LEVELDYNAMIC, mData.mStartIndex);
 		}
 		
 		
@@ -759,8 +762,6 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		return new Response.ErrorListener() {
 			@Override
 			public void onErrorResponse(VolleyError error) {
-				//Analytics.endTimedEvent(Analytics.cardBrowseDuration);
-				//Analytics.endTimedEvent(Analytics.cardBrowseScreen);
 				Log.d(TAG,"Error from server "+error.networkResponse);
 				if(mData.mMasterEntries == null || mData.mMasterEntries.size() == 0){
 					showErrorDialog();

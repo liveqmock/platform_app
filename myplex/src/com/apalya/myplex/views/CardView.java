@@ -463,6 +463,10 @@ public class CardView extends ScrollView {
 //			dataHolder.mRentText.setText(mContext.getString(R.string.cardstatuspaid));
 			dataHolder.mRentLayout.setOnClickListener(null);
 			Log.i("CacheManager", "in purchases");
+		}else if(myplexapplication.getCardExplorerData().requestType == CardExplorerData.REQUEST_TV_SHOWS){
+			dataHolder.mRentText.setText(mContext.getString(R.string.jump_to_episode));
+			if(data.packages == null || data.packages.size() ==0)
+				dataHolder.mRentLayout.setOnClickListener(null);
 		}
 		else if(data.packages == null || data.packages.size() == 0){
 			dataHolder.mRentText.setText(mContext.getString(R.string.cardstatusfree));
@@ -631,7 +635,12 @@ public class CardView extends ScrollView {
 			params.put(Analytics.NUMBER_OF_LIVETV_CARDS,swipeCount+"");
 			event = Analytics.EVENT_BROWSED_TV_CHANNELS;
 		}
-		if("recommendations".equalsIgnoreCase(ctype) || "movie".equalsIgnoreCase(ctype) || "live".equalsIgnoreCase(ctype)) {
+		
+		if("tvseries".equalsIgnoreCase(ctype) )  {
+			params.put(Analytics.NUMBER_OF_LIVETV_SHOW_CARDS,swipeCount+"");
+			event = Analytics.EVENT_BROWSED_TV_SHOWS;
+		}
+		if("recommendations".equalsIgnoreCase(ctype) || "movie".equalsIgnoreCase(ctype) || "live".equalsIgnoreCase(ctype)|| "tvseries".equalsIgnoreCase(ctype)) {
 				Analytics.trackEvent(event,params);
 				Analytics.gaBrowse(ctype,swipeCount);
 				swipeCount = 1;			

@@ -17,6 +17,7 @@ public class CardExplorerData implements Serializable{
 	public static final int REQUEST_PURCHASES = 6;
 	public static final int REQUEST_BROWSE = 7;
 	public static final int REQUEST_INLINESEARCH = 8;
+	public static final int REQUEST_TV_SHOWS = 9;
 	public String requestUrl = new String();
 	public int currentSelectedCard = 0;
 	public  HashMap<String,CardData> mEntries = new HashMap<String,CardData>();

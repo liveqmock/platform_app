@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:background="@drawable/carddetails_bg" >
+
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="120dp" 
+        android:weightSum="5">
+
+        <com.apalya.myplex.utils.NumberPicker
+            android:id="@+id/datePicker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp"
+            selectionDivider="@color/black" 
+            selectionDividerHeight="1px"
+            selectionDividersDistance="3dp"
+            android:layout_weight="1" />
+
+        <com.apalya.myplex.utils.NumberPicker
+            android:id="@+id/programmPicker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="5dp" 
+            android:gravity="center_horizontal"    
+            selectionDivider="@color/black" 
+            selectionDividerHeight="1px"
+            selectionDividersDistance="3dp"        
+            android:layout_weight="4"/>
+
+    </LinearLayout>
+
+</RelativeLayout>

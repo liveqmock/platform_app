@@ -11,6 +11,7 @@ import android.util.DisplayMetrics;
 import com.apalya.myplex.R;
 import com.apalya.myplex.adapters.NavigationOptionsMenuAdapter;
 import com.apalya.myplex.cache.CacheHolder;
+import com.apalya.myplex.receivers.ConnectivityReceiver;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.LocationUtil;
 import com.apalya.myplex.utils.MyVolley;
@@ -98,6 +99,7 @@ public class myplexapplication extends Application {
     }
 	
 	private void init() {
+		ConnectivityReceiver.isConnected=Util.isNetworkAvailable(this);
 		MyVolley.init(this);
 		locationUtil = LocationUtil.getInstance(this);
 		locationUtil.init();

@@ -84,6 +84,7 @@ public class Analytics {
 	public static String EVENT_BROWSED_RECOMMENDATIONS = "browsed recommendations";
 	public static String EVENT_BROWSED_PURCHASES = "browsed purchases";
 	public static String EVENT_BROWSED_TV_CHANNELS = "browsed live tv channels";
+	public static String EVENT_BROWSED_TV_SHOWS = "browsed live tv shows";
 	public static String EVENT_BROWSED_LIVE_TV_GA = "browsed live tv";
 	public static String EVENT_BROWSED_SETTINGS = "browsed settings";
 	//public static String EVENT_SELECTED_FEEDBACK = "selected feedback option";
@@ -166,7 +167,8 @@ public class Analytics {
 	public static String NUMBER_OF_DOWNLOADS = "number of downloads";
 	public static String NUMBER_OF_MOVIE_CARDS = "number of movie cards";
 	public static String NUMBER_OF_CARDS = "number of cards";
-	public static String NUMBER_OF_LIVETV_CARDS = "number of live TV cards";
+	public static String NUMBER_OF_LIVETV_CARDS = "number of live tv cards";
+	public static String NUMBER_OF_LIVETV_SHOW_CARDS = "number of live tv show cards";
 	public static String NUMBER_OF_KEYWORDS = "number of keywords";
 	public static String NUMBER_OF_INVITEES = "number of invitees";
 	public static String INVITED_FRIENDS = "invited friends";
@@ -188,6 +190,7 @@ public class Analytics {
 	public static String CONTENT_ID_PROPERTY = "content id";
 	public static String CONTENT_NAME_PROPERTY = "content name";
 	public static String TV_CHANNEL_NAME = "tv channel name";
+	public static String TV_SHOW_NAME = "tv show name";
 	public static String CONTENT_TYPE_PROPERTY = "content type";
 	public static String CONTENT_PRICE = "content price";
 	public static String TIME_PLAYED_PROPERTY = "time played (in seconds)";
@@ -200,6 +203,7 @@ public class Analytics {
 	public static String EVENT_PLAY = "played";
 	public static String EVENT_PLAYED_TRAILER = "played trailer";
 	public static String EVENT_PLAYED_TV_CHANNEL = "played tv channel";
+	public static String EVENT_PLAYED_TV_SHOW = "played tv show";
 	public static String TRAILER = "trailer";
 	public static String MOVIE = "movie";
 	public static String MOVIES = "movies";
@@ -264,11 +268,13 @@ public class Analytics {
 	public static String PEOPLE_DOWNLOADED_MOVIES = "downloaded movies";
 	public static String PEOPLE_MOVIES_PURCHASED_FOR = "movies purchased for";
 	public static String PEOPLE_LIVETV_PURCHASED_FOR = "live tv purchased for";
+	public static String PEOPLE_LIVETV_SHOW_PURCHASED_FOR = "live tv show purchased for";
 	public static String PEOPLE_TOTAL_PURCHASES = "total purchases";
 	public static String PEOPLE_ENTERED_REVIEWS = "entered reviews";
 	public static String PEOPLE_SHARED_ABOUT_MYPLEX = "shared about myplex";
 	public static String PEOPLE_FREE_MOVIE_RENTALS = "free movie rentals";
 	public static String PEOPLE_FREE_TV_SUBSCRIPTIONS = "free tv subscriptions (w)";
+	public static String PEOPLE_FREE_TV_SHOW_SUBSCRIPTIONS = "free tv show subscriptions (w)";
 	public static String PEOPLE_FREE_DOWNLOADS_TO_OWN = "free downloads to own";
 	public static String PEOPLE_JOINING_DATE = "joining date";
 	public static String PEOPLE_FAVORITES = "favorites";
@@ -430,6 +436,9 @@ public class Analytics {
 				"Yearly".equalsIgnoreCase(contentType) || "live".equalsIgnoreCase(contentType)) {
 			ctype = "live tv";
 		}
+		else if("tvepisode".equalsIgnoreCase(contentType) || "tvseries".equalsIgnoreCase(contentType) || "tvseason".equalsIgnoreCase(contentType)) {
+			ctype = "tvshow";
+		}
 		else {
 			ctype = null;
 		}
@@ -567,6 +576,18 @@ public class Analytics {
 			mMixPanel.getPeople().increment(Analytics.TIME_PLAYED_PROPERTY,ptime);
 			Analytics.gaPlayedLiveTvTimings(ptime, mData.generalInfo.title); 
 			Analytics.createEventGA("live tv", "play", mData.generalInfo.title, ptime);//ga
+			return;
+		}
+		if("tvshow".equalsIgnoreCase(ctype))  {
+			params.put(Analytics.TV_SHOW_NAME, mData.generalInfo.title); //3
+			String bitrate = SharedPrefUtils.getFromSharedPreference(myplexapplication.getAppContext(), Analytics.TRAILER_BITRATE+mCardData.generalInfo._id);
+			params.put(Analytics.TRAILER_DATA_RATE, bitrate);
+			event =  Analytics.EVENT_PLAYED_TV_SHOW;
+			Analytics.trackEvent(event,params);
+			mMixPanel.getPeople().increment(Analytics.PEOPLE_TV_STREAMED,ptimeMinutes);
+			mMixPanel.getPeople().increment(Analytics.TIME_PLAYED_PROPERTY,ptime);
+			Analytics.gaPlayedLiveTvTimings(ptime, mData.generalInfo.title); 
+			Analytics.createEventGA("tv show", "play", mData.generalInfo.title, ptime);//ga
 			return;
 		}
 		

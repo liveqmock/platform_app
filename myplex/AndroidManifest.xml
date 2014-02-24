@@ -128,6 +128,12 @@
         <activity android:name="LiveScoreWebView"></activity>
 
         
+        <receiver android:name="com.apalya.myplex.receivers.ConnectivityReceiver" >
+        	<intent-filter>
+            	<action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+        	</intent-filter>
+    	</receiver>
+    
     </application>
     <!--  <receiver android:name="com.apalya.myplex.widget.MyplexWidgetProvider">
          <intent-filter>

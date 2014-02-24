@@ -37,6 +37,7 @@ import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.AlertDialogUtil;
 import com.apalya.myplex.utils.AlertDialogUtil.NoticeDialogListener;
 import com.apalya.myplex.utils.Analytics;
+import com.apalya.myplex.utils.BundleUpdateHelper;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FetchCardField;
 import com.apalya.myplex.utils.SharedPrefUtils;
@@ -110,7 +111,6 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 				+ "/callback/evergent/";
 		setContentView(R.layout.layout_webview);
 		mWebView= (WebView)findViewById(R.id.webview);
-		
 		try{		
 			setUpWebView(url);
 		}catch(Exception e){
@@ -213,6 +213,46 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 				
 				}//live-tv end
 			
+			if("tvshow".equals(ctype)) {
+				String eventlive = Analytics.EVENT_PAID_FOR_CONTENT;
+				Map<String,String> paramslive = new HashMap<String, String>();
+				paramslive = mixpanelProperties(subscribedData, paramslive);
+				
+				if(isCouponApplied()) { //discounted through coupon
+					if(priceTobecharged2 > 0) {
+						paramslive.put(Analytics.COUPON_USED,"TRUE");
+						paramslive.put(Analytics.PAY_CONTENT_PRICE,priceTobecharged2+""); //8
+						paramslive.put(Analytics.COUPON_DISCOUNT,Analytics.couponDiscountINR+"");
+						Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_LIVETV_SHOW_PURCHASED_FOR,priceTobecharged2); //mixpanel people
+						Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_TOTAL_PURCHASES,priceTobecharged2); //mixpanel people
+						Analytics.trackEvent(eventlive,paramslive);
+						Analytics.trackCharge(priceTobecharged2);
+						Analytics.createTransactionGA(transactionid, paymentModel,priceTobecharged2, 0.0,0.0); //GA transaction
+						Analytics.createItemGA(transactionid, contentName,contentId, ctype, priceTobecharged2, 1L); //GA transaction
+						Analytics.priceTobecharged = 0;
+						Analytics.couponDiscountINR = 0;
+						return;
+					}
+					if(priceTobecharged2 == 0) {
+						//subscribed free
+						freeSubscription(subscribedData);
+					}
+				}
+				else{ //regular price
+					paramslive.put(Analytics.COUPON_USED,"FALSE");
+					paramslive.put(Analytics.COUPON_DISCOUNT,0+"");//set to zero
+					paramslive.put(Analytics.PAY_CONTENT_PRICE,contentPrice+""); //8
+					Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_LIVETV_SHOW_PURCHASED_FOR,contentPrice); //mixpanel people
+					Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_TOTAL_PURCHASES,contentPrice); //mixpanel people
+					Analytics.trackEvent(eventlive,paramslive);
+					Analytics.trackCharge(priceTobecharged2);
+					Analytics.createTransactionGA(transactionid, paymentModel,contentPrice, 0.0,0.0); //GA transaction
+					Analytics.createItemGA(transactionid, contentName,contentId, ctype, contentPrice, 1L); //GA transaction
+					return;
+				}
+				
+				}//live-tv end
+
 			if("movies".equals(ctype)) {
 				String event = Analytics.EVENT_PAID_FOR_CONTENT;
 				Map<String,String> paramsMovies = new HashMap<String, String>();
@@ -274,6 +314,9 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 		
 		if("live tv".equals(ctype)) {
 			people.set(Analytics.PEOPLE_FREE_TV_SUBSCRIPTIONS, 1);
+		}
+		if("tvshow".equals(ctype)) {
+			people.set(Analytics.PEOPLE_FREE_TV_SHOW_SUBSCRIPTIONS, 1);
 		}
 		else if("movies".equals(ctype)) {
 			if("Rental".equalsIgnoreCase(commercialModel)) {
@@ -371,6 +414,18 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 					
 					List<CardData> dataToSave = new ArrayList<CardData>();
 					dataToSave.add(subscribedData);
+					
+					String requestUrl = ConsumerApi.getBundleUrl(subscribedData._id);
+					/*BundleUpdateHelper helper = new BundleUpdateHelper(requestUrl, dataToSave);
+					helper.getConnectIds(new InsertionResult() {						
+						@Override
+						public void updateComplete(Boolean updateStatus) {							
+							closeSession(response);
+							Util.showToast(SubscriptionView.this, "Subscription Info updated",Util.TOAST_TYPE_INFO);
+//							Toast.makeText(SubscriptionView.this, "Subscription Info updated", Toast.LENGTH_SHORT).show();
+						}
+					});
+					helper.updatecurrentUserData();*/					
 					myplexapplication.getCacheHolder().UpdataDataAsync(dataToSave, new InsertionResult() {
 						
 						@Override
