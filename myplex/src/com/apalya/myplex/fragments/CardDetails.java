@@ -104,8 +104,8 @@ public class CardDetails extends BaseFragment implements
 	private LinearLayout mMediaContentLayout;
 	private LinearLayout mPlayerLogsLayout;
 	private LinearLayout mCommentsContentLayout;
-	private LinearLayout mEPGLayout,mBottomDrawerlayout;
-    private SlidingUpPanelLayout slidingUpPanelLayout;
+	private LinearLayout mEPGLayout;
+   // private SlidingUpPanelLayout slidingUpPanelLayout;
 	private CustomScrollView mScrollView;
 //	private RelativeLayout mBottomActionBar;
 //	private ImageView mShareButton;
@@ -125,9 +125,9 @@ public class CardDetails extends BaseFragment implements
 	private SeasonFetchHelper helper = null;
 	private TVShowView mTVShowView = null;
 	private NumberPicker seasonPicker,episodePicker;
-	private Blur mBlurEngine;
-	private ImageView mImageView ;	
-	public int widthPixels,heightPixels,scrollPushUp;
+	private LinearLayout mTvShowLinear;
+
+
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -149,13 +149,7 @@ public class CardDetails extends BaseFragment implements
 		mScrollView = (CustomScrollView) rootView
 				.findViewById(R.id.carddetail_scroll_view);
 		mProgressBar =(ProgressBar)rootView.findViewById(R.id.carddetail_progressBar);
-		slidingUpPanelLayout = (SlidingUpPanelLayout) rootView
-				.findViewById(R.id.sliding_layout);
-		slidingUpPanelLayout.setShadowDrawable(getResources().getDrawable(
-				R.drawable.above_shadow));
-
-		slidingUpPanelLayout.setAnchorPoint(0.7f);
-		mImageView =(ImageView) rootView.findViewById(R.id.name);
+		
 		
 		/*mBottomActionBar = (RelativeLayout) rootView
 				.findViewById(R.id.carddetail_bottomactionbar);
@@ -184,10 +178,9 @@ public class CardDetails extends BaseFragment implements
 		mCardDetailViewFactory.setOnCardDetailExpandListener(this);
 		mMainActivity.setSearchBarVisibilty(View.INVISIBLE);
 		mMainActivity.setSearchViewVisibilty(View.VISIBLE);
-		mBottomDrawerlayout=(LinearLayout) rootView.findViewById(R.id.linear_layout_bottom_drawer);
 		Drawable bg = new ColorDrawable(Color.parseColor("#10000000"));
-		mBottomDrawerlayout.setBackgroundDrawable(bg);
-		slidingUpPanelLayout = (SlidingUpPanelLayout)rootView.findViewById(R.id.sliding_layout);
+		mTvShowLinear =(LinearLayout) rootView.findViewById(R.id.tvshow_linear_layout);
+		
 		
 		mMainActivity.setUpShareButton(mCardData.generalInfo.title.toLowerCase());
 		// prepareContent();
@@ -204,8 +197,8 @@ public class CardDetails extends BaseFragment implements
 		if( mCardData.generalInfo.type != null && mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_SERIES)){
 			helper  = new SeasonFetchHelper(mCardData,new TvShowManager());
 			helper.fetchSeason();
+			initialiseTVShow(rootView);
 			
-			mBottomDrawerlayout.setVisibility(View.VISIBLE);			
 //			mBottom_drawer_layout =(LinearLayout) rootView.findViewById(R.id.linear_layout_bottom_drawer);
 			seasonPicker = (NumberPicker)rootView.findViewById(R.id.numberPickerSeason);
 			episodePicker = (NumberPicker)rootView.findViewById(R.id.numberPickerEpisode);
@@ -215,23 +208,16 @@ public class CardDetails extends BaseFragment implements
 			if(mTVShowView==null){
 				List<CardData> datas = new ArrayList<CardData>();
 				datas.add(mCardData);
-				mTVShowView = new TVShowView(mContext , datas, mBottomDrawerlayout,new TvShowSelectorCallBack());
+				mTVShowView = new TVShowView(mContext , datas, mTvShowLinear,new TvShowSelectorCallBack());
 			}
-			mBottomDrawerlayout.setVisibility(View.VISIBLE);
 			mTVShowView.createTVShowView();
 			seasonPicker = (NumberPicker)rootView.findViewById(R.id.numberPickerSeason);
 			episodePicker = (NumberPicker)rootView.findViewById(R.id.numberPickerEpisode);			
 			initNumberPickerWithLoading(episodePicker);
 			helper  = new SeasonFetchHelper(mCardData,new TvShowManager());
 			helper.fetchEpisodes(mCardData);
-			slidingUpPanelLayout.expandPane();
 		}
-		int devHeight = myplexapplication.getApplicationConfig().screenHeight;
-		int devWidth= myplexapplication.getApplicationConfig().screenHeight;		
-		float pushFactor = ((float)devHeight/800.0f);
-		float pushUp = (120.0f)*(float)(devHeight/800);
-		
-		scrollPushUp = (int)pushUp;
+
 		/*mFavButton.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -303,30 +289,6 @@ public class CardDetails extends BaseFragment implements
 		params.put(Analytics.CONTENT_NAME_PROPERTY, mCardData.generalInfo.title);
 		//params.put(Analytics.BROWSE_TYPE_PROPERTY,Analytics.BROWSE_TYPES.Filter.toString());
 		Analytics.trackEvent(Analytics.EVENT_BROWSE, params);
-
-		slidingUpPanelLayout.setPanelSlideListener(new PanelSlideListener() {
-			
-			@Override
-			public void onPanelSlide(View panel, float slideOffset) {
-				mImageView.setImageResource(R.drawable.icondown);
-			}			
-			@Override
-			public void onPanelExpanded(View panel) {
-			}			
-			@Override
-			public void onPanelCollapsed(View panel) {
-				mScrollView.setScrollingEnabled(true);				
-				mScrollView.smoothScrollTo(0, -scrollPushUp);
-				mImageView.setImageResource(R.drawable.iconup);				
-			}			
-			@Override
-			public void onPanelAnchored(View panel) {
-				mScrollView.setScrollingEnabled(false);
-				mScrollView.smoothScrollTo(0, scrollPushUp);
-				mImageView.setImageResource(R.drawable.icondown);
-			}
-		});
-		
 		return rootView;
 	}
 
@@ -342,20 +304,18 @@ public class CardDetails extends BaseFragment implements
 			}*/
 			
 			mPlayer.playInLandscape();
-			if( mCardData.generalInfo.type != null && 
-				(mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_SERIES)||mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_EPISODE)) 
-						&&(mBottomDrawerlayout!=null) && (mBottomDrawerlayout.getVisibility() == View.VISIBLE))
-				mBottomDrawerlayout.setVisibility(View.GONE);
+			
+			
+		
+		
 		} else {
 			/*if (mBottomActionBar != null) {
 				mBottomActionBar.setVisibility(View.VISIBLE);
 			}*/
 			mPlayer.playInPortrait();
-			if(mCardData.generalInfo.type != null && 
-					(mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_SERIES)||mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_EPISODE))
-					&& (mBottomDrawerlayout!=null) && (mBottomDrawerlayout.getVisibility() == View.GONE))
-				mBottomDrawerlayout.setVisibility(View.VISIBLE);
-		}
+			
+			
+			}
 		super.onConfigurationChanged(newConfig);
 	}
 
@@ -431,6 +391,7 @@ public class CardDetails extends BaseFragment implements
 		LayoutTransition transition = new LayoutTransition();
 		transition.setStartDelay(LayoutTransition.CHANGE_APPEARING, 0);
 		mPlayerLogsLayout.setLayoutTransition(transition);
+		mPlayerLogsLayout.setVisibility(View.GONE);
 		mParentContentLayout.addView(mPlayerLogsLayout);
 
 		mDescriptionContentLayout = new LinearLayout(getContext());
@@ -1077,8 +1038,8 @@ public class CardDetails extends BaseFragment implements
 		if(epgView != null){
 			Log.d("amlan","card view visible");
 			mEPGLayout.setVisibility(View.VISIBLE);
-			params.topMargin = (int) getContext().getResources()
-					.getDimension(R.dimen.margin_gap_12);
+//			params.topMargin = (int) getContext().getResources()
+//					.getDimension(R.dimen.margin_gap_12);
 			mEPGLayout.addView(epgView);
 		}else{
 			mEPGLayout.setVisibility(View.GONE);
@@ -1095,14 +1056,38 @@ public class CardDetails extends BaseFragment implements
 		fillData();
 		mPlayer.updateCardPreviewImage(card);
 	}
+	
+	
+	
+	private void initialiseTVShow(View rootView) {
+		
+		LayoutTransition tvshowtransition = new LayoutTransition();
+		tvshowtransition.setStartDelay(LayoutTransition.CHANGE_APPEARING, 0);
+		mTvShowLinear.setLayoutTransition(tvshowtransition);
+		RelativeLayout.LayoutParams params = (LayoutParams) mTvShowLinear.getLayoutParams();
+				
+		
+		mTvShowLinear.setVisibility(View.VISIBLE);
+	
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	private class TvShowManager implements ShowFetchListener{
 		@Override
 		public void onSeasonDataFetched(List<CardData> seasons) {
 			childSubList.addAll(seasons);
 			if(mTVShowView==null)
-				mTVShowView = new TVShowView(mContext , childSubList , mBottomDrawerlayout,new TvShowSelectorCallBack());
+				mTVShowView = new TVShowView(mContext , childSubList , mTvShowLinear,new TvShowSelectorCallBack());
 			mTVShowView.createTVShowView();
-			slidingUpPanelLayout.expandPane();
 			mSeasonData = seasons.get(0);
 			mCardDetailViewFactory.UpdateSubscriptionStatus(mSeasonData);
 		}
@@ -1113,9 +1098,7 @@ public class CardDetails extends BaseFragment implements
 				mSeasonData = season;
 				mEpisodeData = episodes.get(0);			
 				fillEpisodeData(mEpisodeData);
-				mCardDetailViewFactory.UpdateSubscriptionStatus(mSeasonData);
-				slidingUpPanelLayout.expandPane();
-			}
+				mCardDetailViewFactory.UpdateSubscriptionStatus(mSeasonData);			}
 		}
 		@Override
 		public void onFailed(VolleyError error) {
