@@ -6,22 +6,6 @@
     android:layout_height="match_parent"
     android:background="#e6e6e6" >
 
-    <com.apalya.myplex.utils.SlidingUpPanelLayout
-        xmlns:sothree="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/sliding_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="bottom"
-        android:clickable="true"
-        sothree:collapsedHeight="45dp"
-        sothree:dragView="@+id/name"
-        sothree:shadowHeight="4dp" >
-
-        <RelativeLayout
-            android:id="@+id/namesake_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_alignParentTop="true" >
 
             <RelativeLayout
                 android:id="@+id/carddetail_videolayout"
@@ -44,18 +28,55 @@
 				android:id="@+id/epg_linear_layout"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
-				android:layout_below="@+id/carddetail_videolayout"
+				android:layout_below="@+id/carddetail_progressBar"
 				android:layout_marginLeft="@dimen/margin_gap_12"
 				android:layout_marginRight="@dimen/margin_gap_12"			
 				android:visibility="gone">
+			</LinearLayout>
+			<LinearLayout
+				android:id="@+id/tvshow_linear_layout"
+				android:layout_width="match_parent"
+				android:layout_height="120dp"
+				android:layout_below="@+id/epg_linear_layout"
+				android:layout_marginLeft="@dimen/margin_gap_12"
+				android:layout_marginRight="@dimen/margin_gap_12"			
+				android:visibility="gone"
+				android:background="@drawable/carddetails_bg">
+				
+			    
+			    
+			    <com.apalya.myplex.utils.NumberPicker
+                        android:id="@+id/numberPickerSeason"
+                        android:layout_width="60dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="6dp"
+                       
+                        />
+
+                    <com.apalya.myplex.utils.NumberPicker
+            	         android:id="@+id/numberPickerEpisode"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="6dp"
+                         android:layout_marginLeft="12dip" 
+                      />
+				
+			    
 			</LinearLayout>	
+			
+			
+			
+			
+			<!--      Removed Margin           android:layout_marginTop="@dimen/margin_gap_12"
+			 -->
+			
+			
 
             <com.apalya.myplex.views.CustomScrollView
                 android:id="@+id/carddetail_scroll_view"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/epg_linear_layout"
-                android:layout_marginTop="@dimen/margin_gap_12"
+                android:layout_below="@+id/tvshow_linear_layout"
                 android:background="#e6e6e6"
                 android:scrollbars="none" >
 
@@ -72,62 +93,8 @@
             </com.apalya.myplex.views.CustomScrollView>
         </RelativeLayout>
 
-        <LinearLayout
-            android:id="@+id/linear_layout_bottom_drawer"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:visibility="gone"
-            android:background="#eee"
-            android:clickable="true"
-            android:descendantFocusability="blocksDescendants"
-            android:focusable="false"
-            android:focusableInTouchMode="true"
-            android:orientation="vertical" >
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:orientation="horizontal" >
-
-                <ImageView
-                    android:id="@+id/name"
-                    android:layout_width="match_parent"
-                    android:layout_height="24dp"
-                    android:layout_gravity="center_vertical"
-                    android:paddingLeft="10dp"
-                    android:src="@drawable/iconup"/>
-            </LinearLayout>
-            
-                <LinearLayout
-                    android:id="@+id/llout"
-                    android:layout_width="match_parent"
-                    android:layout_height="120dp"
-                    android:layout_gravity="top|center_horizontal"
-                    android:orientation="horizontal" 
-                    android:layout_marginLeft="18dip"
-                    android:layout_marginRight="18dip"
-                   
-                    
-                    >
-
-                    <com.apalya.myplex.utils.NumberPicker
-                        android:id="@+id/numberPickerSeason"
-                        android:layout_width="60dp"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="6dp"
-                       
-                        />
-
-                    <com.apalya.myplex.utils.NumberPicker
-                        android:id="@+id/numberPickerEpisode"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="6dp"
-                         android:layout_marginLeft="12dip" 
-                      />
-                </LinearLayout>
-        </LinearLayout>
-    </com.apalya.myplex.utils.SlidingUpPanelLayout>
+       
+        
 
     <!--
     <RelativeLayout
@@ -178,4 +145,3 @@
         </LinearLayout>
     </RelativeLayout>
     -->
-</RelativeLayout>

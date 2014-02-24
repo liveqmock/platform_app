@@ -1851,6 +1851,8 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		mTrailerButton.setOnClickListener(new OnClickListener() {			
 			@Override
 			public void onClick(View arg0) {	
+				mVideoViewParent.setOnClickListener(null);
+				mProgressBarLayout.setVisibility(View.VISIBLE);	
 				mPreviewImage.setVisibility(View.INVISIBLE);
 				mTrailerButton.setVisibility(View.INVISIBLE);
 				mPlayButton.setVisibility(View.INVISIBLE);
@@ -1858,6 +1860,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 //				mVideoViewParent.setEnabled(false);
 				recordedProgName.setVisibility(View.INVISIBLE);
 				initPlayBack(urlString);
+				
 			}
 		});
 		recordedProgName.setVisibility(View.VISIBLE);
