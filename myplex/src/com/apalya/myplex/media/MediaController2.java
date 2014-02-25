@@ -17,7 +17,9 @@
 package com.apalya.myplex.media;
 
 import java.util.Formatter;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import android.content.Context;
 import android.media.MediaPlayer;
@@ -40,7 +42,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.apalya.myplex.R;
+import com.apalya.myplex.data.CardData;
+import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.Util;
+import com.google.analytics.tracking.android.EasyTracker;
 
 public class MediaController2 extends LinearLayout {
 
@@ -563,13 +569,19 @@ public class MediaController2 extends LinearLayout {
     		show();
     	}
     }
-
+    
+    private long totalTime  = 0;
+    private long startTime  = 0;
     private void doPauseResume() {
     	if (mPlayer.isPlaying()) {
-    		mPlayer.pause();    		
+    		mPlayer.pause();  
+    		Analytics.pausedAt();
+    		Analytics.gaStopPauseMediaTime("pause",mPlayer.getCurrentPosition());
     		updatePlayerState(PlayerListener.STATE_PAUSED,mPlayer.getCurrentPosition());
     	} else {
     		mPlayer.start();
+    		Analytics.resumedAt();
+    		
     		updatePlayerState(PlayerListener.STATE_PLAYING,mPlayer.getCurrentPosition());
     	}
     	updatePausePlay();
@@ -659,7 +671,7 @@ public class MediaController2 extends LinearLayout {
         super.setEnabled(enabled);
     }
 
-    private View.OnClickListener mRewListener = new View.OnClickListener() {
+    private View.OnClickListener mRewListener = new View.OnClickListener() { 
         public void onClick(View v) {
             int pos = mPlayer.getCurrentPosition();
             pos -= 5000; // milliseconds

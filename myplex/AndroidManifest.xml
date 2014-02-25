@@ -34,8 +34,9 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
-        android:theme="@style/AppTheme" 
-        android:debuggable="true">
+
+        android:theme="@style/AppTheme">
+
         <meta-data
             android:name="com.crashlytics.ApiKey"
             android:value="72b7799d77db95d39c33cbba030236fdf7fb1bf5" />
@@ -77,6 +78,7 @@
             android:name="com.apalya.myplex.MainActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait" >
+             
         </activity>
         <activity
             android:name="com.apalya.myplex.tablet.MultiPaneActivity"
@@ -93,7 +95,9 @@
             android:label="@string/app_name"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" >
         </activity>
-
+		
+       
+        
         <receiver android:name="com.apalya.myplex.receivers.DownloadManagerReceiver">
   			<intent-filter>
     			 <action android:name="android.intent.action.DOWNLOAD_COMPLETE"></action>
@@ -120,7 +124,17 @@
             <category android:name="com.apalya.myplex" />
         </intent-filter>
     </receiver>
+
+    
+   <service android:name="com.google.analytics.tracking.android.CampaignTrackingService" />
+	<receiver android:name="com.google.analytics.tracking.android.CampaignTrackingReceiver" android:exported="true" >
+  		<intent-filter>
+    		<action android:name="com.android.vending.INSTALL_REFERRER" />
+  		</intent-filter>
+	</receiver>
+
         <activity android:name="LiveScoreWebView"></activity>
+
         
         <receiver android:name="com.apalya.myplex.receivers.ConnectivityReceiver" >
         	<intent-filter>
