@@ -13,6 +13,9 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import org.apache.lucene.store.ChecksumIndexInput;
+import org.apache.lucene.store.ChecksumIndexOutput;
+
 import android.animation.LayoutTransition;
 import android.app.Activity;
 import android.content.Intent;
@@ -75,6 +78,8 @@ import com.apalya.myplex.utils.SeasonFetchHelper;
 import com.apalya.myplex.utils.SeasonFetchHelper.ShowFetchListener;
 import com.apalya.myplex.utils.SlidingUpPanelLayout;
 import com.apalya.myplex.utils.SlidingUpPanelLayout.PanelSlideListener;
+import com.apalya.myplex.utils.SurveyUtil;
+import com.apalya.myplex.utils.SurveyUtil.SurveyListener;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.views.CardDetailViewFactory;
 import com.apalya.myplex.views.CardDetailViewFactory.CardDetailViewFactoryListener;
@@ -91,6 +96,7 @@ import com.apalya.myplex.views.OutlineContainer;
 import com.apalya.myplex.views.TVShowView;
 import com.apalya.myplex.views.TVShowView.TVShowSelectListener;
 import com.apalya.myplex.views.docketVideoWidget;
+import com.mixpanel.android.mpmetrics.SurveyState;
 
 public class CardDetails extends BaseFragment implements
 		ItemExpandListenerCallBackListener, CardDetailViewFactoryListener,
@@ -334,6 +340,30 @@ public class CardDetails extends BaseFragment implements
 			if(mSeasonData!=null)
 				mCardDetailViewFactory.UpdateSubscriptionStatus(mSeasonData);
 		}
+		checkForSurvey();
+		
+	}
+	
+	private void checkForSurvey(){
+		
+		SurveyUtil.getInstance().setSurveyListener(new SurveyListener() {
+			
+			@Override
+			public boolean canShowSurvey() {
+				
+				if(myplexapplication.getCardExplorerData().cardDataToSubscribe != null){
+					
+					return false;
+				}
+				
+				if(mPlayer != null && mPlayer.isMediaPlaying()){
+					return false;
+				}
+				return true;
+			}
+		});
+		
+		SurveyUtil.getInstance().checkForSurvey(getActivity());
 	}
 	
 	@Override
