@@ -75,6 +75,7 @@ public class MediaUtility {
 						}	
 						CardDataVideos videos = data.videos;
 						if((!videos.message.equalsIgnoreCase("SUCCESS")) || (videos.values!=null) || (videos.values.size()>0)){
+							//Analytics.startVideoTime();
 							if(isTrailer)	
 								listener.onTrailerUrlFetched(videos.values);
 							else

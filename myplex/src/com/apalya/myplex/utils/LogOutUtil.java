@@ -15,9 +15,11 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.apalya.myplex.LoginActivity;
 import com.apalya.myplex.R;
+import com.apalya.myplex.data.DeviceDetails;
+import com.apalya.myplex.data.UserProfile;
 import com.apalya.myplex.data.myplexapplication;
 import com.facebook.Session;
-import com.flurry.android.monolithic.sdk.impl.mc;
+
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -63,7 +65,8 @@ public class LogOutUtil {
 		}
 	}
 	public static void onClickLogout(Context mContext) {
-
+		UserProfile mUserInfo=myplexapplication.getUserProfileInstance();
+		String userEmail = mUserInfo.getUserEmail();
 		//Log.d("BASE ACTIVITY", "@@@@@@@@@@@@@@ LOGOUT ACTIVITY @@@@@@@@@@@@@@@@@@@@@");
 		logoutContext=mContext;
 		
@@ -119,7 +122,10 @@ public class LogOutUtil {
 		Util.launchActivity(LoginActivity.class,((Activity) logoutContext) , null);
 		dismissProgressBar();		
 	}
+	
 	public static void logoutUser(Context cntx){
+		//mixPanelUserLogout();
+		Analytics.mixPanelUserLogout();
 		logoutContext=cntx;
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("profile","work");
@@ -169,8 +175,7 @@ public class LogOutUtil {
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
 						Log.d(TAG, "########################################################");
 						Log.d(TAG, "---------------------------------------------------------");
-
-						
+												
 					}
 					else
 					{

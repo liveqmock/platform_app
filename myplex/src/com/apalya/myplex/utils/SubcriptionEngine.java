@@ -25,7 +25,9 @@ import com.apalya.myplex.utils.FetchCardField.FetchComplete;
 import com.apalya.myplex.utils.MsisdnRetrivalEngine.MsisdnRetrivalEngineListener;
 import com.apalya.myplex.views.CustomDialog;
 import com.apalya.myplex.views.JazzyViewPager.TransitionEffect;
-import com.flurry.android.FlurryAgent;
+
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.MapBuilder;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -79,7 +81,7 @@ public class SubcriptionEngine {
 						doOperatorBilling();
 					}
 				}
-//				sendFlurryMessage(packageitem,priceItem);
+//				
 			}else if(mSelectedPriceItem.paymentChannel != null && (mSelectedPriceItem.paymentChannel.equalsIgnoreCase("CC")||mSelectedPriceItem.paymentChannel.equalsIgnoreCase("DC")||mSelectedPriceItem.paymentChannel.equalsIgnoreCase("NB"))){
 				launchWebBasedSubscription();
 			}
@@ -166,29 +168,77 @@ public class SubcriptionEngine {
 				try {
 					responseSet  =(BaseReponseData) Util.fromJson(response, BaseReponseData.class);
 				} catch (Exception e) {
-					// TODO: handle exception
+					Log.e(TAG, "request: "+e.toString());
 				}
 				if(responseSet != null && responseSet.code >= 200 && responseSet.code < 300){
 					Log.e(TAG, "onlineRequestSuccessListener success");
 					postSubscriptionSuccess();	
 				}else{
 					Util.showToast(mContext, "Subscription failed", Util.TOAST_TYPE_ERROR);
+					mixpanelSubscriptionFailed(response);// Added for mixpanel analytics					
 					dismissProgressBar();
 				}
 				
 			}
 		};
 	}
+	
+	// Added for mixpanel analytics
+	private void mixpanelSubscriptionFailed(String error) {
+		CardData subscribedData = myplexapplication.getCardExplorerData().cardDataToSubscribe;
+		Map<String,String> params=new HashMap<String, String>();
+		params.put(Analytics.CONTENT_ID_PROPERTY, subscribedData._id);
+		params.put(Analytics.CONTENT_NAME_PROPERTY, subscribedData.generalInfo.title);
+		params.put(Analytics.PAY_CONTENT_PRICE, mSelectedPriceItem.price+"");
+		params.put(Analytics.PAY_PURCHASE_TYPE, mSelectedPackageItem.commercialModel); //Rental or buy
+		params.put(Analytics.PAYMENT_METHOD, mSelectedPriceItem.paymentChannel); //cc or dc
+		params.put(Analytics.CONTENT_QUALITY, mSelectedPackageItem.contentType); //SD or HD
+		String ctype = Analytics.movieOrLivetv(subscribedData.generalInfo.type); //movie or livetv
+		params.put(Analytics.REASON_FAILURE,error);
+		String event = Analytics.EVENT_SUBSCRIPTION_FAILURE;
+		Analytics.trackEvent(event,params);
+	}
+	
 	private Response.ErrorListener onlineRequestErrorListener() {
 		return new Response.ErrorListener() {
 			@Override
 			public void onErrorResponse(VolleyError error) {
 				Log.e(TAG, "Subscriptionresponse "+error);
 				Util.showToast(mContext, "Subscription failed", Util.TOAST_TYPE_ERROR);
+				mixpanelSubscriptionFailed(error.toString());// Added for mixpanel analytics
 				dismissProgressBar();
 			}
 		};
 	}
+	
+	private void mixPanelSubscriptionSuccess() {
+		String transactionId = "Vodafone999";
+		CardData subscribedData = myplexapplication.getCardExplorerData().cardDataToSubscribe;
+		if(subscribedData != null) {
+			Map<String,String> params=new HashMap<String, String>();
+			params.put(Analytics.CONTENT_ID_PROPERTY, subscribedData._id);
+			params.put(Analytics.CONTENT_NAME_PROPERTY, subscribedData.generalInfo.title);
+			params.put(Analytics.PAY_CONTENT_PRICE, mSelectedPriceItem.price+"");
+			params.put(Analytics.PAY_PURCHASE_TYPE, mSelectedPackageItem.commercialModel); //Rental or buy
+			params.put(Analytics.PAYMENT_METHOD, mSelectedPriceItem.paymentChannel); //cc or dc
+			params.put(Analytics.CONTENT_QUALITY, mSelectedPackageItem.contentType); //SD or HD
+			String ctype2 = Analytics.movieOrLivetv(subscribedData.generalInfo.type); //movie or livetv
+			String event = Analytics.EVENT_PAID_FOR_CONTENT;
+			Analytics.trackEvent(event,params);
+			Analytics.trackCharge(mSelectedPriceItem.price);
+			if("live tv".equals(ctype2)) {
+				Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_LIVETV_PURCHASED_FOR,mSelectedPriceItem.price);
+			}
+			if("movies".equals(ctype2)) {
+				Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_MOVIES_PURCHASED_FOR,mSelectedPriceItem.price);
+			}
+			Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_TOTAL_PURCHASES,mSelectedPriceItem.price);
+			Analytics.createTransactionGA(transactionId, mSelectedPackageItem.commercialModel,new Double(mSelectedPriceItem.price), 0.0,0.0);
+			Analytics.createItemGA(transactionId, subscribedData.generalInfo.title,subscribedData._id, ctype2, new Double(mSelectedPriceItem.price), 1L);
+		}
+	}
+	
+	//invoked only for operator billing.not for webbased-subscription
 	private void postSubscriptionSuccess(){
 
 		Util.showToast(mContext, "Subscription: Success",Util.TOAST_TYPE_INFO);
@@ -205,18 +255,7 @@ public class SubcriptionEngine {
 				CardData subscribedData = myplexapplication.getCardExplorerData().cardDataToSubscribe;
 				subscribedData.currentUserData =  data.results.get(0).currentUserData;
 				
-				
-				Map<String,String> params=new HashMap<String, String>();
-				/*params.put("CardId",subscribedData._id);
-				params.put("CardName", subscribedData.generalInfo.title);
-				params.put("Status", "Purchase Success");
-				Analytics.trackEvent(Analytics.PackagesPurchase,params);*/
-				
-				params.put(Analytics.CONTENT_ID_PROPERTY, subscribedData._id);
-				params.put(Analytics.CONTENT_NAME_PROPERTY, subscribedData.generalInfo.title);
-				params.put(Analytics.PAY_COMMERCIAL_TYPE_PROPERTY, Analytics.PAY_COMMERCIAL_TYPES.Buy.toString());
-				params.put(Analytics.PAY_STATUS_PROPERTY, Analytics.PAY_CONTENT_STATUS_TYPES.Success.toString());				
-				Analytics.trackEvent(Analytics.EVENT_PAY,params);
+				mixPanelSubscriptionSuccess();
 				
 				List<CardData> dataToSave = new ArrayList<CardData>();
 				dataToSave.add(subscribedData);
@@ -239,30 +278,33 @@ public class SubcriptionEngine {
 		else
 			requestUrl = ConsumerApi.getSusbcriptionRequest(mSelectedPriceItem.paymentChannel, mSelectedPackageItem.packageId,couponCode);
 		Intent i = new Intent(mContext,SubscriptionView.class);
+		CardData subscribedData = myplexapplication.getCardExplorerData().cardDataToSubscribe;
+		String commercialModel = mSelectedPackageItem.commercialModel; //Rental or Buy
+		String ctype = Analytics.movieOrLivetv(mSelectedPackageItem.contentType); //Movie or LiveTv
+		String paymentMode = mSelectedPriceItem.name; //creditcard or debitcard etc
 		Bundle b = new Bundle();
+		String contentType =  mSelectedPackageItem.contentType;
 		b.putString("url", requestUrl);
+		b.putString("contentname", subscribedData.generalInfo.title);
+		b.putString("contentid", subscribedData.generalInfo._id);
+		b.putDouble("contentprice", mSelectedPriceItem.price);
+		b.putString("commercialModel", commercialModel); //Rental or Buy
+		b.putString("paymentMode", paymentMode); 
+		b.putString("contentType", contentType);//SD or HD
+		b.putString("ctype", ctype);//LiveTv or Movie
+		b.putString("packageId", mSelectedPackageItem.packageId); 
+		Analytics.mixPanelPaymentOptionsSelected(subscribedData.generalInfo._id, subscribedData.generalInfo.title, paymentMode, mSelectedPriceItem.price+"");
+		String cCode = getCouponCode(); //couponCode
+		if(cCode != null && cCode.length() > 0  ) {
+			b.putString("couponCode", cCode);
+			b.putDouble("priceAfterCoupon", Analytics.priceTobecharged);
+		}
+		//Analytics.priceTobecharged = 0.0;
 		i.putExtras(b);
-		sendFlurryMessage();
+		//sendMixPanelMessage();
 		((Activity) mContext).startActivityForResult(i, ConsumerApi.SUBSCRIPTIONREQUEST);
 	}
-	private void sendFlurryMessage(){
-		FlurryAgent.onStartSession(mContext, "X6WWX57TJQM54CVZRB3K");
-		Map<String,String> params=new HashMap<String, String>();
-		/*
-		params.put("PackageId",mSelectedPackageItem.packageId);
-		params.put("PackageName", mSelectedPackageItem.packageName);
-		params.put("PaymentChannel", mSelectedPriceItem.paymentChannel);
-		params.put("Action", "Purchase");
-		*/
-		
-		params.put(Analytics.PAY_PACKAGE_ID,mSelectedPackageItem.packageId);
-		params.put(Analytics.PAY_PACKAGE_NAME, mSelectedPackageItem.packageName);
-		params.put(Analytics.PAY_PACKAGE_CHANNEL, mSelectedPriceItem.paymentChannel);
-		params.put(Analytics.PAY_STATUS_PROPERTY, Analytics.PAY_COMMERCIAL_TYPES.Buy.toString());
-		Analytics.trackEvent(Analytics.PAY_PACKAGE_PURCHASE_STATUS,params);
-		
-		FlurryAgent.onEndSession(mContext);
-	}
+	
 	public void showProgressBar() {
 		if (mProgressDialog != null) {
 			mProgressDialog.dismiss();
@@ -275,4 +317,5 @@ public class SubcriptionEngine {
 			mProgressDialog.dismiss();
 		}
 	}
+	
 }

@@ -3,6 +3,7 @@ package com.apalya.myplex.views;
 
 import com.apalya.myplex.R;
 import com.apalya.myplex.data.CardData;
+import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MessagePost;
 import com.apalya.myplex.utils.MessagePost.MessagePostCallback;
@@ -64,6 +65,8 @@ public class CommentDialog {
 						dialog.dismiss();
 						if(mListener != null){
 							mListener.sendMessage(status);
+							
+							//Analytics.COMMENT_POSTED = mMessageBox.getEditableText().toString();
 						}
 					}
 				});

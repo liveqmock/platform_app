@@ -14,7 +14,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.flurry.android.monolithic.sdk.impl.pa;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.location.LocationClient;
@@ -85,7 +84,7 @@ public class LocationUtil
 		}
 		return params;
 	}
-	private  Location getLocation() 
+	public  Location getLocation() 
 	{
 		if(client!=null){
 			if(client.isConnected())

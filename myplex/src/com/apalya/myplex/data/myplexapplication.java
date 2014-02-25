@@ -15,10 +15,15 @@ import com.apalya.myplex.receivers.ConnectivityReceiver;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.LocationUtil;
 import com.apalya.myplex.utils.MyVolley;
+
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.Tracker;
+
 import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.utils.Util;
 import com.crashlytics.android.Crashlytics;
 import com.flurry.android.FlurryAgent;
+
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 
 public class myplexapplication extends Application {
@@ -32,7 +37,13 @@ public class myplexapplication extends Application {
 	private static CacheHolder mCache ;
 	private static MixpanelAPI mixPanel;
 	public static int mSelectedOption_Tablet = NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION;
+	private static Context context;
+	
+	private static EasyTracker mTracker;
+	
+
 	public static boolean isInitlized=false;
+
 	private static final String MIXPANEL_DISTINCT_ID_NAME = "Mixpanel Example $distinctid";
 	/*
 	 * You will use a Mixpanel API token to allow your app to send data to Mixpanel. To get your token
@@ -45,7 +56,7 @@ public class myplexapplication extends Application {
 	 *   Paste it below (where you see "YOUR API TOKEN")
 	 */
 	public static final String MIXPANEL_API_TOKEN = "20541460115650ad4e07ab10de528e81";
-
+	
 	/*
 	 * In order for your app to receive push notifications, you will need to enable
 	 * the Google Cloud Messaging for Android service in your Google APIs console. To do this:
@@ -77,8 +88,15 @@ public class myplexapplication extends Application {
 		// TODO Auto-generated method stub
 		super.onCreate();
 		init();
+		initializeGa();
 		mixPanel = MixpanelAPI.getInstance(this, MIXPANEL_API_TOKEN);
+		myplexapplication.context = getApplicationContext();
 	}
+	
+	public static Context getAppContext() {
+        return myplexapplication.context;
+    }
+	
 	private void init() {
 		ConnectivityReceiver.isConnected=Util.isNetworkAvailable(this);
 		MyVolley.init(this);
@@ -110,6 +128,17 @@ public class myplexapplication extends Application {
 		return mCache;
 	}
 	
+
+	 private void initializeGa() {
+		mTracker = EasyTracker.getInstance(this);		    
+	 }
+	 
+	 public static EasyTracker getGaTracker() {
+	    return mTracker;
+	}
+	 
+	 
+
 	public static void init(Activity activity) {
 
 		isInitlized=true;
@@ -222,4 +251,5 @@ public class myplexapplication extends Application {
 			}
 		}
 	}
+
 }

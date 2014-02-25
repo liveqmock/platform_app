@@ -6,28 +6,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.LayoutTransition;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -35,50 +22,43 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnFocusChangeListener;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.ScrollView;
 import android.widget.Space;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
+import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.Request.Method;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.apalya.myplex.LoginActivity;
 import com.apalya.myplex.R;
-import com.apalya.myplex.SignUpActivity;
-import com.apalya.myplex.SubscriptionView;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDataCertifiedRatingsItem;
 import com.apalya.myplex.data.CardDataPackagePriceDetailsItem;
 import com.apalya.myplex.data.CardDataPackages;
 import com.apalya.myplex.data.CardDataPromotionDetailsItem;
-import com.apalya.myplex.data.CardResponseData;
 import com.apalya.myplex.data.CouponResponseData;
 import com.apalya.myplex.data.MsisdnData;
 import com.apalya.myplex.data.ResultsData;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.Blur;
+import com.apalya.myplex.utils.Blur.BlurResponse;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MsisdnRetrivalEngine;
@@ -86,13 +66,10 @@ import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.utils.SubcriptionEngine;
 import com.apalya.myplex.utils.Util;
-import com.apalya.myplex.utils.Blur.BlurResponse;
 import com.crashlytics.android.Crashlytics;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.Module.SetupContext;
-import com.flurry.android.FlurryAgent;
-import com.flurry.android.monolithic.sdk.impl.ca;
+
 
 public class PackagePopUp {
 	private String TAG  = "PackagePopUp";
@@ -115,6 +92,7 @@ public class PackagePopUp {
 	private static String COUPON_CODE ="";
 	private ScrollView pkgScrollView;
 	private RelativeLayout couponLayout;
+	CardData cardDataAnalytics;
 	
 	public PackagePopUp(Context cxt,View background){
 		this.mContext = cxt;
@@ -135,9 +113,20 @@ public class PackagePopUp {
 			params.put("clientKey",myplexapplication.getDevDetailsInstance().getClientKey());
 			RegisterUserReq(mContext.getString(R.string.signuppath), params);
 		}
+		
+		//Analytics.mixPanelPaymentOptionsPresented();
 	}
-
-
+	
+	/*private void mixPanelPaymentOptionsPresented() {
+		Map<String,String> params=new HashMap<String, String>();
+		int selected = myplexapplication.getCardExplorerData().currentSelectedCard;
+		CardData  mData = myplexapplication.getCardExplorerData().mMasterEntries.get(selected);
+		params.put(Analytics.CONTENT_ID_PROPERTY, mData._id);
+		params.put(Analytics.CONTENT_NAME_PROPERTY, mData.generalInfo.title);
+		Analytics.trackEvent(Analytics.EVENT_PAYMENT_OPTIONS_PRESENTED,params);
+	}*/
+	
+	
 	private void dismissFilterMenuPopupWindow() {
 		if (mFilterMenuPopupWindow != null) {
 			mFilterMenuPopupWindowList.remove(mFilterMenuPopupWindow);
@@ -196,8 +185,9 @@ public class PackagePopUp {
 //		else
 //			hideCouponFunctionality(v);
 		showPopup(v,anchorView);
-		
+		cardDataAnalytics = data;
 	}
+	
 	private void setUpCouponFunctionality(View view,CardData data) {	
 		couponLayout = (RelativeLayout)view.findViewById(R.id.couponLayout);
 		couponLayout.setVisibility(View.VISIBLE);
@@ -220,6 +210,8 @@ public class PackagePopUp {
 				showProgressBar();
 //				applyCouponBtn.setVisibility(View.GONE);
 				String validateCouponUrl = ConsumerApi.checkCouponCode(COUPON_CODE, packages);
+				
+							
 				RequestQueue queue = MyVolley.getRequestQueue();
 				StringRequest applyCouponRequest = new StringRequest(Request.Method.GET, validateCouponUrl, new Listener<String>() {
 				@Override
@@ -233,6 +225,9 @@ public class PackagePopUp {
 								List<CouponResponseData> values = resultsData.results.values;
 								for(CouponResponseData coupon : resultsData.results.values){
 									if(coupon.status.equalsIgnoreCase("SUCCESS")){
+										//mixPanelCouponEntered();
+										//Analytics.mixPanelCouponEntered(COUPON_CODE);
+										Analytics.priceTobecharged = coupon.priceTobeCharged;//for analytics
 										applyCoupon(coupon.packageId,coupon.priceTobeCharged);
 										coupanCodes.put(coupon.packageId, COUPON_CODE);
 										if(!coupon.message.equalsIgnoreCase(""))
@@ -328,6 +323,8 @@ public class PackagePopUp {
 
 	private void addPack(CardData data,LinearLayout parentlayout) {
 		if(data.packages == null){return;}
+		List<String> qualityList = new ArrayList<String>(); //analytics
+		List<String> purchaseOptionsList = new ArrayList<String>(); //analytics
 		for(CardDataPackages packageitem:data.packages){
 			if(packageitem.priceDetails != null && packageitem.priceDetails.size() > 0){
 				if(packageitem.priceDetails.size() == 1 && packageitem.priceDetails.get(0)!=null && packageitem.priceDetails.get(0).paymentChannel.equalsIgnoreCase("INAPP"))
@@ -336,6 +333,9 @@ public class PackagePopUp {
 					continue;
 				}
 				createPackItem(packageitem.priceDetails.get(0),packageitem,parentlayout);
+				qualityList.add(packageitem.contentType);
+				purchaseOptionsList.add(packageitem.commercialModel);
+				Log.d(TAG, packageitem.contentType+"  "+ packageitem.commercialModel);
 			}
 		}
 	}
@@ -370,6 +370,7 @@ public class PackagePopUp {
 				v.setAlpha(1.0f);
 				
 				CardDataPackages packageitem = (CardDataPackages)subLayout.getTag();
+				Analytics.mixPanelPaymentOptionsPresented2(cardDataAnalytics,packageitem);//
 				if(packageitem == null){return;}
 				if(packageitem.priceDetails == null){return;}
 				int count = 0;
@@ -531,10 +532,6 @@ public class PackagePopUp {
 	}
 	private void RegisterUserReq(String contextPath, final Map<String,String> bodyParams) {
 
-		Map<String,String> attribs=new HashMap<String, String>();
-		attribs.put("Duration", "");
-		//Analytics.trackEvent(Analytics.loginSignUp,attribs,true);
-		
 		RequestQueue queue = MyVolley.getRequestQueue();
 
 		String url=ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+ConsumerApi.USER_CONTEXT+ConsumerApi.SLASH+contextPath;
@@ -558,8 +555,7 @@ public class PackagePopUp {
 			@Override
 			public void onResponse(String response) {
 				
-				//Analytics.endTimedEvent(Analytics.loginSignUp);
-				
+						
 				Log.d(TAG,"Response: "+response);
 				try {	
 					Log.d(TAG, "########################################################");
@@ -567,9 +563,6 @@ public class PackagePopUp {
 
 					if(jsonResponse.getString("status").equalsIgnoreCase("SUCCESS"))
 					{
-						Map<String,String> attribs=new HashMap<String, String>();
-						attribs.put("Status", "Success");
-						//Analytics.trackEvent(Analytics.loginSignUp,attribs);
 						Log.d(TAG, "status: "+jsonResponse.getString("status"));
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
@@ -587,7 +580,7 @@ public class PackagePopUp {
 						
 						Crashlytics.setUserEmail(account);
 						String userIdSha1=Util.sha1Hash(account);
-						FlurryAgent.setUserId(userIdSha1);
+						
 						Crashlytics.setUserName(userIdSha1);
 						Crashlytics.setUserIdentifier(userIdSha1);
 						
@@ -595,10 +588,6 @@ public class PackagePopUp {
 					}
 					else
 					{
-						Map<String,String> attribs=new HashMap<String, String>();
-						attribs.put("Status", "Failed");
-						attribs.put("Msg", jsonResponse.getString("code"));
-						//Analytics.trackEvent(Analytics.loginSignUp,attribs);
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
 						
@@ -613,11 +602,6 @@ public class PackagePopUp {
 		return new Response.ErrorListener() {
 			@Override
 			public void onErrorResponse(VolleyError error) {
-				//Analytics.endTimedEvent(Analytics.loginSignUp);
-				Map<String,String> attribs=new HashMap<String, String>();
-				attribs.put("Status", "Failed");
-				attribs.put("Msg", error.toString());
-				//Analytics.trackEvent(Analytics.loginSignUp,attribs);
 				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
 				Log.d(TAG,"Error: "+error.toString());
 				Log.d(TAG, "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
@@ -703,11 +687,15 @@ public class PackagePopUp {
 					Animation anim = AnimationUtils.loadAnimation(mContext, R.anim.shake);
 					new_price.startAnimation(anim);
 					String oldPrice = new_price.getText().toString().trim();
+					double couponPrice = Double.parseDouble(oldPrice) - priceTobecharged; //for analytics
+					Analytics.couponDiscountINR = couponPrice; 
+					Analytics.mixPanelCouponEntered(COUPON_CODE,couponPrice+"");
 					StrikeTextView oldprice = (StrikeTextView) layout2.findViewById(R.id.purchasepackItem1_price_before_coupon);
 					oldprice.setVisibility(View.VISIBLE);
 //					oldprice.setPaintFlags(oldprice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 					oldprice.setText(oldPrice);					
 					new_price.setText(" "+priceTobecharged);
+					//Analytics.priceTobecharged = priceTobecharged; //to capture the price after coupon in Subscription view
 					Util.showToast(mContext, "coupon applied", Util.TOAST_TYPE_INFO);
 					break;
 				}				

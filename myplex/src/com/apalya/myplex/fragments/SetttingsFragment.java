@@ -1,7 +1,9 @@
 package com.apalya.myplex.fragments;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import android.content.Intent;
@@ -24,7 +26,9 @@ import com.apalya.myplex.adapters.SettingsAdapter;
 import com.apalya.myplex.data.ApplicationSettings;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.SettingsData;
+import com.apalya.myplex.data.UserProfile;
 import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.DeviceRegUtil;
 import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.utils.Util;
@@ -41,6 +45,10 @@ public class SetttingsFragment extends BaseFragment {
 	private PinnedSectionListView mSettingsListView;
 	private SettingsAdapter mListAdapter;
 	private List<SettingsData> mSettingsList;
+
+	public static String RATING_POSTED = null; //analytics useful to getdata from MessagePost to CardDetailViewFactory
+	public static String FEEDBACK_POSTED = null; //analytics useful to getdata from MessagePost to CardDetailViewFactory
+
 	private String FEEDBACK = "feedback";
 	private String TANDC = "terms & conditions";
 	private String PRIVACYPOLIY ="privacy policy";
@@ -50,7 +58,7 @@ public class SetttingsFragment extends BaseFragment {
 	public static final String DRM_LEVAL_STRING="WVDRM statusKey";
 	public static final String ROOT_STATUS_STRING="root status";
 	public static final String DERIGISTER_DEVICE="deRegister device";
-	
+
 	private int debug_mode_counter=0;
 
 	@Override
@@ -61,6 +69,9 @@ public class SetttingsFragment extends BaseFragment {
 				.findViewById(R.id.settings_list);		
 		PreapreSettingsData();
 		debug_mode_counter=0;
+		
+		Analytics.mixPanelBrowsedSettings();
+		Analytics.createScreenGA(Analytics.SCREEN_SETTINGS);
 		mSettingsListView.setOnItemClickListener(new OnItemClickListener() {
 
 			@Override
@@ -100,6 +111,8 @@ public class SetttingsFragment extends BaseFragment {
 					return;
 				
 				if (data.mSettingName.equals(FEEDBACK)) {
+					Analytics.mixPanelFeedbackInitiation();
+					UserProfile userProfile = myplexapplication.getUserProfileInstance();
 					CardData profileData=new CardData();
 					profileData._id="0";
 					RatingDialog dialog = new RatingDialog(mContext);
@@ -109,6 +122,7 @@ public class SetttingsFragment extends BaseFragment {
 						@Override
 						public void sendMessage(boolean status) {
 							if(status){
+								Analytics.mixPanelProvidedFeedback(FEEDBACK_POSTED, RATING_POSTED);
 								Util.showToast(mContext, "Thanks for your feedback.",Util.TOAST_TYPE_INFO);
 								
 							}else{

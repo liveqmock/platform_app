@@ -13,6 +13,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.apalya.myplex.data.BaseReponseData;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardResponseData;
+import com.apalya.myplex.views.CardDetailViewFactory;
 
 public class MessagePost {
 	public static final String TAG = "MessagePost";
@@ -24,6 +25,7 @@ public class MessagePost {
 	private MessagePostCallback mListener;
 	
 	public void sendComment(final String message,final int value, CardData data,final int type,MessagePostCallback listener){
+		CardDetailViewFactory.COMMENT_POSTED = message; //added for analytics
 		this.mListener = listener;
 		String requestURl = new String();
 		if(type == POST_COMMENT){

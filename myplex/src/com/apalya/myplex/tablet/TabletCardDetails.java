@@ -6,6 +6,7 @@ import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.fragments.CardDetailsTabletFrag;
 import com.apalya.myplex.fragments.CardExplorer;
+import com.apalya.myplex.utils.Analytics;
 
 import android.app.Activity;
 import android.app.FragmentManager;
@@ -38,6 +39,8 @@ public class TabletCardDetails extends BaseActivity{
 	}
 	@Override
 	public void onBackPressed() {
+		//Analytics.stoppedAt();
+		//Analytics.mixPanelVideoTimeCalculation(myplexapplication.mSelectedCard);
 		startActivity(new Intent(TabletCardDetails.this,MultiPaneActivity.class));
 		finish();
 	}
