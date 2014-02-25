@@ -55,9 +55,8 @@ public class myplexapplication extends Application {
 	 *
 	 *   Paste it below (where you see "YOUR API TOKEN")
 	 */
-	//public static final String MIXPANEL_API_TOKEN = "20541460115650ad4e07ab10de528e81";
-	public static final String MIXPANEL_API_TOKEN = "8293ff14fa557625b1e4ed11a349d5bb";
-
+	public static final String MIXPANEL_API_TOKEN = "20541460115650ad4e07ab10de528e81";
+	
 	/*
 	 * In order for your app to receive push notifications, you will need to enable
 	 * the Google Cloud Messaging for Android service in your Google APIs console. To do this:
