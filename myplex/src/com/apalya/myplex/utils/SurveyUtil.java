@@ -24,67 +24,76 @@ import com.mixpanel.android.mpmetrics.Survey;
 import com.mixpanel.android.mpmetrics.SurveyCallbacks;
 
 public class SurveyUtil {
-  
-	private static SurveyUtil self=null;
+
+	private static SurveyUtil self = null;
 	private Activity activity = null;
-	
-	private enum SurveyState {UNDEFINED, INPROGRESS, COMPLETED};
-	
-	private SurveyState mSurveyState= SurveyState.UNDEFINED;
-	
-	private SurveyUtil() {		
+
+	private enum SurveyState {
+		UNDEFINED, INPROGRESS, COMPLETED
+	};
+
+	private SurveyState mSurveyState = SurveyState.UNDEFINED;
+
+	private SurveyUtil() {
 	}
-	
-	public static SurveyUtil getInstance(){
-		if(self == null){
+
+	public static SurveyUtil getInstance() {
+		if (self == null) {
 			self = new SurveyUtil();
 		}
-		return self;		
+		return self;
 	}
-	
-	
-	
+
 	public interface SurveyListener {
 		boolean canShowSurvey();
-	} 
-	
-	private  SurveyListener surveyListener;
-	
+	}
+
+	private SurveyListener surveyListener;
+
 	public void setSurveyListener(SurveyListener surveyListener) {
 		this.surveyListener = surveyListener;
 	}
-	
-	public  void checkForSurvey( Activity caller){
+
+	public void checkForSurvey(Activity caller) {
 		this.activity = caller;
-		
-		if(mSurveyState != SurveyState.UNDEFINED){
-			Log.d("MixpanelAPI", "discard survey check request already in-progress");
+
+		if (mSurveyState != SurveyState.UNDEFINED) {
+			Log.d("MixpanelAPI",
+					"discard survey check request already in-progress");
 			return;
 		}
-		
-		mSurveyState=SurveyState.INPROGRESS;
-		
-		myplexapplication.getMixPanel().getPeople().checkForSurvey(new SurveyCallbacks() {
-		    public void foundSurvey(Survey s) {
-		        try {
-		        	mSurveyState=SurveyState.COMPLETED;
-						if(s == null || surveyListener == null){
-							return;
-						}
+
+		mSurveyState = SurveyState.INPROGRESS;
+
+		myplexapplication.getMixPanel().getPeople()
+				.checkForSurvey(new SurveyCallbacks() {
+					
+					public void foundSurvey(Survey s) {
 						
-						if(!surveyListener.canShowSurvey()){
-							Log.d("MixpanelAPI", "discard survey canShowSurvey returned false");
-							mSurveyState=SurveyState.UNDEFINED;
-							return;
+						try {
+							
+							mSurveyState = SurveyState.COMPLETED;
+							
+							if (s == null || surveyListener == null) {
+								return;
+							}
+
+							if (!surveyListener.canShowSurvey()) {
+								Log.d("MixpanelAPI",
+										"discard survey canShowSurvey returned false");
+								mSurveyState = SurveyState.UNDEFINED;
+								return;
+							}
+
+							myplexapplication.getMixPanel().getPeople()
+									.showSurvey(s, activity);
+							activity = null;
+
+						} catch (Throwable e) {
+							Log.d("MixpanelAPI",
+									"exception after survey found :" + e);
 						}
-						
-					    myplexapplication.getMixPanel().getPeople().showSurvey(s,activity);
-					    activity=null;
-					    
-				} catch (Throwable e) {					
-					Log.d("MixpanelAPI", "exception after survey found :"+e);
-				}
-		    }
-		});
+					}
+				});
 	}
 }
