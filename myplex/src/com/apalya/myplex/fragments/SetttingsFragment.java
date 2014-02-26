@@ -58,6 +58,7 @@ public class SetttingsFragment extends BaseFragment {
 	public static final String DRM_LEVAL_STRING="WVDRM statusKey";
 	public static final String ROOT_STATUS_STRING="root status";
 	public static final String DERIGISTER_DEVICE="deRegister device";
+	public static final String SENSOR_SCROLL="Sensor Scroll";
 
 	private int debug_mode_counter=0;
 
@@ -179,6 +180,7 @@ public class SetttingsFragment extends BaseFragment {
 		mSettingsList.add(new SettingsData(SettingsData.SECTION, "App Settings", 0,SettingsData.VIEWTYPE_NORMAL));
 		mSettingsList.add(new SettingsData(SettingsData.ITEM, DOWNLOAD_OR_STREAM_MSG+"\t\t"+currentRentalOptions, 0,SettingsData.VIEWTYPE_NORMAL));
 		mSettingsList.add(new SettingsData(SettingsData.ITEM, "Download only on Wifi", 0,SettingsData.VIEWTYPE_TOGGLEBUTTON));
+		mSettingsList.add(new SettingsData(SettingsData.ITEM, SENSOR_SCROLL, 0,SettingsData.VIEWTYPE_TOGGLEBUTTON));
 		if(ApplicationSettings.ENABLE_SHOW_PLAYER_LOGS_SETTINGS){
 			mSettingsList.add(new SettingsData(SettingsData.ITEM, "Show player logs", 0,SettingsData.VIEWTYPE_TOGGLEBUTTON));
 			WidevineDrm widevineDRM= new WidevineDrm(mContext);

@@ -102,6 +102,9 @@ public class myplexapplication extends Application {
 		MyVolley.init(this);
 		locationUtil = LocationUtil.getInstance(this);
 		locationUtil.init();
+		ApplicationSettings.ENABLE_SENSOR_SCROLL = SharedPrefUtils.getBoolFromSharedPreference(
+				getApplicationContext(), getApplicationContext().getString(R.string.isSensorScrollEnabled),
+				false);
 	}
 	public static ApplicationConfig getApplicationConfig(){
 		if(mDisplayInfo == null){
