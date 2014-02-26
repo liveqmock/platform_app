@@ -64,7 +64,6 @@ import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.SearchData;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.data.SearchData.ButtonData;
-import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
@@ -114,11 +113,14 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 	}
 	@Override
 	protected void onResume() {
+		createCardExplorer();
+/*
+		
 		if(myplexapplication.mSelectedOption_Tablet != NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION){
 			createCardExplorer();
 		}else{
 			OnSelectedOption(myplexapplication.mSelectedOption_Tablet, "live tv");
-		}
+		}*/
 		super.onResume();
 	}
 	@Override
@@ -127,10 +129,10 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 	}
 	
 	//Search related code
-	//when search is clicked discover is displayed
+	
 	@Override
 	public void searchButtonClicked() {
-		
+
 		if (mSearchbleTags == null || mSearchbleTags.size() <= 0)
 		{
 //			Toast.makeText(mContext,  "Select search tags or enter text for search ",  Toast.LENGTH_LONG).show();
@@ -138,7 +140,7 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 			return;
 		}
 //		mMainActivity.showActionBarProgressBar();
-		Analytics.SEARCH_TYPE = "actionbar";
+
 		String searchQuery = new String();
 		final List<CardData> searchString = new ArrayList<CardData>();
 		for (ButtonData data : mSearchbleTags) {
@@ -173,7 +175,6 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 			@Override
 			public void onClick(View v) {
 				Animation slideDown = AnimationUtils.loadAnimation(mContext, R.anim.slide_down);
-				Analytics.mixPanelDiscoveryOptionSelected();
 				slideDown.setAnimationListener(new AnimationListener() {
 					@Override
 					public void onAnimationStart(Animation animation) {
@@ -684,5 +685,47 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 	{
 		super.setUpShareButton(toBeShared);
 		
+	}
+	
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+	  super.onSaveInstanceState(savedInstanceState);
+	  // Save UI state changes to the savedInstanceState.
+	  // This bundle will be passed to onCreate if the process is
+	  // killed and restarted.
+	  
+	  /*
+	  savedInstanceState.putBoolean("MyBoolean", true);
+	  savedInstanceState.putDouble("myDouble", 1.9);
+	  savedInstanceState.putInt("MyInt", 1);
+	  savedInstanceState.putString("MyString", "Welcome back to Android");
+	  
+	  */
+	  
+	  
+	  
+	  
+	  // etc.
+	}
+	@Override
+	public void onRestoreInstanceState(Bundle savedInstanceState) {
+	  super.onRestoreInstanceState(savedInstanceState);
+	  // Restore UI state from the savedInstanceState.
+	  // This bundle has also been passed to onCreate.
+	  
+	  /*
+	  boolean myBoolean = savedInstanceState.getBoolean("MyBoolean");
+	  double myDouble = savedInstanceState.getDouble("myDouble");
+	  int myInt = savedInstanceState.getInt("MyInt");
+	  
+	  
+	  String myString = savedInstanceState.getString("MyString");
+	
+	
+*/	
+	
+	
+	
+	
 	}
 }
