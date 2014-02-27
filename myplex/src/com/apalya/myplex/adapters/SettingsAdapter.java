@@ -8,11 +8,14 @@ import java.util.Map;
 import twitter4j.RelatedResults;
 
 import com.apalya.myplex.R;
+import com.apalya.myplex.data.ApplicationSettings;
 import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.SettingsData;
 import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.fragments.SetttingsFragment;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.FontUtil;
+import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.views.PinnedSectionListView.PinnedSectionListAdapter;
 
 import android.content.Context;
@@ -68,6 +71,8 @@ public class SettingsAdapter extends ArrayAdapter<SettingsData> implements Pinne
 					txt.setChecked(myplexapplication.getApplicationSettings().downloadOnlyOnWifi);	
 				}else if(data.mSettingName.equalsIgnoreCase("Show player logs")){
 					txt.setChecked(myplexapplication.getApplicationSettings().showPlayerLogs);	
+				}else if (data.mSettingName.equalsIgnoreCase(SetttingsFragment.SENSOR_SCROLL)){
+					txt.setChecked(ApplicationSettings.ENABLE_SENSOR_SCROLL);
 				}
 				txt.setOnCheckedChangeListener(mActionListener);
 				txt.setTag(data);
@@ -95,6 +100,9 @@ public class SettingsAdapter extends ArrayAdapter<SettingsData> implements Pinne
 						myplexapplication.getApplicationSettings().downloadOnlyOnWifi = isChecked;
 					}else if(obj.mSettingName.equalsIgnoreCase("Show player logs")){
 						myplexapplication.getApplicationSettings().showPlayerLogs = isChecked;	
+					}else if (obj.mSettingName.equalsIgnoreCase(SetttingsFragment.SENSOR_SCROLL)){
+						SharedPrefUtils.writeToSharedPref(mContext, mContext.getString(R.string.isSensorScrollEnabled),isChecked);
+						ApplicationSettings.ENABLE_SENSOR_SCROLL=isChecked;
 					}
 				}
 			} catch (Exception e) {

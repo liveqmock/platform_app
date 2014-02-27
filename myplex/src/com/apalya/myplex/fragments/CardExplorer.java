@@ -12,6 +12,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -72,6 +73,7 @@ import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.views.CardView;
 import com.apalya.myplex.views.PackagePopUp;
+import com.apalya.myplex.views.SensorScrollUtil;
 
 public class CardExplorer extends BaseFragment implements CardActionListener,CacheManagerCallback,DownloadProgressStatus,
 		OnDismissCallback, AlertDialogUtil.NoticeDialogListener,Util.KeyRenewListener {
@@ -92,6 +94,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	private HashMap<CardData,Integer> mDownloadTracker= new HashMap<CardData,Integer>();
 	private boolean mRefreshOnce = false;
 	public static  boolean mfirstTime = false;
+	private View mProgressView = null;
+	private SensorScrollUtil mSensorScrollUtil ;
 	//private EasyTracker easyTracker = null;
 	
 	@Override
@@ -108,7 +112,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			mMainActivity.bringFragment(fragment);	
 		}
 	}
-
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
@@ -116,9 +120,18 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		mData = myplexapplication.getCardExplorerData();
 		mfirstTime = true;
 		Analytics.createScreenGA(Analytics.SCREEN_CARD_EXPLORER);
+		mSensorScrollUtil= new SensorScrollUtil();
+		mSensorScrollUtil.register(getContext());
 	}
 
 	public void showProgressBar() {
+		if(mProgressView != null){
+			ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(mProgressView,
+					"alpha", 0f, 1f);
+			fadeAnim2.setDuration(800);
+			fadeAnim2.start();
+			mProgressView.setVisibility(View.VISIBLE);
+		}
 //		if (mProgressDialog != null) {
 //			mProgressDialog.dismiss();
 //		}
@@ -126,6 +139,13 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	}
 
 	public void dismissProgressBar() {
+		if(mProgressView != null){
+			ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(mProgressView,
+					"alpha", 1f, 0f);
+			fadeAnim2.setDuration(800);
+			fadeAnim2.start();
+//			mProgressView.setVisibility(View.INVISIBLE);
+		}
 //		if (mProgressDialog != null) {
 //			mProgressDialog.dismiss();
 //		}
@@ -163,6 +183,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		if(mDownloadProgressManager != null){
 			mDownloadProgressManager.stopPolling();
 		}
+		mSensorScrollUtil.unregister();
 		super.onStop();
 	}
 	private void closeSession(){
@@ -291,6 +312,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		mCardView = (CardView) mRootView.findViewById(R.id.framelayout);
 		mGridView = (GridView)mRootView.findViewById(R.id.tabletview);
 		mStackFrame = (LinearLayout)mRootView.findViewById(R.id.cardstackframe);
+		mProgressView = mRootView.findViewById(R.id.card_loading_progress);
 		arangeWaterMark();
 		if(getContext() == null)
 		{
@@ -321,6 +343,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		mMainActivity.setSearchViewVisibilty(View.VISIBLE);
 		delayedAction();
 		hideNewArrivals();
+		mSensorScrollUtil.init(mCardView);
 		return mRootView;
 	}
 
@@ -492,6 +515,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			return;
 		}*/
 		mMainActivity.showActionBarProgressBar();
+		showProgressBar();
 		RequestQueue queue = MyVolley.getRequestQueue();
 		int requestMethod = Method.GET;
 		String requestUrl = new String();
