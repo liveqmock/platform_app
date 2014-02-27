@@ -57,6 +57,9 @@ import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.views.FlowLayout;
 import com.apalya.myplex.views.PinnedSectionListView;
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.Fields;
+import com.google.analytics.tracking.android.MapBuilder;
 
 public class SearchActivity extends BaseFragment implements
 		OpenCallBackListener, CacheManagerCallback {
@@ -75,10 +78,13 @@ public class SearchActivity extends BaseFragment implements
 	private ProgressDialog mProgressDialog = null;
 	private CacheManager mCacheManager = new CacheManager();
 	public static final String TAG = "SearchActivity";
+	//private EasyTracker easyTracker = null;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Analytics.mixPanelDiscoveryOptionSelected();
+		Analytics.createScreenGA(Analytics.SCREEN_DISCOVER);
 	}
 
 	@Override
@@ -160,12 +166,7 @@ public class SearchActivity extends BaseFragment implements
 //		mMainActivity.setTitle("Search");
 
 		loadSearchTags();
-		//???
-		Map<String,String> params=new HashMap<String, String>();
-		params.put("status", "Shown");
-		//Analytics.trackEvent(Analytics.SearchScreenShown,params);
 		
-
 		return rootView;
 	}
 
@@ -203,10 +204,10 @@ public class SearchActivity extends BaseFragment implements
 			searchQuery += data.getButtonName();
 			searchString.add(temp);
 			
-			Map<String,String> params=new HashMap<String, String>();
-			params.put("tagsSelected", searchQuery);
-			Analytics.trackEvent(Analytics.SEARCH_QUERY_PROPERTY,params);
 		}
+		
+		//mixPanelSearchButtonClicked(searchQuery);
+		Analytics.mixPanelDiscoverySearchButtonClicked(searchQuery,mSearchbleTags);
 		mSearchQuery = searchQuery;
 		mMainActivity.setActionBarTitle(searchQuery);
 		IndexHandler.OperationType searchType = IndexHandler.OperationType.DONTSEARCHDB;
@@ -214,7 +215,7 @@ public class SearchActivity extends BaseFragment implements
 			searchType = IndexHandler.OperationType.FTSEARCH;
 		mCacheManager.getCardDetails(searchString, searchType, SearchActivity.this);
 	}
-
+	
 	// Boolean true to add, false to remove
 	private void UpdateSearchTags(ButtonData tagData, Boolean addorremove) {
 		if (mSearchbleTags == null)
@@ -224,15 +225,15 @@ public class SearchActivity extends BaseFragment implements
 		{
 			mSearchbleTags.add(tagData);
 			
-			params.put("tagAdded", tagData.getButtonName());
+			params.put(Analytics.DISCOVER_KEYWORD, tagData.getButtonName());
 			
 		}
 		else
 		{
-			params.put("tagRemoved", tagData.getButtonName());
+			//params.put("tagRemoved", tagData.getButtonName()); 
 			mSearchbleTags.remove(tagData);
 		}
-		Analytics.trackEvent(Analytics.SEARCH_QUERY_PROPERTY,params);
+		
 		if (mSearchbleTags.size() == 0)
 			mMainActivity.setSearchBarVisibilty(View.INVISIBLE);
 		else
@@ -242,9 +243,7 @@ public class SearchActivity extends BaseFragment implements
 	private void ClearSearchTags() {
 		if (mSearchbleTags != null)
 			mSearchbleTags.clear();
-		Map<String,String> params=new HashMap<String, String>();
-		params.put("tagCleared", "true");
-		Analytics.trackEvent(Analytics.SEARCH_QUERY_PROPERTY,params);
+		
 	}
 
 	public List<ButtonData> GetSearchTags() {
@@ -252,7 +251,7 @@ public class SearchActivity extends BaseFragment implements
 	}
 
 	private void loadSearchTags() {
-		mListData.clear();
+		mListData.clear(); 
 		mMainActivity.showActionBarProgressBar();
 		showProgressBar();
 		TextView empty = (TextView) rootView.findViewById(R.id.empty);
@@ -267,17 +266,12 @@ public class SearchActivity extends BaseFragment implements
 		Log.d("tagresponse", myReq.getUrl());
 		queue.add(myReq);
 		
-		Map<String,String> params=new HashMap<String, String>();
-		params.put("Duration", "");
-		Analytics.trackEvent(Analytics.SEARCH_SCREEN_PROPERTY,params,true);
-		
 	}
 
 	private Response.Listener<JSONObject> createMyReqSuccessListener() {
 		return new Response.Listener<JSONObject>() {
 			@Override
 			public void onResponse(JSONObject response) {
-				Analytics.endTimedEvent(Analytics.SEARCH_SCREEN_PROPERTY);
 				ParseJonsResponse(response);
 				mMainActivity.hideActionBarProgressBar();
 				dismissProgressBar();

@@ -17,6 +17,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.apalya.myplex.R;
+import com.apalya.myplex.data.DeviceDetails;
+import com.apalya.myplex.data.UserProfile;
+import com.apalya.myplex.data.myplexapplication;
 
 public class DeviceRegUtil {
 	public static final String TAG = "DeviceRegUtil";
@@ -46,11 +49,15 @@ public class DeviceRegUtil {
 		};
 		myReg.setShouldCache(false);
 		queue.add(myReg);
+		//mixPanelDeviceRegisterInitiated(1);
+		Analytics.mixPanelDeviceDeRegisterInitiated(1);
 		mProgressDialog = ProgressDialog.show(mContext,"", "UnRegistering device..", true,false);
 		
 		Log.e(TAG, "requestUrl: "+url);
 		
 	}
+	
+   
 	private Response.Listener<String> onlineRequestSuccessListener() {
 		return new Response.Listener<String>() {
 			@Override
@@ -73,18 +80,22 @@ public class DeviceRegUtil {
 
 					{
 						String msg =jsonResponse.getString("message");
+						Analytics.mixPanelDeviceDeRegisterInitiated(2);
 						if(!TextUtils.isEmpty(msg)){
 							Util.showToast(mContext, msg, Util.TOAST_TYPE_ERROR);
 							LogOutUtil.onClickLogout(mContext);
 							return;
 						}
+						//mixPanelDeviceRegisterInitiated(2);
+						
+						
 					}
 					
 					Util.showToast(mContext, response, Util.TOAST_TYPE_ERROR);
 
 					
 				} catch (Exception e) {
-					// TODO: handle exception
+					Log.e(TAG, e.toString());
 				}
 			}
 		};
@@ -101,6 +112,7 @@ public class DeviceRegUtil {
 					msg=""+error.networkResponse.statusCode+":";
 				}
 				dismissProgressBar();
+				Analytics.mixPanelDeviceDeRegisterfailed(error.toString());
 				Util.showToast(mContext, msg+error.toString(),Util.TOAST_TYPE_ERROR);
 				
 			}

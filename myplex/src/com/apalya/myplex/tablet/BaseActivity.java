@@ -86,6 +86,7 @@ import com.apalya.myplex.views.PinnedSectionListView;
 import com.facebook.Session;
 
 public class BaseActivity extends Activity implements MainBaseOptions{
+	
 	protected DrawerLayout mDrawerLayout;
 	protected ListView mDrawerList;
 	private ActionBarDrawerToggle mDrawerToggle;
@@ -103,6 +104,10 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 	private TextView socialShare;
 	private TextView mFilterLevle;
 
+	private RelativeLayout rLayout;
+	
+
+	
 	@Override
 	public void setOrientation(int value){
 		setRequestedOrientation(value);
@@ -135,7 +140,11 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		super.onCreate(savedInstanceState);
 		mContext = this;
 		Util.prepareDisplayinfo(this);
+		
+		
 		// setContentView(R.layout.mainview);
+		
+		//rLayout = (RelativeLayout) findViewById(R.id.navigation_layout);
 		mContentLayout = (FrameLayout) findViewById(R.id.content_frame);
 		mInflater = LayoutInflater.from(this);
 //		if (savedInstanceState == null) {
@@ -205,7 +214,10 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LIVETV,R.string.iconlivetv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.MOVIES,R.string.iconmovie, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.RECOMMENDED,R.string.iconhome, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-//		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.SPORTS,R.string.iconcricket, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.TVSHOWS,R.string.iconlivetv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+
+		
+		//		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.SPORTS,R.string.iconcricket, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGO,R.string.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
 
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FAVOURITE,R.string.iconfav, null, screenType,R.layout.navigation_menuitemsmall));
@@ -234,7 +246,9 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 	public String mLastActionBarTitle = new String();
 	public void setActionBarTitle(String title) {
 //		mFilterLevle.setVisibility(View.GONE);
-		mFilterLevle.setText("All");
+		
+		if(mFilterLevle!=null){
+		mFilterLevle.setText("All");}
 		this.mTitle = title;
 		if (mTitleTextView != null) {
 			mTitleTextView.setText(mTitle);
@@ -247,6 +261,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 	private RelativeLayout mCustomActionBarTitleLayout;
 	private ProgressBar mCustomActionBarProgressBar;
 	private ImageView mCustomActionBarSearch;
+
 	private boolean mNavigationDrawerOpened = false;
 	private OnClickListener mOnFilterClickListener = new OnClickListener() {
 
@@ -317,6 +332,23 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		
 		mTitleFilterSymbol = (TextView)v.findViewById(R.id.customactionbar_filter_text1);
 		changeVisibility(mTitleFilterSymbol,View.GONE);		
+		/*if( visib !=-1){
+		
+		backkView = (ImageView)v.findViewById(R.id.customactionbar_back);
+		
+		backkView.setVisibility(visib);
+		backkView.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				
+				onBackPressed();
+				
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		}*/
 		
 		SearchView mSearchView = (SearchView)v.findViewById(R.id.customsearchview);
 		mSearchView.setVisibility(View.INVISIBLE);
@@ -536,8 +568,29 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 			mCurrentFragment=mCardDetails;
 			mCurrentFragment.mDataObject=profileData;
 			myplexapplication.mSelectedCard = profileData;
-			startActivity(new Intent(this,TabletCardDetails.class));
-				setActionBarTitle("My Profile");
+			
+			
+			
+			prepareCustomActionBar();
+			CardDetailsTabletFrag cardDetails = (CardDetailsTabletFrag) createFragment(NavigationOptionsMenuAdapter.CARDDETAILS_ACTION);
+			cardDetails.mDataObject = myplexapplication.mSelectedCard;
+			pushFragment();
+			/*
+			hideActionBarProgressBar();
+			enableFilterAction(false);
+			setSearchBarVisibilty(View.INVISIBLE);
+			setUpShareButton(((CardData)cardDetails.mDataObject).generalInfo.title.toLowerCase());
+			
+			*/
+			
+			//rLayout.setVisibility(View.GONE);
+			
+			
+			
+		//	startActivity(new Intent(this,TabletCardDetails.class));
+			
+			
+			setActionBarTitle("My Profile");
 			return;
 		}
 		case NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION: {
@@ -565,7 +618,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 			} else if (label
 					.equalsIgnoreCase(NavigationOptionsMenuAdapter.TVSHOWS)) {
 				data.requestType = CardExplorerData.REQUEST_BROWSE;
-				data.searchQuery = "tvshows";
+				data.searchQuery = "tvseries";
 				setActionBarTitle(NavigationOptionsMenuAdapter.TVSHOWS);
 			}else if(label.equalsIgnoreCase(NavigationOptionsMenuAdapter.DOWNLOADS)){
 				data.requestType = CardExplorerData.REQUEST_DOWNLOADS;
@@ -583,12 +636,12 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 				setActionBarTitle("myplex");
 				Log.e("", label);
 			}
-			if(this instanceof TabletCardDetails){
+/*			if(this instanceof TabletCardDetails){
 				myplexapplication.mSelectedOption_Tablet = screenType;
 				startActivity(new Intent(this,MultiPaneActivity.class));
 				finish();
 				return;
-			}
+			}*/
 			mCurrentFragment = mCardExplorer;
 			break;
 		}
@@ -852,4 +905,8 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		// TODO Auto-generated method stub
 		
 	}
+
+	
+
+
 }

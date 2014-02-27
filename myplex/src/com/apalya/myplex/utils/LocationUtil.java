@@ -3,7 +3,6 @@ package com.apalya.myplex.utils;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.ExecutionException;
 
 import android.content.Context;
 import android.location.Address;
@@ -13,7 +12,6 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-
 import com.apalya.myplex.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
@@ -86,7 +84,7 @@ public class LocationUtil
 		}
 		return params;
 	}
-	private  Location getLocation() 
+	public  Location getLocation() 
 	{
 		if(client!=null){
 			if(client.isConnected())
