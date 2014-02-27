@@ -64,6 +64,7 @@ import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.SearchData;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.data.SearchData.ButtonData;
+import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
@@ -140,7 +141,7 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 			return;
 		}
 //		mMainActivity.showActionBarProgressBar();
-
+		Analytics.SEARCH_TYPE = "actionbar";
 		String searchQuery = new String();
 		final List<CardData> searchString = new ArrayList<CardData>();
 		for (ButtonData data : mSearchbleTags) {
@@ -175,6 +176,7 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 			@Override
 			public void onClick(View v) {
 				Animation slideDown = AnimationUtils.loadAnimation(mContext, R.anim.slide_down);
+				Analytics.mixPanelDiscoveryOptionSelected();
 				slideDown.setAnimationListener(new AnimationListener() {
 					@Override
 					public void onAnimationStart(Animation animation) {

@@ -1,17 +1,25 @@
 package com.apalya.myplex.tablet;
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.ImageView;
-import android.widget.ListView;
 
 import com.apalya.myplex.R;
 import com.apalya.myplex.adapters.NavigationOptionsMenuAdapter;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.fragments.CardDetailsTabletFrag;
+import com.apalya.myplex.fragments.CardExplorer;
+import com.apalya.myplex.utils.Analytics;
+
+
+import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ListView;
+import android.content.Intent;
+import android.util.Log;
+import android.widget.ImageView;
 
 public class TabletCardDetails extends BaseActivity{
 	private ListView mLeftNavigationListView;
@@ -65,6 +73,8 @@ public class TabletCardDetails extends BaseActivity{
 	}
 	@Override
 	public void fillMenuItem() {
+		//Analytics.stoppedAt();
+		//Analytics.mixPanelVideoTimeCalculation(myplexapplication.mSelectedCard);
 		super.fillMenuItem();
 	}
 }
