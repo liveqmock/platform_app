@@ -331,8 +331,8 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		if(intent==null)
 			return false;
 		 
-		if(getIntent().hasExtra("_id")){
-			_id = getIntent().getExtras().getString("_id");
+		if(getIntent().hasExtra(mContext.getString(R.string._id))){
+			_id = getIntent().getExtras().getString(mContext.getString(R.string._id));
 			List<CardData> cards  =  new ArrayList<CardData>();
 			CardData cardData  = new CardData();
 			cardData._id = _id;
@@ -365,13 +365,13 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 			}
 		}
 		String action  = "";
-		if(intent.hasExtra("widget_click_event")){
-			action = intent.getStringExtra("widget_click_event");
+		if(intent.hasExtra(mContext.getString(R.string.page))){
+			action = intent.getStringExtra(mContext.getString(R.string.page));
 		}
 		if(action.length()>0){
-			if(action.equalsIgnoreCase("live_tv"))
+			if(action.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE))
 				selectItem(3);
-			else if(action.equalsIgnoreCase("movie"))
+			else if(action.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_MOVIE))
 				selectItem(2);
 			return true;
 		}

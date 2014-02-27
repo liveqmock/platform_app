@@ -66,6 +66,7 @@ public class EpgView implements ProgrammActionListener{
 		programmList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 		dateList.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
 		epgView.setVisibility(View.GONE);
+		setProgrammLoding();
 		String dayString  = calendar.get(Calendar.YEAR)+"-"+(calendar.get(Calendar.MONTH)+1)+"-"+calendar.get(Calendar.DAY_OF_MONTH);
 		fetchEPGData(dayString.trim());
 		fillDates();

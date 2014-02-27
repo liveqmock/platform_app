@@ -43,8 +43,8 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="2dp"
             android:background="@drawable/carddetails_bg"
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp">
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp">
 
             <View
                 android:id="@+id/myRectangleView"

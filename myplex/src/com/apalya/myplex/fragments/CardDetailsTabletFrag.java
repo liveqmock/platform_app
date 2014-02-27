@@ -189,15 +189,16 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		}
 		
 		if(mCardData.generalInfo.type != null && mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
-			mBottomScrollView.setVisibility(View.GONE);
-			//mPickerLayout.setVisibility(View.VISIBLE);
-			datePicker = (NumberPicker)rootView.findViewById(R.id.datePicker);
-			programmePicker = (NumberPicker)rootView.findViewById(R.id.programmPicker);		
-			datePicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
-			programmePicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
-			initNumberPickerWithLoading(datePicker);
-			initNumberPickerWithLoading(programmePicker);
 			
+		//	mBottomScrollView.setVisibility(View.GONE);
+//			mPickerLayout.setVisibility(View.VISIBLE);
+//			datePicker = (NumberPicker)rootView.findViewById(R.id.datePicker);
+//			programmePicker = (NumberPicker)rootView.findViewById(R.id.programmPicker);		
+//			datePicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
+//			programmePicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
+//			initNumberPickerWithLoading(datePicker);
+//			initNumberPickerWithLoading(programmePicker);
+//			
 			mRightSideLayout.setVisibility(View.GONE);
 			mCustomScrollView.setVisibility(View.VISIBLE);
 
@@ -637,14 +638,6 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 			return false;
 		}
 	}
-	
-	
-	
-	
-	
-	
-	
-	
 	public void initNumberPickerWithLoading(NumberPicker np) {
 		
 		String seasonValues[]  = new String[] { "Loading...", "Loading...","Loading..." };
@@ -670,17 +663,11 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		fillData();
 		mPlayer.updateCardPreviewImage(card);
 	}
-	
-	
-	
 	private void removePreviousViews(){
 		mDescriptionContentLayout.removeAllViews(); //1
 		mMediaContentLayout.removeAllViews(); //2
 
 		mCommentsContentLayout.removeAllViews(); //3
-
-
-		
 	}
 	
 	private void initialiseTVShow(View rootView) {
@@ -694,17 +681,6 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		mTvShowLinear.setVisibility(View.VISIBLE);
 	
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	private class TvShowManager implements ShowFetchListener{
 		@Override
 		public void onSeasonDataFetched(List<CardData> seasons) {
@@ -821,8 +797,9 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		mEPGLayout.setVisibility(View.VISIBLE);
 
 		View epgView  = epgview.createEPGView();
+		epgView.setBackgroundDrawable(null);
+		
 		mEPGLayout.addView(epgView);
-
 		
 		
 		/*

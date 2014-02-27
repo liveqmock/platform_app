@@ -257,4 +257,8 @@
     <string name="com_facebook_requesterror_reconnect">Please log into this app again to reconnect your Facebook account.</string>
     <string name="com_facebook_requesterror_permissions">This app doesn’t have permission to do this. To change permissions, try logging into the app again.</string>
 
+    <!-- Intents  for MainActivity-->
+    <string name="page">page</string>   
+    <string name="_id">_id</string>
+    
 </resources>

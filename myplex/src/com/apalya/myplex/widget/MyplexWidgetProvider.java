@@ -12,6 +12,7 @@ import android.widget.RemoteViews;
 import com.apalya.myplex.LoginActivity;
 import com.apalya.myplex.MainActivity;
 import com.apalya.myplex.R;
+import com.apalya.myplex.utils.ConsumerApi;
 
 public class MyplexWidgetProvider extends AppWidgetProvider 
 {
@@ -41,14 +42,14 @@ public class MyplexWidgetProvider extends AppWidgetProvider
 	            Log.d("amlan",intent.getAction()+" clicked");
 	            Intent liveTvIntent = new Intent(context, MainActivity.class);
 	            liveTvIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-	            liveTvIntent.putExtra("widget_click_event", "live_tv");
+	            liveTvIntent.putExtra(context.getString(R.string.page), ConsumerApi.VIDEO_TYPE_LIVE);
 	        	context.startActivity(liveTvIntent);
 
 	        }else if(MOVIE.equalsIgnoreCase(intent.getAction())){
 	        	Log.d("amlan",intent.getAction()+" clicked");
 	        	Intent movieIntent = new Intent(context, MainActivity.class);
 	        	movieIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-	        	movieIntent.putExtra("widget_click_event", "movie");
+	        	movieIntent.putExtra(context.getString(R.string.page), ConsumerApi.VIDEO_TYPE_MOVIE);
 	        	context.startActivity(movieIntent);
 	        }
 	    }
