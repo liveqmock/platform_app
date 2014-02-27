@@ -2,8 +2,10 @@ package com.apalya.myplex;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
 import java.util.Timer;
@@ -154,6 +156,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		changeVisibility(mTitleFilterSymbol,View.GONE);
 	}
 	private List<NavigationOptionsMenu> mMenuItemList = new ArrayList<NavigationOptionsMenu>();
+	private String _id;
 	private void fillMenuItem() {
 		
 	String email = myplexapplication.getUserProfileInstance().getUserEmail();
@@ -301,7 +304,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		};
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
 
-		if(!prepareWidgetEvent(getIntent())){
+		if(!onHandleExternalIntent(getIntent())){
 			if(ApplicationSettings.MODE_APP_TYPE == APP_TYPE.OFFLINE )
 				selectItem(2);
 			else
@@ -320,9 +323,43 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		Util.deserializeData(MainActivity.this);
 	}
 
-	private boolean prepareWidgetEvent(Intent intent) {
+	private boolean onHandleExternalIntent(Intent intent) {
 		if(intent==null)
 			return false;
+		 
+		if(getIntent().hasExtra("_id")){
+			_id = getIntent().getExtras().getString("_id");
+			List<CardData> cards  =  new ArrayList<CardData>();
+			CardData cardData  = new CardData();
+			cardData._id = _id;
+			cards.add(cardData);
+			if(_id!=null && _id.length() >0){
+				mCacheManager.getCardDetails(cards, IndexHandler.OperationType.FTSEARCH, new CacheManagerCallback() {					
+					@Override
+					public void OnOnlineResults(List<CardData> dataList) {
+					}					
+					@Override
+					public void OnOnlineError(VolleyError error) {
+					}					
+					@Override
+					public void OnCacheResults(HashMap<String, CardData> obj,
+							boolean issuedRequest) {
+						CardData data = null;
+						mCacheManager.unRegisterCallback();
+						 Iterator<Entry<String, CardData>> it = obj.entrySet().iterator();
+						    while (it.hasNext()) {
+						        Entry<String, CardData> pair = it.next();
+						        if(pair.getValue()._id.equalsIgnoreCase(_id)){
+						        	data = pair.getValue();
+						        }
+						    }
+						BaseFragment fragment = createFragment(NavigationOptionsMenuAdapter.CARDDETAILS_ACTION);
+						fragment.setDataObject(data);
+						bringFragment(fragment);
+					}
+				});
+			}
+		}
 		String action  = "";
 		if(intent.hasExtra("widget_click_event")){
 			action = intent.getStringExtra("widget_click_event");

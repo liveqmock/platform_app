@@ -3,35 +3,65 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="center"
-    android:background="@drawable/carddetails_bg" >
+    android:background="@android:color/transparent" >
 
     <LinearLayout
         android:id="@+id/linearLayout1"
         android:layout_width="match_parent"
-        android:layout_height="120dp" 
-        android:weightSum="5">
+        android:layout_height="108dp" >
 
-        <com.apalya.myplex.utils.NumberPicker
-            android:id="@+id/datePicker"
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            selectionDivider="@color/black" 
-            selectionDividerHeight="1px"
-            selectionDividersDistance="3dp"
-            android:layout_weight="1" />
+            android:layout_marginRight="2dp"
+            android:layout_marginLeft="2dp"
+            android:background="@drawable/carddetails_bg"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp" >
 
-        <com.apalya.myplex.utils.NumberPicker
-            android:id="@+id/programmPicker"
+            <View
+                android:id="@+id/myRectangleView"
+                android:layout_width="85dp"
+                android:layout_height="30dp"
+                android:layout_centerInParent="true"
+                android:layout_alignParentLeft="true"
+                android:background="@drawable/rectangle"
+                android:padding="10dp"
+                />
+
+            <com.apalya.myplex.views.ListView3d
+                android:id="@+id/dateList"
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:divider="@null"
+                android:scrollbars="none"
+               	android:layout_centerVertical="true" />
+        </RelativeLayout>
+
+        <RelativeLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp" 
-            android:gravity="center_horizontal"    
-            selectionDivider="@color/black" 
-            selectionDividerHeight="1px"
-            selectionDividersDistance="3dp"        
-            android:layout_weight="4"/>
+            android:layout_marginLeft="2dp"
+            android:background="@drawable/carddetails_bg"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp">
 
+            <View
+                android:id="@+id/myRectangleView"
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/rectangle_left"
+                 />
+
+            <com.apalya.myplex.views.ListView3d
+                android:id="@+id/programmList"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:divider="@null"
+                android:scrollbars="none" />
+        </RelativeLayout>
     </LinearLayout>
 
 </RelativeLayout>

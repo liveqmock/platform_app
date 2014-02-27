@@ -120,6 +120,7 @@
             	<action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
         	</intent-filter>
     	</receiver>
+        <receiver android:name=".receivers.ReminderReceiver"></receiver>
     
     </application>
     <!--  <receiver android:name="com.apalya.myplex.widget.MyplexWidgetProvider">
