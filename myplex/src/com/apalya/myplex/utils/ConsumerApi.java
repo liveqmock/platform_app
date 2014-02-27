@@ -104,6 +104,7 @@ public class ConsumerApi {
 	
 	// for live tv epg
 //	public static final String EPG_BASE_URL = "http://d2capp.apalya-auth.com/recording/epg/whatsOnIndiaXml.action?serviceId=";
+//	public static final String EPG_BASE_URL = "http://192.168.200.16:8080/recording/epg/getEPGScheduleXML.action?serviceId=";
 	public static final String EPG_BASE_URL = "http://220.226.22.120:8080/recording/epg/getEPGScheduleXML.action?serviceId=";
 	public static final String DAYS  = "days=";
 	public static final String DATE  = "rdate=";
@@ -170,12 +171,12 @@ public class ConsumerApi {
 				+ startIndex + AMPERSAND + LEVEL
 				+ level + AMPERSAND+COUNT;
 	}
-	public static String getPurchases(String level,int startIndex) {
+	public static String getPurchases(String level,int startIndex , String searchType) {
 		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH 
 				+ PURCHASEDLIST_ACTION + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY
 				+  AMPERSAND + STARTINDEX
 				+ startIndex + AMPERSAND + LEVEL
-				+ level + AMPERSAND+COUNT;
+				+ level + AMPERSAND + COUNT +  AMPERSAND + BROWSETYPE  + searchType ;
 	}
 	public static String getFavourite(String contentId) {
 		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + CONTENT_TAG +SLASH + contentId +SLASH

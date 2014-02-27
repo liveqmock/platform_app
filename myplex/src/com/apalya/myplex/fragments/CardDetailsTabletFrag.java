@@ -131,7 +131,7 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		if(mDataObject instanceof CardData){
+		if(mDataObject != null && mDataObject instanceof CardData){
 			mCardData = (CardData) mDataObject;
 		}
 		Log.d(TAG,"content ID ="+mCardData._id);
@@ -189,18 +189,19 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		}
 		
 		if(mCardData.generalInfo.type != null && mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
-			mBottomScrollView.setVisibility(View.GONE);
-			//mPickerLayout.setVisibility(View.VISIBLE);
-			datePicker = (NumberPicker)rootView.findViewById(R.id.datePicker);
-			programmePicker = (NumberPicker)rootView.findViewById(R.id.programmPicker);		
-			datePicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
-			programmePicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
-			initNumberPickerWithLoading(datePicker);
-			initNumberPickerWithLoading(programmePicker);
 			
+		//	mBottomScrollView.setVisibility(View.GONE);
+//			mPickerLayout.setVisibility(View.VISIBLE);
+//			datePicker = (NumberPicker)rootView.findViewById(R.id.datePicker);
+//			programmePicker = (NumberPicker)rootView.findViewById(R.id.programmPicker);		
+//			datePicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
+//			programmePicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
+//			initNumberPickerWithLoading(datePicker);
+//			initNumberPickerWithLoading(programmePicker);
+//			
 			mRightSideLayout.setVisibility(View.GONE);
 			mCustomScrollView.setVisibility(View.VISIBLE);
-
+			
 
 			createEPGView(rootView);
 			fillDataForTV();
@@ -637,14 +638,6 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 			return false;
 		}
 	}
-	
-	
-	
-	
-	
-	
-	
-	
 	public void initNumberPickerWithLoading(NumberPicker np) {
 		
 		String seasonValues[]  = new String[] { "Loading...", "Loading...","Loading..." };
@@ -670,17 +663,11 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		fillData();
 		mPlayer.updateCardPreviewImage(card);
 	}
-	
-	
-	
 	private void removePreviousViews(){
 		mDescriptionContentLayout.removeAllViews(); //1
 		mMediaContentLayout.removeAllViews(); //2
 
 		mCommentsContentLayout.removeAllViews(); //3
-
-
-		
 	}
 	
 	private void initialiseTVShow(View rootView) {
@@ -694,17 +681,6 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		mTvShowLinear.setVisibility(View.VISIBLE);
 	
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	private class TvShowManager implements ShowFetchListener{
 		@Override
 		public void onSeasonDataFetched(List<CardData> seasons) {
@@ -819,10 +795,10 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		EpgView epgview =new EpgView(mCardData, mContext);
 		epgview.setCardVideoPlayer(mPlayer);
 		mEPGLayout.setVisibility(View.VISIBLE);
-
+		
 		View epgView  = epgview.createEPGView();
+		
 		mEPGLayout.addView(epgView);
-
 		
 		
 		/*

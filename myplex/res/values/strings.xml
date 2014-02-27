@@ -84,6 +84,8 @@
     <string name="add_live_tv_review">add a live tv review</string>
     <string name="loading">loading</string>
     <string name="jump_to_episode">jump to episode</string>
+    <string name="pref_state">pref_state</string>
+    <string name="state">state</string>
     
     <string name="stream">stream</string>	
     <string name="download">download</string>			
@@ -139,6 +141,9 @@
     <string name="iconshare">&#xF601;</string>
     <string name="record_play">&#x25B6;</string>
     <!--Navigation drawer icons-->
+
+	<string name="reminder_icon">&#x23F0;</string>
+	<string name="play_icon">&#x25B6;</string>
     
     <string-array name="hometabletanim">
         <item>Bottom-In</item>
@@ -252,4 +257,8 @@
     <string name="com_facebook_requesterror_reconnect">Please log into this app again to reconnect your Facebook account.</string>
     <string name="com_facebook_requesterror_permissions">This app doesn’t have permission to do this. To change permissions, try logging into the app again.</string>
 
+    <!-- Intents  for MainActivity-->
+    <string name="page">page</string>   
+    <string name="_id">_id</string>
+    
 </resources>

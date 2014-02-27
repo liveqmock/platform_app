@@ -17,84 +17,40 @@
             android:layout_height="wrap_content"
             android:background="#000000" >
         </RelativeLayout>
+
         <LinearLayout
-				android:id="@+id/epg_linear_layout"
-				android:layout_width="match_parent"
-				android:layout_height="wrap_content"
-				android:layout_marginLeft="@dimen/margin_gap_12"
-				android:layout_marginRight="@dimen/margin_gap_12"			
-				android:visibility="gone"				
-				android:background="@drawable/carddetails_bg"
-				
-				>
-			    <LinearLayout
-        android:id="@+id/linearLayout1"
-        android:layout_width="match_parent"
-        android:layout_height="120dp" 
-        android:weightSum="5">
-
-        <com.apalya.myplex.utils.NumberPicker
-            android:id="@+id/datePicker"
-            android:layout_width="wrap_content"
+            android:id="@+id/epg_linear_layout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            selectionDivider="@color/black" 
-            selectionDividerHeight="1px"
-            selectionDividersDistance="3dp"
-            android:layout_weight="1" />
+            android:layout_marginLeft="@dimen/margin_gap_12"
+            android:layout_marginRight="@dimen/margin_gap_12"
+			android:background="@android:color/transparent"		
+            />
 
-        <com.apalya.myplex.utils.NumberPicker
-            android:id="@+id/programmPicker"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="5dp" 
-            android:gravity="center_horizontal"    
-            selectionDivider="@color/black" 
-            selectionDividerHeight="1px"
-            selectionDividersDistance="3dp"        
-            android:layout_weight="4"/>
+        <LinearLayout
+            android:id="@+id/carddetailtablet_seasonEpisodePicker"
+            android:layout_width="fill_parent"
+            android:layout_height="108dp"
+            android:background="@drawable/carddetails_bg"
+            android:visibility="gone" >
 
-    </LinearLayout>	
-            
-            
-            
-            
-            
-            
-            
-            
-            
-            
-			</LinearLayout>
-         
-        <LinearLayout 
-                android:id="@+id/carddetailtablet_seasonEpisodePicker"
-                android:layout_width="fill_parent"
-               	android:layout_height="108dp"
-							
-				android:visibility="gone"
-				android:background="@drawable/carddetails_bg"
-               >
-                 <com.apalya.myplex.utils.NumberPicker
-                        android:id="@+id/numberPickerSeason"
-                        android:layout_width="110dp"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="6dp"
-                        selectionDividerHeight="1px"
-            			selectionDividersDistance="3dp"
-                       
-                        />
+            <com.apalya.myplex.utils.NumberPicker
+                android:id="@+id/numberPickerSeason"
+                android:layout_width="110dp"
+                android:layout_height="wrap_content"
+                android:layout_margin="6dp"
+                selectionDividerHeight="1px"
+                selectionDividersDistance="3dp" />
 
-                    <com.apalya.myplex.utils.NumberPicker
-            	         android:id="@+id/numberPickerEpisode"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_margin="6dp"
-                         android:layout_marginLeft="12dip" 
-                         selectionDividerHeight="1px"
-            			selectionDividersDistance="3dp"
-                      />
-          </LinearLayout>
+            <com.apalya.myplex.utils.NumberPicker
+                android:id="@+id/numberPickerEpisode"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="6dp"
+                android:layout_marginLeft="12dip"
+                selectionDividerHeight="1px"
+                selectionDividersDistance="3dp" />
+        </LinearLayout>
 
         <ScrollView
             android:id="@+id/carddetailtablet_descriptionscroll_view"
@@ -104,21 +60,16 @@
             android:layout_marginLeft="@dimen/margin_gap_12"
             android:layout_marginRight="@dimen/margin_gap_12"
             android:background="@drawable/carddetails_bg"
-            android:scrollbars="none" 
+            android:scrollbars="none"
             android:visibility="visible" >
-              <LinearLayout
+
+            <LinearLayout
                 android:id="@+id/carddetailtablet_multimedialayout"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:orientation="vertical"
-                >
+                android:orientation="vertical" >
             </LinearLayout>
         </ScrollView>
-            
-            
-            
-
-          
     </LinearLayout>
 
     <LinearLayout
@@ -144,8 +95,8 @@
                 android:id="@+id/carddetailtablet_descriptiondetaillayout"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:paddingBottom="4dp"
-                android:orientation="vertical" >
+                android:orientation="vertical"
+                android:paddingBottom="4dp" >
             </LinearLayout>
         </ScrollView>
 
@@ -163,32 +114,31 @@
                 android:id="@+id/carddetailtablet_commentlayout"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"
-                android:orientation="vertical"
-                 >
+                android:orientation="vertical" >
             </LinearLayout>
         </ScrollView>
     </LinearLayout>
-    <com.apalya.myplex.views.CustomScrollView
-                android:id="@+id/carddetailtable_right_scroll_view"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/tvshow_linear_layout"
-                android:layout_weight="4"
-                
-                android:background="#e6e6e6"
-                android:scrollbars="none" 
-                android:visibility="gone">
 
-                <LinearLayout
-                    android:id="@+id/carddetailtablet_rightlayout"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="@dimen/margin_gap_12"
-                    android:layout_marginLeft="@dimen/margin_gap_12"
-                    android:layout_marginRight="@dimen/margin_gap_12"
-                    android:animateLayoutChanges="true"
-                    android:orientation="vertical" >
-               </LinearLayout>
-       </com.apalya.myplex.views.CustomScrollView>
+    <com.apalya.myplex.views.CustomScrollView
+        android:id="@+id/carddetailtable_right_scroll_view"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvshow_linear_layout"
+        android:layout_weight="4"
+        android:background="#e6e6e6"
+        android:scrollbars="none"
+        android:visibility="gone" >
+
+        <LinearLayout
+            android:id="@+id/carddetailtablet_rightlayout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/margin_gap_12"
+            android:layout_marginLeft="@dimen/margin_gap_12"
+            android:layout_marginRight="@dimen/margin_gap_12"
+            android:animateLayoutChanges="true"
+            android:orientation="vertical" >
+        </LinearLayout>
+    </com.apalya.myplex.views.CustomScrollView>
 
 </LinearLayout>
