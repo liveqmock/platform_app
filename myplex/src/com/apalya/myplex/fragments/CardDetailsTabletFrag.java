@@ -607,6 +607,7 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		// TODO Auto-generated method stub
 		
 	}
+	//copied from CardDetails for Analytics
 	@Override
 	public boolean onBackClicked() {
 		try{
