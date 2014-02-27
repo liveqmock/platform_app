@@ -197,7 +197,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		};
 		task.execute();
 
-//		Crashlytics.start(this);
+		Crashlytics.start(this);
 
 		FontUtil.loadFonts(getAssets());
 		String trackingDistinctId = getTrackingDistinctId();
