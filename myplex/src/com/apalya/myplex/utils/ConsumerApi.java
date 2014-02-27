@@ -171,12 +171,12 @@ public class ConsumerApi {
 				+ startIndex + AMPERSAND + LEVEL
 				+ level + AMPERSAND+COUNT;
 	}
-	public static String getPurchases(String level,int startIndex) {
+	public static String getPurchases(String level,int startIndex , String searchType) {
 		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH 
 				+ PURCHASEDLIST_ACTION + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY
 				+  AMPERSAND + STARTINDEX
 				+ startIndex + AMPERSAND + LEVEL
-				+ level + AMPERSAND+COUNT;
+				+ level + AMPERSAND + COUNT +  AMPERSAND + BROWSETYPE  + searchType ;
 	}
 	public static String getFavourite(String contentId) {
 		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + CONTENT_TAG +SLASH + contentId +SLASH

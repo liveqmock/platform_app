@@ -5,10 +5,16 @@ import java.util.HashMap;
 public class StateLanguageUtils 
 {
 	private HashMap<String, String> hashMap = new HashMap<String, String>();
+	private static StateLanguageUtils utils = null;
 	
-	public StateLanguageUtils() {
-		init();
+	private StateLanguageUtils() {
 	}
+	public static StateLanguageUtils getInstance(){
+		if(utils==null)
+			utils = new StateLanguageUtils();
+		return utils;
+	}
+	
 	
 	public void init() {
 		hashMap.put("Andhra Pradesh", "Telugu");

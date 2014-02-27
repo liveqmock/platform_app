@@ -24,8 +24,8 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/margin_gap_12"
             android:layout_marginRight="@dimen/margin_gap_12"
-            android:background="@drawable/carddetails_bg"
-            android:visibility="gone" />
+			android:background="@android:color/transparent"		
+            />
 
         <LinearLayout
             android:id="@+id/carddetailtablet_seasonEpisodePicker"

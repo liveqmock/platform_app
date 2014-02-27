@@ -13,7 +13,6 @@ import android.support.v4.app.NotificationCompat;
 
 import com.apalya.myplex.MainActivity;
 import com.apalya.myplex.R;
-import com.apalya.myplex.data.CardData;
 
 public class ReminderReceiver extends BroadcastReceiver {
 
@@ -24,10 +23,13 @@ public class ReminderReceiver extends BroadcastReceiver {
 	
 		 
 				Bundle extras=intent.getExtras();
-				CardData data = (CardData) intent.getSerializableExtra("object");
+				if(extras == null || 
+						extras.getString("_id")==null ||
+							extras.getString("_id").length() <1)
+					return;
+					
 				Intent notificationIntent = new Intent(context, MainActivity.class);
 				notificationIntent.putExtra("_id", extras.getString("_id"));
-				notificationIntent.putExtra("card_obj",data);
 				PendingIntent contentIntent = PendingIntent.getActivity(context,
 				                0, notificationIntent,
 				                PendingIntent.FLAG_CANCEL_CURRENT);

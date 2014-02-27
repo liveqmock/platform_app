@@ -13,7 +13,7 @@ import android.widget.TextView;
 import com.apalya.myplex.R;
 import com.apalya.myplex.utils.FontUtil;
 
-public class DaysAdapter extends BaseAdapter {
+public class StringAdapter extends BaseAdapter {
 	
 	private Context context;
 	private String[] days;
@@ -21,7 +21,7 @@ public class DaysAdapter extends BaseAdapter {
 //	private TextView day;
 	private int presentIndex;
 
-	public DaysAdapter(Context context, String[] days) {
+	public StringAdapter(Context context, String[] days) {
 		
 		this.context = context;
 		this.days = new String[days.length];

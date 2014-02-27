@@ -131,7 +131,7 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		if(mDataObject instanceof CardData){
+		if(mDataObject != null && mDataObject instanceof CardData){
 			mCardData = (CardData) mDataObject;
 		}
 		Log.d(TAG,"content ID ="+mCardData._id);
@@ -201,7 +201,7 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 //			
 			mRightSideLayout.setVisibility(View.GONE);
 			mCustomScrollView.setVisibility(View.VISIBLE);
-
+			
 
 			createEPGView(rootView);
 			fillDataForTV();
@@ -795,9 +795,8 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		EpgView epgview =new EpgView(mCardData, mContext);
 		epgview.setCardVideoPlayer(mPlayer);
 		mEPGLayout.setVisibility(View.VISIBLE);
-
+		
 		View epgView  = epgview.createEPGView();
-		epgView.setBackgroundDrawable(null);
 		
 		mEPGLayout.addView(epgView);
 		

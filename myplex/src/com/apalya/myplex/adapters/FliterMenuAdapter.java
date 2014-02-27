@@ -27,11 +27,13 @@ public class FliterMenuAdapter extends ArrayAdapter<FilterMenudata>
 	public LayoutInflater mInflater;
 	private List<FilterMenudata> mMenuDataList = new ArrayList<FilterMenudata>();
 	private String state,language;
+	private String[] languagePreferences = new String[]{"Hindi","English"};
 
 	public void setDataList(List<FilterMenudata> menuDataList){
 		state = SharedPrefUtils.getFromSharedPreference(mContext, mContext.getString(R.string.pref_state));
 		if(state != null && state.length() >0){
-			StateLanguageUtils languageUtils = new StateLanguageUtils();
+			StateLanguageUtils languageUtils = StateLanguageUtils.getInstance();
+			languageUtils.init();
 			language = languageUtils.getLanguage(state);
 			if(language != null && language.length() >0){
 				Collections.sort(menuDataList,new CoutComparator());
@@ -97,17 +99,16 @@ public class FliterMenuAdapter extends ArrayAdapter<FilterMenudata>
 				return -1;
 			}else if(rhsString.equalsIgnoreCase( language )){
 				return 1;
-			}else if(lhsString.equalsIgnoreCase( "Hindi" )){
-				return -1;
-			}else if(rhsString.equalsIgnoreCase( "Hindi" )){
-				return 1;
-			}else if(lhsString.equalsIgnoreCase( "English" )){
-				return -1;
-			}else if(rhsString.equalsIgnoreCase( "English" )){
-				return 1;
-			}else {
-				return 0;
+			}			
+			for(int i=0;i<languagePreferences.length;i++){
+				String preferedLanguage = languagePreferences[i];
+				if(lhsString.equalsIgnoreCase(preferedLanguage)){
+					return -1;
+				}else if(rhsString.equalsIgnoreCase(preferedLanguage)){
+					return 1;
+				}
 			}
+			return 0;
 		}
 	}
 	private class CoutComparator implements Comparator<FilterMenudata>{

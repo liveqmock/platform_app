@@ -524,7 +524,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			requestUrl = ConsumerApi.getFavourites(ConsumerApi.LEVELDYNAMIC,mData.mStartIndex);
 		}else if(mData.requestType == CardExplorerData.REQUEST_PURCHASES){
 			screenName="Purchases";
-			requestUrl = ConsumerApi.getPurchases(ConsumerApi.LEVELDYNAMIC,mData.mStartIndex);
+			String searchType = ConsumerApi.VIDEO_TYPE_LIVE+","+ConsumerApi.VIDEO_TYPE_MOVIE+","+ConsumerApi.TYPE_TV_SEASON;
+			requestUrl = ConsumerApi.getPurchases(ConsumerApi.LEVELDYNAMIC,mData.mStartIndex,searchType);
 			requestMethod = Method.POST;
 		}else if(mData.requestType == CardExplorerData.REQUEST_BROWSE){
 			screenName="Browse" + mData.searchQuery;

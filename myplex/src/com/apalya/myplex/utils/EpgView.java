@@ -28,7 +28,7 @@ import com.android.volley.Response.Listener;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.EPGRequest;
 import com.apalya.myplex.R;
-import com.apalya.myplex.adapters.DaysAdapter;
+import com.apalya.myplex.adapters.StringAdapter;
 import com.apalya.myplex.adapters.EpgAdapter;
 import com.apalya.myplex.adapters.EpgAdapter.ProgrammActionListener;
 import com.apalya.myplex.data.CardData;
@@ -47,7 +47,7 @@ public class EpgView implements ProgrammActionListener{
 	private Calendar calendar;
 	private ListView programmList,dateList;
 	private EpgAdapter adapter;
-	private DaysAdapter daysAdapter;
+	private StringAdapter daysAdapter;
 	private int progSelectedIndex = 0, dateSelectedIndex =0;
 	private String days[] =  new String[9];
 	
@@ -110,7 +110,7 @@ public class EpgView implements ProgrammActionListener{
 		days[0] = "";
 		days[8] = "";
 
-		daysAdapter = new DaysAdapter(mContext, days);
+		daysAdapter = new StringAdapter(mContext, days);
 		
 		dateList.setOnItemClickListener(new OnItemClickListener() {
 			@Override
