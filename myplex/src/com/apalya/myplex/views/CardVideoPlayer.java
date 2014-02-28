@@ -370,6 +370,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 				 fetchUrl(null);
 				mVideoViewParent.setOnClickListener(null);
 				Analytics.startVideoTime();
+				Analytics.gaPlayedMovieEvent(mData, 0);
 			}
 			// TODO Auto-generated method stub
 

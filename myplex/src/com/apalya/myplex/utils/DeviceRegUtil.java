@@ -23,6 +23,8 @@ import com.apalya.myplex.data.myplexapplication;
 
 public class DeviceRegUtil {
 	public static final String TAG = "DeviceRegUtil";
+	public static final int ONE = 1;
+	public static final int TWO = 2;
 	private Context mContext;
 	ProgressDialog mProgressDialog;
 	
@@ -49,8 +51,7 @@ public class DeviceRegUtil {
 		};
 		myReg.setShouldCache(false);
 		queue.add(myReg);
-		//mixPanelDeviceRegisterInitiated(1);
-		Analytics.mixPanelDeviceDeRegisterInitiated(1);
+		Analytics.mixPanelDeviceDeRegisterInitiated(ONE);
 		mProgressDialog = ProgressDialog.show(mContext,"", "UnRegistering device..", true,false);
 		
 		Log.e(TAG, "requestUrl: "+url);
@@ -80,7 +81,7 @@ public class DeviceRegUtil {
 
 					{
 						String msg =jsonResponse.getString("message");
-						Analytics.mixPanelDeviceDeRegisterInitiated(2);
+						Analytics.mixPanelDeviceDeRegisterInitiated(TWO);
 						if(!TextUtils.isEmpty(msg)){
 							Util.showToast(mContext, msg, Util.TOAST_TYPE_ERROR);
 							LogOutUtil.onClickLogout(mContext);

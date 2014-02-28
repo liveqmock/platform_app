@@ -764,7 +764,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 					Crashlytics.logException(new DRMException("acquireRights failed, status:"+status + " \n url:"+url));
 				}
 				//mixPanelUnableToPlayVideo(Analytics.ACQUIRE_RIGHTS_FAILED);
-				Analytics.mixPanelUnableToPlayVideo2(Analytics.ACQUIRE_RIGHTS_FAILED);
+				Analytics.mixPanelUnableToPlayVideo(Analytics.ACQUIRE_RIGHTS_FAILED);
 				Util.showToast(mContext, "Acquire Rights Failed", Util.TOAST_TYPE_INFO);
 				//closeSession();
 				if(mPlayerListener!=null)
@@ -872,7 +872,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 					break;
 			}
 				//mixPanelUnableToPlayVideo(errMsg);
-				Analytics.mixPanelUnableToPlayVideo2(errMsg);
+				Analytics.mixPanelUnableToPlayVideo(errMsg);
 				Util.showToast(mContext,errMsg+" ("+status+")",Util.TOAST_TYPE_INFO);
 				startPlayer(false);
 				//drmManager.
@@ -881,7 +881,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 			if(status == Settings.WIDEVINE_AUTH_FAILED){
 				//TODO Refresh purchase detail for content id.
 				//mixPanelUnableToPlayVideo(Analytics.WIDEVINE_AUTH_FAILED);
-				Analytics.mixPanelUnableToPlayVideo2(Analytics.WIDEVINE_AUTH_FAILED);
+				Analytics.mixPanelUnableToPlayVideo(Analytics.WIDEVINE_AUTH_FAILED);
 			}
 			if(status == 608 || status == 607){
 				 iPlayerStarted=false;

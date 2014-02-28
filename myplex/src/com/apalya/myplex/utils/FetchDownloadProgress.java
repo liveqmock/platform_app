@@ -105,7 +105,8 @@ public class FetchDownloadProgress {
 						mDownloadData.mCompleted = true;
 						mDownloadData.mPercentage = 100;
 						//for Analytics //Util.java startDownload() method the Analytics.downloadStartTime is initialized
-						long startTime = SharedPrefUtils.getLongFromSharedPreference(mContext, Analytics.downLoadStartTime);
+						String key = mCardData.generalInfo._id+Analytics.UNDERSCORE+Analytics.downLoadStartTime;
+						long startTime = SharedPrefUtils.getLongFromSharedPreference(mContext, key);
 						long timetakenForDownload = System.currentTimeMillis() - startTime;
 						long timeInMinutes = TimeUnit.MILLISECONDS.toMinutes(timetakenForDownload);
 						long mb=1024L*1024L;

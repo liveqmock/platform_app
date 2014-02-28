@@ -138,14 +138,14 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 		params.put(Analytics.CONTENT_TYPE_PROPERTY, ctype); //4
 		params.put(Analytics.PAY_PURCHASE_TYPE, commercialModel); //Rental or buy //5
 		params.put(Analytics.PAYMENT_METHOD, paymentModel); //cc or dc //6
-		if("live tv".equalsIgnoreCase(ctype)) {
+		if(Analytics.CONSTANT_LIVETV.equalsIgnoreCase(ctype)) {
 			params.put(Analytics.CONTENT_QUALITY, "not applicable");
 		}
-		else if("movies".equalsIgnoreCase(ctype)){
+		else if(Analytics.CONSTANT_MOVIES.equalsIgnoreCase(ctype)){
 			params.put(Analytics.CONTENT_QUALITY, contentType); //SD or HD //7
-			String str = "analytics";
+			String str = Analytics.ANALYTICS;
 			String value = commercialModel+":"+contentType;
-			String key = subscribedData._id+"analytics";
+			String key = subscribedData._id+ Analytics.ANALYTICS;
 			SharedPrefUtils.writeToSharedPref(myplexapplication.getAppContext(), key, value);//storing rental/buy &SD/HD info for analytics
 		}
 		params.put(Analytics.USER_ID,Analytics.getUserEmail());//8
@@ -155,18 +155,71 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 			params.put(Analytics.LANGUAGE,subscribedData.content.language.get(0));
 		}
 		else {
-			params.put(Analytics.LANGUAGE,"Not available");
+			params.put(Analytics.LANGUAGE,Analytics.UNAVAILABLE);
 		}
 		params.put(Analytics.PAYMENT_METHOD, paymentModel); 
 		
 		return params;
 	}
 	
+	private void mixPanelPaySuccess2(CardData subscribedData) {
+		if(subscribedData == null ) return;
+		if(subscribedData.generalInfo == null ) return;
+		String event = Analytics.EVENT_PAID_FOR_CONTENT;
+		String str =  Analytics.ANALYTICS;
+		String value = commercialModel+":"+contentType;
+		//This data will be used to capture storing rental/buy &SD/HD info while playing video
+		SharedPrefUtils.writeToSharedPref(this, "subscribedData._id"+str, value);
+		
+		String ctype = Analytics.movieOrLivetv(subscribedData.generalInfo.type);
+		
+		Map<String,String> paramslive = new HashMap<String, String>();
+		paramslive = mixpanelProperties(subscribedData, paramslive);
+		
+		if(isCouponApplied()) { //discounted through coupon
+			if(priceTobecharged2 > 0) {
+				paramslive.put(Analytics.COUPON_USED,"TRUE");
+				paramslive.put(Analytics.PAY_CONTENT_PRICE,priceTobecharged2+""); //8
+				paramslive.put(Analytics.COUPON_DISCOUNT,Analytics.couponDiscountINR+"");
+				Analytics.priceTobecharged = 0;
+				Analytics.couponDiscountINR = 0;
+			}
+			if(priceTobecharged2 == 0) {
+				//subscribed free
+				freeSubscription(subscribedData);
+			}
+		}
+		else{ //regular price
+			paramslive.put(Analytics.COUPON_USED,Analytics.FALSE);
+			paramslive.put(Analytics.COUPON_DISCOUNT,0+"");//set to zero
+			paramslive.put(Analytics.PAY_CONTENT_PRICE,contentPrice+""); //8
+		}
+		
+		if("live tv".equals(ctype)) {
+			Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_LIVETV_PURCHASED_FOR,priceTobecharged2); //mixpanel people
+			Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_TOTAL_PURCHASES,priceTobecharged2); //mixpanel people
+		} 
+		else if("tvshow".equals(ctype)) {
+			Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_LIVETV_SHOW_PURCHASED_FOR,priceTobecharged2); //mixpanel people
+			Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_TOTAL_PURCHASES,priceTobecharged2); //mixpanel people
+		} 
+		else if("movies".equals(ctype)) {
+			Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_MOVIES_PURCHASED_FOR,priceTobecharged2); //people
+			Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_TOTAL_PURCHASES,priceTobecharged2); //people
+		}
+		Analytics.trackEvent(event,paramslive);
+		Analytics.trackCharge(priceTobecharged2);
+		Analytics.createTransactionGA(transactionid, paymentModel,priceTobecharged2, 0.0,0.0); //GA transaction
+		Analytics.createItemGA(transactionid, contentName,packageId, ctype+" "+commercialModel, priceTobecharged2, 1L); //GA transaction */
+		
+	}
+
+	
 	private void mixPanelPaySuccess(CardData subscribedData) {
 			if(subscribedData == null ) return;
 			if(subscribedData.generalInfo == null ) return;
 			
-			String str = "analytics";
+			String str =Analytics.ANALYTICS;
 			String value = commercialModel+":"+contentType;
 			//This data will be used to capture storing rental/buy &SD/HD info while playing video
 			SharedPrefUtils.writeToSharedPref(this, "subscribedData._id"+str, value);
@@ -188,7 +241,7 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 						Analytics.trackEvent(eventlive,paramslive);
 						Analytics.trackCharge(priceTobecharged2);
 						Analytics.createTransactionGA(transactionid, paymentModel,priceTobecharged2, 0.0,0.0); //GA transaction
-						Analytics.createItemGA(transactionid, contentName,contentId, ctype, priceTobecharged2, 1L); //GA transaction
+						Analytics.createItemGA(transactionid, contentName,packageId, ctype+" "+commercialModel, priceTobecharged2, 1L); //GA transaction
 						Analytics.priceTobecharged = 0;
 						Analytics.couponDiscountINR = 0;
 						return;
@@ -207,7 +260,7 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 					Analytics.trackEvent(eventlive,paramslive);
 					Analytics.trackCharge(priceTobecharged2);
 					Analytics.createTransactionGA(transactionid, paymentModel,contentPrice, 0.0,0.0); //GA transaction
-					Analytics.createItemGA(transactionid, contentName,contentId, ctype, contentPrice, 1L); //GA transaction
+					Analytics.createItemGA(transactionid, contentName,packageId, ctype+" "+commercialModel, contentPrice, 1L); //GA transaction
 					return;
 				}
 				
@@ -228,7 +281,7 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 						Analytics.trackEvent(eventlive,paramslive);
 						Analytics.trackCharge(priceTobecharged2);
 						Analytics.createTransactionGA(transactionid, paymentModel,priceTobecharged2, 0.0,0.0); //GA transaction
-						Analytics.createItemGA(transactionid, contentName,contentId, ctype, priceTobecharged2, 1L); //GA transaction
+						Analytics.createItemGA(transactionid, contentName,packageId, ctype+" "+commercialModel, priceTobecharged2, 1L); //GA transaction
 						Analytics.priceTobecharged = 0;
 						Analytics.couponDiscountINR = 0;
 						return;
@@ -247,7 +300,7 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 					Analytics.trackEvent(eventlive,paramslive);
 					Analytics.trackCharge(priceTobecharged2);
 					Analytics.createTransactionGA(transactionid, paymentModel,contentPrice, 0.0,0.0); //GA transaction
-					Analytics.createItemGA(transactionid, contentName,contentId, ctype, contentPrice, 1L); //GA transaction
+					Analytics.createItemGA(transactionid, contentName,packageId, ctype+" "+commercialModel, contentPrice, 1L); //GA transaction
 					return;
 				}
 				
@@ -269,7 +322,7 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 						Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_MOVIES_PURCHASED_FOR,priceTobecharged2); //people
 						Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_TOTAL_PURCHASES,priceTobecharged2); //people
 						Analytics.createTransactionGA(transactionid, paymentModel,priceTobecharged2, 0.0,0.0); //GA transaction
-						Analytics.createItemGA(transactionid, contentName,contentId, ctype, priceTobecharged2, 1L);//GA transaction
+						Analytics.createItemGA(transactionid, contentName,packageId, ctype+" "+commercialModel, priceTobecharged2, 1L);//GA transaction
 						Analytics.priceTobecharged = 0;
 						Analytics.couponDiscountINR = 0;
 						return;
@@ -290,7 +343,7 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 					Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_MOVIES_PURCHASED_FOR,contentPrice);
 					Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_TOTAL_PURCHASES,contentPrice);
 					Analytics.createTransactionGA(transactionid, paymentModel,contentPrice, 0.0,0.0);
-					Analytics.createItemGA(transactionid, contentName,packageId, ctype, contentPrice, 1L);//packageid as sku
+					Analytics.createItemGA(transactionid, contentName,packageId, ctype+" "+commercialModel, contentPrice, 1L);//packageid as sku
 					return;
 				}
 				
@@ -314,78 +367,18 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 		
 		if("live tv".equals(ctype)) {
 			people.set(Analytics.PEOPLE_FREE_TV_SUBSCRIPTIONS, 1);
-		}
-		if("tvshow".equals(ctype)) {
+		}else if("tvshow".equals(ctype)) {
 			people.set(Analytics.PEOPLE_FREE_TV_SHOW_SUBSCRIPTIONS, 1);
 		}
 		else if("movies".equals(ctype)) {
 			if("Rental".equalsIgnoreCase(commercialModel)) {
 				people.set(Analytics.PEOPLE_FREE_MOVIE_RENTALS, 1);
 			}
-			if("Buy".equalsIgnoreCase(commercialModel)) {
+			else if("Buy".equalsIgnoreCase(commercialModel)) {
 				people.set(Analytics.PEOPLE_FREE_DOWNLOADS_TO_OWN, 1);
 			}
 			
 		}
-	}
-	
-	private void mixPanelPaySuccessCopy(CardData subscribedData) {
-		if(subscribedData == null ) return;
-		if(subscribedData.generalInfo == null ) return;
-		Map<String,String> params=new HashMap<String, String>();
-		String str = "analytics";
-		String value = commercialModel+":"+contentType;
-		SharedPrefUtils.writeToSharedPref(this, "subscribedData._id"+str, value);//storing rental/buy &SD/HD info for analytics
-		params.put(Analytics.CONTENT_ID_PROPERTY, subscribedData._id);//1
-		params.put(Analytics.CONTENT_NAME_PROPERTY, subscribedData.generalInfo.title);//2
-		String ctype = Analytics.movieOrLivetv(subscribedData.generalInfo.type); //movie or livetv //3
-		params.put(Analytics.CONTENT_TYPE_PROPERTY, ctype); //4
-		params.put(Analytics.PAY_PURCHASE_TYPE, commercialModel); //Rental or buy //5
-		params.put(Analytics.PAYMENT_METHOD, paymentModel); //cc or dc //6
-		params.put(Analytics.CONTENT_QUALITY, contentType); //SD or HD //7
-		params.put(Analytics.USER_ID,Analytics.getUserEmail());//8
-		String event = Analytics.EVENT_PAID_FOR_CONTENT;
-		//String event = Analytics.EVENT_PAID_FOR + Analytics.EMPTY_SPACE+subscribedData.generalInfo.title;
-		if("live tv".equals(ctype)) {
-			Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_LIVETV_PURCHASED_FOR,contentPrice);
-			Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_TOTAL_PURCHASES,contentPrice);
-			Analytics.trackEvent(event,params);
-			Analytics.createTransactionGA(transactionid, paymentModel,contentPrice, 0.0,0.0);
-			Analytics.createItemGA(transactionid, contentName,contentId, ctype, contentPrice, 1L);
-			return;
-		}
-		
-		if(couponCode != null && couponCode.length() > 0) { //coupon is applied
-			params.put(Analytics.COUPON_USED,"TRUE");
-			params.put(Analytics.COUPON_DISCOUNT,Analytics.couponDiscountINR+"");
-			if(priceTobecharged2 > 0) {
-				params.put(Analytics.PAY_CONTENT_PRICE,priceTobecharged2+""); //8
-				Analytics.trackEvent(event,params);
-				Analytics.trackCharge(priceTobecharged2);
-				Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_MOVIES_PURCHASED_FOR,priceTobecharged2);
-				Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_TOTAL_PURCHASES,priceTobecharged2);
-				Analytics.createTransactionGA(transactionid, paymentModel,contentPrice, 0.0,0.0);
-				Analytics.createItemGA(transactionid, contentName,contentId, ctype, contentPrice, 1L);
-				return;
-			}	
-			if(priceTobecharged2 == 0) {
-				event = Analytics.EVENT_SUBSCRIBED_FREE + Analytics.EMPTY_SPACE+subscribedData.generalInfo.title;
-				Analytics.trackEvent(event,params);
-				return;
-			}
-		}
-		else { //regular price
-			params.put(Analytics.COUPON_USED,"FALSE"); //regular price
-			params.put(Analytics.COUPON_DISCOUNT,0.0+"");
-			params.put(Analytics.PAY_CONTENT_PRICE, contentPrice.toString()); //8
-			Analytics.trackEvent(event,params);
-			Analytics.trackCharge(contentPrice);
-			Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_MOVIES_PURCHASED_FOR,contentPrice);
-			Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_TOTAL_PURCHASES,priceTobecharged2);
-			Analytics.createTransactionGA(transactionid, paymentModel,contentPrice, 0.0,0.0);
-			Analytics.createItemGA(transactionid, contentName,packageId, ctype, contentPrice, 1L);//packageid as sku
-		}
-			
 	}
 	
 	private boolean isCouponApplied() {

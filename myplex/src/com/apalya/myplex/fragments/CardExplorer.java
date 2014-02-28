@@ -98,6 +98,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	private SensorScrollUtil mSensorScrollUtil ;
 	//private EasyTracker easyTracker = null;
 	
+
 	@Override
 	public void open(CardData object) {
 		
@@ -429,7 +430,6 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	@Override
 	public void onPause() {
 		// TODO Auto-generated method stub
-		//mCardView.mixpanelBrowsing();
 		//for analytics
 		CardView cardView = getmCardView();
     	if(cardView != null) {
@@ -760,7 +760,6 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		prepareFilterData();
 		dismissProgressBar();
 		mMainActivity.hideActionBarProgressBar();
-		//Analytics.mixPanelBrowsingEvents(mData,mfirstTime);
 	}
 
 	private void showErrorDialog() {
@@ -812,8 +811,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				if(value){
 					status="Not Favourite";
 					if(type == FavouriteUtil.FAVOURITEUTIL_ADD) {
-						//mixPanelAddFavorite(data,1);
-						Analytics.mixPanelAddFavorite(data,1);
+						Analytics.mixPanelAddFavorite(data,Analytics.NUMBER_FAVOURITE);
 						Util.showToast(getContext(), data.generalInfo.title+" set as favourite",Toast.LENGTH_SHORT);
 					}
 					else {
