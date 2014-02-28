@@ -162,7 +162,7 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 		return params;
 	}
 	
-	private void mixPanelPaySuccess2(CardData subscribedData) {
+	private void mixPanelPaySuccess(CardData subscribedData) {
 		if(subscribedData == null ) return;
 		if(subscribedData.generalInfo == null ) return;
 		String event = Analytics.EVENT_PAID_FOR_CONTENT;
@@ -214,8 +214,8 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 		
 	}
 
-	
-	private void mixPanelPaySuccess(CardData subscribedData) {
+	//dead code can be removed
+	private void mixPanelPaySuccess2(CardData subscribedData) {
 			if(subscribedData == null ) return;
 			if(subscribedData.generalInfo == null ) return;
 			
@@ -444,7 +444,7 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 		params.put(Analytics.CONTENT_ID_PROPERTY, subscribedData._id);
 		params.put(Analytics.CONTENT_NAME_PROPERTY, subscribedData.generalInfo.title);
 		String ctype = Analytics.movieOrLivetv(subscribedData.generalInfo.type); 
-		params.put(Analytics.CONTENT_TYPE_PROPERTY, contentType);//movie or livetv
+		params.put(Analytics.CONTENT_TYPE_PROPERTY, ctype);//movie or livetv
 		params.put(Analytics.PAY_PURCHASE_TYPE, commercialModel); //Rental or buy
 		params.put(Analytics.CONTENT_QUALITY, contentType); //SD or HD
 		params.put(Analytics.PAY_CONTENT_PRICE, contentPrice.toString());
