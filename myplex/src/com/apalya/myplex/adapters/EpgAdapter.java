@@ -68,7 +68,7 @@ public class EpgAdapter extends BaseAdapter {
 				&& content.StartTime!=null && content.StartTime.length() > 0
 				&& content.EndTime!=null && content.EndTime.length() > 0){	
 
-			title.setText(content.Name+" ("+getTime(getDate(content.StartTime))+" - "+getTime(getDate(content.EndTime))+")");
+			title.setText("("+getTime(getDate(content.StartTime))+" - "+getTime(getDate(content.EndTime))+")"+content.Name);
 			Date startDate  = getDate(content.StartTime);
 			Date EndDate  = getDate(content.EndTime);
 			reminder.setTypeface(FontUtil.ss_symbolicons_line);
@@ -77,7 +77,7 @@ public class EpgAdapter extends BaseAdapter {
 				reminder.setVisibility(View.VISIBLE);
 				reminder.setText(context.getString(R.string.reminder_icon));			
 			}else if(now.after(EndDate)){
-				if(content.assetType.equals("1") && content.assetUrl!=null 
+				if(content.assetType!=null && content.assetType.equals("1") && content.assetUrl!=null 
 						&& (!content.assetUrl.equalsIgnoreCase(context.getString(R.string.no_url)))){
 					reminder.setVisibility(View.VISIBLE);
 					reminder.setText(context.getString(R.string.play_icon));

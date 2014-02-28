@@ -1910,6 +1910,8 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		mPlayButton.setVisibility(View.VISIBLE);		
 	}
 	public void removeProgrammeName(){
+		if(mPreviewImage!=null)
+			mPreviewImage.setVisibility(View.INVISIBLE);	
 		if(recordedProgName!=null)
 			recordedProgName.setVisibility(View.GONE);
 		if(mTrailerButton!=null)
