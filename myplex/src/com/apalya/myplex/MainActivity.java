@@ -81,6 +81,7 @@ import com.apalya.myplex.fragments.CardExplorer;
 import com.apalya.myplex.fragments.SearchSuggestions;
 import com.apalya.myplex.fragments.SetttingsFragment;
 import com.apalya.myplex.menu.FilterMenuProvider;
+import com.apalya.myplex.receivers.ConnectivityReceiver;
 import com.apalya.myplex.utils.Blur;
 import com.apalya.myplex.utils.Blur.BlurResponse;
 import com.apalya.myplex.utils.ConsumerApi;
@@ -325,8 +326,11 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 	private boolean onHandleExternalIntent(Intent intent) {
 		if(intent==null)
 			return false;
-		 
+		
+		boolean intentHandled = false;
+		
 		if(getIntent().hasExtra(mContext.getString(R.string._id))){
+			showActionBarProgressBar();
 			_id = getIntent().getExtras().getString(mContext.getString(R.string._id));
 			List<CardData> cards  =  new ArrayList<CardData>();
 			CardData cardData  = new CardData();
@@ -336,6 +340,16 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 				mCacheManager.getCardDetails(cards, IndexHandler.OperationType.FTSEARCH, new CacheManagerCallback() {					
 					@Override
 					public void OnOnlineResults(List<CardData> dataList) {
+						for (CardData cardData : dataList) {
+							if(cardData._id.equalsIgnoreCase(_id)){
+								mCacheManager.unRegisterCallback();
+								hideActionBarProgressBar();
+								BaseFragment fragment = createFragment(NavigationOptionsMenuAdapter.CARDDETAILS_ACTION);
+								fragment.setDataObject(cardData);
+								bringFragment(fragment);
+								break;
+							}
+						}
 					}					
 					@Override
 					public void OnOnlineError(VolleyError error) {
@@ -344,20 +358,33 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 					public void OnCacheResults(HashMap<String, CardData> obj,
 							boolean issuedRequest) {
 						CardData data = null;
-						mCacheManager.unRegisterCallback();
+						
 						 Iterator<Entry<String, CardData>> it = obj.entrySet().iterator();
 						    while (it.hasNext()) {
 						        Entry<String, CardData> pair = it.next();
 						        if(pair.getValue()._id.equalsIgnoreCase(_id)){
 						        	data = pair.getValue();
+						        	break;
 						        }
 						    }
+						
+						if(data == null){
+							if(!ConnectivityReceiver.isConnected){
+								mCacheManager.unRegisterCallback();
+								selectItem(3);								
+							} 
+							return;
+						}
+						    
+						hideActionBarProgressBar();
+						mCacheManager.unRegisterCallback();
 						BaseFragment fragment = createFragment(NavigationOptionsMenuAdapter.CARDDETAILS_ACTION);
 						fragment.setDataObject(data);
 						bringFragment(fragment);
 					}
 				});
 			}
+			intentHandled=true;
 		}
 		String action  = "";
 		if(intent.hasExtra(mContext.getString(R.string.page))){
@@ -370,7 +397,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 				selectItem(2);
 			return true;
 		}
-		return false;
+		return intentHandled;
 	}
 
 	private void showNavigationFullImage(boolean value){
@@ -643,6 +670,11 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		if(mCurrentFragment instanceof CardDetails){
 			if(mCurrentFragment.onBackClicked())
 				return;
+			if(mFragmentStack.size() == 1){				
+				exitApp();
+				super.onBackPressed();
+				return;
+			}
 		}
 		try {
 			if (mDrawerLayout!=null && mNavigationDrawerOpened) {
@@ -1416,7 +1448,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 					tvOrMovie.setEnabled(true);
 				}
 			}, 3000);
-			selectItem(3);
+			selectItem(2);
 		}		
 	};
 	

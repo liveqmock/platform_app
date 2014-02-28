@@ -2,9 +2,9 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
-    android:layout_gravity="center_vertical"
+    android:layout_gravity="center_vertical|center_horizontal|top"
     android:padding="5dp"
-     >
+    android:background="@null">
 <TextView 
     android:id="@+id/day_item"
     android:paddingLeft="5dp"
@@ -15,7 +15,7 @@
     android:layout_centerHorizontal="true"
     android:layout_centerVertical="true"
     android:textSize="12sp"
-    android:text="TextView" 
+    android:text="" 
     android:duplicateParentState="true"
     android:textColor="#4b4b4c" 
     />

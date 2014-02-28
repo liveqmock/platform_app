@@ -37,6 +37,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request.Method;
+import com.android.volley.AuthFailureError;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -418,7 +419,9 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		boolean isMovie = false;  
 		if((mData.requestType == CardExplorerData.REQUEST_RECOMMENDATION )||( mData.requestType ==CardExplorerData.REQUEST_BROWSE))
 		{
-			if(mData.requestType == CardExplorerData.REQUEST_RECOMMENDATION ){
+			if(mData.requestType == CardExplorerData.REQUEST_BROWSE 
+					&& mData.searchQuery!=null 
+						&& mData.searchQuery.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_MOVIE)){
 				isMovie = true;
 				mMainActivity.setUpLivetvOrMovie(isMovie);
 			}else{
@@ -582,9 +585,17 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		
 		
 		requestUrl = requestUrl.replaceAll(" ", "%20");
-		mVolleyRequest = new GZipRequest(requestMethod, requestUrl, deviceMinSuccessListener(), responseErrorListener());
-//		mVolleyRequest.printLogs(true);
-//		myReg.setShouldCache(true);
+		mVolleyRequest = new GZipRequest(requestMethod, requestUrl, deviceMinSuccessListener(), responseErrorListener()){
+			@Override
+			protected Map<String, String> getParams() throws AuthFailureError {
+				if(mData.requestType == CardExplorerData.REQUEST_PURCHASES){
+					Map<String, String> params = new HashMap<String, String>();
+					params.put("type", "live,movie,tvseason");	
+					return params;
+				}
+				return super.getParams();
+			}
+		};
 		Log.d(TAG,"Min Request:"+requestUrl);
 		if(requestUrl.equals("0") || (requestUrl.length()==0)){
 			mMainActivity.hideActionBarProgressBar();

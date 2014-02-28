@@ -647,6 +647,39 @@ public class Util {
 			}
 		}
 	}
+	
+	public static boolean onHandleExternalIntent(Activity activity) {
+		
+		if (activity.getIntent() == null)
+			return false;
+		
+		Bundle bundle = activity.getIntent().getExtras();
+		
+		if (bundle == null)
+			return false;
+		
+		Intent intent;
+		
+		if (activity.getResources().getBoolean(R.bool.isTablet)) {
+			intent = new Intent(activity, MultiPaneActivity.class);
+		} else {
+			intent = new Intent(activity, MainActivity.class);
+		}
+		
+		for (String key : bundle.keySet()) {			
+			intent.putExtra(key, bundle.getString(key).trim());
+		}
+
+		launchMainActivity(activity, intent);
+		return true;
+	}
+	
+
+	public static void launchMainActivity(Activity activity, Intent intent){
+		activity.startActivity(intent);
+		
+	}
+	
 	public static int calculateInSampleSize(
 			BitmapFactory.Options options, int reqWidth, int reqHeight) {
 		// Raw height and width of image

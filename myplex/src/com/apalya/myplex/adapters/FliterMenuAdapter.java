@@ -39,6 +39,10 @@ public class FliterMenuAdapter extends ArrayAdapter<FilterMenudata>
 				Collections.sort(menuDataList,new CoutComparator());
 				Collections.sort(menuDataList,new LanguageComparetaor());
 			}
+		}else{
+			language = "Hindi";
+			Collections.sort(menuDataList,new CoutComparator());
+			Collections.sort(menuDataList,new LanguageComparetaor());
 		}
 		this.mMenuDataList = menuDataList;
 	}

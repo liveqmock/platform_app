@@ -21,6 +21,7 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response.ErrorListener;
@@ -112,7 +113,7 @@ public class EpgView implements ProgrammActionListener{
 
 		daysAdapter = new StringAdapter(mContext, days);
 		
-		dateList.setOnItemClickListener(new OnItemClickListener() {
+		/*dateList.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> adapter, View view, int position,long id) {
 				
@@ -142,13 +143,13 @@ public class EpgView implements ProgrammActionListener{
 				}catch (Exception e) {
 				}
 			}			
-		});
+		});*/
 		dateList.setOnScrollListener(new AbsListView.OnScrollListener() {			
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
 				if(scrollState == SCROLL_STATE_IDLE){						
-					dateSelectedIndex = dateList.getFirstVisiblePosition()+1;
-					dateList.smoothScrollToPosition(dateSelectedIndex-1);
+					dateSelectedIndex = dateList.getFirstVisiblePosition()+2;
+					dateList.smoothScrollToPosition(dateSelectedIndex-2);
 					handler.postDelayed(new Runnable() {
 						public void run() {
 							dateList.setItemChecked(dateSelectedIndex, true);
@@ -157,6 +158,56 @@ public class EpgView implements ProgrammActionListener{
 					Calendar cal = Calendar.getInstance();
 					daysAdapter.setIndex(dateSelectedIndex);
 					String dateString =days[dateList.getFirstVisiblePosition()+1];
+					Calendar calendar = Calendar.getInstance();
+					Scanner scanner = new Scanner(dateString).useDelimiter("[^0-9]+");
+					try {
+					cal.setTime(new SimpleDateFormat("MMM").parse(dateString.replaceAll("\\d","").trim()));
+					int monthInt = cal.get(Calendar.MONTH) + 1;
+					String dayString  = calendar.get(Calendar.YEAR)+"-"+monthInt+"-"+scanner.nextInt();
+					Toast.makeText(mContext, dayString, Toast.LENGTH_SHORT).show();
+					fetchEPGData(dayString);
+					} catch (ParseException e) {						
+						e.printStackTrace();
+					}
+				}
+			}
+
+			@Override
+			public void onScroll(AbsListView view, int firstVisibleItem,int visibleItemCount, int totalItemCount) 
+			{
+				
+			}
+		});
+		/*dateList.setOnScrollListener(new AbsListView.OnScrollListener() {			
+			private int totalVisibleItem;
+			private int lastVisibleItem;
+			private boolean isScrollingDown;
+
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+				if(scrollState == SCROLL_STATE_IDLE){						
+				
+					
+					int marginIndex=1;
+					
+					if(totalVisibleItem > 3 && lastVisibleItem !=0){
+						marginIndex=isScrollingDown?3:2;
+					}
+					
+					lastVisibleItem=0;
+					dateSelectedIndex = dateList.getFirstVisiblePosition()+marginIndex;					
+					
+			
+					dateList.smoothScrollToPosition(dateSelectedIndex-marginIndex);
+					
+					handler.postDelayed(new Runnable() {
+						public void run() {
+							dateList.setItemChecked(dateSelectedIndex, true);
+						}
+					}, 300);
+					Calendar cal = Calendar.getInstance();
+					daysAdapter.setIndex(dateSelectedIndex);
+					String dateString =days[dateSelectedIndex];
 					Calendar calendar = Calendar.getInstance();
 					Scanner scanner = new Scanner(dateString).useDelimiter("[^0-9]+");
 					try {
@@ -173,12 +224,21 @@ public class EpgView implements ProgrammActionListener{
 			@Override
 			public void onScroll(AbsListView view, int firstVisibleItem,int visibleItemCount, int totalItemCount) 
 			{
-				
+				 if (firstVisibleItem > lastVisibleItem) {
+				        isScrollingDown = true;
+				    }
+				    else {
+				        isScrollingDown = false;
+				    }
+				    lastVisibleItem = firstVisibleItem;
+				    
+				Log.d(TAG,"totalItemCount:"+visibleItemCount);
+				totalVisibleItem=visibleItemCount;
 			}
-		});		
+		});*/
 		
 		dateList.setAdapter(daysAdapter);
-		dateList.setSelection(4);
+		dateList.setSelection(3);
 	}
 	
 	private String getMonthAndDate(int days) {
@@ -277,11 +337,13 @@ public class EpgView implements ProgrammActionListener{
 		
 		programmList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
+			private int position1;
+
 			@Override
 			public void onItemClick(AdapterView<?> adpater, View view, int position,long id) {
 				
+				position1 = position;
 				
-				final int position1 = position;
 				handler.postDelayed(new Runnable() {
 					public void run() {
 						programmList.setItemChecked(position1, true);
@@ -296,9 +358,9 @@ public class EpgView implements ProgrammActionListener{
 				
 				Log.d(TAG,"title "+epgContents.get(position1).Name);
 				if(!now.before(programmeTime)){
-					Log.d(TAG,"assert url"+epgContents.get(position1-1).assetUrl);
-					String assertUrl = epgContents.get(position1-1).assetUrl;
-					String assetType = epgContents.get(position1-1).assetType;
+					Log.d(TAG,"assert url"+epgContents.get(position1).assetUrl);
+					String assertUrl = epgContents.get(position1).assetUrl;
+					String assetType = epgContents.get(position1).assetType;
 					if(player.isMediaPlaying())
 						return;
 					if(assetType.equals("1") && assertUrl!=null  && (!assertUrl.equalsIgnoreCase(mContext.getString(R.string.no_url)))){
