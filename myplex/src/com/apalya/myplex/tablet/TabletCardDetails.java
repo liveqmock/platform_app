@@ -39,8 +39,6 @@ public class TabletCardDetails extends BaseActivity{
 	}
 	@Override
 	public void onBackPressed() {
-		//Analytics.stoppedAt();
-		//Analytics.mixPanelVideoTimeCalculation(myplexapplication.mSelectedCard);
 		startActivity(new Intent(TabletCardDetails.this,MultiPaneActivity.class));
 		finish();
 	}

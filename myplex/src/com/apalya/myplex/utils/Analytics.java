@@ -48,6 +48,7 @@ public class Analytics {
 	public static String downLoadStartTime;
 		
 	private static String TAG = "Analytics";
+	public static String UNDERSCORE = "_";
 	
 	public static enum SCREEN_NAMES {CardExplorer,Settings,CardDetails,CardDetailsTabletFrag,SearchSuggestions};
 	
@@ -56,6 +57,7 @@ public class Analytics {
 	public static long pausedAt = 0;
 	public static long playedTime = 0;
 	public static long totalPlayedTime = 0;
+	public static int NUMBER_FAVOURITE = 1;
 	public static enum LOGIN_OPTIONS {facebook,twitter,google,myplex};
 	
 	/*
@@ -84,7 +86,7 @@ public class Analytics {
 	public static String EVENT_BROWSED_RECOMMENDATIONS = "browsed recommendations";
 	public static String EVENT_BROWSED_PURCHASES = "browsed purchases";
 	public static String EVENT_BROWSED_TV_CHANNELS = "browsed live tv channels";
-	public static String EVENT_BROWSED_TV_SHOWS = "browsed live tv shows";
+	public static String EVENT_BROWSED_TV_SHOWS = "browsed tv shows";
 	public static String EVENT_BROWSED_LIVE_TV_GA = "browsed live tv";
 	public static String EVENT_BROWSED_SETTINGS = "browsed settings";
 	//public static String EVENT_SELECTED_FEEDBACK = "selected feedback option";
@@ -97,14 +99,12 @@ public class Analytics {
 	public static String EVENT_SHARED_MYPLEX_EXPERIENCE = "shared myplex experience";
 	public static String EVENT_EXPANDED_CAST_CREW = "expanded cast and crew details";
 	public static String EVENT_EXPLORED_CAST_CREW_POPUP = "explored cast and crew pop up";
-	//public static String EVENT_EXPLORING_SIMILAR_CONTENT = "exploring similar items of";
 	public static String EVENT_EXPLORING_SIMILAR_CONTENT = "explored similar items";
 	public static String EVENT_SELECTED_WIFI_ONLY = "selected wifi only";
 	public static String EVENT_LOGGED_OUT = "logged out";
 	public static String EVENT_ADDED = "added";
 	public static String EVENT_REMOVED = "removed";
 	public static String EVENT_DELETED = "deleted";
-	//public static String EVENT_SUBSCRIBED_FREE_FOR = "subscribed free";
 	public static String EVENT_SUBSCRIBED_FREE = "subscribed free";
 	public static String EVENT_SUBSCRIPTION_FAILURE = "subscription/payment failed";
 	public static String EVENT_UNABLE_TO_PLAY = "unable to play";
@@ -139,7 +139,6 @@ public class Analytics {
 	public static String FORGOT_PASSWORD_FAILED_ON = "forgot password failed on";
 	
 		
-	//public static String EVENT_FILTERED_BY = "filtered by category";
 	public static String EVENT_FILTERED_BY_CATEGORY = "filtered by category";
 	public static String EVENT_FILTERED = "filtered";
 	public static String FILTER_NAME = "filter name";
@@ -151,13 +150,11 @@ public class Analytics {
 	public static String EVENT_CONTENT_DISCOVERY_INITIATED = "content discovery initiated";
 	public static String EVENT_CONTENT_DISCOVERY_RESULTS = "content discovery results";
 	public static String EVENT_SELECTED_A_KEYWORD_DISCOVERY = "selected a keyword";
-	//public static String SEARCHED_FOR = "searched for";
 	public static String SEARCHED_MYPLEX = "searched myplex";
 	public static String EVENT_SELECTED_IN_DROPDOWN_RESULTS = "in the drop down results";
 	public static String EVENT_SELECTED_DROPDOWN_RESULT = "selected drop down result";
 	public static String EVENT_INLINE_SEARCH_INITIATED = "inline search initiated";
 	public static enum SEARCH_TYPES {DropDown,Discover,Filter,Inline};
-	//public static enum LOGIN_TYPES {FaceBook,Twitter,Google,myplex,Guest};
 	public static String ALL_LOGIN_OPTIONS = "all login options";
 	public static String ALL_SIGN_UP_OPTIONS = "all sign up options";
 	
@@ -196,7 +193,6 @@ public class Analytics {
 	public static String TIME_PLAYED_PROPERTY = "time played (in seconds)";
 	public static String FEEDBACK_TEXT = "feedback text";
 	public static String FEEDBACK_RATING = "rating";
-	//public static String MOVIE_SIZE = "movie size";
 	public static String TIME_TAKEN_TO_DOWNLOAD = "time taken to download (in minutes)";
 	public static String TRAILER_DATA_RATE = "data rate";
 	
@@ -225,6 +221,7 @@ public class Analytics {
 	public static String PAY_COUPON_CODE = "coupon code";
 	public static String PAY_COUPON_VALUE = "coupon value";
 	public static String COUPON_USED = "coupon used";
+	public static String FALSE = "FALSE";
 	public static String COUPON_DISCOUNT = "coupon discount";
 	public static String PAY_PURCHASE_TYPE = "purchase type";
 	public static String MOVIE_SIZE = "movie size (MB)";
@@ -238,6 +235,7 @@ public class Analytics {
 	public static String CONTENT_QUALITY_AVAILABLE =  "content quality available";
 	public static String STUDIO =  "studio";
 	public static String LANGUAGE =  "language";
+	public static String ANALYTICS =  "analytics";
 	public static String TOP_RESULT =  "top result";
 	public static String INITIATED_FROM =  "initiated from";
 	public static String DOWNLOAD_OPTION_AVAILABLE =  "download option available";
@@ -287,6 +285,7 @@ public class Analytics {
 	public static String CATEGORY_SEARCH = "search";
 	public static String CATEGORY_SUBMIT = "submit";
 	public static String CATEGORY_NETWORK = "network";
+	public static String CATEGORY_MOVIE = "movie";
 	public static enum  CATEGORY_SOCIAL_NETWORK_TYPES {facebook,twitter,google};
 	public static String CATEGORY_PLAYED_MOVIE = "played movie";
 	public static String CATEGORY_PLAYED_TRAILER = "played trailer";
@@ -296,10 +295,12 @@ public class Analytics {
 	public static String ACTION_FILTER = "filter";
 	public static String ACTION_COMMENTS = "comments";
 	public static String ACTION_REVIEWS = "reviews";
+	public static String ACTION_RATING = "rating";
 	public static String ACTION_LOGIN = "login";
 	public static String ACTION_INVITE_FRIENDS = "invite friends";
 	public static String ACTION_SHARE = "share";
 	public static enum  ACTION_TYPES {play,pause,stop};
+	//public static enum  CATEGORY_TYPES {live tv,movie,};
 	
 	//screen names
 	public static String SCREEN_LOGINACTIVITY = "login activity";
@@ -312,6 +313,15 @@ public class Analytics {
 	public static String SCREEN_SEARCH_SUGGESTIONS = "search suggestions";
 	
 	public static String TRAILER_BITRATE = "trailer_bitrate_";
+	
+	public static String CONSTANT_RECOMMENDATIONS = "recommendations";
+	public static String CONSTANT_MOVIE = "movie";
+	public static String CONSTANT_MOVIES = "movies";
+	public static String CONSTANT_DOWNLOADED = "downloaded";
+	public static String CONSTANT_LIVETV = "live tv";
+	public static String CONSTANT_LIVE = "live";
+	public static String CONSTANT_TV_SERIES = "tvseries";
+	public static String CONSTANT_TV_SHOW = "tvshow";
 	
 	
 	private static MixpanelAPI mMixPanel = myplexapplication.getMixPanel();
@@ -566,7 +576,7 @@ public class Analytics {
 		String event = null;
 		long ptime = Analytics.getTotalPlayedTime();
 		long ptimeMinutes = Analytics.getTotalPlayedTimeInMinutes();
-		if("live tv".equalsIgnoreCase(ctype))  {
+		if(Analytics.CONSTANT_LIVETV.equalsIgnoreCase(ctype))  { 
 			params.put(Analytics.TV_CHANNEL_NAME, mData.generalInfo.title); //3
 			String bitrate = SharedPrefUtils.getFromSharedPreference(myplexapplication.getAppContext(), Analytics.TRAILER_BITRATE+mCardData.generalInfo._id);
 			params.put(Analytics.TRAILER_DATA_RATE, bitrate);
@@ -578,7 +588,7 @@ public class Analytics {
 			Analytics.createEventGA("live tv", "play", mData.generalInfo.title, ptime);//ga
 			return;
 		}
-		if("tvshow".equalsIgnoreCase(ctype))  {
+		else if(Analytics.CONSTANT_TV_SHOW.equalsIgnoreCase(ctype))  {
 			params.put(Analytics.TV_SHOW_NAME, mData.generalInfo.title); //3
 			String bitrate = SharedPrefUtils.getFromSharedPreference(myplexapplication.getAppContext(), Analytics.TRAILER_BITRATE+mCardData.generalInfo._id);
 			params.put(Analytics.TRAILER_DATA_RATE, bitrate);
@@ -587,7 +597,7 @@ public class Analytics {
 			mMixPanel.getPeople().increment(Analytics.PEOPLE_TV_STREAMED,ptimeMinutes);
 			mMixPanel.getPeople().increment(Analytics.TIME_PLAYED_PROPERTY,ptime);
 			Analytics.gaPlayedLiveTvTimings(ptime, mData.generalInfo.title); 
-			Analytics.createEventGA("tv show", "play", mData.generalInfo.title, ptime);//ga
+			//Analytics.createEventGA("tv show", "play", mData.generalInfo.title, ptime);//ga
 			return;
 		}
 		
@@ -606,7 +616,7 @@ public class Analytics {
 			return;
 		}
 		
-		if("movies".equalsIgnoreCase(ctype))  {
+		if(Analytics.CONSTANT_MOVIES.equalsIgnoreCase(ctype))  {
 			String contentQuality = null;
 			boolean localPlayback = isLocalPlayBack(mData._id);//based on this properties change 
 			
@@ -638,7 +648,8 @@ public class Analytics {
 				//people data remove comments later
 				mMixPanel.getPeople().increment(Analytics.PEOPLE_MOVIES_STREAMED_FOR,getTotalPlayedTimeInMinutes());
 			}
-			Analytics.gaPlayedMovieTimings(ptime, mData.generalInfo.title, contentQuality);			
+			Analytics.gaPlayedMovieTimings(ptime, mData.generalInfo.title, contentQuality);	
+			Analytics.createEventGA(CONSTANT_MOVIES, ACTION_TYPES.play.toString(), mCardData.generalInfo.title, ptime);
 		}
 		Analytics.trackEvent(event,params);		
 		mMixPanel.getPeople().increment(Analytics.TIME_PLAYED_PROPERTY,ptime);
@@ -675,7 +686,7 @@ public class Analytics {
 		long ptime = Analytics.getTotalPlayedTime();
 		
 		//not necessary //for any eventuality
-		if("live tv".equalsIgnoreCase(ctype))  {
+		if(Analytics.CONSTANT_LIVETV.equalsIgnoreCase(ctype))  {
 			if(ptime == 0) return;
 			params.put(Analytics.TV_CHANNEL_NAME, mData.generalInfo.title); //3
 			String bitrate = SharedPrefUtils.getFromSharedPreference(myplexapplication.getAppContext(), Analytics.TRAILER_BITRATE+mData.generalInfo._id);
@@ -706,7 +717,7 @@ public class Analytics {
 			return;
 		}
 		
-		if("movies".equalsIgnoreCase(ctype))  {
+		if(Analytics.CONSTANT_MOVIES.equalsIgnoreCase(ctype))  {
 			
 			boolean localPlayback = isLocalPlayBack(mData._id);//based on this properties change 
 			String contentQuality = null;
@@ -760,6 +771,8 @@ public class Analytics {
 	}
 	
 	public static boolean isLocalPlayBack(String id) {
+		if( myplexapplication.mDownloadList == null) return false;
+		if( myplexapplication.mDownloadList.mDownloadedList == null || myplexapplication.mDownloadList.mDownloadedList.size() == 0) return false;
 		CardDownloadData mDownloadData = myplexapplication.mDownloadList.mDownloadedList.get(id);
 		if (mDownloadData == null) {
 			return false;
@@ -887,77 +900,7 @@ public class Analytics {
 
 	}
 	
-	/*
-	 * Invokd from CardExplorer. It is not fired for 1) live tv 2) movies 3) recommendations
-	 * It is fired for 1) favourites 2) downloads 3) purchases
-	 */
-	public static void mixPanelBrowsingEvents2(CardExplorerData mData,boolean mfirstTime) {
-		if(mData == null ) return;
-		if(CardExplorer.mfirstTime) {
-			Map<String,String> params=new HashMap<String, String>();
-			String ctype = Analytics.movieOrLivetv(mData.searchQuery);
-			int rtype = mData.requestType;
-			String reqtype = Analytics.getRequestType(rtype);
-			if(ctype == null) {
-				ctype = reqtype;
-			}
-			String event = null;
-			
-			if("favorites".equalsIgnoreCase(ctype)) {
-				params.put(Analytics.NUMBER_OF_FAVORITES, mData.mMasterEntries.size()+"");
-				event = Analytics.EVENT_BROWSED_FAVORITES;
-			}
-			else if("downloads".equalsIgnoreCase(ctype)) {
-				params.put(Analytics.NUMBER_OF_DOWNLOADS, mData.mMasterEntries.size()+"");
-				event = Analytics.EVENT_BROWSED_DOWNLOADS;
-			}
-			else if("purchases".equalsIgnoreCase(ctype)) {
-				params.put(Analytics.NUMBER_OF_PURCHASES, mData.mMasterEntries.size()+"");
-				event = Analytics.EVENT_BROWSED_PURCHASES;
-			}
-			else if("live tv".equalsIgnoreCase(ctype)) {
-				//ctype = Analytics.TV_CHANNELS;
-				params.put(Analytics.NUMBER_OF_LIVETV_CARDS,1+"");
-				event = Analytics.EVENT_BROWSED_LIVE_TV;
-			}
-			else if("movies".equalsIgnoreCase(ctype)) {
-				ctype = Analytics.MOVIES;
-				params.put(Analytics.NUMBER_OF_MOVIE_CARDS,1+"");
-				event = Analytics.EVENT_BROWSED_MOVIES;
-			}
-			else if("recommendations".equalsIgnoreCase(ctype)) {
-				params.put(Analytics.NUMBER_OF_CARDS,1+"");
-				event = Analytics.EVENT_BROWSED_RECOMMENDATIONS;
-			}
-				
-			if("discover".equalsIgnoreCase(ctype)) {
-				params.put(Analytics.NUMBER_OF_RESULTS, mData.mMasterEntries.size()+"");
-				event = Analytics.EVENT_CONTENT_DISCOVERY_RESULTS;
-				if("actionbar".equalsIgnoreCase(Analytics.SEARCH_TYPE)) {
-					//event = Analytics.SEARCHED_MYPLEX+Analytics.EMPTY_SPACE+mData.searchQuery;
-					event = Analytics.SEARCHED_MYPLEX;
-					params.put(Analytics.KEYWORD,mData.searchQuery);
-					params.put(Analytics.USER_ID,getUserEmail());
-					Analytics.SEARCH_TYPE = null;
-				}
-			}
-			if("inline".equalsIgnoreCase(Analytics.SEARCH_TYPE)) {
-				ctype = Analytics.SEARCH_TYPE;
-				params.put(Analytics.NUMBER_OF_RESULTS,mData.mMasterEntries.size()+"");
-				params.put(Analytics.KEYWORD,Analytics.SELECTED_INLINE_WORD);
-				event = Analytics.EVENT_SELECTED+Analytics.EMPTY_SPACE+Analytics.SELECTED_INLINE_WORD+Analytics.EMPTY_SPACE+Analytics.EVENT_SELECTED_IN_DROPDOWN_RESULTS;
-			}
-			//int count = mData.mMasterEntries.size();
-			if(ctype != null && (!"recommendations".equalsIgnoreCase(ctype)) && (!"movies".equalsIgnoreCase(ctype)) && (!"live tv".equalsIgnoreCase(ctype))) {
-				Analytics.trackEvent(event,params);
-				Analytics.SEARCH_TYPE = null;
-				Analytics.SELECTED_INLINE_WORD = null;
-			}
-		    }
-		CardExplorer.mfirstTime = false;
-
-	}
-	
+		
 	public static void mixPanelAddFavorite(final CardData data,int type) {
 		if(data == null ) return;
 		if(data.generalInfo == null ) return;
@@ -1001,7 +944,7 @@ public class Analytics {
 			params.put(Analytics.TYPE_OF_CONTENT,ctype);
 			String eventFiltered = Analytics.EVENT_FILTERED_BY_CATEGORY;
 			Analytics.trackEvent(eventFiltered,params);	
-			gaFilter(ctype, localData.size());
+			gaFilter(label, localData.size());
 		}catch(Exception excp) {
 			Log.d(TAG, excp.toString());
 		}
@@ -1203,7 +1146,7 @@ public class Analytics {
 		DeviceDetails mDevInfo = myplexapplication.getDevDetailsInstance();
 		String deviceDesc  = mUserInfo.getName()+Analytics.APOS+ Analytics.EMPTY_SPACE+ mDevInfo.getDeviceOs();
 		Map<String,String> params = new HashMap<String, String>();
-		params.put(Analytics.DEVICE_ID, mDevInfo.getDeviceId());
+		params.put(Analytics.DEVICE_ID, mDevInfo.getClientDeviceId());
 		params.put(Analytics.DEVICE_DESC, deviceDesc);
 		String event = null;
 		if(type == 1)
@@ -1219,7 +1162,7 @@ public class Analytics {
 			DeviceDetails mDevInfo = myplexapplication.getDevDetailsInstance();
 			String deviceDesc  = mUserInfo.getName()+Analytics.APOS+ Analytics.EMPTY_SPACE+ mDevInfo.getDeviceOs();
 			Map<String,String> params = new HashMap<String, String>();
-			params.put(Analytics.DEVICE_ID, mDevInfo.getDeviceId());
+			params.put(Analytics.DEVICE_ID, mDevInfo.getClientDeviceId());
 			params.put(Analytics.DEVICE_DESC, deviceDesc);
 			params.put(Analytics.REASON_FAILURE, error);
 			String event = Analytics.EVENT_DEVICE_DEREGISTRATION_FAILURE;
@@ -1235,7 +1178,8 @@ public class Analytics {
 			UserProfile mUserInfo = myplexapplication.getUserProfileInstance();
 			DeviceDetails mDevInfo = myplexapplication.getDevDetailsInstance();
 			params2.put(Analytics.USER_ID,mUserInfo.getUserEmail());
-			params2.put(Analytics.DEVICE_ID,mDevInfo.getDeviceId());
+			params2.put(Analytics.DEVICE_ID,mDevInfo.getClientDeviceId()); 
+			String str = mDevInfo.getDeviceSNo();
 			Analytics.trackEvent(Analytics.EVENT_LOGGED_OUT,params2);
 		}catch(Exception excp) {
 			Log.d(TAG, excp.toString());
@@ -1320,24 +1264,13 @@ public class Analytics {
 		params.put(Analytics.TIME_TAKEN_TO_DOWNLOAD,downloadTime);
 		params.put(Analytics.USER_ID,getUserEmail());
 		Analytics.trackEvent(Analytics.EVENT_DOWNLOAD_MOVIE,params);
-		
+		long dtime = 0;
+		if(downloadTime != null)
+			dtime = Long.parseLong(downloadTime);
+		Analytics.createEventGA(CONSTANT_MOVIES, CONSTANT_DOWNLOADED, contentName, dtime);
 	}
 	
-	public static void mixPanelUnableToPlayVideo2(String error) {
-    	
-        EasyTracker easyTracker = myplexapplication.getGaTracker();
-    	int selected = myplexapplication.getCardExplorerData().currentSelectedCard;
-		CardData  cardData = myplexapplication.getCardExplorerData().mMasterEntries.get(selected);
-		String contentName = cardData.generalInfo.title;
-		Map<String,String> params = new HashMap<String, String>();
-		params.put(Analytics.CONTENT_NAME_PROPERTY,contentName);
-		params.put(Analytics.CONTENT_ID_PROPERTY,cardData._id);
-		params.put(Analytics.CONTENT_TYPE_PROPERTY,Analytics.movieOrLivetv(cardData.generalInfo.type));
-		params.put(Analytics.REASON_FAILURE,error);
-		String event = Analytics.EVENT_UNABLE_TO_PLAY + Analytics.EMPTY_SPACE + contentName;
-		Analytics.trackEvent(event,params);
-		//Analytics.createEventGA(easyTracker, Analytics.EVENT_PLAY,Analytics.CONTENT_PLAY_ERROR,contentName );
-    }
+	
 	
 	public static void mixPanelCouponEntered(String couponCode,String couponPrice) {
 		
@@ -1557,12 +1490,14 @@ public class Analytics {
 	}
 	
 	public static void gaBrowse(String ctype,long swipeCount) {
-		if("movie".equalsIgnoreCase(ctype)) {
+		if(Analytics.CONSTANT_MOVIE.equalsIgnoreCase(ctype)) {
 			Analytics.createEventGA(Analytics.CATEGORY_BROWSE, Analytics.EVENT_BROWSED_MOVIES, Analytics.NUMBER_OF_CARDS, swipeCount);
-		}
-		if("live".equalsIgnoreCase(ctype)) {
+		} else 	if(Analytics.CONSTANT_LIVE.equalsIgnoreCase(ctype)) {
 			Analytics.createEventGA(Analytics.CATEGORY_BROWSE, Analytics.EVENT_BROWSED_LIVE_TV_GA, Analytics.NUMBER_OF_CARDS, swipeCount);
-		}		
+		}
+		else if(Analytics.CONSTANT_TV_SERIES.equalsIgnoreCase(ctype)) {
+			Analytics.createEventGA(Analytics.CATEGORY_BROWSE, Analytics.EVENT_BROWSED_TV_SHOWS, Analytics.NUMBER_OF_CARDS, swipeCount);
+		}	
 	}
 	
 	public static void gaInlineSearch(String keyword,long results) {
@@ -1586,13 +1521,24 @@ public class Analytics {
 	}
 	
 	public static void gaRating(String contentName,long rating) {
-		Analytics.createEventGA(Analytics.CATEGORY_SUBMIT, Analytics.ACTION_REVIEWS, contentName, rating);
+		Analytics.createEventGA(Analytics.CATEGORY_SUBMIT, Analytics.ACTION_RATING, contentName, rating);
 	}
 	
 	public static void gaPlayedMovie(String contentName,long rating) {
 		Analytics.createEventGA(Analytics.CATEGORY_PLAYED_MOVIE, Analytics.ACTION_REVIEWS, contentName, rating);
 	}
 	
+	public static void gaPlayedMovieEvent(CardData cardData,long rating) {
+		if(cardData == null) return;
+		if(cardData.generalInfo == null) return;
+		if(Analytics.CONSTANT_MOVIE.equals(cardData.generalInfo.type)) {
+			Analytics.createEventGA(Analytics.CATEGORY_MOVIE, Analytics.ACTION_TYPES.play.toString(), cardData.generalInfo.title, 1l);
+		}
+	}
+	
+	/*
+	 * pause,resume does not apply to livetv
+	 */
 	public static void gaStopPauseMediaTime(String action,long stopPauseLocation) {
 		boolean bool = myplexapplication.getAppContext().getResources().getBoolean(R.bool.isTablet);
 		CardData  mData = null;
@@ -1609,8 +1555,8 @@ public class Analytics {
 		if(mData.generalInfo == null ) return;
 		String contentType = mData.generalInfo.type; //movie or livetv
 		String ctype = Analytics.movieOrLivetv(contentType);
-		if("movies".equalsIgnoreCase(ctype)) {
-			Analytics.createEventGA("movies", action, mData.generalInfo.title, stopPauseLocation);
+		if(CONSTANT_MOVIES.equalsIgnoreCase(ctype)) {
+			Analytics.createEventGA(CONSTANT_MOVIES, action, mData.generalInfo.title, stopPauseLocation);
 		}
 	}
 	
@@ -1625,9 +1571,6 @@ public class Analytics {
 	public static void gaPlayedLiveTvTimings(long timeInSeconds,String contentName) {
 		Analytics.createUserTimingGA(Analytics.CATEGORY_PLAYED_LIVETV,timeInSeconds , contentName, null);
 	}
-	public static void gaPlayedLiveTvEvent(String contentName,long timeInSeconds) {
-		Analytics.createEventGA("live tv", "play", contentName, timeInSeconds);
-	}
-		
+			
 }
 

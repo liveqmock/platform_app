@@ -611,36 +611,29 @@ public class CardView extends ScrollView {
 	
 	public void mixpanelBrowsing() {
 		String event = null;
-		/*
-		CardExplorerData data = myplexapplication.getCardExplorerData();		
-		String ctype = data.searchQuery;		
-		if(ctype == null || ctype.length() == 0) {
-			int requestType = data.requestType;
-			ctype = Analytics.getRequestType(requestType);
-		}*/
-		
+				
 		Map<String,String> params=new HashMap<String, String>();
 		String ctype = ScreenName;
-		if(	"recommendations".equalsIgnoreCase(ctype) )  {
+		if(	Analytics.CONSTANT_RECOMMENDATIONS.equalsIgnoreCase(ctype) )  {
 			event = Analytics.EVENT_BROWSED_RECOMMENDATIONS;
 			params.put(Analytics.NUMBER_OF_MOVIE_CARDS,swipeCount+"");
 		}
 		
-		if(	"movie".equalsIgnoreCase(ctype) )  {
+		if(	Analytics.CONSTANT_MOVIE.equalsIgnoreCase(ctype) )  {
 			params.put(Analytics.NUMBER_OF_MOVIE_CARDS,swipeCount+"");
 			event = Analytics.EVENT_BROWSED_MOVIES;
 		}
 		
-		if("live".equalsIgnoreCase(ctype) )  {
+		if(Analytics.CONSTANT_LIVE.equalsIgnoreCase(ctype) )  {
 			params.put(Analytics.NUMBER_OF_LIVETV_CARDS,swipeCount+"");
 			event = Analytics.EVENT_BROWSED_TV_CHANNELS;
 		}
 		
-		if("tvseries".equalsIgnoreCase(ctype) )  {
+		if(Analytics.CONSTANT_TV_SERIES.equalsIgnoreCase(ctype) )  {
 			params.put(Analytics.NUMBER_OF_LIVETV_SHOW_CARDS,swipeCount+"");
 			event = Analytics.EVENT_BROWSED_TV_SHOWS;
 		}
-		if("recommendations".equalsIgnoreCase(ctype) || "movie".equalsIgnoreCase(ctype) || "live".equalsIgnoreCase(ctype)|| "tvseries".equalsIgnoreCase(ctype)) {
+		if(Analytics.CONSTANT_RECOMMENDATIONS.equalsIgnoreCase(ctype) || Analytics.CONSTANT_MOVIE.equalsIgnoreCase(ctype) || Analytics.CONSTANT_LIVE.equalsIgnoreCase(ctype)|| Analytics.CONSTANT_TV_SERIES.equalsIgnoreCase(ctype)) {
 				Analytics.trackEvent(event,params);
 				Analytics.gaBrowse(ctype,swipeCount);
 				swipeCount = 1;			
@@ -750,7 +743,6 @@ public class CardView extends ScrollView {
 		params.put(Analytics.CONTENT_TYPE_PROPERTY,ctype);
 		params.put(Analytics.CONTENT_ID_PROPERTY,mCardData._id);
 		params.put(Analytics.USER_ID,Analytics.getUserEmail());
-		//String event = Analytics.EVENT_DELETED+Analytics.EMPTY_SPACE+ mCardData.generalInfo.title+Analytics.EMPTY_SPACE+Analytics.FROM_CARDS;
 		String event = Analytics.EVENT_DELETED_FROM_CARDS;
 		Analytics.trackEvent(event,params);
     }

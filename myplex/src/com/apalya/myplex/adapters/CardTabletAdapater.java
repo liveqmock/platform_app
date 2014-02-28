@@ -374,9 +374,11 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 		@Override
 		public void onDelayedClick(View v) {
 			Log.e(TAG, "mDeleteListener onClick");
+			
 			CardDataHolder dataHolder = null;
 			if(v.getTag() instanceof CardDataHolder){
 				dataHolder = (CardDataHolder) v.getTag();
+				mixPanelDeleteCard(dataHolder.mDataObject);
 				if(dataHolder == null){return;}
 				if(dataHolder.mDataObject == null){return;}
 			}else{
@@ -387,7 +389,7 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 			/*****************************DELTEING DOWNLOAD DATA************************************/
 			
 			if(myplexapplication.mDownloadList != null){
-				mixPanelDeleteCard(dataHolder.mDataObject);
+				
 				CardDownloadData mDownloadData = myplexapplication.mDownloadList.mDownloadedList.get(mDataList.get(index)._id);
 				if(mDownloadData!=null){
 					Util.removeDownload(mDownloadData.mDownloadId,mContext);
@@ -560,31 +562,23 @@ private void prepareDrmManager(String url){
 	
 	public void mixpanelBrowsingTablet() {
 		String event = null;
-		/*
-		CardExplorerData data = myplexapplication.getCardExplorerData();		
-		String ctype = data.searchQuery;		
-		if(ctype == null || ctype.length() == 0) {
-			int requestType = data.requestType;
-			ctype = Analytics.getRequestType(requestType);
-		}*/
-		
 		Map<String,String> params=new HashMap<String, String>();
 		String ctype = ScreenName;
-		if(	"recommendations".equalsIgnoreCase(ctype) )  {
+		if(	Analytics.CONSTANT_RECOMMENDATIONS.equalsIgnoreCase(ctype) )  {
 			event = Analytics.EVENT_BROWSED_RECOMMENDATIONS;
 			params.put(Analytics.NUMBER_OF_MOVIE_CARDS,swipeCount+"");
-		}
-		
-		if(	"movie".equalsIgnoreCase(ctype) )  {
+		}		
+		else if(Analytics.CONSTANT_MOVIE.equalsIgnoreCase(ctype) )  {
 			params.put(Analytics.NUMBER_OF_MOVIE_CARDS,swipeCount+"");
 			event = Analytics.EVENT_BROWSED_MOVIES;
 		}
 		
-		if("live".equalsIgnoreCase(ctype) )  {
+		else if(Analytics.CONSTANT_LIVE.equalsIgnoreCase(ctype) )  {
 			params.put(Analytics.NUMBER_OF_LIVETV_CARDS,swipeCount+"");
 			event = Analytics.EVENT_BROWSED_TV_CHANNELS;
 		}
-		if("recommendations".equalsIgnoreCase(ctype) || "movie".equalsIgnoreCase(ctype) || "live".equalsIgnoreCase(ctype)) {
+		
+		if(Analytics.CONSTANT_RECOMMENDATIONS.equalsIgnoreCase(ctype) || Analytics.CONSTANT_MOVIE.equalsIgnoreCase(ctype) || Analytics.CONSTANT_LIVE.equalsIgnoreCase(ctype)) {
 				Analytics.trackEvent(event,params);
 				Analytics.gaBrowse(ctype,swipeCount);
 				swipeCount = 1;			

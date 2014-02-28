@@ -214,15 +214,10 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		// that will be used for people analytics. You must set this explicitly in order
 		// to dispatch people data.
 		
-		//mMixpanel.getPeople().identify(trackingDistinctId);
-		/*String distinctId = mMixpanel.getDistinctId();
-		Log.d(TAG, "Mixpanel generated distinctid "+distinctId);*/
-		
 		mMixpanel.getPeople().initPushHandling(myplexapplication.ANDROID_PUSH_SENDER_ID);
 		Map<String,String> params1 = new HashMap<String, String>();
 		params1.put(Analytics.ALL_LOGIN_OPTIONS,"facebook google twitter myplex");
 		Analytics.trackEvent(Analytics.EVENT_LOGIN_OPTIONS_PRESENTED,params1);
-		//Analytics.startActivity(easyTracker, this);
 		Analytics.createScreenGA(Analytics.SCREEN_LOGINACTIVITY);
 		
 		Intent intent = this.getIntent();
@@ -805,7 +800,6 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			params.put("Network", "Mobile");
 		}
 		
-		//Analytics.trackEvent(Analytics.loginScreen,params);
 		
 		long nowInHours = hoursSinceEpoch();
 		int hourOfTheDay = hourOfTheDay();
@@ -1858,7 +1852,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					Crashlytics.setUserName(userIdSha1);
 					Crashlytics.setUserIdentifier(userIdSha1);
 					
-					
+					mMixpanel.getPeople().set("android app version.release", Util.getAppVersionNumber(this));
 					String profilename=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
 							getString(R.string.userprofilename));
 					String profilePic=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,

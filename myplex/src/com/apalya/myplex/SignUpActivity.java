@@ -304,9 +304,6 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 			mSubmit.setTypeface(FontUtil.Roboto_Regular);
 			mSubmit.setText("Join myplex");
 			
-			/*Map<String,String> params = new HashMap<String, String>();
-			params.put(Analytics.EVENT_MYPLEX_SIGNUP_OPTION, Analytics.ACCOUNT_TYPE_MYPLEX);
-			Analytics.trackEvent(Analytics.EVENT_JOIN_MYPLEX_INITIATED,params);*/
 			Analytics.mixPanelJoinMyplexInitiated();
 
 			mEmail.setOnFocusChangeListener(new OnFocusChangeListener() {
@@ -553,23 +550,20 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 	protected void onStart() {
 		// TODO Auto-generated method stub
 		super.onStart();
-		//EasyTracker.getInstance(this).activityStart(this); 
-		
+				
 	}
 	@Override
 	protected void onStop() {
 		// TODO Auto-generated method stub
 		super.onStop();
 		
-		//EasyTracker.getInstance(this).activityStop(this); 
 	}
 	protected Listener<String> RegisterUserSuccessListener() {
 		return new Response.Listener<String>() {
 			@Override
 			public void onResponse(String response) {
 				
-				//Analytics.endTimedEvent(Analytics.loginSignUp);
-				
+								
 				Log.d(TAG,"Response: "+response);
 				try {	
 					Log.d(TAG, "########################################################");
@@ -577,11 +571,9 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 					
 					
 					
-					//params1.put(Analytics.SIGNUP_DATE_PROPERTY, new Date().toString());
-					
+										
 					if(jsonResponse.getString("status").equalsIgnoreCase("SUCCESS"))
 					{
-						//myplexapplication.getMixPanel().getPeople().identify(mEmail.getText().toString());
 						Analytics.mixPanelMyplexJoinedSuccess(mEmail.getText().toString());
 						Log.d(TAG, "status: "+jsonResponse.getString("status"));
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
@@ -612,11 +604,6 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 					}
 					else
 					{
-						/*Map<String,String> params1=new HashMap<String, String>();
-						params1.put(Analytics.EVENT_MYPLEX_SIGNUP_OPTION, Analytics.ACCOUNT_TYPE_MYPLEX);
-						params1.put(Analytics.REASON_FAILURE, jsonResponse.getString("message"));
-						params1.put(Analytics.USER_ID,mEmail.getText().toString());
-						Analytics.trackEvent(Analytics.EVENT_JOINED_MYPLEX_FAILURE, params1);*/
 						Analytics.mixPanelMyplexJoinedFailure(mEmail.getText().toString(), jsonResponse.getString("message"));
 						
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
@@ -683,9 +670,6 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 						Log.d(TAG, "---------------------------------------------------------");
 						Util.showToast(SignUpActivity.this, jsonResponse.getString("message"),Util.TOAST_TYPE_INFO);
 						//Util.showToast(jsonResponse.getString("message"), SignUpActivity.this);
-						/*Map<String,String> attribs=new HashMap<String, String>();
-						attribs.put(Analytics.USER_ID, mEmail.getText().toString());
-						Analytics.trackEvent(Analytics.EVENT_FORGOT_PASSWORD_SUCCEEDED,attribs); */
 						Analytics.mixPanelForgotPasswordSucceeded(mEmail.getText().toString());
 											
 					}
@@ -695,10 +679,6 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
 						sendNotification("Err: "+jsonResponse.getString("code")+" \nErr Msg: "+jsonResponse.getString("message"));
 						
-						/*Map<String,String> attribs=new HashMap<String, String>();
-						attribs.put(Analytics.USER_ID, mEmail.getText().toString());
-						attribs.put(Analytics.REASON_FAILURE, jsonResponse.getString("message"));
-						Analytics.trackEvent(Analytics.EVENT_FORGOT_PASSWORD_FAILED,attribs); */
 						Analytics.mixPanelForgotPasswordFailed( mEmail.getText().toString(), jsonResponse.getString("message"));
 				}
 				} catch (JSONException e) {
@@ -714,21 +694,7 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 		Map<String,String> attribs=new HashMap<String, String>();
 		attribs.put(Analytics.ACCOUNT_TYPE, Analytics.ALL_LOGIN_TYPES.myplex.toString());
 		Analytics.trackEvent(Analytics.EVENT_MYPLEX_LOGIN_SELECTED,attribs); 
-		/*MixpanelAPI  mMixpanel=myplexapplication.getMixPanel();
-		MixpanelAPI.People people = mMixpanel.getPeople();
-		people.identify("999222");
-		people.set("$email", "apalya200.yahoo.com");
-		people.set("$first_name","KrishnaGovindam");
-		people.set("$last_name","NarayanaAnanda");
-		people.trackCharge(555.7, null);*/
-		/*JSONObject properties = new JSONObject();
-		try {
-			properties.put("$"+Analytics.LOGIN_EMAIL_PROPERTY,bodyParams.get("userid"));
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}*/
-		
+			
 		String url=ConsumerApi.SCHEME+ConsumerApi.DOMAIN+ConsumerApi.SLASH+ConsumerApi.USER_CONTEXT+ConsumerApi.SLASH+contextPath;
 		StringRequest myReq = new StringRequest(Method.POST,
 				url,
@@ -798,7 +764,6 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 		return new Response.Listener<String>() {
 			@Override
 			public void onResponse(String response) {
-				//Analytics.endTimedEvent(Analytics.loginSignIn);
 				Log.d(TAG,"Response: "+response);
 				try {	
 					Log.d(TAG, "########################################################");
@@ -806,7 +771,6 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 
 					if(jsonResponse.getString("status").equalsIgnoreCase("SUCCESS"))
 					{
-						//myplexapplication.getMixPanel().getPeople().identify(mEmail.getText().toString());
 						Map<String,String> attribs=new HashMap<String, String>();
 						attribs.put(Analytics.ACCOUNT_TYPE, Analytics.ALL_LOGIN_TYPES.myplex.toString());
 						attribs.put(Analytics.USER_ID,mEmail.getText().toString());

@@ -226,10 +226,10 @@ public class SubcriptionEngine {
 			String event = Analytics.EVENT_PAID_FOR_CONTENT;
 			Analytics.trackEvent(event,params);
 			Analytics.trackCharge(mSelectedPriceItem.price);
-			if("live tv".equals(ctype2)) {
+			if(Analytics.CONSTANT_LIVETV.equals(ctype2)) {
 				Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_LIVETV_PURCHASED_FOR,mSelectedPriceItem.price);
 			}
-			if("movies".equals(ctype2)) {
+			if(Analytics.CONSTANT_MOVIES.equals(ctype2)) {
 				Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_MOVIES_PURCHASED_FOR,mSelectedPriceItem.price);
 			}
 			Analytics.getMixpanelPeople().increment(Analytics.PEOPLE_TOTAL_PURCHASES,mSelectedPriceItem.price);

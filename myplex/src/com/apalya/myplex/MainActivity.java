@@ -121,17 +121,12 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 	protected void onStart() {
 		// TODO Auto-generated method stub
 		super.onStart();
-		
-		/*easyTracker = myplexapplication.getGaTracker();
-		Analytics.startActivity(easyTracker, this);*/
-		//easyTracker.activityStart(this);
 	}
 	
 	@Override
 	protected void onStop() {
 		// TODO Auto-generated method stub
 		super.onStop();
-		//EasyTracker.getInstance(this).activityStop(this); 
 	}
 	
 	@Override
@@ -395,6 +390,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 			v.setVisibility(value);
 		}
 	}
+	
 	private String getCurrentScreen() {
 		String currentScreen = null;
 		if(mCurrentFragment != null) {
@@ -415,9 +411,9 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		}
 		else{
 			return "CardExplorer Screen";
-		}
-		
+		}		
 	}
+	
 	private ImageView mNavigationMenu;
 	public void prepareCustomActionBar() {
 		getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
