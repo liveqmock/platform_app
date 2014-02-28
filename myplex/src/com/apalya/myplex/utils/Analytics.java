@@ -201,7 +201,7 @@ public class Analytics {
 	public static String EVENT_PLAYED_TV_CHANNEL = "played tv channel";
 	public static String EVENT_PLAYED_TV_SHOW = "played tv show";
 	public static String TRAILER = "trailer";
-	public static String MOVIE = "movie";
+	//public static String MOVIE = "movie";
 	public static String MOVIES = "movies";
 	public static String KEYWORD = "keyword";
 	public static String TV_CHANNEL = "TV channel";
@@ -618,34 +618,32 @@ public class Analytics {
 		
 		if(Analytics.CONSTANT_MOVIES.equalsIgnoreCase(ctype))  {
 			String contentQuality = null;
+			String purchaseType = null;
 			boolean localPlayback = isLocalPlayBack(mData._id);//based on this properties change 
+			if(cardData != null && cardData.currentUserData != null &&
+                    cardData.currentUserData.purchase != null && !cardData.currentUserData.purchase.isEmpty()){
+            
+				CardDataPurchaseItem  purchaseitem = cardData.currentUserData.purchase.get(0);
+            
+            if(purchaseitem.type != null) {
+            	purchaseType = purchaseitem.type;
+            }
+			}
+    
 			
 			if(localPlayback) {
 				//people data remove comments later
 				mMixPanel.getPeople().increment(Analytics.PEOPLE_MOVIES_PLAYED_LOCALLY_FOR,getTotalPlayedTimeInMinutes());
 				event = Analytics.EVENT_PLAYED_DOWNLOADED_MOVIE; //5
 				params.put(Analytics.MOVIE_SIZE,getDownloadedMovieSize(mData._id)+"");
-				String key = mData._id+"analytics";
-				String purchaseType = null; //rent or buy
+				params.put(Analytics.PAY_PURCHASE_TYPE, purchaseType); //6 //to be reviewed
+				params.put(Analytics.CONTENT_QUALITY, contentQuality); //7
 				
-				//Data is stored while purchase in SubscriptionView -mixPanelPaySuccess()
-				String value = SharedPrefUtils.getFromSharedPreference(myplexapplication.getAppContext(), key);
-				if(value != null) {
-					String[] sArray = value.split(":");
-					if(sArray != null && sArray.length == 2) {
-						purchaseType = sArray[0];
-						contentQuality = sArray[1];
-					}
-					
-					params.put(Analytics.PAY_PURCHASE_TYPE, purchaseType); //6 //to be reviewed
-					params.put(Analytics.CONTENT_QUALITY, contentQuality); //7
-				}
 			}
 			else { //streaming
 				params.put(Analytics.DOWNLOAD_OPTION_AVAILABLE,"TRUE"); //5 to-be-done
 				params.put(Analytics.MOVIE_SIZE,"1000mb"); //6 to-be-done
 				event = Analytics.EVENT_STREAMED_MOVIE;
-				//people data remove comments later
 				mMixPanel.getPeople().increment(Analytics.PEOPLE_MOVIES_STREAMED_FOR,getTotalPlayedTimeInMinutes());
 			}
 			Analytics.gaPlayedMovieTimings(ptime, mData.generalInfo.title, contentQuality);	

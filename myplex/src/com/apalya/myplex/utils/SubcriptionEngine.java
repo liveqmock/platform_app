@@ -194,6 +194,7 @@ public class SubcriptionEngine {
 		params.put(Analytics.PAYMENT_METHOD, mSelectedPriceItem.paymentChannel); //cc or dc
 		params.put(Analytics.CONTENT_QUALITY, mSelectedPackageItem.contentType); //SD or HD
 		String ctype = Analytics.movieOrLivetv(subscribedData.generalInfo.type); //movie or livetv
+		params.put(Analytics.CONTENT_TYPE_PROPERTY, ctype);//movie or livetv
 		params.put(Analytics.REASON_FAILURE,error);
 		String event = Analytics.EVENT_SUBSCRIPTION_FAILURE;
 		Analytics.trackEvent(event,params);
