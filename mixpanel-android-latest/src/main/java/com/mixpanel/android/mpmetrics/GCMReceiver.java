@@ -7,12 +7,14 @@ import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build;
+import android.text.TextUtils;
 import android.util.Log;
 
 /**
@@ -86,7 +88,8 @@ import android.util.Log;
 */
 public class GCMReceiver extends BroadcastReceiver {
     String LOGTAG = "MPGCMReceiver";
-
+    
+    
     @Override
     public void onReceive(Context context, Intent intent) {
         final String action = intent.getAction();
@@ -122,9 +125,12 @@ public class GCMReceiver extends BroadcastReceiver {
 
     private void handleNotificationIntent(Context context, Intent intent) {
         final String message = intent.getExtras().getString("mp_message");
-
+        final String _id = intent.getExtras().getString("_id");
+        final String page = intent.getExtras().getString("page");
+        
         if (message == null) return;
         if (MPConfig.DEBUG) Log.d(LOGTAG, "MP GCM notification received: " + message);
+        if (MPConfig.DEBUG) Log.d(LOGTAG, "MP GCM notification _id received: " + _id);
 
         final PackageManager manager = context.getPackageManager();
         final Intent appIntent = manager.getLaunchIntentForPackage(context.getPackageName());
@@ -137,7 +143,13 @@ public class GCMReceiver extends BroadcastReceiver {
         } catch (final NameNotFoundException e) {
             // In this case, use a blank title and default icon
         }
-
+        
+        if(!TextUtils.isEmpty(_id)){
+        	appIntent.putExtra("_id", _id);
+        }else if (!TextUtils.isEmpty(page)){
+        	appIntent.putExtra("page", page);
+        }
+        
         final PendingIntent contentIntent = PendingIntent.getActivity(
             context.getApplicationContext(),
             0,
