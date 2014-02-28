@@ -176,7 +176,7 @@ public class ConsumerApi {
 				+ PURCHASEDLIST_ACTION + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY
 				+  AMPERSAND + STARTINDEX
 				+ startIndex + AMPERSAND + LEVEL
-				+ level + AMPERSAND + COUNT +  AMPERSAND + BROWSETYPE  + searchType ;
+				+ level + AMPERSAND + COUNT ;//+ AMPERSAND ;// +  BROWSETYPE + searchType ;
 	}
 	public static String getFavourite(String contentId) {
 		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + CONTENT_TAG +SLASH + contentId +SLASH
@@ -190,9 +190,13 @@ public class ConsumerApi {
 				+ AMPERSAND + LEVEL + level ;
 	}
 	public static String getContentDetail(String contentID,String level){
+//		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH + CONTENTDETAILS_ACTION
+//				+ SLASH + contentID + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY  + AMPERSAND
+//		        + LEVEL + level + AMPERSAND+COUNT;
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH + CONTENTDETAILS_ACTION
 				+ SLASH + contentID + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY  + AMPERSAND
-		        + LEVEL + level + AMPERSAND+COUNT;
+		        + AMPERSAND+COUNT + AMPERSAND 
+		        + "fields=user/currentdata,images,generalInfo,contents,comments,reviews/user,_id,relatedMedia,packages,relatedCast,dynamicMeta";
 	}
 	public static String getVideosDetail(String contentID){
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT_V3 +  SLASH + CONTENTDETAILS_ACTION
@@ -281,12 +285,13 @@ public class ConsumerApi {
 		
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH + CONTENT_RELATED_CONTEXT + SLASH + contentId 
 				+ SLASH + QUESTION_MARK+ CLIENTKEY + DEBUGCLIENTKEY + AMPERSAND + LEVEL + LEVELDYNAMIC 
-				+ AMPERSAND + BROWSETYPE + TYPE_TV_SEASON;
+				+ AMPERSAND + BROWSETYPE + TYPE_TV_SEASON + AMPERSAND +"count=-1";
 	}
 	
 	public static String getEpisodesUrl(String contentId){
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH + CONTENT_RELATED_CONTEXT + SLASH + contentId 
 				+ SLASH + QUESTION_MARK+ CLIENTKEY + DEBUGCLIENTKEY + 
-				AMPERSAND + BROWSETYPE + TYPE_TV_EPISODE + "&fields=images,generalInfo,contents,comments,reviews/user,_id,relatedMedia" ;
+				AMPERSAND + BROWSETYPE + TYPE_TV_EPISODE +  AMPERSAND +"count=-1" 
+				+ "&fields=images,generalInfo,contents,comments,reviews/user,_id,relatedMedia" ;
 	}
 }

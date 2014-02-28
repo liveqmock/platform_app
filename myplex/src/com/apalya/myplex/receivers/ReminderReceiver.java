@@ -11,7 +11,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 
-import com.apalya.myplex.MainActivity;
+import com.apalya.myplex.LoginActivity;
 import com.apalya.myplex.R;
 
 public class ReminderReceiver extends BroadcastReceiver {
@@ -28,7 +28,7 @@ public class ReminderReceiver extends BroadcastReceiver {
 							extras.getString("_id").length() <1)
 					return;
 					
-				Intent notificationIntent = new Intent(context, MainActivity.class);
+				Intent notificationIntent = new Intent(context, LoginActivity.class);
 				notificationIntent.putExtra("_id", extras.getString("_id"));
 				PendingIntent contentIntent = PendingIntent.getActivity(context,
 				                0, notificationIntent,
