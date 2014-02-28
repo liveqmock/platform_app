@@ -877,7 +877,12 @@ public class CardDetails extends BaseFragment implements
 		//mixPanelSimilarContent();
 		Analytics.mixPanelSimilarContent(mCardData);
 		mMainActivity.bringFragment(fragment);
-		mMainActivity.setActionBarTitle("similar content");
+//		mMainActivity.setActionBarTitle("similar content");
+		if(mCardData.generalInfo.type != null && mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
+			mMainActivity.setActionBarTitle(mContext.getString(R.string.similar_live_tv));
+		}else if(mCardData.generalInfo.type != null && mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
+			mMainActivity.setActionBarTitle(mContext.getString(R.string.similar_movies));
+		}
 
 	}
 	
