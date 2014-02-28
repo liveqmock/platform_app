@@ -30,8 +30,9 @@
 				android:layout_height="wrap_content"
 				android:layout_below="@+id/carddetail_progressBar"
 				android:layout_marginLeft="@dimen/margin_gap_12"
-				android:layout_marginRight="@dimen/margin_gap_12"			
-				android:visibility="gone">
+				android:layout_marginRight="@dimen/margin_gap_12"	
+				android:background="@android:color/transparent"		
+				>
 			</LinearLayout>
 			<LinearLayout
 				android:id="@+id/tvshow_linear_layout"

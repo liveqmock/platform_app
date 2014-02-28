@@ -862,7 +862,7 @@ public class CardDetailViewFactory {
 		
 		RelativeLayout expand = (RelativeLayout)v.findViewById(R.id.carddetailfulldescription_expandlayout);
 		if(mContext.getResources().getBoolean(R.bool.isTablet)){
-			expand.setVisibility(View.INVISIBLE);
+			//.setVisibility(View.VISIBLE);
 		}
 		expand.setOnClickListener(new OnClickListener() {
 			

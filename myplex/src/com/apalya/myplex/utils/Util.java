@@ -101,6 +101,7 @@ import com.apalya.myplex.data.CardDownloadedDataList;
 import com.apalya.myplex.data.FetchDownloadData;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.tablet.MultiPaneActivity;
+import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookException;
 import com.facebook.FacebookOperationCanceledException;
 import com.facebook.Session;
@@ -436,6 +437,7 @@ public class Util {
 				Log.d(TAG,"downl;oad failed");
 				Util.showToast(mContext, "Some error occured during downloading.",Util.TOAST_TYPE_INFO);
 				t.printStackTrace();
+				Crashlytics.logException(t);
 			}
 			
 			if(lastDownloadId>0)

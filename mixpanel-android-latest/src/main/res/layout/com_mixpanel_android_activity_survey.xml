@@ -63,6 +63,7 @@
             android:layout_alignParentBottom="true"
             android:src="@drawable/com_mixpanel_android_logo"
             android:contentDescription="@string/com_mixpanel_android_logo"
+            android:visibility="gone"
             />
 
         <com.mixpanel.android.surveys.FadeOnPressButton

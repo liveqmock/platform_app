@@ -1758,7 +1758,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			{
 				if(Util.isWifiEnabled(mContext))
 				{
-					if(ApplicationSettings.ENABLE_SHOW_PLAYER_LOGS_SETTINGS){
+					/*if(ApplicationSettings.ENABLE_SHOW_PLAYER_LOGS_SETTINGS){
                         if(mData._id != null && mData._id.equalsIgnoreCase("413")){
                                 url="http://192.168.60.36/myplex/413_sd_est_1388644246475.wvm";
                         }else if(mData._id != null && mData._id.equalsIgnoreCase("415")){
@@ -1766,7 +1766,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
                         }else if(mData._id != null && mData._id.equalsIgnoreCase("446")){
                                 url="http://192.168.60.36/myplex/446_sd_est_1386786732268.wvm";
                         }
-                }
+                }*/
 					Util.startDownload(url, mData, mContext);
 				}
 				else
@@ -1909,5 +1909,14 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		mTrailerButton.setVisibility(View.GONE);
 		recordedProgName.setVisibility(View.GONE);
 		mPlayButton.setVisibility(View.VISIBLE);		
+	}
+	public void removeProgrammeName(){
+		if(recordedProgName!=null)
+			recordedProgName.setVisibility(View.GONE);
+		if(mTrailerButton!=null)
+			mTrailerButton.setVisibility(View.GONE);
+		if(mPlayButton!=null)
+			mPlayButton.setVisibility(View.GONE);
+		
 	}
 }

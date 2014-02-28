@@ -3,7 +3,6 @@ package com.apalya.myplex.utils;
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.ExecutionException;
 
 import android.content.Context;
 import android.location.Address;
@@ -13,7 +12,7 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-
+import com.apalya.myplex.R;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.location.LocationClient;
@@ -27,6 +26,7 @@ import com.google.android.gms.location.LocationClient;
  */
 public class LocationUtil 
 {
+	public static final String TAG = "LocationUtil";
 	private LocationClient client;
 	private Location location = null;
 	private Context context;	
@@ -132,7 +132,7 @@ public class LocationUtil
 				Geocoder geocoder =
 						new Geocoder(context, Locale.getDefault());
 				Location loc = param[0];
-				
+				String state  = null;
 				try {
 					
 					addresses = geocoder.getFromLocation(loc.getLatitude(),
@@ -145,6 +145,7 @@ public class LocationUtil
 								params += "&postalCode="+address.getPostalCode();
 							if(address.getLocality()!=null)
 								params += "&area="+address.getLocality();
+							state = address.getAdminArea();
 						}
 				} catch (IOException e1) {
 					Log.e("LocationSampleActivity",
@@ -166,6 +167,10 @@ public class LocationUtil
 				}catch (Exception e) {
 					e.printStackTrace();
 				}	
+			if(state != null && state.length() >0){
+				Log.d(TAG,"state ="+state);
+				SharedPrefUtils.writeToSharedPref(context, context.getString(R.string.pref_state),state);
+			}
 			params = params.replaceAll(" ", "%20");
 			return params;
 				
