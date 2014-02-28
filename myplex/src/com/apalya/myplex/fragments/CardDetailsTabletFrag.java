@@ -52,7 +52,9 @@ import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.NumberPicker;
 import com.apalya.myplex.utils.SeasonFetchHelper;
+import com.apalya.myplex.utils.SurveyUtil;
 import com.apalya.myplex.utils.SeasonFetchHelper.ShowFetchListener;
+import com.apalya.myplex.utils.SurveyUtil.SurveyListener;
 import com.apalya.myplex.views.CardDetailViewFactory;
 import com.apalya.myplex.views.CardDetailViewFactory.CardDetailViewFactoryListener;
 import com.apalya.myplex.views.CardVideoPlayer;
@@ -266,6 +268,29 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		if(mCardDetailViewFactory != null){
 			mCardDetailViewFactory.UpdateSubscriptionStatus(mCardData);
 		}
+		checkForSurvey();
+	}
+	
+	private void checkForSurvey(){
+		
+		SurveyUtil.getInstance().setSurveyListener(new SurveyListener() {
+			
+			@Override
+			public boolean canShowSurvey() {
+				
+				if(myplexapplication.getCardExplorerData().cardDataToSubscribe != null){
+					
+					return false;
+				}
+				
+				if(mPlayer != null && mPlayer.isMediaPlaying()){
+					return false;
+				}
+				return true;
+			}
+		});
+		
+		SurveyUtil.getInstance().checkForSurvey(getActivity());
 	}
 	private void prepareContent() {
 		fillData();

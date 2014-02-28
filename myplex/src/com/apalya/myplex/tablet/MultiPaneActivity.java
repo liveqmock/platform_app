@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,6 +17,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -61,9 +63,11 @@ import com.apalya.myplex.cache.IndexHandler;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardExplorerData;
 import com.apalya.myplex.data.FilterMenudata;
+import com.apalya.myplex.data.NavigationOptionsMenu;
 import com.apalya.myplex.data.SearchData;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.data.SearchData.ButtonData;
+import com.apalya.myplex.receivers.ConnectivityReceiver;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FontUtil;
@@ -111,6 +115,7 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 		prepareNavipane();
 		prepareCustomActionBar();
 		enableFilterAction(true);
+		onHandleExternalIntent(getIntent());
 	}
 	@Override
 	protected void onResume() {
@@ -729,5 +734,75 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 	
 	
 	
+	}
+	
+	private String _id;
+	
+	private boolean onHandleExternalIntent(Intent intent) {
+		
+		if(intent==null)
+			return false;
+		
+		if(!ConnectivityReceiver.isConnected){			
+			return false;								
+		} 
+		
+		boolean intentHandled = false;
+		
+		if(getIntent().hasExtra(mContext.getString(R.string._id))){
+			showActionBarProgressBar();
+			_id = getIntent().getExtras().getString(mContext.getString(R.string._id));
+			List<CardData> cards  =  new ArrayList<CardData>();
+			CardData cardData  = new CardData();
+			cardData._id = _id;
+			cards.add(cardData);
+			if(_id!=null && _id.length() >0){
+				mCacheManager.getCardDetails(cards, IndexHandler.OperationType.FTSEARCH, new CacheManagerCallback() {					
+					@Override
+					public void OnOnlineResults(List<CardData> dataList) {
+						for (CardData cardData : dataList) {
+							if(cardData._id.equalsIgnoreCase(_id)){
+								mCacheManager.unRegisterCallback();
+								hideActionBarProgressBar();
+								myplexapplication.mSelectedCard = cardData;
+								startActivity(new Intent(getApplicationContext(),TabletCardDetails.class));
+								finish();
+								break;
+							}
+						}
+					}					
+					@Override
+					public void OnOnlineError(VolleyError error) {
+					}					
+					@Override
+					public void OnCacheResults(HashMap<String, CardData> obj,
+							boolean issuedRequest) {
+						CardData data = null;
+						
+						 Iterator<Entry<String, CardData>> it = obj.entrySet().iterator();
+						    while (it.hasNext()) {
+						        Entry<String, CardData> pair = it.next();
+						        if(pair.getValue()._id.equalsIgnoreCase(_id)){
+						        	data = pair.getValue();
+						        	break;
+						        }
+						    }
+						
+						if(data == null){							
+							return;
+						}
+						    
+						hideActionBarProgressBar();
+						mCacheManager.unRegisterCallback();
+						myplexapplication.mSelectedCard = data;
+						startActivity(new Intent(getApplicationContext(),TabletCardDetails.class));
+						finish();
+					}
+				});
+			}
+			intentHandled=true;
+		}
+		
+		return intentHandled;
 	}
 }
