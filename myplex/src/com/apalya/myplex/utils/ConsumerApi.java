@@ -74,6 +74,7 @@ public class ConsumerApi {
 	public static final String STREAMDOWNLOAD = "download";
 	
 	public static final String PAYMENT_CHANNEL_INAPP="INAPP";
+	public static final String IMAGE_COVERPOSTER_MDPI="imageType=coverposter&imageProfile=mdpi";
 	
 	// min: returns only content ids.
 	// static: returns static sub-entities.
@@ -117,8 +118,10 @@ public class ConsumerApi {
 	public static final String CONTENT_RELATED_CONTEXT = "contentRelated";
 	public static final String TYPE_TV_SERIES = "tvseries";
 	public static final String TYPE_TV_SEASON= "tvseason";
-	public static final String TYPE_TV_EPISODE = "tvepisode";
-		
+	public static final String TYPE_TV_EPISODE = "tvepisode";	
+	
+	public static final String  HEADER_RESPONSE_TYPE_CACHED="cache-hit";
+	
 	public static String getSearch(String queryStr, String level,int startIndex, String searchType) {
 		if(queryStr == null||(queryStr != null && queryStr.length() ==0)){
 			queryStr = "*";
@@ -196,7 +199,8 @@ public class ConsumerApi {
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH + CONTENTDETAILS_ACTION
 				+ SLASH + contentID + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY  + AMPERSAND
 		        + AMPERSAND+COUNT + AMPERSAND 
-		        + "fields=user/currentdata,images,generalInfo,contents,comments,reviews/user,_id,relatedMedia,packages,relatedCast,dynamicMeta";
+		        + "fields=user/currentdata,images,generalInfo,contents,comments,reviews/user,_id,relatedMedia,packages,relatedCast,dynamicMeta,_lastModifiedAt,_expiresAt" 
+		        + AMPERSAND + IMAGE_COVERPOSTER_MDPI;
 	}
 	public static String getVideosDetail(String contentID){
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT_V3 +  SLASH + CONTENTDETAILS_ACTION

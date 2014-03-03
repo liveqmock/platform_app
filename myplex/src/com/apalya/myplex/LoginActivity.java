@@ -214,7 +214,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		// that will be used for people analytics. You must set this explicitly in order
 		// to dispatch people data.
 		
-		mMixpanel.getPeople().initPushHandling(myplexapplication.ANDROID_PUSH_SENDER_ID);
+		mMixpanel.getPeople().initPushHandling(getString(R.string.config_android_push_senderid));
 		Map<String,String> params1 = new HashMap<String, String>();
 		params1.put(Analytics.ALL_LOGIN_OPTIONS,"facebook google twitter myplex");
 		Analytics.trackEvent(Analytics.EVENT_LOGIN_OPTIONS_PRESENTED,params1);
@@ -1812,7 +1812,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		SetDeviceDetails();
 
 
-		ConsumerApi.DOMAIN=getString(R.string.domain_name);
+		ConsumerApi.DOMAIN=getString(R.string.config_domain_name);
 
 		String clientKey=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
 				getString(R.string.devclientkey));
