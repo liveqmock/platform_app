@@ -55,7 +55,7 @@ public class myplexapplication extends Application {
 	 *
 	 *   Paste it below (where you see "YOUR API TOKEN")
 	 */
-	public static final String MIXPANEL_API_TOKEN = "8293ff14fa557625b1e4ed11a349d5bb";
+
 	
 	/*
 	 * In order for your app to receive push notifications, you will need to enable
@@ -80,7 +80,7 @@ public class myplexapplication extends Application {
 	 * declare the permissions and receiver capabilities you'll need to get your push notifications working.
 	 * You can take a look at this application's AndroidManifest.xml file for an example of what is needed.
 	 */
-	public static final String ANDROID_PUSH_SENDER_ID = "976964091787";
+
 	public static LocationUtil locationUtil;
 
 	@Override
@@ -89,7 +89,7 @@ public class myplexapplication extends Application {
 		super.onCreate();
 		init();
 		initializeGa();
-		mixPanel = MixpanelAPI.getInstance(this, MIXPANEL_API_TOKEN);
+		mixPanel = MixpanelAPI.getInstance(this,getResources().getString(R.string.config_mixpanel_token));
 		myplexapplication.context = getApplicationContext();
 	}
 	
@@ -187,7 +187,7 @@ public class myplexapplication extends Application {
 		// Log.d(TAG,
 		// "******************************************************************");
 
-		ConsumerApi.DOMAIN = activity.getString(R.string.domain_name);
+		ConsumerApi.DOMAIN = activity.getString(R.string.config_domain_name);
 
 		String clientKey = SharedPrefUtils.getFromSharedPreference(activity,
 				activity.getString(R.string.devclientkey));
