@@ -86,6 +86,8 @@ public class EpgAdapter extends BaseAdapter {
 					//				reminder.setText(context.getString(R.string.play_icon));
 				}
 			}
+		}else if(content.Name!=null && content.Name.length() > 0){
+			title.setText(content.Name);			
 		}
 		
 

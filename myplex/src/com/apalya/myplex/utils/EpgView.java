@@ -19,9 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response.ErrorListener;
@@ -164,7 +162,6 @@ public class EpgView implements ProgrammActionListener{
 					cal.setTime(new SimpleDateFormat("MMM").parse(dateString.replaceAll("\\d","").trim()));
 					int monthInt = cal.get(Calendar.MONTH) + 1;
 					String dayString  = calendar.get(Calendar.YEAR)+"-"+monthInt+"-"+scanner.nextInt();
-					Toast.makeText(mContext, dayString, Toast.LENGTH_SHORT).show();
 					fetchEPGData(dayString);
 					} catch (ParseException e) {						
 						e.printStackTrace();
@@ -372,7 +369,8 @@ public class EpgView implements ProgrammActionListener{
 					}
 					return;
 				}
-				AlertDialogUtil.showAlert(mContext, "Do you want to set reminder", "no","yes",  new NoticeDialogListener() {					
+				AlertDialogUtil.showAlert(mContext, "Set reminder for "+epgContents.get(position1).Name+ " starting at "+getTime(programmeTime)
+						, "no","yes",  new NoticeDialogListener() {					
 					@Override
 					public void onDialogOption2Click() {
 							
@@ -405,7 +403,14 @@ public class EpgView implements ProgrammActionListener{
 	}
 	
 	public void removeEPGView(){
-		epgView.setVisibility(View.GONE);
+		List<EpgContent> contents = new ArrayList<EpgContent>();
+		for(int i=0;i<3;i++){
+			EpgContent content = new EpgContent(mContext.getString(R.string.epg_not_avaialable),"","","","");
+			contents.add(content);
+		}
+		adapter = new EpgAdapter(mContext, contents );
+		programmList.setAdapter(adapter);
+		adapter.notifyDataSetChanged();
 	}
 	public Date getDate(String dateString){
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");				

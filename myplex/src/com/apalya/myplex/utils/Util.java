@@ -224,7 +224,7 @@ public class Util {
 
 	public static void prepareDisplayinfo(Activity activity) {
 		try {
-			ConsumerApi.DOMAIN = activity.getString(R.string.domain_name);
+			ConsumerApi.DOMAIN = activity.getString(R.string.config_domain_name);
 			myplexapplication.getApplicationConfig().downloadCardsPath =  activity.getFilesDir()+"/"+"downloadlist.bin";
 			myplexapplication.getApplicationConfig().msisdnPath =  activity.getFilesDir()+"/"+"msisdn.bin";
 			myplexapplication.getApplicationConfig().lastViewedCardsPath = activity.getFilesDir()+"/"+"lastviewed.bin";

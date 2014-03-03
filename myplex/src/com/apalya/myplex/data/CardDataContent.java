@@ -22,5 +22,6 @@ public class CardDataContent implements Serializable{
 	public String parentId;
 	public String categoryType;
 	public String serialNo;
+	public String siblingOrder;
 	public CardDataContent(){}
 }

@@ -1,6 +1,7 @@
 package com.apalya.myplex.views;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import android.content.Context;
@@ -15,6 +16,8 @@ import com.apalya.myplex.utils.NumberPicker;
 import com.apalya.myplex.utils.SoundUtils;
 
 public class TVShowView  {
+	
+	private static final String TAG = "TVShowView";
 	private List<CardData> mCardDataList;
 
 
@@ -78,6 +81,7 @@ public class TVShowView  {
 
 	public boolean onEpisodeFetchComplete(CardData season, List<CardData> episodes)
 	{
+		
 		for(CardData data : mCardDataList){
 			if(data.equals(season)){
 				data.chields = episodes;
@@ -106,7 +110,7 @@ public class TVShowView  {
 			String appendString ="";
 			
 			if(season.content.serialNo==null || season.content.serialNo.length()==0){
-				Log.i("DEVESH","contents.serialNo is Null");
+				Log.i(TAG,"contents.serialNo is Null");
 				seasons[i] = "Se00";
 				//seasons[i] = content.generalInfo.title;
 			}
@@ -121,26 +125,11 @@ public class TVShowView  {
 				}
 				seasons[i] = appendString.concat((season.content.serialNo));
 				
-				Log.i("DEVESH","contents.serialNo is :"+ season.content.serialNo);
+				Log.i(TAG,"contents.serialNo is :"+ season.content.serialNo);
 				
 			
-			} 
-				
-			
-			
-		
-			//seasons[i] = content.generalInfo.title;/*+"("+content._id+")";*/
-		/*	
-			
-			if(content.serialNo < 10)
-			{appendString = "Se0";
-			}else{
-				{appendString = "Se";
-			}
-			
-			//seasons[i] = appendString.concat(String.valueOf(content.serialNo));
-*/			
-			
+			}				
+	
 		}
 		
 		int max = npSeason.getMaxValue();
@@ -192,14 +181,9 @@ public class TVShowView  {
 			programmes[i] = "\""+episode.generalInfo.title+"\"";
 			String appendString ="";
 			//		programmes[i] = content.generalInfo.title ;
-
-			
-			
-			
-			
 		
 			if(episode.content.serialNo==null || episode.content.serialNo.length()==0){
-				Log.i("DEVESH","contents.serialNo is Null");
+				Log.i(TAG,"contents.serialNo is Null");
 				appends[i] = "Ep 00";
 				//seasons[i] = content.generalInfo.title;
 			}
@@ -214,24 +198,16 @@ public class TVShowView  {
 				}
 				appends[i] = appendString.concat((episode.content.serialNo));
 				
-				Log.i("DEVESH","contents.serialNo is :"+ episode.content.serialNo);
+				Log.i(TAG,"contents.serialNo is :"+ episode.content.serialNo);
 				
 			
 			} 
 			appends[i]= appends[i].concat(" ");
 			programmes[i]= appends[i].concat(programmes[i]);
-			
-			 
-			 
-			
-			
-			
-			
-			
-			
-			
-			
 		}
+		
+		Arrays.sort(programmes);
+		
 		int max = npEpisode.getMaxValue();
 
 		if (programmes.length > max) {
@@ -360,7 +336,7 @@ public class TVShowView  {
 				int oldVal, int newVal) {
 			if(mSoundUtils!=null){mSoundUtils= null;}
 			mSoundUtils = new SoundUtils(mContext,R.raw.keypress);
-			mSoundUtils.playSound();
+//			mSoundUtils.playSound();
 			// TODO Auto-generated method stub
 			
 		}
