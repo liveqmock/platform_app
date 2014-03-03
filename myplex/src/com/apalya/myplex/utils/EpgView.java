@@ -317,7 +317,9 @@ public class EpgView implements ProgrammActionListener{
 					
 					if(player.isMediaPlaying())
 						return;
-					if(assetType.equals("1") && assertUrl!=null  && (!assertUrl.equalsIgnoreCase(mContext.getString(R.string.no_url)))){
+					if(assetType!=null && assetType.equals("1")
+							&& assertUrl!=null 
+								&& (!assertUrl.equalsIgnoreCase(mContext.getString(R.string.no_url)))){
 						Log.d(TAG,"got url for playback ="+assertUrl);
 						player.createRecordPlayView(assertUrl,epgContents.get(progSelectedIndex).Name);
 					}else{
