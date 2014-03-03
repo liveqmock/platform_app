@@ -104,9 +104,9 @@ public class ConsumerApi {
 
 	
 	// for live tv epg
-//	public static final String EPG_BASE_URL = "http://d2capp.apalya-auth.com/recording/epg/whatsOnIndiaXml.action?serviceId=";
+	public static final String EPG_BASE_URL = "http://d2capp.apalya-auth.com/recording/epg/whatsOnIndiaXml.action?serviceId=";
 //	public static final String EPG_BASE_URL = "http://192.168.200.16:8080/recording/epg/getEPGScheduleXML.action?serviceId=";
-	public static final String EPG_BASE_URL = "http://220.226.22.120:8080/recording/epg/getEPGScheduleXML.action?serviceId=";
+//	public static final String EPG_BASE_URL = "http://220.226.22.120:8080/recording/epg/getEPGScheduleXML.action?serviceId=";
 	public static final String DAYS  = "days=";
 	public static final String DATE  = "rdate=";
 	// list of content types
