@@ -1,5 +1,6 @@
 package com.mixpanel.android.mpmetrics;
 
+import com.mixpanel.android.R;
 import com.mixpanel.android.mpmetrics.MixpanelAPI.InstanceProcessor;
 
 import android.annotation.TargetApi;
@@ -16,6 +17,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.RemoteViews;
 
 /**
 * BroadcastReciever for handling Google Cloud Messaging intents.
@@ -160,7 +162,14 @@ public class GCMReceiver extends BroadcastReceiver {
         if (Build.VERSION.SDK_INT < 11) {
             showNotificationSDKLessThan11(context, contentIntent, notificationIcon, notificationTitle, message);
         } else {
-            showNotificationSDK11OrHigher(context, contentIntent, notificationIcon, notificationTitle, message);
+        	 RemoteViews remoteViews = new RemoteViews(context.getPackageName(),
+                    R.layout.push_notification);
+      
+        	 remoteViews.setTextViewText(R.id.push_subject,notificationTitle);
+             remoteViews.setTextViewText(R.id.push_message,message);
+             remoteViews.setImageViewResource(R.id.push_icon,notificationIcon);
+             
+            showNotificationSDK11OrHigher(context, contentIntent, notificationIcon, notificationTitle, message, remoteViews);
         }
     }
 
@@ -175,7 +184,7 @@ public class GCMReceiver extends BroadcastReceiver {
     }
 
     @SuppressWarnings("deprecation")
-	private void showNotificationSDK11OrHigher(Context context, PendingIntent intent, int notificationIcon, CharSequence title, CharSequence message) {
+	private void showNotificationSDK11OrHigher(Context context, PendingIntent intent, int notificationIcon, CharSequence title, CharSequence message, RemoteViews remoteViews) {
         final NotificationManager nm = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
         final Notification.Builder builder = new Notification.Builder(context).
                 setSmallIcon(notificationIcon).
@@ -183,7 +192,7 @@ public class GCMReceiver extends BroadcastReceiver {
                 setWhen(System.currentTimeMillis()).
                 setContentTitle(title).
                 setContentText(message).
-                setContentIntent(intent);
+                setContentIntent(intent).setContent(remoteViews);
         Notification n;
         if (Build.VERSION.SDK_INT < 16) {
             n = builder.getNotification();
