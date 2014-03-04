@@ -43,7 +43,7 @@ public class ReminderReceiver extends BroadcastReceiver {
 				builder.setContentIntent(contentIntent)
 				       .setSmallIcon(R.drawable.myplexicon)
 				       .setLargeIcon(BitmapFactory.decodeResource(res, R.drawable.myplexicon))
-				       .setTicker("Myplex")
+				       .setTicker("myplex")
 				       .setWhen(System.currentTimeMillis())
 				       .setAutoCancel(true)
 				       .setContentTitle(extras.getString("title"))

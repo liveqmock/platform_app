@@ -102,9 +102,9 @@ public class EpgView implements ProgrammActionListener{
 
 	private void fillDates() {
 		
-		for(int i=-3;i<=3;i++){
+		for(int i=1;i<=7;i++){
 			
-			days[i+4] = getMonthAndDate(i);
+			days[i] = getMonthAndDate(i-1);
 		}		
 		days[0] = "";
 		days[8] = "";
@@ -235,7 +235,7 @@ public class EpgView implements ProgrammActionListener{
 		});*/
 		
 		dateList.setAdapter(daysAdapter);
-		dateList.setSelection(3);
+		dateList.setSelection(0);
 	}
 	
 	private String getMonthAndDate(int days) {
@@ -354,6 +354,11 @@ public class EpgView implements ProgrammActionListener{
 				final Date programmeTime  = getDate(epgContents.get(position1).StartTime);
 				final Calendar prg = Calendar.getInstance();
 				prg.setTime(programmeTime);
+				
+				if(epgContents.get(position1).Name==null || epgContents.get(position1).Name.length() ==0
+						|| epgContents.get(position1).StartTime==null || epgContents.get(position1).StartTime.length() ==0 
+						|| epgContents.get(position1).EndTime==null || epgContents.get(position1).EndTime.length() ==0)
+					return;
 				
 				Log.d(TAG,"title "+epgContents.get(position1).Name);
 				if(!now.before(programmeTime)){

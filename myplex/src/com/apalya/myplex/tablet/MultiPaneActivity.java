@@ -798,15 +798,20 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 			action = intent.getStringExtra(mContext.getString(R.string.page));
 		}
 		if(action.length()>0){
-			if(action.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE))
+			if(action.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
 				OnSelectedOption(1,NavigationOptionsMenuAdapter.LIVETV);
-			else if(action.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_MOVIE))
+				intentHandled=true;
+			}else if(action.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_MOVIE)){
 				OnSelectedOption(1,NavigationOptionsMenuAdapter.MOVIES);
-			else if(action.equalsIgnoreCase(NavigationOptionsMenuAdapter.RECOMMENDED))
+				intentHandled=true;
+			}else if(action.equalsIgnoreCase(NavigationOptionsMenuAdapter.RECOMMENDED)){
 				OnSelectedOption(1,NavigationOptionsMenuAdapter.RECOMMENDED);
-			else if(action.equalsIgnoreCase(NavigationOptionsMenuAdapter.TVSHOWS))
+				intentHandled=true;
+			}else if(action.equalsIgnoreCase(NavigationOptionsMenuAdapter.TVSHOWS)){
 				OnSelectedOption(1,NavigationOptionsMenuAdapter.TVSHOWS);
-			return true;
+				intentHandled=true;
+			}
+			return intentHandled;
 		}
 		return intentHandled;
 	}
