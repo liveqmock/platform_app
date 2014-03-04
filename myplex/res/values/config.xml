@@ -6,4 +6,5 @@
     <string name="config.mixpanel.token">8293ff14fa557625b1e4ed11a349d5bb</string>
     <string name="config.android.push.senderid">976964091787</string>
     <string name="ga_trackingId">UA-47802668-1</string>
+    <bool name="config.crashlytics.enable">true</bool>
 </resources>
