@@ -392,9 +392,13 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		}
 		if(action.length()>0){
 			if(action.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE))
-				selectItem(3);
+				selectItem(1);
 			else if(action.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_MOVIE))
 				selectItem(2);
+			else if(action.equalsIgnoreCase(NavigationOptionsMenuAdapter.RECOMMENDED))
+				selectItem(3);
+			else if(action.equalsIgnoreCase(NavigationOptionsMenuAdapter.TVSHOWS))
+				selectItem(4);
 			return true;
 		}
 		return intentHandled;
