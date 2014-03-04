@@ -362,7 +362,7 @@ public class EpgView implements ProgrammActionListener{
 					String assetType = epgContents.get(position1).assetType;
 					if(player.isMediaPlaying())
 						return;
-					if(assetType.equals("1") && assertUrl!=null  && (!assertUrl.equalsIgnoreCase(mContext.getString(R.string.no_url)))){
+					if(assetType!=null && assetType.equals("1") && assertUrl!=null  && (!assertUrl.equalsIgnoreCase(mContext.getString(R.string.no_url)))){
 						Log.d(TAG,"got url for playback ="+assertUrl);
 						player.removeProgrammeName();
 						player.initPlayBack(assertUrl.trim());
@@ -419,7 +419,6 @@ public class EpgView implements ProgrammActionListener{
 		Date date = null;
 		try {
 			date   = format.parse(dateString);
-//			System.out.println(date);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
