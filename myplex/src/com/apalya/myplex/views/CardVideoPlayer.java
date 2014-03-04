@@ -1279,7 +1279,6 @@ private void playVideoFile(CardDownloadData mDownloadData){
 	@Override
 	public void onStateChanged(int state , int elapsedTime) 
 	{
-		System.out.println("state changed" + state + elapsedTime);
 		this.state = PlayerListener.STATE_PAUSED;
 		currentDuration = elapsedTime;
 		switch (state) {
