@@ -131,6 +131,7 @@ public class TVShowView  {
 			}				
 	
 		}
+		Arrays.sort(seasons);
 		
 		int max = npSeason.getMaxValue();
 
