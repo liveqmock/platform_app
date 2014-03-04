@@ -911,7 +911,6 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 							Session session = Session.getActiveSession();
 							
 							if(session != null ){
-								System.out.println("LoginActivity.onClickLogin()");
 								session.closeAndClearTokenInformation();
 								session = new Session(LoginActivity.this);
 								Session.setActiveSession(session);

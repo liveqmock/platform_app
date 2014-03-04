@@ -147,9 +147,8 @@ public class CardDetails extends BaseFragment implements
 		if (mDataObject instanceof CardData) {
 			mCardData = (CardData) mDataObject;
 			Log.d(TAG, "content ID =" + mCardData._id);
-		}
-		
-		
+		}		
+			
 		mMainActivity.setOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		mInflater = LayoutInflater.from(getContext());
 		rootView = inflater.inflate(R.layout.carddetails, container, false);
@@ -726,7 +725,6 @@ public class CardDetails extends BaseFragment implements
 
 			translationY = (rawY - mMinRawY) + mQuickReturnHeight;
 
-			// System.out.println(translationY);
 			if (translationY < 0) {
 				translationY = 0;
 				mMinRawY = rawY + mQuickReturnHeight;

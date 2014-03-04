@@ -78,7 +78,6 @@ public class SearchListAdapter extends BaseAdapter implements
 		if (mSearchDataList == null)
 			return null;
 		if (mSearchDataList.size() > 0) {
-//			System.out.println("POS:: " + position);
 
 			SearchData mLocalSearchData = mSearchDataList.get(position);
 			

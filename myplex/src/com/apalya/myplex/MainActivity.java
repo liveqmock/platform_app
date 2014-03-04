@@ -345,6 +345,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 								mCacheManager.unRegisterCallback();
 								hideActionBarProgressBar();
 								BaseFragment fragment = createFragment(NavigationOptionsMenuAdapter.CARDDETAILS_ACTION);
+								fragment.setMainActivity(MainActivity.this);
 								fragment.setDataObject(cardData);
 								bringFragment(fragment);
 								break;
@@ -390,12 +391,22 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		if(intent.hasExtra(mContext.getString(R.string.page))){
 			action = intent.getStringExtra(mContext.getString(R.string.page));
 		}
+		
 		if(action.length()>0){
-			if(action.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE))
-				selectItem(3);
-			else if(action.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_MOVIE))
+			if(action.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
+				selectItem(1);
+				intentHandled=true;
+			}else if(action.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_MOVIE)){
 				selectItem(2);
-			return true;
+				intentHandled=true;
+			}else if(action.equalsIgnoreCase(NavigationOptionsMenuAdapter.RECOMMENDED)){
+				selectItem(3);
+				intentHandled=true;
+			}else if(action.equalsIgnoreCase(NavigationOptionsMenuAdapter.TVSHOWS)){
+				selectItem(4);
+				intentHandled=true;
+			}
+			return intentHandled;
 		}
 		return intentHandled;
 	}

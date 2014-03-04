@@ -121,12 +121,10 @@ public class FliterMenuAdapter extends ArrayAdapter<FilterMenudata>
 			int lhsCount = 0,rhsCount = 0;
 			Matcher lhsMatcher = Pattern.compile("\\(([^)]+)\\)").matcher(lhs.label);
 		     while(lhsMatcher.find()) {
-		       System.out.println(lhsMatcher.group(1));    
 		       lhsCount = Integer.parseInt(lhsMatcher.group(1));
 		     }
 		     Matcher rhsMatcher = Pattern.compile("\\(([^)]+)\\)").matcher(rhs.label);
 		     while(rhsMatcher.find()) {
-		       System.out.println(rhsMatcher.group(1));    
 		       rhsCount = Integer.parseInt(rhsMatcher.group(1));
 		       }
 		     if(lhsCount > rhsCount){

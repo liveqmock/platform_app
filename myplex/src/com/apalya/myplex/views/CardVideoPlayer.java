@@ -985,7 +985,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		if (mData.images != null) {
 			for (CardDataImagesItem imageItem : mData.images.values) {
 				if (imageItem.type != null && imageItem.type.equalsIgnoreCase("coverposter") && imageItem.profile != null
-						&& imageItem.profile.equalsIgnoreCase(ApplicationConfig.HDPI)) {
+						&& imageItem.profile.equalsIgnoreCase(ApplicationConfig.MDPI)) {
 					if (imageItem.link == null
 							|| imageItem.link.compareTo("Images/NoImage.jpg") == 0) {
 						mPreviewImage.setImageResource(0);
@@ -1279,7 +1279,6 @@ private void playVideoFile(CardDownloadData mDownloadData){
 	@Override
 	public void onStateChanged(int state , int elapsedTime) 
 	{
-		System.out.println("state changed" + state + elapsedTime);
 		this.state = PlayerListener.STATE_PAUSED;
 		currentDuration = elapsedTime;
 		switch (state) {

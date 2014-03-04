@@ -102,9 +102,9 @@ public class EpgView implements ProgrammActionListener{
 
 	private void fillDates() {
 		
-		for(int i=-3;i<=3;i++){
+		for(int i=1;i<=7;i++){
 			
-			days[i+4] = getMonthAndDate(i);
+			days[i] = getMonthAndDate(i-1);
 		}		
 		days[0] = "";
 		days[8] = "";
@@ -235,7 +235,7 @@ public class EpgView implements ProgrammActionListener{
 		});*/
 		
 		dateList.setAdapter(daysAdapter);
-		dateList.setSelection(3);
+		dateList.setSelection(0);
 	}
 	
 	private String getMonthAndDate(int days) {
@@ -355,6 +355,11 @@ public class EpgView implements ProgrammActionListener{
 				final Calendar prg = Calendar.getInstance();
 				prg.setTime(programmeTime);
 				
+				if(epgContents.get(position1).Name==null || epgContents.get(position1).Name.length() ==0
+						|| epgContents.get(position1).StartTime==null || epgContents.get(position1).StartTime.length() ==0 
+						|| epgContents.get(position1).EndTime==null || epgContents.get(position1).EndTime.length() ==0)
+					return;
+				
 				Log.d(TAG,"title "+epgContents.get(position1).Name);
 				if(!now.before(programmeTime)){
 					Log.d(TAG,"assert url"+epgContents.get(position1).assetUrl);
@@ -362,7 +367,7 @@ public class EpgView implements ProgrammActionListener{
 					String assetType = epgContents.get(position1).assetType;
 					if(player.isMediaPlaying())
 						return;
-					if(assetType.equals("1") && assertUrl!=null  && (!assertUrl.equalsIgnoreCase(mContext.getString(R.string.no_url)))){
+					if(assetType!=null && assetType.equals("1") && assertUrl!=null  && (!assertUrl.equalsIgnoreCase(mContext.getString(R.string.no_url)))){
 						Log.d(TAG,"got url for playback ="+assertUrl);
 						player.removeProgrammeName();
 						player.initPlayBack(assertUrl.trim());
@@ -419,7 +424,6 @@ public class EpgView implements ProgrammActionListener{
 		Date date = null;
 		try {
 			date   = format.parse(dateString);
-//			System.out.println(date);
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}

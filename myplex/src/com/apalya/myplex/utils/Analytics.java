@@ -322,6 +322,7 @@ public class Analytics {
 	public static String CONSTANT_LIVE = "live";
 	public static String CONSTANT_TV_SERIES = "tvseries";
 	public static String CONSTANT_TV_SHOW = "tvshow";
+	public static String CONSTANT_TV_EPISODE = "tvepisode";
 	
 	
 	private static MixpanelAPI mMixPanel = myplexapplication.getMixPanel();
@@ -489,7 +490,7 @@ public class Analytics {
 			break;
 		case 7:
 			ctype= "live tv";
-			break;
+			break;		
 		default:
 			ctype= null;
 			break;
@@ -841,8 +842,8 @@ public class Analytics {
 			Map<String,String> params=new HashMap<String, String>();
 			String ctype = Analytics.movieOrLivetv(mData.searchQuery);
 			int rtype = mData.requestType;
-			String reqtype = Analytics.getRequestType(rtype);
 			if(ctype == null) {
+				String reqtype = Analytics.getRequestType(rtype);
 				ctype = reqtype;
 			}
 			String event = null;
@@ -1494,7 +1495,8 @@ public class Analytics {
 			Analytics.createEventGA(Analytics.CATEGORY_BROWSE, Analytics.EVENT_BROWSED_LIVE_TV_GA, Analytics.NUMBER_OF_CARDS, swipeCount);
 		}
 		else if(Analytics.CONSTANT_TV_SERIES.equalsIgnoreCase(ctype)) {
-			Analytics.createEventGA(Analytics.CATEGORY_BROWSE, Analytics.EVENT_BROWSED_TV_SHOWS, Analytics.NUMBER_OF_CARDS, swipeCount);
+			Log.d("amlan","tv series");
+			Analytics.createEventGA(Analytics.CONSTANT_TV_SERIES, Analytics.EVENT_BROWSED_TV_SHOWS, Analytics.NUMBER_OF_CARDS, swipeCount);
 		}	
 	}
 	
@@ -1531,6 +1533,8 @@ public class Analytics {
 		if(cardData.generalInfo == null) return;
 		if(Analytics.CONSTANT_MOVIE.equals(cardData.generalInfo.type)) {
 			Analytics.createEventGA(Analytics.CATEGORY_MOVIE, Analytics.ACTION_TYPES.play.toString(), cardData.generalInfo.title, 1l);
+		}else if(Analytics.CONSTANT_TV_EPISODE.equals(cardData.generalInfo.type)) {
+			Analytics.createEventGA(Analytics.CONSTANT_TV_SERIES, Analytics.ACTION_TYPES.play.toString(), cardData.generalInfo.title, 1l);
 		}
 	}
 	
@@ -1555,6 +1559,10 @@ public class Analytics {
 		String ctype = Analytics.movieOrLivetv(contentType);
 		if(CONSTANT_MOVIES.equalsIgnoreCase(ctype)) {
 			Analytics.createEventGA(CONSTANT_MOVIES, action, mData.generalInfo.title, stopPauseLocation);
+		}else if(CONSTANT_LIVETV.equalsIgnoreCase(ctype)){
+			Analytics.createEventGA(CONSTANT_LIVETV, action, mData.generalInfo.title, stopPauseLocation);
+		}else if(CONSTANT_TV_SHOW.equalsIgnoreCase(ctype)){
+			Analytics.createEventGA(CONSTANT_TV_SERIES, action, mData.generalInfo.title, stopPauseLocation);
 		}
 	}
 	
