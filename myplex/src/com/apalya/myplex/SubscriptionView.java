@@ -408,8 +408,8 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 					List<CardData> dataToSave = new ArrayList<CardData>();
 					dataToSave.add(subscribedData);
 					
-					String requestUrl = ConsumerApi.getBundleUrl(subscribedData._id);
-					/*BundleUpdateHelper helper = new BundleUpdateHelper(requestUrl, dataToSave);
+					String requestUrl = ConsumerApi.getBundleUrl(packageId);
+					BundleUpdateHelper helper = new BundleUpdateHelper(requestUrl, dataToSave);
 					helper.getConnectIds(new InsertionResult() {						
 						@Override
 						public void updateComplete(Boolean updateStatus) {							
@@ -418,16 +418,16 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 //							Toast.makeText(SubscriptionView.this, "Subscription Info updated", Toast.LENGTH_SHORT).show();
 						}
 					});
-					helper.updatecurrentUserData();*/					
-					myplexapplication.getCacheHolder().UpdataDataAsync(dataToSave, new InsertionResult() {
-						
-						@Override
-						public void updateComplete(Boolean updateStatus) {
-							closeSession(response);
-							Util.showToast(SubscriptionView.this, "Subscription Info updated",Util.TOAST_TYPE_INFO);
-//							Toast.makeText(SubscriptionView.this, "Subscription Info updated", Toast.LENGTH_SHORT).show();
-						}
-					});					
+//					helper.updatecurrentUserData();					
+//					myplexapplication.getCacheHolder().UpdataDataAsync(dataToSave, new InsertionResult() {
+//						
+//						@Override
+//						public void updateComplete(Boolean updateStatus) {
+//							closeSession(response);
+//							Util.showToast(SubscriptionView.this, "Subscription Info updated",Util.TOAST_TYPE_INFO);
+////							Toast.makeText(SubscriptionView.this, "Subscription Info updated", Toast.LENGTH_SHORT).show();
+//						}
+//					});					
 				}
 			});
 		}else{
