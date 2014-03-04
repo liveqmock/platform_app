@@ -218,6 +218,7 @@ public class CardDetails extends BaseFragment implements
 				datas.add(mCardData);
 				mTVShowView = new TVShowView(mContext , datas, mTvShowLinear,new TvShowSelectorCallBack());
 			}
+			initialiseTVShow(rootView);
 			mTVShowView.createTVShowView();
 			seasonPicker = (NumberPicker)rootView.findViewById(R.id.numberPickerSeason);
 			episodePicker = (NumberPicker)rootView.findViewById(R.id.numberPickerEpisode);			
@@ -292,12 +293,6 @@ public class CardDetails extends BaseFragment implements
 
 		return rootView;
 	}
-	
-	
-	
-	
-
-	
 	private CardVideoPlayer mPlayer;
 	private CardData mCardData,mSeasonData,mEpisodeData;
 
@@ -1063,8 +1058,6 @@ public class CardDetails extends BaseFragment implements
 		mPlayer.updateCardPreviewImage(card);
 	}
 	
-	
-	
 	private void initialiseTVShow(View rootView) {
 		
 		LayoutTransition tvshowtransition = new LayoutTransition();
@@ -1075,18 +1068,7 @@ public class CardDetails extends BaseFragment implements
 		
 		mTvShowLinear.setVisibility(View.VISIBLE);
 	
-	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	}	
 	private class TvShowManager implements ShowFetchListener{
 		@Override
 		public void onSeasonDataFetched(List<CardData> seasons) {
