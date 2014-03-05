@@ -321,7 +321,7 @@ public class Analytics {
 	public static String CONSTANT_LIVETV = "live tv";
 	public static String CONSTANT_LIVE = "live";
 	public static String CONSTANT_TV_SERIES = "tvseries";
-	public static String CONSTANT_TV_SHOW = "tvshow";
+	public static String CONSTANT_TV_SHOW = "tv shows";
 	public static String CONSTANT_TV_EPISODE = "tvepisode";
 	
 	
@@ -448,7 +448,7 @@ public class Analytics {
 			ctype = "live tv";
 		}
 		else if("tvepisode".equalsIgnoreCase(contentType) || "tvseries".equalsIgnoreCase(contentType) || "tvseason".equalsIgnoreCase(contentType)) {
-			ctype = "tvshow";
+			ctype = "tv shows";
 		}
 		else {
 			ctype = null;
@@ -586,7 +586,7 @@ public class Analytics {
 			mMixPanel.getPeople().increment(Analytics.PEOPLE_TV_STREAMED,ptimeMinutes);
 			mMixPanel.getPeople().increment(Analytics.TIME_PLAYED_PROPERTY,ptime);
 			Analytics.gaPlayedLiveTvTimings(ptime, mData.generalInfo.title); 
-			Analytics.createEventGA("live tv", "play", mData.generalInfo.title, ptime);//ga
+			Analytics.createEventGA("live tv", "play", mData.generalInfo.title, ptimeMinutes);//ga
 			return;
 		}
 		else if(Analytics.CONSTANT_TV_SHOW.equalsIgnoreCase(ctype))  {
@@ -597,8 +597,8 @@ public class Analytics {
 			Analytics.trackEvent(event,params);
 			mMixPanel.getPeople().increment(Analytics.PEOPLE_TV_STREAMED,ptimeMinutes);
 			mMixPanel.getPeople().increment(Analytics.TIME_PLAYED_PROPERTY,ptime);
-			Analytics.gaPlayedLiveTvTimings(ptime, mData.generalInfo.title); 
-			//Analytics.createEventGA("tv show", "play", mData.generalInfo.title, ptime);//ga
+			Analytics.gaPlayedTvShowsTimings(ptime, mData.generalInfo.title); 
+			Analytics.createEventGA(Analytics.CONSTANT_TV_SHOW, "play", mData.generalInfo.title, ptimeMinutes);//ga
 			return;
 		}
 		
@@ -648,7 +648,7 @@ public class Analytics {
 				mMixPanel.getPeople().increment(Analytics.PEOPLE_MOVIES_STREAMED_FOR,getTotalPlayedTimeInMinutes());
 			}
 			Analytics.gaPlayedMovieTimings(ptime, mData.generalInfo.title, contentQuality);	
-			Analytics.createEventGA(CONSTANT_MOVIES, ACTION_TYPES.play.toString(), mCardData.generalInfo.title, ptime);
+			Analytics.createEventGA(CONSTANT_MOVIES, ACTION_TYPES.play.toString(), mCardData.generalInfo.title, ptimeMinutes);
 		}
 		Analytics.trackEvent(event,params);		
 		mMixPanel.getPeople().increment(Analytics.TIME_PLAYED_PROPERTY,ptime);
@@ -1496,7 +1496,7 @@ public class Analytics {
 		}
 		else if(Analytics.CONSTANT_TV_SERIES.equalsIgnoreCase(ctype)) {
 			Log.d("amlan","tv series");
-			Analytics.createEventGA(Analytics.CONSTANT_TV_SERIES, Analytics.EVENT_BROWSED_TV_SHOWS, Analytics.NUMBER_OF_CARDS, swipeCount);
+			Analytics.createEventGA(Analytics.CATEGORY_BROWSE, Analytics.EVENT_BROWSED_TV_SHOWS, Analytics.NUMBER_OF_CARDS, swipeCount);
 		}	
 	}
 	
@@ -1534,7 +1534,7 @@ public class Analytics {
 		if(Analytics.CONSTANT_MOVIE.equals(cardData.generalInfo.type)) {
 			Analytics.createEventGA(Analytics.CATEGORY_MOVIE, Analytics.ACTION_TYPES.play.toString(), cardData.generalInfo.title, 1l);
 		}else if(Analytics.CONSTANT_TV_EPISODE.equals(cardData.generalInfo.type)) {
-			Analytics.createEventGA(Analytics.CONSTANT_TV_SERIES, Analytics.ACTION_TYPES.play.toString(), cardData.generalInfo.title, 1l);
+			Analytics.createEventGA(Analytics.CONSTANT_TV_SHOW, Analytics.ACTION_TYPES.play.toString(), cardData.generalInfo.title, 1l);
 		}
 	}
 	
@@ -1562,20 +1562,24 @@ public class Analytics {
 		}else if(CONSTANT_LIVETV.equalsIgnoreCase(ctype)){
 			Analytics.createEventGA(CONSTANT_LIVETV, action, mData.generalInfo.title, stopPauseLocation);
 		}else if(CONSTANT_TV_SHOW.equalsIgnoreCase(ctype)){
-			Analytics.createEventGA(CONSTANT_TV_SERIES, action, mData.generalInfo.title, stopPauseLocation);
+			Analytics.createEventGA(CONSTANT_TV_SHOW, action, mData.generalInfo.title, stopPauseLocation);
 		}
 	}
 	
 	public static void gaPlayedMovieTimings(long timeInSeconds,String contentName,String label) {
-		Analytics.createUserTimingGA(Analytics.CATEGORY_PLAYED_MOVIE,timeInSeconds , contentName, label);
+		Analytics.createUserTimingGA(Analytics.CATEGORY_PLAYED_MOVIE,1L , contentName, label);
 	}
 	
 	public static void gaPlayedTrailerTimings(long timeInSeconds,String contentName) {
-		Analytics.createUserTimingGA(Analytics.CATEGORY_PLAYED_TRAILER,timeInSeconds , contentName, null);
+		Analytics.createUserTimingGA(Analytics.CATEGORY_PLAYED_TRAILER,1L , contentName, null);
 	}
 	
 	public static void gaPlayedLiveTvTimings(long timeInSeconds,String contentName) {
-		Analytics.createUserTimingGA(Analytics.CATEGORY_PLAYED_LIVETV,timeInSeconds , contentName, null);
+		Analytics.createUserTimingGA(Analytics.CATEGORY_PLAYED_LIVETV,1L , contentName, null);
+	}
+	
+	public static void gaPlayedTvShowsTimings(long timeInSeconds,String contentName) {
+		Analytics.createUserTimingGA(Analytics.CONSTANT_TV_SHOW,1L , contentName, null);
 	}
 			
 }

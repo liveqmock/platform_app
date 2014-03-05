@@ -315,8 +315,8 @@ public class EpgView implements ProgrammActionListener{
 						}
 					}, 300);
 					
-					if(player.isMediaPlaying())
-						return;
+					if(player.isMediaPlaying() || assetType == null || assertUrl == null)
+						return;	
 					if(assetType!=null && assetType.equals("1")
 							&& assertUrl!=null 
 								&& (!assertUrl.equalsIgnoreCase(mContext.getString(R.string.no_url)))){
