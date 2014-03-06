@@ -12,8 +12,10 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.net.Uri;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
@@ -90,7 +92,8 @@ import android.widget.RemoteViews;
 */
 public class GCMReceiver extends BroadcastReceiver {
     String LOGTAG = "MPGCMReceiver";
-    
+//    public static final String PLAYSTORE_DOWNLOAD_PATH="market://details?id=com.apalya.myplex&referrer=utm_source%3Dgoogle%26utm_medium%3Dcpc%26utm_term%3Drunning%252Bshoes%26utm_content%3DdisplayAd1%26utm_campaign%3Dshoe%252Bcampaign";    
+    public static final String PLAYSTORE_DOWNLOAD_PATH="market://details?id=";
     
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -128,6 +131,8 @@ public class GCMReceiver extends BroadcastReceiver {
     private void handleNotificationIntent(Context context, Intent intent) {
         final String message = intent.getExtras().getString("mp_message");
         final String _id = intent.getExtras().getString("_id");
+        final String latestVersion = intent.getExtras().getString("ver");
+        
         final String page = intent.getExtras().getString("page");
         
         if (message == null) return;
@@ -135,13 +140,14 @@ public class GCMReceiver extends BroadcastReceiver {
         if (MPConfig.DEBUG) Log.d(LOGTAG, "MP GCM notification _id received: " + _id);
 
         final PackageManager manager = context.getPackageManager();
-        final Intent appIntent = manager.getLaunchIntentForPackage(context.getPackageName());
+         Intent appIntent = manager.getLaunchIntentForPackage(context.getPackageName());
         CharSequence notificationTitle = "";
         int notificationIcon = android.R.drawable.sym_def_app_icon;
         try {
             final ApplicationInfo appInfo = manager.getApplicationInfo(context.getPackageName(), 0);
             notificationTitle = manager.getApplicationLabel(appInfo);
             notificationIcon = appInfo.icon;
+            
         } catch (final NameNotFoundException e) {
             // In this case, use a blank title and default icon
         }
@@ -150,6 +156,29 @@ public class GCMReceiver extends BroadcastReceiver {
         	appIntent.putExtra("_id", _id);
         }else if (!TextUtils.isEmpty(page)){
         	appIntent.putExtra("page", page);
+        }else if (!TextUtils.isEmpty(latestVersion)){        	
+        	
+        	if (MPConfig.DEBUG) Log.d(LOGTAG, "MP GCM notification latestVer received: " + latestVersion);
+        	
+    		PackageInfo info;
+    		try {
+    			int latVer = Integer.valueOf(latestVersion);
+    			info = manager.getPackageInfo(
+    					context.getPackageName(), 0);
+    			 				
+				if (latVer <= info.versionCode) {
+					// Ignore , app is already up to date.
+					if (MPConfig.DEBUG)
+						Log.d(LOGTAG, "Ignore , app is already up to date");
+					return;
+				}
+    			
+    		} catch (Throwable e) {			
+    			return ;
+    		}
+    		
+        	appIntent = new Intent(Intent.ACTION_VIEW);
+        	appIntent.setData( Uri.parse(PLAYSTORE_DOWNLOAD_PATH+context.getPackageName()));
         }
         
         final PendingIntent contentIntent = PendingIntent.getActivity(
