@@ -34,6 +34,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Base64;
 import android.util.DisplayMetrics;
@@ -203,11 +204,20 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 		FontUtil.loadFonts(getAssets());
 		String trackingDistinctId = getTrackingDistinctId();
-		Analytics.trackingId = trackingDistinctId;
+		
 		mMixpanel = myplexapplication.getMixPanel();
 		// We also identify the current user with a distinct ID, and
 		// register ourselves for push notifications from Mixpanel.
 
+
+		String username=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
+				getString(R.string.devusername));
+		
+		if(!TextUtils.isEmpty(username)){
+			trackingDistinctId=username;
+		}
+		
+		Analytics.trackingId = trackingDistinctId;
 		mMixpanel.identify(trackingDistinctId); //this is the distinct_id value that
 		// will be sent with events. If you choose not to set this,
 		// the SDK will generate one for you
@@ -217,6 +227,10 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		// to dispatch people data.
 		
 		mMixpanel.getPeople().initPushHandling(getString(R.string.config_android_push_senderid));
+		
+		if(TextUtils.isEmpty(username)){
+			Analytics.setMixPanelFirstName(Analytics.PEOPLE_DEFAULT_NAME);
+		}
 		Map<String,String> params1 = new HashMap<String, String>();
 		params1.put(Analytics.ALL_LOGIN_OPTIONS,"facebook google twitter myplex");
 		Analytics.trackEvent(Analytics.EVENT_LOGIN_OPTIONS_PRESENTED,params1);
@@ -1055,10 +1069,14 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 						SharedPrefUtils.writeToSharedPref(LoginActivity.this,
 								getString(R.string.devusername), mUserInfo.getUserEmail());
 						
+						Analytics.setMixPanelEmail(mUserInfo.getUserEmail());
+						
 						if(mUserInfo.getName() != null)
 						{
 							SharedPrefUtils.writeToSharedPref(LoginActivity.this,
 								getString(R.string.userprofilename), mUserInfo.getName());
+							Analytics.setMixPanelFirstName( mUserInfo.getName());
+							
 						}
 						
 						if(fbUserId != null)
@@ -1315,8 +1333,10 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					{
 
 						Log.d(TAG, "########################################################");
+						Analytics.setMixPanelEmail(mUserInfo.getUserEmail());
 						if(mUserInfo.getName() != null){
 							SharedPrefUtils.writeToSharedPref(LoginActivity.this, getString(R.string.userprofilename), mUserInfo.getName());
+							Analytics.setMixPanelFirstName( mUserInfo.getName());
 						}
 						
 						if(mUserInfo.getGoogleId() != null)
@@ -1874,7 +1894,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					
 					if(username != null){
 						mMixpanel.getPeople().set("$email", username);
-						//mMixpanel.getPeople().identify(username);
+//						mMixpanel.getPeople().identify(username);
 					}
 					
 					finish();
