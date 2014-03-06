@@ -574,6 +574,8 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 										
 					if(jsonResponse.getString("status").equalsIgnoreCase("SUCCESS"))
 					{
+						Analytics.setMixPanelEmail(mEmail.getText().toString());
+						Analytics.setMixPanelFirstName(mEmail.getText().toString());
 						Analytics.mixPanelMyplexJoinedSuccess(mEmail.getText().toString());
 						Log.d(TAG, "status: "+jsonResponse.getString("status"));
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
@@ -592,7 +594,6 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 								getString(R.string.devusername), mEmail.getText().toString());
 						SharedPrefUtils.writeToSharedPref(SignUpActivity.this,
 								getString(R.string.devpassword), mPassword.getText().toString());
-
 						Crashlytics.setUserEmail(mEmail.getText().toString());
 						String userIdSha1=Util.sha1Hash(mEmail.getText().toString());
 						
@@ -771,6 +772,10 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 
 					if(jsonResponse.getString("status").equalsIgnoreCase("SUCCESS"))
 					{
+						Analytics.setMixPanelEmail(mEmail.getText().toString());
+						Analytics.setMixPanelFirstName(mEmail.getText().toString());
+						
+						
 						Map<String,String> attribs=new HashMap<String, String>();
 						attribs.put(Analytics.ACCOUNT_TYPE, Analytics.ALL_LOGIN_TYPES.myplex.toString());
 						attribs.put(Analytics.USER_ID,mEmail.getText().toString());
@@ -792,7 +797,7 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 								getString(R.string.devusername), mEmail.getText().toString());
 						SharedPrefUtils.writeToSharedPref(SignUpActivity.this,
 								getString(R.string.devpassword), mPassword.getText().toString());
-
+						
 						Crashlytics.setUserEmail(mEmail.getText().toString());
 						String userIdSha1=Util.sha1Hash(mEmail.getText().toString());
 						

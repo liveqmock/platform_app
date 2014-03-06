@@ -276,6 +276,8 @@ public class Analytics {
 	public static String PEOPLE_FREE_DOWNLOADS_TO_OWN = "free downloads to own";
 	public static String PEOPLE_JOINING_DATE = "joining date";
 	public static String PEOPLE_FAVORITES = "favorites";
+	public static String PEOPLE_DEFAULT_NAME = "Guest";
+	
 	
 	//Google Analytics
 	public static String GA_AFFILIATION = "GoogleStore";
@@ -337,7 +339,7 @@ public class Analytics {
 	
 	public static MixpanelAPI.People getMixpanelPeople() {
 		MixpanelAPI.People people = mMixPanel.getPeople();
-		people.identify(getUserEmail());
+//		people.identify(getUserEmail());
 		return people;
 	}
 	
@@ -1578,5 +1580,14 @@ public class Analytics {
 		Analytics.createUserTimingGA(Analytics.CATEGORY_PLAYED_LIVETV,timeInSeconds , contentName, null);
 	}
 			
+	public static void setMixPanelEmail(String email){
+		mMixPanel.identify(email);		
+		mMixPanel.getPeople().identify(email);
+		mMixPanel.getPeople().set("$email", email);
+	}
+	
+	public static void setMixPanelFirstName(String firstName){
+		mMixPanel.getPeople().set("$first_name", firstName);
+	}
 }
 
