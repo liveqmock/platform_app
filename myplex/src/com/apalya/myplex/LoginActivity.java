@@ -228,7 +228,9 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		
 		mMixpanel.getPeople().initPushHandling(getString(R.string.config_android_push_senderid));
 		
-		Analytics.setMixPanelFirstName(Analytics.PEOPLE_DEFAULT_NAME);
+		if(TextUtils.isEmpty(username)){
+			Analytics.setMixPanelFirstName(Analytics.PEOPLE_DEFAULT_NAME);
+		}
 		Map<String,String> params1 = new HashMap<String, String>();
 		params1.put(Analytics.ALL_LOGIN_OPTIONS,"facebook google twitter myplex");
 		Analytics.trackEvent(Analytics.EVENT_LOGIN_OPTIONS_PRESENTED,params1);
