@@ -34,6 +34,7 @@ import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.receivers.ReminderReceiver;
 import com.apalya.myplex.utils.AlertDialogUtil.NoticeDialogListener;
 import com.apalya.myplex.views.CardVideoPlayer;
+import com.apalya.myplex.views.MyplexDialog;
 
 public class EpgView implements ProgrammActionListener{
 	private CardData mData;
@@ -376,7 +377,7 @@ public class EpgView implements ProgrammActionListener{
 					}
 					return;
 				}
-				AlertDialogUtil.showAlert(mContext, "Set reminder for "+epgContents.get(position1).Name+ " starting at "+getTime(programmeTime)
+				/*AlertDialogUtil.showAlert(mContext, "Set reminder for "+epgContents.get(position1).Name+ " starting at "+getTime(programmeTime)
 						, "no","yes",  new NoticeDialogListener() {					
 					@Override
 					public void onDialogOption2Click() {
@@ -404,7 +405,40 @@ public class EpgView implements ProgrammActionListener{
 					@Override
 					public void onDialogOption1Click() {
 					}
-				});				
+				});	*/
+				MyplexDialog dialog = new MyplexDialog(mContext, "myplex", "Set reminder for "
+									+epgContents.get(position1).Name+ " starting at "+getTime(programmeTime), "no","yes",new NoticeDialogListener() {
+										
+										@Override
+										public void onDialogOption2Click() {
+											Calendar calendar = Calendar.getInstance();
+											calendar.set(Calendar.SECOND, prg.get(Calendar.SECOND));
+											calendar.set(Calendar.MINUTE, prg.get(Calendar.MINUTE));
+											calendar.set(Calendar.HOUR_OF_DAY, prg.get(Calendar.HOUR_OF_DAY));
+											calendar.set(Calendar.DAY_OF_MONTH, prg.get(Calendar.DAY_OF_MONTH));
+
+											EpgContent content = epgContents.get(position1);
+											Intent alarmintent = new Intent(mContext, ReminderReceiver.class);
+											alarmintent.putExtra("title",content.Name);
+											alarmintent.putExtra("note","The programm is scheduled at "+getTime(getDate(content.StartTime)));
+											alarmintent.putExtra("_id",mData._id);
+											 
+											PendingIntent sender = PendingIntent.getBroadcast(mContext, 0,
+											alarmintent,PendingIntent.FLAG_UPDATE_CURRENT|  Intent.FILL_IN_DATA);
+											
+											 
+											AlarmManager am = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+											am.set(AlarmManager.RTC_WAKEUP, prg.getTimeInMillis(), sender);
+										}
+										
+										@Override
+										public void onDialogOption1Click() {
+											// TODO Auto-generated method stub
+											
+										}
+									});
+				
+				dialog.showDialog();
 			}			
 		});		
 	}

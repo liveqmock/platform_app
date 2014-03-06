@@ -217,6 +217,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		// to dispatch people data.
 		
 		mMixpanel.getPeople().initPushHandling(getString(R.string.config_android_push_senderid));
+		mMixpanel.getPeople().set("android app version.release", Util.getAppVersionNumber(this));
 		Map<String,String> params1 = new HashMap<String, String>();
 		params1.put(Analytics.ALL_LOGIN_OPTIONS,"facebook google twitter myplex");
 		Analytics.trackEvent(Analytics.EVENT_LOGIN_OPTIONS_PRESENTED,params1);
@@ -1857,7 +1858,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					Crashlytics.setUserName(userIdSha1);
 					Crashlytics.setUserIdentifier(userIdSha1);
 					
-					mMixpanel.getPeople().set("android app version.release", Util.getAppVersionNumber(this));
+					
 					String profilename=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
 							getString(R.string.userprofilename));
 					String profilePic=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,

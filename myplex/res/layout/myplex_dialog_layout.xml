@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent"
+    android:orientation="vertical" >
+
+    <View
+        android:id="@+id/top_blue"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:background="@drawable/dialog_top_blue" />
+
+    <LinearLayout
+        android:id="@+id/title_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/round_corner_dialog_bg"
+        android:gravity="center_vertical"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:id="@+id/linear_ll_options"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/title_layout"
+            android:layout_margin="8dp"
+            android:gravity="top|center_vertical"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/dialog_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                android:gravity="left"
+                android:text="TextView"
+                android:textSize="@dimen/textsize_18" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="8dp"
+                android:gravity="center"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:id="@+id/dialog_msg"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="@string/best_option_msg"
+                    android:textSize="@dimen/textsize_12" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <View
+            android:id="@+id/btn_divider"
+            android:layout_width="match_parent"
+            android:layout_height="0.5dp"
+            android:layout_below="@+id/dont_ask_layout"
+            android:layout_marginTop="8dp"
+            android:background="@android:color/darker_gray" />
+
+        <LinearLayout
+            android:id="@+id/bottom_button_container_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:weightSum="2" >
+
+            <Button
+                android:id="@+id/dialog_left_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/btn_divider"
+                android:layout_margin=".5dp"
+                android:layout_weight="1"
+                android:background="@drawable/left_button_selector"
+                android:gravity="center_vertical|center_horizontal"
+                android:paddingLeft=".5dp"
+                android:text="no" />
+
+            <View
+                android:id="@+id/btn_divider"
+                android:layout_width="0.5dp"
+                android:layout_height="match_parent"
+                android:layout_below="@+id/dont_ask_layout"
+                android:background="@android:color/darker_gray" />
+
+            <Button
+                android:id="@+id/dialog_right_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/btn_divider"
+                android:layout_weight="1"
+                android:background="@drawable/right_button_selector"
+                android:gravity="center_vertical|center_horizontal"
+                android:text="yes" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

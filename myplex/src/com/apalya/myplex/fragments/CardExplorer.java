@@ -428,7 +428,12 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				if(mData.searchQuery.equalsIgnoreCase("live"))
 					mMainActivity.setUpLivetvOrMovie(false);
 			}
-		}		
+		}	
+		if(mVolleyRequest == null)
+			return;
+		if(mVolleyRequest.isCanceled()){
+			delayedAction();
+		}
 	}
 	@Override
 	public void onPause() {
@@ -468,6 +473,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	private boolean mOldDataAdded = false;
 	private int mOldDataListSize  = 0;
 	private boolean mAddDataAdded = false;
+	private RequestQueue queue;
 	private void fillOldData(final List<CardData> lastSavedData){
 		Handler h = new Handler(Looper.getMainLooper());
 		h.post(new Runnable() {
@@ -519,7 +525,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		}*/
 		mMainActivity.showActionBarProgressBar();
 		showProgressBar();
-		RequestQueue queue = MyVolley.getRequestQueue();
+		queue = MyVolley.getRequestQueue();
 		int requestMethod = Method.GET;
 		String requestUrl = new String();
 		if(mData.requestType == CardExplorerData.REQUEST_SEARCH){
@@ -634,6 +640,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 						}
 						if(minResultSet.results ==  null){showNoDataMessage(false);return;}
 						if(minResultSet.results.size() ==  0){showNoDataMessage(false);return;}
+						mVolleyRequest = null;
 						mCacheManager.getCardDetails(minResultSet.results,IndexHandler.OperationType.IDSEARCH,CardExplorer.this);
 					}
 				} catch (Exception e) {
