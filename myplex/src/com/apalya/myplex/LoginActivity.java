@@ -79,6 +79,7 @@ import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.utils.Twitter11;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.utils.AlertDialogUtil;
+import com.apalya.myplex.utils.Util.KeyRenewListener;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookAuthorizationException;
 import com.facebook.FacebookOperationCanceledException;
@@ -106,7 +107,7 @@ import com.google.analytics.tracking.android.GoogleAnalytics;
 
 
 public class LoginActivity extends Activity implements OnClickListener, AccountUtils.AuthenticateCallback,Twitter11.TwitterAuthenticateCallback, GooglePlayServicesClient.ConnectionCallbacks,
-GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedListener,AlertDialogUtil.NoticeDialogListener {
+GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedListener,AlertDialogUtil.NoticeDialogListener,KeyRenewListener {
 
 	private Button mFacebookButton,mGoogleLogin,mTwitterLogin;
 	private TextView mLetMeIn,mLoginText,mSignupText;
@@ -156,6 +157,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 	private static int scrollWidth;
 	private TranslateAnimation translateAnim;
 	private RelativeLayout backgroundScrollLayout;
+	private Context mContext;
 
 	/*
 	 * In order for your app to receive push notifications, you will need to enable
@@ -198,6 +200,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		};
 		task.execute();
 
+		mContext = LoginActivity.this;
 		if(getResources().getBoolean(R.bool.config_crashlytics_enable)){
 			Crashlytics.start(this);
 		}
@@ -1853,59 +1856,20 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			Date now=new Date(nowinms);
 			mUserInfo.lastVisitedDate=now.toLocaleString();
 
-
 			//check if the client key is valid or not, if expired give generate key request
 			if(Util.isTokenValid(clientKeyExp))
-			{
-				mDevInfo.setClientKey(clientKey);
-				mDevInfo.setClientDeviceId(SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
-						getString(R.string.devclientdevid)));
-				mDevInfo.setClientKeyExp(SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
-						getString(R.string.devclientkeyexp)));
-				Log.d(TAG, "---------------------------------------------------------");
-
-				String username=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
-						getString(R.string.devusername));
-
-
-				//check if user is already logged in, if so take him to main screen or else login screen
-				if(username!=null)
-				{
-					Crashlytics.setUserEmail(username);
-					
-					String userIdSha1=Util.sha1Hash(username);
-					
-					Crashlytics.setUserName(userIdSha1);
-					Crashlytics.setUserIdentifier(userIdSha1);
-					
-					
-					String profilename=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
-							getString(R.string.userprofilename));
-					String profilePic=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
-							getString(R.string.userpic));
-					//mMixpanel.getPeople().identify(username);
-					if(profilename!=null)
-					{
-						mUserInfo.setName(profilename);
-						mMixpanel.getPeople().set("$first_name", profilename);
-					}
-					if(profilePic!=null)
-						mUserInfo.setProfilePic(profilePic);
-					mUserInfo.setUserEmail(username);
-					
-					if(username != null){
-						mMixpanel.getPeople().set("$email", username);
-//						mMixpanel.getPeople().identify(username);
-					}
-					
+			{				
+				
+				if(setUpUserDetails(clientKey))
+				{	
 					finish();
 					Util.launchMainActivity(LoginActivity.this);
 				}
 
-			}
-			else
-			{
+			}else{
 				//Generatey new Key
+				Util.setKeyListener(LoginActivity.this);
+				mProgressDialog = ProgressDialog.show(mContext, null, "please wait", false, false);
 				String devId=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
 						getString(R.string.devclientdevid));
 
@@ -2099,9 +2063,72 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		// TODO Auto-generated method stub
 		//Util.showToast(this, "Negative Button Clicked", Util.TOAST_TYPE_ERROR);
 	}
+
+	@Override
+	public void onKeyRenewed() {
+		
+		mProgressDialog.dismiss();
+		ConsumerApi.DOMAIN = getString(R.string.config_domain_name);
+
+		String clientKey = SharedPrefUtils.getFromSharedPreference(
+				LoginActivity.this, getString(R.string.devclientkey));
+		if (clientKey != null) {
+			ConsumerApi.DEBUGCLIENTKEY = clientKey;
+		}
+
+		if (setUpUserDetails(clientKey)) {
+			finish();
+			Util.launchMainActivity(LoginActivity.this);
+		}
+
+	}
+
+	@Override
+	public void onKeyRenewFailed(String message) {
+		mProgressDialog.dismiss();
+	}
 	
 	
-	
+	public boolean setUpUserDetails(String clientKey) {
+
+		mDevInfo.setClientKey(clientKey);
+		mDevInfo.setClientDeviceId(SharedPrefUtils.getFromSharedPreference(
+				LoginActivity.this, getString(R.string.devclientdevid)));
+		mDevInfo.setClientKeyExp(SharedPrefUtils.getFromSharedPreference(
+				LoginActivity.this, getString(R.string.devclientkeyexp)));
+		String username = SharedPrefUtils.getFromSharedPreference(
+				LoginActivity.this, getString(R.string.devusername));
+
+		// check if user is already logged in, if so take him to main screen or
+		// else login screen
+		if (username != null) {
+			Crashlytics.setUserEmail(username);
+
+			String userIdSha1 = Util.sha1Hash(username);
+
+			Crashlytics.setUserName(userIdSha1);
+			Crashlytics.setUserIdentifier(userIdSha1);
+
+			String profilename = SharedPrefUtils.getFromSharedPreference(
+					LoginActivity.this, getString(R.string.userprofilename));
+			String profilePic = SharedPrefUtils.getFromSharedPreference(
+					LoginActivity.this, getString(R.string.userpic));
+
+			if (profilename != null) {
+				mUserInfo.setName(profilename);
+				mMixpanel.getPeople().set("$first_name", profilename);
+			}
+
+			if (profilePic != null)
+				mUserInfo.setProfilePic(profilePic);
+
+			mUserInfo.setUserEmail(username);
+			mMixpanel.getPeople().set("$email", username);
+
+			return true;
+		}
+		return false;
+	}
 	
 	
 }
