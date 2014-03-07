@@ -227,6 +227,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		// to dispatch people data.
 		
 		mMixpanel.getPeople().initPushHandling(getString(R.string.config_android_push_senderid));
+		mMixpanel.getPeople().set("android app version.release", Util.getAppVersionNumber(this));
 		
 		if(TextUtils.isEmpty(username)){
 			Analytics.setMixPanelFirstName(Analytics.PEOPLE_DEFAULT_NAME);
@@ -1877,7 +1878,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 					Crashlytics.setUserName(userIdSha1);
 					Crashlytics.setUserIdentifier(userIdSha1);
 					
-					mMixpanel.getPeople().set("android app version.release", Util.getAppVersionNumber(this));
+					
 					String profilename=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,
 							getString(R.string.userprofilename));
 					String profilePic=SharedPrefUtils.getFromSharedPreference(LoginActivity.this,

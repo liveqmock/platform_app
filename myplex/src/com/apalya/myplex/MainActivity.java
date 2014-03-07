@@ -116,6 +116,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 	private TextView socialShare;
 	private TextView tvOrMovie;
 	private Handler handler= new Handler();
+	private String hintString= null;
 
 	NavigationOptionsMenuAdapter mNavigationAdapter;
 	private TextView mFilterLevle;
@@ -1288,11 +1289,15 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 			@Override
 			public boolean onQueryTextChange(String newText) {
 				String type = null;
-				if((myplexapplication.getCardExplorerData() != null) &&
+				/*if((myplexapplication.getCardExplorerData() != null) &&
 						(myplexapplication.getCardExplorerData().searchScope!=null) &&
 						(myplexapplication.getCardExplorerData().searchScope.equals(ConsumerApi.VIDEO_TYPE_LIVE))){
 					type = ConsumerApi.VIDEO_TYPE_LIVE;
+				}*/
+				if(hintString!= null && hintString.equalsIgnoreCase("search live tv")){
+					type = ConsumerApi.VIDEO_TYPE_LIVE;
 				}
+				
 				//Addanalytics just record textchanges
 				if(mSearchSuggestionFrag != null && newText.length() >0)
 					mSearchSuggestionFrag.setQuery(newText,type);
@@ -1303,6 +1308,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 	
 	private void setSearchviewHint(String hint)
 	{
+		hintString = hint;
 		if(mSearchView !=null)
 			mSearchView.setQueryHint(hint);
 	}
