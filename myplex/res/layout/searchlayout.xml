@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:demoapp="http://schemas.android.com/apk/res/com.apalya.myplex"
+    xmlns:customItem="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="#FFFFFF"
@@ -52,8 +52,8 @@
         android:animateLayoutChanges="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-		demoapp:horizontalSpacing="@dimen/margin_gap_4"
-		demoapp:verticalSpacing="@dimen/margin_gap_4"
+		customItem:horizontalSpacing="@dimen/margin_gap_4"
+		customItem:verticalSpacing="@dimen/margin_gap_4"
 		android:layout_marginTop="@dimen/margin_gap_2"
         android:layout_marginLeft="@dimen/margin_gap_8" 
         android:layout_marginRight="@dimen/margin_gap_8"

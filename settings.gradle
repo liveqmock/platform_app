@@ -1,0 +1,3 @@
+include ':mixpanel-android-latest:src:main'
+include ':google-play-services_lib'
+include ':myplex'

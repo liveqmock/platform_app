@@ -1,5 +1,5 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:localns="http://schemas.android.com/apk/res/com.apalya.myplex"
+   xmlns:customItem="http://schemas.android.com/apk/res-auto"
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:padding="@dimen/layoutleftpadding"
@@ -9,8 +9,8 @@
         android:id="@+id/buttongroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        localns:horizontalSpacing="@dimen/margin_gap_12"
-        localns:verticalSpacing="@dimen/margin_gap_12" >
+        customItem:horizontalSpacing="@dimen/margin_gap_12"
+        customItem:verticalSpacing="@dimen/margin_gap_12" >
     </com.apalya.myplex.views.FlowLayout>
 
 </RelativeLayout>
