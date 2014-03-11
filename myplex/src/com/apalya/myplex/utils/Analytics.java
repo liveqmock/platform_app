@@ -292,6 +292,7 @@ public class Analytics {
 	public static String CATEGORY_PLAYED_MOVIE = "played movie";
 	public static String CATEGORY_PLAYED_TRAILER = "played trailer";
 	public static String CATEGORY_PLAYED_LIVETV = "played live tv";
+	public static String CATEGORY_PLAYED_TV_EPISODE = "played tv episode";
 	public static String GA_INLINE_SEARCH = "inline search";
 	public static String CATEGORY_DISCOVERY = "discovery";
 	public static String ACTION_FILTER = "filter";
@@ -401,7 +402,6 @@ public class Analytics {
 	}
 	
 	public static void  createEventGA(String category,String action,String label,Long value) {
-		
 		easyTracker.send(
 			     MapBuilder.createEvent(category, action, label, value).build());
 	}
@@ -1497,7 +1497,6 @@ public class Analytics {
 			Analytics.createEventGA(Analytics.CATEGORY_BROWSE, Analytics.EVENT_BROWSED_LIVE_TV_GA, Analytics.NUMBER_OF_CARDS, swipeCount);
 		}
 		else if(Analytics.CONSTANT_TV_SERIES.equalsIgnoreCase(ctype)) {
-			Log.d("amlan","tv series");
 			Analytics.createEventGA(Analytics.CATEGORY_BROWSE, Analytics.EVENT_BROWSED_TV_SHOWS, Analytics.NUMBER_OF_CARDS, swipeCount);
 		}	
 	}
@@ -1567,6 +1566,18 @@ public class Analytics {
 			Analytics.createEventGA(CONSTANT_TV_SHOW, action, mData.generalInfo.title, stopPauseLocation);
 		}
 	}
+	public static void gaStopPauseMediaTime(String action,long stopPauseLocation,CardData mData) {
+		
+		String contentType = mData.generalInfo.type; //movie or livetv
+		String ctype = Analytics.movieOrLivetv(contentType);
+		if(CONSTANT_MOVIES.equalsIgnoreCase(ctype)) {
+			Analytics.createEventGA(CONSTANT_MOVIES, action, mData.generalInfo.title, stopPauseLocation);
+		}else if(CONSTANT_LIVETV.equalsIgnoreCase(ctype)){
+			Analytics.createEventGA(CONSTANT_LIVETV, action, mData.generalInfo.title, stopPauseLocation);
+		}else if(CONSTANT_TV_SHOW.equalsIgnoreCase(ctype)){
+			Analytics.createEventGA(CONSTANT_TV_SHOW, action, mData.generalInfo.title, stopPauseLocation);
+		}
+	}
 	
 	public static void gaPlayedMovieTimings(long timeInSeconds,String contentName,String label) {
 		Analytics.createUserTimingGA(Analytics.CATEGORY_PLAYED_MOVIE,1L , contentName, label);
@@ -1581,7 +1592,7 @@ public class Analytics {
 	}
 	
 	public static void gaPlayedTvShowsTimings(long timeInSeconds,String contentName) {
-		Analytics.createUserTimingGA(Analytics.CONSTANT_TV_SHOW,1L , contentName, null);
+		Analytics.createUserTimingGA(Analytics.CATEGORY_PLAYED_TV_EPISODE,1L , contentName, null);
 	}
 			
 	public static void setMixPanelEmail(String email){

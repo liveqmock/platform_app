@@ -202,6 +202,7 @@ public class CardDetails extends BaseFragment implements
 				mEPGLayout.setVisibility(View.GONE);
 		}		
 		if( mCardData.generalInfo.type != null && mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_SERIES)){
+			childSubList.removeAll(childSubList);
 			helper  = new SeasonFetchHelper(mCardData,new TvShowManager());
 			helper.fetchSeason();
 			initialiseTVShow(rootView);
@@ -367,7 +368,7 @@ public class CardDetails extends BaseFragment implements
 			if(mPlayer.isMediaPlaying()){
 				mPlayer.onStateChanged(PlayerListener.STATE_PAUSED, mPlayer.getStopPosition());
 				Analytics.stoppedAt();
-				Analytics.gaStopPauseMediaTime("stop",mPlayer.getStopPosition());
+				Analytics.gaStopPauseMediaTime("stop",mPlayer.getStopPosition(),mCardData);
 				Analytics.mixPanelVideoTimeCalculation(mCardData);
 				mPlayer.stopSportsStatusRefresh();
 				if(ApplicationSettings.ENABLE_FB_SHARE_FREE_MOVIE){
@@ -1010,10 +1011,10 @@ public class CardDetails extends BaseFragment implements
 			}
 			if(mPlayer.isMediaPlaying()){
 				mPlayer.onStateChanged(PlayerListener.STATE_PAUSED, mPlayer.getStopPosition());
-				mPlayer.closePlayer();
 				Analytics.stoppedAt();
 				Analytics.mixPanelVideoTimeCalculation(mCardData);
-				Analytics.gaStopPauseMediaTime("stop",mPlayer.getStopPosition());
+				Analytics.gaStopPauseMediaTime("stop",mPlayer.getStopPosition(),mCardData);
+				mPlayer.closePlayer();
 				return true;
 			}
 			return false;
@@ -1035,7 +1036,6 @@ public class CardDetails extends BaseFragment implements
 		View epgView  = epgview.createEPGView();
 		
 		if(epgView != null){
-			Log.d("amlan","card view visible");
 			mEPGLayout.setVisibility(View.VISIBLE);
 //			params.topMargin = (int) getContext().getResources()
 //					.getDimension(R.dimen.margin_gap_12);
@@ -1070,9 +1070,8 @@ public class CardDetails extends BaseFragment implements
 	private class TvShowManager implements ShowFetchListener{
 		@Override
 		public void onSeasonDataFetched(List<CardData> seasons) {
-			childSubList.addAll(seasons);
-			if(mTVShowView==null)
-				mTVShowView = new TVShowView(mContext , childSubList , mTvShowLinear,new TvShowSelectorCallBack());
+			childSubList.addAll(seasons);			
+			mTVShowView = new TVShowView(mContext , childSubList , mTvShowLinear,new TvShowSelectorCallBack());
 			mTVShowView.createTVShowView();
 			mSeasonData = seasons.get(0);
 			mCardDetailViewFactory.UpdateSubscriptionStatus(mSeasonData);

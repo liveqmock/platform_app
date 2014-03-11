@@ -780,7 +780,11 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 						attribs.put(Analytics.ACCOUNT_TYPE, Analytics.ALL_LOGIN_TYPES.myplex.toString());
 						attribs.put(Analytics.USER_ID,mEmail.getText().toString());
 						Analytics.trackEvent(Analytics.EVENT_MYPLEX_LOGIN_SUCCESS,attribs); 
-						
+
+						MixpanelAPI.People people = Analytics.getMixpanelPeople();
+                        people.setOnce(Analytics.ACCOUNT_TYPE, Analytics.ACCOUNT_TYPE_MYPLEX);
+                        people.setOnce(Analytics.USER_ID, mEmail.getText().toString());
+                        
 						Log.d(TAG, "status: "+jsonResponse.getString("status"));
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
