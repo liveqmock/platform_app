@@ -7,12 +7,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import com.apalya.myplex.R;
@@ -29,6 +32,7 @@ import com.apalya.myplex.data.UserProfile;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.fragments.CardExplorer;
 import com.apalya.myplex.views.CardDetailViewFactory;
+import com.flurry.android.monolithic.sdk.impl.in;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.Fields;
 import com.google.analytics.tracking.android.MapBuilder;
@@ -327,6 +331,7 @@ public class Analytics {
 	public static String CONSTANT_TV_SHOW = "tv shows";
 	public static String CONSTANT_TV_EPISODE = "tvepisode";
 	
+	public static String NOTIFICATION_OPEND = "notification opened";
 	
 	private static MixpanelAPI mMixPanel = myplexapplication.getMixPanel();
 	private static EasyTracker easyTracker = myplexapplication.getGaTracker();
@@ -1483,8 +1488,34 @@ public class Analytics {
 		people.set(Analytics.FORGOT_PASSWORD_FAILED_ON, lastFailedDate);
 	}
 	
+	public static void mixPanelNotificationReceived(Context context, Intent intent) {
+		
+		if(context == null || intent == null || intent.getExtras() == null){
+			return;
+		}
+		
+		if(intent.hasExtra(context.getString(R.string.notification_type)) && intent.hasExtra(context.getString(R.string.notification_msg))){
+			
+			Map<String,String> params1=new HashMap<String, String>();
+			params1.put("message", intent.getExtras().getString(context.getString(R.string.notification_msg)));
+			params1.put("message type", intent.getExtras().getString(context.getString(R.string.notification_type)));
+			String content_id="NA";
+			
+			if(intent.hasExtra(context.getString(R.string._id))){
+				content_id = intent.getExtras().getString(context.getString(R.string._id));
+			}
+			
+			params1.put(Analytics.CONTENT_ID_PROPERTY, content_id);
+			Analytics.trackEvent(NOTIFICATION_OPEND, params1);
+		}
+		
+	
+			
+	}
+	
 	public static String getCurrentDate() {
-		SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 		//SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		String date = sdf.format(new Date()); 
 		return date;		
