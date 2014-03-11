@@ -65,6 +65,7 @@ import android.os.Environment;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
+import android.text.method.KeyListener;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.MonthDisplayHelper;
@@ -1178,7 +1179,7 @@ public class Util {
 			}/*else if(days >0){
 				return "watch for "+((int)(24*days)+(calendar.get(Calendar.HOUR)))+" hrs";
 			}*/else if(days>=0 && hours>=2){
-				return "watch for next "+(int)((24*days)+hours)+ " hrs";
+				return "watch for next "+(int)(hours)+ " hrs";
 			}else if(hours<=2 && minutes>1){
 				return "watch now (expires in "+minutes+" mins)";
 			}else if(minutes<=1 && seconds >1 ){
@@ -1271,6 +1272,10 @@ public class Util {
 			e.printStackTrace();
 		}
 		return false;
+	}
+	
+	public static void setKeyListener(KeyRenewListener listener){
+		Util.keyRenewListener = listener;
 	}
 	
 	public interface KeyRenewListener {

@@ -68,7 +68,11 @@ public class MediaUtility {
 						if(data.videos == null || data.videos.values == null || data.videos.values.size() == 0)
 						{
 							if(data.videos != null && data.videos.status != null && !data.videos.status.equalsIgnoreCase("SUCCESS")){								
-								listener.onUrlFetchFailed(data.videos.status);
+								if(data.videos.message != null && data.videos.status.equalsIgnoreCase("ERR_USER_NOT_SUBSCRIBED")){
+										listener.onUrlFetchFailed(data.videos.status);
+								}
+								
+								listener.onUrlFetchFailed(data.videos.message);
 								return;
 							}							
 							listener.onUrlFetchFailed(mContext.getString(R.string.canot_fetch_url));

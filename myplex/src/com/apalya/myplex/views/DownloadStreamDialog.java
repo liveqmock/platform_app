@@ -3,6 +3,7 @@ package com.apalya.myplex.views;
 import android.app.Dialog;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -30,7 +31,8 @@ public class DownloadStreamDialog  implements OnClickListener
 	private DownloadListener listener;
 	private Context context;
 	private LinearLayout dontAskLayout,alwaysAskLayout;
-
+	private Handler handler = new Handler();
+	
 	public DownloadStreamDialog(Context context,String title) 
 	{
 		this.context = context;
@@ -65,12 +67,7 @@ public class DownloadStreamDialog  implements OnClickListener
 		always_ask.setOnClickListener(this);
 		best.setOnClickListener(this);
 		good.setOnClickListener(this);		
-		continuee.setOnClickListener(this);
-		dontAsk.setOnCheckedChangeListener(new OnCheckedChangeListener() {			
-			@Override
-			public void onCheckedChanged(CompoundButton button, boolean isChecked) {
-			}
-		});
+		continuee.setOnClickListener(this);		
 		initValues();
 	}
 
@@ -84,6 +81,12 @@ public class DownloadStreamDialog  implements OnClickListener
 				}
 			});
 			best.setOnClickListener(null);
+		}
+		if(alwaysAskLayout.getVisibility()  == View.VISIBLE){
+			if(!(SharedPrefUtils.getBoolFromSharedPreference(context, context.getString(R.string.is_dont_ask_again,false)))){
+				always_ask.setChecked(true);
+				return;
+			}
 		}
 		if(!SharedPrefUtils.getBoolFromSharedPreference(context, context.getString(R.string.isDownload),true)){
 			good.setChecked(true);
@@ -112,7 +115,8 @@ public class DownloadStreamDialog  implements OnClickListener
 		if(dialog!=null){
 			dialog.dismiss();
 			dialog = null;
-		}	}
+		}	
+	}
 
 
 
@@ -123,28 +127,43 @@ public class DownloadStreamDialog  implements OnClickListener
 		switch(view.getId()){
 		case R.id.dialog_continue:
 			dismissDialog();
-			if(alwaysAskLayout.getVisibility() != View.GONE){
-				if(always_ask.isChecked()){
-					listener.onOptionSelected(false);
-					SharedPrefUtils.writeToSharedPref(context, context.getString(R.string.is_dont_ask_again), false);
-				}else{
-					SharedPrefUtils.writeToSharedPref(context, context.getString(R.string.is_dont_ask_again), true);
-				}
-			}
-			if(dontAskLayout.getVisibility() != View.GONE){
-				if(dontAsk.isChecked()){
-					SharedPrefUtils.writeToSharedPref(context, context.getString(R.string.is_dont_ask_again), true);
-				}else{
-					SharedPrefUtils.writeToSharedPref(context, context.getString(R.string.is_dont_ask_again), false);
-				}
-			}
-			if(best.isChecked()){				
-				SharedPrefUtils.writeToSharedPref(context, context.getString(R.string.isDownload), true);				
-				listener.onOptionSelected(true);
-			}else if(good.isChecked()){
-				SharedPrefUtils.writeToSharedPref(context, context.getString(R.string.isDownload), false);
-				listener.onOptionSelected(false);
-			}			
+			Thread sharedPrefWriterThread = new Thread(){
+				public void run() {
+					if(alwaysAskLayout.getVisibility() != View.GONE){
+						if(always_ask.isChecked()){
+							listener.onOptionSelected(false);
+							SharedPrefUtils.writeToSharedPref(context, context.getString(R.string.is_dont_ask_again), false);
+						}else{
+							SharedPrefUtils.writeToSharedPref(context, context.getString(R.string.is_dont_ask_again), true);
+						}
+					}
+					if(dontAskLayout.getVisibility() != View.GONE){
+						if(dontAsk.isChecked()){
+							SharedPrefUtils.writeToSharedPref(context, context.getString(R.string.is_dont_ask_again), true);
+						}else{
+							SharedPrefUtils.writeToSharedPref(context, context.getString(R.string.is_dont_ask_again), false);
+						}
+					}
+					if(best.isChecked()){				
+						handler.post(new Runnable() {							
+							@Override
+							public void run() {
+								listener.onOptionSelected(true);
+							}
+						});
+						SharedPrefUtils.writeToSharedPref(context, context.getString(R.string.isDownload), true);				
+					}else if(good.isChecked()){
+						handler.post(new Runnable() {							
+							@Override
+							public void run() {
+								listener.onOptionSelected(false);
+							}
+						});
+						SharedPrefUtils.writeToSharedPref(context, context.getString(R.string.isDownload), false);
+					}					
+				};
+			};
+			sharedPrefWriterThread.start();
 			break;	
 		case R.id.best_radio_btn:
 			dontAsk.setChecked(true);
@@ -177,13 +196,14 @@ public class DownloadStreamDialog  implements OnClickListener
 		}		
 	}
 	public void setAlwaysAskAsDefault() {
-		((RadioButton)dialog.findViewById(R.id.always_ask_radio_btn)).setChecked(true);
-		((RadioButton)dialog.findViewById(R.id.best_radio_btn)).setChecked(false);
-		((RadioButton)dialog.findViewById(R.id.good_radio_btn)).setChecked(false);
+		always_ask.setChecked(false);
+		best.setChecked(false);
+		good.setChecked(false);	
 	}
 	public void showAlwaysAskOption(){
 		dontAskLayout.setVisibility(View.GONE);
 		alwaysAskLayout.setVisibility(View.VISIBLE);
+		initValues();
 	}
 
 	public interface DownloadListener{

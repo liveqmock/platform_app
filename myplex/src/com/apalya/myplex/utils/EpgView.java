@@ -34,6 +34,7 @@ import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.receivers.ReminderReceiver;
 import com.apalya.myplex.utils.AlertDialogUtil.NoticeDialogListener;
 import com.apalya.myplex.views.CardVideoPlayer;
+import com.apalya.myplex.views.MyplexDialog;
 
 public class EpgView implements ProgrammActionListener{
 	private CardData mData;
@@ -102,52 +103,24 @@ public class EpgView implements ProgrammActionListener{
 
 	private void fillDates() {
 		
-		for(int i=1;i<=7;i++){
+		for(int i=0;i<=8;i++){
 			
 			days[i] = getMonthAndDate(i-1);
 		}		
-		days[0] = "";
-		days[8] = "";
+//		days[0] = "";
+//		days[8] = "";
 
-		daysAdapter = new StringAdapter(mContext, days);
+		daysAdapter = new StringAdapter(mContext, days);		
 		
-		/*dateList.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> adapter, View view, int position,long id) {
-				
-				final int position1 = position;
-				dateList.smoothScrollToPosition(position-1);
-				handler.postDelayed(new Runnable() {
-					public void run() {
-						dateList.setItemChecked(position1, true);
-					}
-				}, 300);
-				daysAdapter.setIndex(position);		
-				
-				
-				String dateString =days[position];
-				if(dateString.length()<=1)
-					return;
-				Calendar calendar = Calendar.getInstance();
-				Scanner scanner = new Scanner(dateString).useDelimiter("[^0-9]+");
-				Calendar cal = Calendar.getInstance();
-				try {
-					cal.setTime(new SimpleDateFormat("MMM").parse(dateString.replaceAll("\\d","").trim()));
-					int monthInt = cal.get(Calendar.MONTH) + 1;
-					String dayString  = calendar.get(Calendar.YEAR)+"-"+monthInt+"-"+scanner.nextInt();
-					fetchEPGData(dayString);
-				} catch (ParseException e) {
-					e.printStackTrace();
-				}catch (Exception e) {
-				}
-			}			
-		});*/
 		dateList.setOnScrollListener(new AbsListView.OnScrollListener() {			
 			@Override
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
 				if(scrollState == SCROLL_STATE_IDLE){						
-					dateSelectedIndex = dateList.getFirstVisiblePosition()+2;
-					dateList.smoothScrollToPosition(dateSelectedIndex-2);
+//					dateSelectedIndex = dateList.getFirstVisiblePosition()+2;
+					dateSelectedIndex = (dateList.getFirstVisiblePosition()+dateList.getLastVisiblePosition())/2;
+//					dateList.smoothScrollToPosition(dateSelectedIndex);
+					dateList.setSelection(dateSelectedIndex-1);
+					
 					handler.postDelayed(new Runnable() {
 						public void run() {
 							dateList.setItemChecked(dateSelectedIndex, true);
@@ -174,68 +147,16 @@ public class EpgView implements ProgrammActionListener{
 			{
 				
 			}
-		});
-		/*dateList.setOnScrollListener(new AbsListView.OnScrollListener() {			
-			private int totalVisibleItem;
-			private int lastVisibleItem;
-			private boolean isScrollingDown;
-
-			@Override
-			public void onScrollStateChanged(AbsListView view, int scrollState) {
-				if(scrollState == SCROLL_STATE_IDLE){						
-				
-					
-					int marginIndex=1;
-					
-					if(totalVisibleItem > 3 && lastVisibleItem !=0){
-						marginIndex=isScrollingDown?3:2;
-					}
-					
-					lastVisibleItem=0;
-					dateSelectedIndex = dateList.getFirstVisiblePosition()+marginIndex;					
-					
-			
-					dateList.smoothScrollToPosition(dateSelectedIndex-marginIndex);
-					
-					handler.postDelayed(new Runnable() {
-						public void run() {
-							dateList.setItemChecked(dateSelectedIndex, true);
-						}
-					}, 300);
-					Calendar cal = Calendar.getInstance();
-					daysAdapter.setIndex(dateSelectedIndex);
-					String dateString =days[dateSelectedIndex];
-					Calendar calendar = Calendar.getInstance();
-					Scanner scanner = new Scanner(dateString).useDelimiter("[^0-9]+");
-					try {
-					cal.setTime(new SimpleDateFormat("MMM").parse(dateString.replaceAll("\\d","").trim()));
-					int monthInt = cal.get(Calendar.MONTH) + 1;
-					String dayString  = calendar.get(Calendar.YEAR)+"-"+monthInt+"-"+scanner.nextInt();
-					fetchEPGData(dayString);
-					} catch (ParseException e) {						
-						e.printStackTrace();
-					}
-				}
-			}
-
-			@Override
-			public void onScroll(AbsListView view, int firstVisibleItem,int visibleItemCount, int totalItemCount) 
-			{
-				 if (firstVisibleItem > lastVisibleItem) {
-				        isScrollingDown = true;
-				    }
-				    else {
-				        isScrollingDown = false;
-				    }
-				    lastVisibleItem = firstVisibleItem;
-				    
-				Log.d(TAG,"totalItemCount:"+visibleItemCount);
-				totalVisibleItem=visibleItemCount;
-			}
-		});*/
-		
+		});		
 		dateList.setAdapter(daysAdapter);
-		dateList.setSelection(0);
+		handler.postDelayed(new Runnable() {			
+			@Override
+			public void run() {
+				
+				dateList.setSelection(0);
+//				dateList.setItemChecked(1, true);
+			}
+		}, 100);
 	}
 	
 	private String getMonthAndDate(int days) {
@@ -315,8 +236,8 @@ public class EpgView implements ProgrammActionListener{
 						}
 					}, 300);
 					
-					if(player.isMediaPlaying())
-						return;
+					if(player.isMediaPlaying() || assetType == null || assertUrl == null)
+						return;	
 					if(assetType!=null && assetType.equals("1")
 							&& assertUrl!=null 
 								&& (!assertUrl.equalsIgnoreCase(mContext.getString(R.string.no_url)))){
@@ -375,38 +296,44 @@ public class EpgView implements ProgrammActionListener{
 						player.removeRecordPay();
 					}
 					return;
-				}
-				AlertDialogUtil.showAlert(mContext, "Set reminder for "+epgContents.get(position1).Name+ " starting at "+getTime(programmeTime)
-						, "no","yes",  new NoticeDialogListener() {					
-					@Override
-					public void onDialogOption2Click() {
-							
-							Calendar calendar = Calendar.getInstance();
-							calendar.set(Calendar.SECOND, prg.get(Calendar.SECOND));
-							calendar.set(Calendar.MINUTE, prg.get(Calendar.MINUTE));
-							calendar.set(Calendar.HOUR_OF_DAY, prg.get(Calendar.HOUR_OF_DAY));
-							calendar.set(Calendar.DAY_OF_MONTH, prg.get(Calendar.DAY_OF_MONTH));
+				}				
+				MyplexDialog dialog = new MyplexDialog(mContext, "myplex", "Set reminder for "
+									+epgContents.get(position1).Name+ " starting at "+getTime(programmeTime), "no","yes",new NoticeDialogListener() {
+										
+										@Override
+										public void onDialogOption2Click() {
+											Calendar calendar = Calendar.getInstance();
+											calendar.set(Calendar.SECOND, prg.get(Calendar.SECOND));
+											calendar.set(Calendar.MINUTE, prg.get(Calendar.MINUTE));
+											calendar.set(Calendar.HOUR_OF_DAY, prg.get(Calendar.HOUR_OF_DAY));
+											calendar.set(Calendar.DAY_OF_MONTH, prg.get(Calendar.DAY_OF_MONTH));
 
-							EpgContent content = epgContents.get(position1);
-							Intent alarmintent = new Intent(mContext, ReminderReceiver.class);
-							alarmintent.putExtra("title",content.Name);
-							alarmintent.putExtra("note","The programm is scheduled at "+getTime(getDate(content.StartTime)));
-							alarmintent.putExtra("_id",mData._id);
-							 
-							PendingIntent sender = PendingIntent.getBroadcast(mContext, 0,
-							alarmintent,PendingIntent.FLAG_UPDATE_CURRENT|  Intent.FILL_IN_DATA);
-							
-							 
-							AlarmManager am = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
-							am.set(AlarmManager.RTC_WAKEUP, prg.getTimeInMillis(), sender);
-					}
-					
-					@Override
-					public void onDialogOption1Click() {
-					}
-				});				
+											EpgContent content = epgContents.get(position1);
+											Intent alarmintent = new Intent(mContext, ReminderReceiver.class);
+											alarmintent.putExtra("title",content.Name);
+											alarmintent.putExtra("note","The programm is scheduled at "+getTime(getDate(content.StartTime)));
+											alarmintent.putExtra("_id",mData._id);
+											 
+											PendingIntent sender = PendingIntent.getBroadcast(mContext, 0,
+											alarmintent,PendingIntent.FLAG_UPDATE_CURRENT|  Intent.FILL_IN_DATA);
+											
+											 
+											AlarmManager am = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
+											am.set(AlarmManager.RTC_WAKEUP, prg.getTimeInMillis(), sender);
+										}
+										
+										@Override
+										public void onDialogOption1Click() {
+											// TODO Auto-generated method stub
+											
+										}
+									});
+				
+				dialog.showDialog();
 			}			
 		});		
+		
+		programmList.setSelection(0);
 	}
 	
 	public void removeEPGView(){

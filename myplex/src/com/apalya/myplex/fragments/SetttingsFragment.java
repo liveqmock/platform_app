@@ -169,7 +169,7 @@ public class SetttingsFragment extends BaseFragment {
 
 	private void PreapreSettingsData() {
 		String currentRentalOptions  ="";
-		if(!SharedPrefUtils.getBoolFromSharedPreference(mContext, mContext.getString(R.string.is_dont_ask_again))){
+		if(!(SharedPrefUtils.getBoolFromSharedPreference(mContext, mContext.getString(R.string.is_dont_ask_again,false)))){
 				currentRentalOptions = "always ask";
 		}else{
 			currentRentalOptions = SharedPrefUtils.getBoolFromSharedPreference(mContext, mContext.getString(R.string.isDownload),true)?
