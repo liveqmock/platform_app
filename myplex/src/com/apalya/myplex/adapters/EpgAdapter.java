@@ -23,7 +23,7 @@ public class EpgAdapter extends BaseAdapter {
 
 	private Context context;
 	private List<EpgContent> contents = new ArrayList<EpgContent>();
-	private int currentIndex;
+	private int currentIndex = 1;
 
 	public EpgAdapter(Context context, List<EpgContent> contents) {
 
@@ -53,22 +53,29 @@ public class EpgAdapter extends BaseAdapter {
 		TextView reminder = (TextView)convertView.findViewById(R.id.reminder);
 
 //		title.setTextColor(Color.BLACK);
-		title.setTypeface(FontUtil.Roboto_Regular);
-		title.setTextSize(12);
-		/*if(currentIndex == position){
+//		title.setTypeface(FontUtil.Roboto_Regular);
+		if(currentIndex == position){
+			title.setTextSize(12);
 			title.setTypeface(FontUtil.Roboto_Bold);	
 			convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.rounded));
 		}else{
 			title.setTypeface(FontUtil.Roboto_Light);
-			title.setTextSize(8);
-		}*/
+			title.setTextSize(10);
+		}
 
 		EpgContent content = contents.get(position);
 		if(content.Name!=null && content.Name.length() > 0
 				&& content.StartTime!=null && content.StartTime.length() > 0
 				&& content.EndTime!=null && content.EndTime.length() > 0){	
 
-			title.setText("("+getTime(getDate(content.StartTime))+" - "+getTime(getDate(content.EndTime))+")"+content.Name);
+			Date start = getDate(content.StartTime);
+			SimpleDateFormat am_pm_Sdf = new SimpleDateFormat("hh:mm aa");
+			String startTime = am_pm_Sdf.format(start);
+			
+			Date end = getDate(content.EndTime);
+			String endTime = am_pm_Sdf.format(end);
+			
+			title.setText("("+startTime+" - "+ endTime +") "+content.Name);
 			Date startDate  = getDate(content.StartTime);
 			Date EndDate  = getDate(content.EndTime);
 			reminder.setTypeface(FontUtil.ss_symbolicons_line);

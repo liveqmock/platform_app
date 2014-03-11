@@ -19,7 +19,7 @@ public class StringAdapter extends BaseAdapter {
 	private String[] days;
 //	private ViewHolder holder;
 //	private TextView day;
-	private int presentIndex;
+	private int presentIndex = 1;
 
 	public StringAdapter(Context context, String[] days) {
 		
@@ -55,14 +55,14 @@ public class StringAdapter extends BaseAdapter {
 		day.setTypeface(FontUtil.Roboto_Regular);
 		day.setText(days[position]);
 		
-		/*if(presentIndex == position){
+		if(presentIndex == position){
 			day.setTypeface(FontUtil.Roboto_Bold);	
-			day.setTextSize(16);
+			day.setTextSize(12);
 		}else{
-			day.setTypeface(FontUtil.Roboto_Light);
-			day.setTextSize(8);
+			day.setTypeface(FontUtil.Roboto_Thin);
+			day.setTextSize(10);
 //			convertView.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.wheel_bg));
-		}*/
+		}
 		/*day.setOnFocusChangeListener(new OnFocusChangeListener() {			
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {

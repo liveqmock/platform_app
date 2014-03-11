@@ -90,7 +90,7 @@ public class TVShowView  {
 				data.chields = episodes;
 			}
 		}
-		if(season.generalInfo.title.equalsIgnoreCase(mCardDataList.get(seasonIndex).generalInfo.title)){
+		if(season._id.equalsIgnoreCase(mCardDataList.get(seasonIndex)._id)){
 			fillEpisode(episodes, npEpisode);	
 			return true;
 		}else{
@@ -120,11 +120,10 @@ public class TVShowView  {
 			else if(season.content.serialNo.length()>0)
 			{ 
 				if(Integer.parseInt(season.content.serialNo)< 10)
-				{appendString = "Se0";
-				}else
 				{
-				appendString = "Se";
-					
+					appendString = "Se0";
+				}else{
+					appendString = "Se";					
 				}
 				seasons[i] = appendString.concat((season.content.serialNo));
 				
@@ -194,11 +193,10 @@ public class TVShowView  {
 			else if(episode.content.serialNo.length()>0)
 			{ 
 				if(Integer.parseInt(episode.content.serialNo)< 10)
-				{appendString = "Ep 0";
-				}else
 				{
-				appendString = "Ep ";
-					
+					appendString = "Ep 0";
+				}else{
+					appendString = "Ep ";					
 				}
 				appends[i] = appendString.concat((episode.content.serialNo));
 				

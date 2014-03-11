@@ -576,7 +576,7 @@ public class MediaController2 extends LinearLayout {
     	if (mPlayer.isPlaying()) {
     		mPlayer.pause();  
     		Analytics.pausedAt();
-    		Analytics.gaStopPauseMediaTime(Analytics.ACTION_TYPES.pause.toString(),mPlayer.getCurrentPosition());
+    		Analytics.gaStopPauseMediaTime(Analytics.ACTION_TYPES.pause.toString(),(mPlayer.getCurrentPosition()/1000));
     		updatePlayerState(PlayerListener.STATE_PAUSED,mPlayer.getCurrentPosition());
     	} else {
     		mPlayer.start();
