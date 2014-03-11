@@ -377,7 +377,6 @@ public class VideoView extends SurfaceView implements MediaPlayerControl {
             if (getWindowToken() != null) {
                 Resources r = mContext.getResources();
                
-//                Log.d("amlan","duration"+mp.getDuration());
                 //mixPanelUnableToPlayVideo("Cannot play video");
                 Analytics.mixPanelUnableToPlayVideo("Cannot play video");
         		Analytics.createExceptionGA("Cannot play video", false);
