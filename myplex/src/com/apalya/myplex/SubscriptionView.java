@@ -100,6 +100,9 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 			couponCode = b.getString("couponCode");
 			priceTobecharged2 = b.getDouble("priceAfterCoupon");
 			packageId = b.getString("packageId");
+			if(priceTobecharged2 == 0.0){
+				priceTobecharged2 = contentPrice;
+			}
 
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -403,8 +406,7 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 					}
 					CardData subscribedData = myplexapplication.getCardExplorerData().cardDataToSubscribe;
 					subscribedData.currentUserData =  data.results.get(0).currentUserData;
-					mixPanelPaySuccess(subscribedData);					
-					
+					mixPanelPaySuccess(subscribedData);							
 					List<CardData> dataToSave = new ArrayList<CardData>();
 					dataToSave.add(subscribedData);
 					
