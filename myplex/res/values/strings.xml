@@ -3,7 +3,7 @@
     tools:ignore="all">
 	<!-- <string name="domain_name">alpha.myplex.in:8866</string>  -->
 	
-    <string name="app_name">myplex</string>
+    <!-- <string name="app_name">myplex</string> -->
     <string name="hello_world">Hello world!</string>
     <string name="menu_settings">Settings</string>
     
