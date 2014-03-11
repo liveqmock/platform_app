@@ -17,6 +17,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -129,7 +130,8 @@ public class GCMReceiver extends BroadcastReceiver {
     }
 
     private void handleNotificationIntent(Context context, Intent intent) {
-        final String message = intent.getExtras().getString("mp_message");
+    	
+    	final String message = intent.getExtras().getString("mp_message");
         final String _id = intent.getExtras().getString("_id");
         final String latestVersion = intent.getExtras().getString("ver");
         
@@ -152,6 +154,9 @@ public class GCMReceiver extends BroadcastReceiver {
             // In this case, use a blank title and default icon
         }
         
+        appIntent.putExtra("message", message);
+    	appIntent.putExtra("message_type", "push");
+    	
         if(!TextUtils.isEmpty(_id)){
         	appIntent.putExtra("_id", _id);
         }else if (!TextUtils.isEmpty(page)){

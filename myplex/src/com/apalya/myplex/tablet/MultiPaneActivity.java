@@ -740,6 +740,8 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 		
 		boolean intentHandled = false;
 		
+		Analytics.mixPanelNotificationReceived(mContext, getIntent());
+		
 		if(getIntent().hasExtra(mContext.getString(R.string._id))){
 			showActionBarProgressBar();
 			_id = getIntent().getExtras().getString(mContext.getString(R.string._id));
