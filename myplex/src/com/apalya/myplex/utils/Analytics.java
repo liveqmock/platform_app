@@ -383,7 +383,7 @@ public class Analytics {
 	public static void  createTransactionGA(String transactionid,String affiliation,Double revenue, Double tax, Double shippingCost) {
 		easyTracker.send(MapBuilder
 			      .createTransaction(transactionid,       // (String) Transaction ID
-			                         Analytics.GA_AFFILIATION,   // (String) Affiliation
+			                         affiliation,         // (String) Affiliation
 			                         revenue,            // (Double) Order revenue
 			                         tax,            // (Double) Tax
 			                         shippingCost,             // (Double) Shipping
