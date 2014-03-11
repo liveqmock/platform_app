@@ -101,7 +101,7 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 			priceTobecharged2 = b.getDouble("priceAfterCoupon");
 			packageId = b.getString("packageId");
 			if(priceTobecharged2 == 0.0){
-				priceTobecharged2 = contentPrice;
+					priceTobecharged2 = contentPrice;
 			}
 
 		} catch (Exception e) {
