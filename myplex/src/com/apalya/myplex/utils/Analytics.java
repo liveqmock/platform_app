@@ -1498,7 +1498,14 @@ public class Analytics {
 			
 			Map<String,String> params1=new HashMap<String, String>();
 			params1.put("message", intent.getExtras().getString(context.getString(R.string.notification_msg)));
-			params1.put("message_type", intent.getExtras().getString(context.getString(R.string.notification_type)));	
+			params1.put("message type", intent.getExtras().getString(context.getString(R.string.notification_type)));
+			String content_id="NA";
+			
+			if(intent.hasExtra(context.getString(R.string._id))){
+				content_id = intent.getExtras().getString(context.getString(R.string._id));
+			}
+			
+			params1.put(Analytics.CONTENT_ID_PROPERTY, content_id);
 			Analytics.trackEvent(NOTIFICATION_OPEND, params1);
 		}
 		

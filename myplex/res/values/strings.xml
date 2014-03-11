@@ -262,5 +262,7 @@
     <!-- Intents  for MainActivity-->
     <string name="page">page</string>   
     <string name="_id">_id</string>
+    <string name="notification_type">message_type</string>
+    <string name="notification_msg">message</string>
     
 </resources>

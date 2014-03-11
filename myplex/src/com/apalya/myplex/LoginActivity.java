@@ -508,6 +508,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		CheckUserStatus();
 		
 		myplexapplication.isInitlized=true;		
+		
+		Analytics.mixPanelNotificationReceived(mContext, getIntent());
 
 	}
 	
