@@ -291,7 +291,7 @@ public class Analytics {
 	public static String CATEGORY_SEARCH = "search";
 	public static String CATEGORY_SUBMIT = "submit";
 	public static String CATEGORY_NETWORK = "network";
-	public static String CATEGORY_MOVIE = "movie";
+	public static String CATEGORY_MOVIE = "movies";
 	public static enum  CATEGORY_SOCIAL_NETWORK_TYPES {facebook,twitter,google};
 	public static String CATEGORY_PLAYED_MOVIE = "played movie";
 	public static String CATEGORY_PLAYED_TRAILER = "played trailer";
