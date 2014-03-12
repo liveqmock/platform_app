@@ -1704,7 +1704,8 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		closePlayer();
 		if(message != null && message.equalsIgnoreCase("ERR_USER_NOT_SUBSCRIBED")){
 			if(mData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_EPISODE)){
-				mPlayerStatusListener.playerStatusUpdate("ERR_USER_NOT_SUBSCRIBED");
+				if(mPlayerStatusListener!=null)
+					mPlayerStatusListener.playerStatusUpdate("ERR_USER_NOT_SUBSCRIBED");
 				return;
 			}
 			PackagePopUp popup = new PackagePopUp(mContext,(View)mParentLayout.getParent());
