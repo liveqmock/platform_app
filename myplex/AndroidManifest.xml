@@ -25,6 +25,7 @@
 	 <permission android:name="com.apalya.myplex.permission.C2D_MESSAGE" android:protectionLevel="signature" />
     <uses-permission android:name="com.apalya.myplex.permission.C2D_MESSAGE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
    
     
     <application
@@ -34,10 +35,12 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
-        android:theme="@style/AppTheme" >
+
+        android:theme="@style/AppTheme">
+
         <meta-data
             android:name="com.crashlytics.ApiKey"
-            android:value="72b7799d77db95d39c33cbba030236fdf7fb1bf5" />
+            android:value="@string/config.crashlytics.ApiKey" />
 
         <activity
             android:name="com.apalya.myplex.LoginActivity"
@@ -49,6 +52,7 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            
         </activity>
         <activity
             android:name=".SearchActivity"
@@ -75,6 +79,7 @@
             android:name="com.apalya.myplex.MainActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="portrait" >
+             
         </activity>
         <activity
             android:name="com.apalya.myplex.tablet.MultiPaneActivity"
@@ -91,7 +96,9 @@
             android:label="@string/app_name"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" >
         </activity>
-
+		
+       
+        
         <receiver android:name="com.apalya.myplex.receivers.DownloadManagerReceiver">
   			<intent-filter>
     			 <action android:name="android.intent.action.DOWNLOAD_COMPLETE"></action>
@@ -103,8 +110,13 @@
         
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
-            android:value="@string/fbapp_id" />
+            android:value="@string/config.fbapp_id" />
 
+        <meta-data
+      			android:name="com.mixpanel.android.MPConfig.AutoCheckForSurveys"
+      			android:value="false" />
+        <activity android:name="com.mixpanel.android.surveys.SurveyActivity" />
+        
         <receiver android:name="com.mixpanel.android.mpmetrics.GCMReceiver"
               android:permission="com.google.android.c2dm.permission.SEND" >
         <intent-filter>
@@ -113,8 +125,25 @@
             <category android:name="com.apalya.myplex" />
         </intent-filter>
     </receiver>
+
+    
+   <service android:name="com.google.analytics.tracking.android.CampaignTrackingService" />
+	<receiver android:name="com.google.analytics.tracking.android.CampaignTrackingReceiver" android:exported="true" >
+  		<intent-filter>
+    		<action android:name="com.android.vending.INSTALL_REFERRER" />
+  		</intent-filter>
+	</receiver>
+
         <activity android:name="LiveScoreWebView"></activity>
+
         
+        <receiver android:name="com.apalya.myplex.receivers.ConnectivityReceiver" >
+        	<intent-filter>
+            	<action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+        	</intent-filter>
+    	</receiver>
+        <receiver android:name=".receivers.ReminderReceiver"></receiver>
+    
     </application>
     <!--  <receiver android:name="com.apalya.myplex.widget.MyplexWidgetProvider">
          <intent-filter>

@@ -41,7 +41,7 @@ public class LiveScoreWebView extends Activity implements
 		requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
 		setContentView(R.layout.layout_webview);
 		liveWebView = (WebView) findViewById(R.id.webview);
-		liveWebView.getSettings().setJavaScriptEnabled(true);
+//		liveWebView.getSettings().setJavaScriptEnabled(true);
 		url = new String();
 		try {
 			Bundle b = this.getIntent().getExtras();
@@ -54,7 +54,7 @@ public class LiveScoreWebView extends Activity implements
 		getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
 		getActionBar().setCustomView(R.layout.ab_live_score_layout);
 		progressBar = (ProgressBar) getActionBar().getCustomView().findViewById(R.id.livescore_progressBar);
-		setUpWebView(url);
+		setUpWebView(url.trim());
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class LiveScoreWebView extends Activity implements
 		liveWebView.setWebViewClient(webviewclient = new FbWebViewClient());
 		liveWebView.setWebChromeClient(new CustomChromeClient());
 		WebSettings webSettings = liveWebView.getSettings();
-		webSettings.setJavaScriptEnabled(true);
+//		webSettings.setJavaScriptEnabled(true);
 		webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
 		webSettings.setLoadsImagesAutomatically(true);
 		liveWebView.loadUrl(url);

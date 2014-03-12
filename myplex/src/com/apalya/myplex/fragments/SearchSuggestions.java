@@ -4,14 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.crypto.spec.PSource;
-
-import org.apache.lucene.document.Field.Index;
-import org.apache.lucene.index.FieldInfo.IndexOptions;
-
 import android.content.Context;
 import android.os.Bundle;
-import android.text.method.HideReturnsTransformationMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -30,20 +23,17 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.apalya.myplex.BaseFragment;
-import com.apalya.myplex.MainActivity;
 import com.apalya.myplex.R;
 import com.apalya.myplex.adapters.NavigationOptionsMenuAdapter;
 import com.apalya.myplex.cache.CacheManager;
-import com.apalya.myplex.cache.IndexHandler.OperationType;
 import com.apalya.myplex.data.CardData;
-import com.apalya.myplex.data.CardDataGenralInfo;
 import com.apalya.myplex.data.CardDataHolder;
 import com.apalya.myplex.data.CardDataImagesItem;
 import com.apalya.myplex.data.CardExplorerData;
 import com.apalya.myplex.data.CardImageView;
 import com.apalya.myplex.data.CardResponseData;
-import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.CardImageLoader;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FontUtil;
@@ -51,6 +41,8 @@ import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.google.analytics.tracking.android.Fields;
+import com.google.analytics.tracking.android.MapBuilder;
 
 public class SearchSuggestions extends BaseFragment {
 
@@ -68,6 +60,7 @@ public class SearchSuggestions extends BaseFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Analytics.createScreenGA(Analytics.SCREEN_SEARCH_SUGGESTIONS);	
 	}
 
 	@Override
@@ -119,8 +112,6 @@ public class SearchSuggestions extends BaseFragment {
 				Log.d(TAG, response);
 				CardResponseData minResultSet = null;
 				try {
-					//Analytics.endTimedEvent("RECOMMENDATIONS-REQUEST");
-					//Analytics.trackEvent("RECOMMENDATIONS-REQUEST-SUCCESS");
 					minResultSet  =(CardResponseData) Util.fromJson(response, CardResponseData.class);
 				} catch (JsonMappingException e) {
 					// TODO Auto-generated catch block
@@ -145,15 +136,30 @@ public class SearchSuggestions extends BaseFragment {
 					public void onItemClick(AdapterView<?> parent, View view,
 							int position, long id) {
 						List<CardData> searchResults = mSearchlistAdapter.getSearchResults();
+						
 						if(position < searchResults.size())
 						{
+							String localSearchScope = null;
 							CardExplorerData dataBundle = myplexapplication.getCardExplorerData();
-							dataBundle.reset();
+							Analytics.SEARCH_TYPE = "inline"; //added for analytics
+
+//							dataBundle.reset();
+							if(dataBundle != null){			
+								if((dataBundle.searchScope!=null) && dataBundle.searchScope.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
+									localSearchScope = ConsumerApi.VIDEO_TYPE_LIVE;
+								}
+								dataBundle.reset();
+								if(localSearchScope != null){
+									dataBundle.searchScope = localSearchScope;
+								}
+							}
+
 							dataBundle.searchQuery = searchResults.get(position)._id;
 							dataBundle.requestType = CardExplorerData.REQUEST_INLINESEARCH;
 							BaseFragment fragment = mMainActivity.createFragment(NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION);
 							mMainActivity.bringFragment(fragment);
 							mMainActivity.setActionBarTitle(searchResults.get(position).generalInfo.title.toLowerCase());
+							Analytics.SELECTED_INLINE_WORD = searchResults.get(position).generalInfo.title.toLowerCase();
 						}
 						
 					}

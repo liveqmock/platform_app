@@ -1,6 +1,5 @@
 package com.apalya.myplex.fragments;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -13,7 +12,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
-import android.animation.Animator.AnimatorListener;
+import android.animation.ValueAnimator;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -26,11 +25,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.animation.Animation;
-import android.view.animation.Animation.AnimationListener;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.TranslateAnimation;
 import android.view.ViewGroup;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.AbsListView;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -41,6 +37,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request.Method;
+import com.android.volley.AuthFailureError;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -55,7 +52,6 @@ import com.apalya.myplex.cache.CacheManager;
 import com.apalya.myplex.cache.IndexHandler;
 import com.apalya.myplex.data.ApplicationSettings;
 import com.apalya.myplex.data.CardData;
-import com.apalya.myplex.data.CardDataGenralInfo;
 import com.apalya.myplex.data.CardDataGenre;
 import com.apalya.myplex.data.CardDownloadData;
 import com.apalya.myplex.data.CardExplorerData;
@@ -70,15 +66,15 @@ import com.apalya.myplex.utils.AlertDialogUtil;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FavouriteUtil;
-import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.FavouriteUtil.FavouriteCallback;
 import com.apalya.myplex.utils.FetchDownloadProgress;
 import com.apalya.myplex.utils.FetchDownloadProgress.DownloadProgressStatus;
+import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.views.CardView;
 import com.apalya.myplex.views.PackagePopUp;
-import com.fasterxml.jackson.core.JsonParseException;
+import com.apalya.myplex.views.SensorScrollUtil;
 
 public class CardExplorer extends BaseFragment implements CardActionListener,CacheManagerCallback,DownloadProgressStatus,
 		OnDismissCallback, AlertDialogUtil.NoticeDialogListener,Util.KeyRenewListener {
@@ -98,20 +94,15 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	private LinearLayout mStackFrame;
 	private HashMap<CardData,Integer> mDownloadTracker= new HashMap<CardData,Integer>();
 	private boolean mRefreshOnce = false;
+	public static  boolean mfirstTime = false;
+	private View mProgressView = null;
+	private SensorScrollUtil mSensorScrollUtil ;
+	//private EasyTracker easyTracker = null;
 	
+
 	@Override
 	public void open(CardData object) {
 		
-		Map<String,String> params=new HashMap<String, String>();
-		/*params.put("CardId", object._id);
-		params.put("CardType", object.generalInfo.type);
-		params.put("CardName", object.generalInfo.title);*/
-		//???
-		params.put(Analytics.CONTENT_ID_PROPERTY, object._id);
-		params.put(Analytics.CONTENT_NAME_PROPERTY, object.generalInfo.title);
-		params.put(Analytics.CONTENT_TYPE_PROPERTY,object.generalInfo.type);
-		//Analytics.trackEvent(Analytics.EVENT_PLAY,params);
-		Analytics.trackEvent(Analytics.EVENT_BROWSE,params);
 		mMainActivity.saveActionBarTitle();
 		if(getResources().getBoolean(R.bool.isTablet)){
 			myplexapplication.mSelectedCard = object;
@@ -123,19 +114,26 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			mMainActivity.bringFragment(fragment);	
 		}
 	}
-
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		mData = myplexapplication.getCardExplorerData();
-		Map<String,String> params=new HashMap<String, String>();
-		params.put(Analytics.BROWSE_TYPE_PROPERTY, Analytics.BROWSE_TYPES.Cards.toString());
-		Analytics.trackEvent(Analytics.EVENT_BROWSE,params);
-		Log.d(TAG,"onCreate");
+		mfirstTime = true;
+		Analytics.createScreenGA(Analytics.SCREEN_CARD_EXPLORER);
+		mSensorScrollUtil= new SensorScrollUtil();
+		mSensorScrollUtil.register(getContext());
 	}
 
 	public void showProgressBar() {
+		if(mProgressView != null){
+			ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(mProgressView,
+					"alpha", 0f, 1f);
+			fadeAnim2.setDuration(800);
+			fadeAnim2.start();
+			mProgressView.setVisibility(View.VISIBLE);
+		}
 //		if (mProgressDialog != null) {
 //			mProgressDialog.dismiss();
 //		}
@@ -143,6 +141,13 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	}
 
 	public void dismissProgressBar() {
+		if(mProgressView != null){
+			ValueAnimator fadeAnim2 = ObjectAnimator.ofFloat(mProgressView,
+					"alpha", 1f, 0f);
+			fadeAnim2.setDuration(800);
+			fadeAnim2.start();
+//			mProgressView.setVisibility(View.INVISIBLE);
+		}
 //		if (mProgressDialog != null) {
 //			mProgressDialog.dismiss();
 //		}
@@ -180,6 +185,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		if(mDownloadProgressManager != null){
 			mDownloadProgressManager.stopPolling();
 		}
+		mSensorScrollUtil.unregister();
 		super.onStop();
 	}
 	private void closeSession(){
@@ -308,6 +314,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		mCardView = (CardView) mRootView.findViewById(R.id.framelayout);
 		mGridView = (GridView)mRootView.findViewById(R.id.tabletview);
 		mStackFrame = (LinearLayout)mRootView.findViewById(R.id.cardstackframe);
+		mProgressView = mRootView.findViewById(R.id.card_loading_progress);
 		arangeWaterMark();
 		if(getContext() == null)
 		{
@@ -338,6 +345,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		mMainActivity.setSearchViewVisibilty(View.VISIBLE);
 		delayedAction();
 		hideNewArrivals();
+		mSensorScrollUtil.init(mCardView);
 		return mRootView;
 	}
 
@@ -411,18 +419,37 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		boolean isMovie = false;  
 		if((mData.requestType == CardExplorerData.REQUEST_RECOMMENDATION )||( mData.requestType ==CardExplorerData.REQUEST_BROWSE))
 		{
-			if(mData.requestType == CardExplorerData.REQUEST_RECOMMENDATION ){
+			if(mData.requestType == CardExplorerData.REQUEST_BROWSE 
+					&& mData.searchQuery!=null 
+						&& mData.searchQuery.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_MOVIE)){
 				isMovie = true;
 				mMainActivity.setUpLivetvOrMovie(isMovie);
 			}else{
 				if(mData.searchQuery.equalsIgnoreCase("live"))
 					mMainActivity.setUpLivetvOrMovie(false);
 			}
-		}		
+		}	
+		if(mVolleyRequest == null)
+			return;
+		if(mVolleyRequest.isCanceled()){
+			delayedAction();
+		}
 	}
 	@Override
 	public void onPause() {
 		// TODO Auto-generated method stub
+		//for analytics
+		CardView cardView = getmCardView();
+    	if(cardView != null) {
+    		if(cardView.swipeCount > 1) {
+    			cardView.mixpanelBrowsing();
+    		}
+    	}
+    	if(mTabletAdapter != null) {
+    		if(mTabletAdapter.swipeCount > 1) {
+    			mTabletAdapter.mixpanelBrowsingTablet();
+    		}
+    	}
 		super.onPause();
 	}
 	public void fillDownloadList(){
@@ -446,6 +473,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	private boolean mOldDataAdded = false;
 	private int mOldDataListSize  = 0;
 	private boolean mAddDataAdded = false;
+	private RequestQueue queue;
 	private void fillOldData(final List<CardData> lastSavedData){
 		Handler h = new Handler(Looper.getMainLooper());
 		h.post(new Runnable() {
@@ -496,7 +524,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			return;
 		}*/
 		mMainActivity.showActionBarProgressBar();
-		RequestQueue queue = MyVolley.getRequestQueue();
+		showProgressBar();
+		queue = MyVolley.getRequestQueue();
 		int requestMethod = Method.GET;
 		String requestUrl = new String();
 		if(mData.requestType == CardExplorerData.REQUEST_SEARCH){
@@ -528,7 +557,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			requestUrl = ConsumerApi.getFavourites(ConsumerApi.LEVELDYNAMIC,mData.mStartIndex);
 		}else if(mData.requestType == CardExplorerData.REQUEST_PURCHASES){
 			screenName="Purchases";
-			requestUrl = ConsumerApi.getPurchases(ConsumerApi.LEVELDYNAMIC,mData.mStartIndex);
+			String searchType = ConsumerApi.VIDEO_TYPE_LIVE+","+ConsumerApi.VIDEO_TYPE_MOVIE+","+ConsumerApi.TYPE_TV_SEASON;
+			requestUrl = ConsumerApi.getPurchases(ConsumerApi.LEVELDYNAMIC,mData.mStartIndex,searchType);
 			requestMethod = Method.POST;
 		}else if(mData.requestType == CardExplorerData.REQUEST_BROWSE){
 			screenName="Browse" + mData.searchQuery;
@@ -554,18 +584,24 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			}
 			requestUrl = ConsumerApi.getSimilarContent(mData.searchQuery,ConsumerApi.LEVELDYNAMIC);
 			
+		}else if(mData.requestType == CardExplorerData.REQUEST_TV_SHOWS){
+			screenName="Browse" + mData.searchQuery;
+			requestUrl = ConsumerApi.getBrowse(mData.searchQuery,ConsumerApi.LEVELDYNAMIC, mData.mStartIndex);
 		}
 		
 		
-		/*attrib.put("Category", screenName);
-		attrib.put("Duration", "");
-		Analytics.trackEvent(Analytics.cardBrowseDuration,attrib,true);*/
-		
-		
 		requestUrl = requestUrl.replaceAll(" ", "%20");
-		mVolleyRequest = new GZipRequest(requestMethod, requestUrl, deviceMinSuccessListener(), responseErrorListener());
-//		mVolleyRequest.printLogs(true);
-//		myReg.setShouldCache(true);
+		mVolleyRequest = new GZipRequest(requestMethod, requestUrl, deviceMinSuccessListener(), responseErrorListener()){
+			@Override
+			protected Map<String, String> getParams() throws AuthFailureError {
+				if(mData.requestType == CardExplorerData.REQUEST_PURCHASES){
+					Map<String, String> params = new HashMap<String, String>();
+					params.put("type", "live,movie,tvseason");	
+					return params;
+				}
+				return super.getParams();
+			}
+		};
 		Log.d(TAG,"Min Request:"+requestUrl);
 		if(requestUrl.equals("0") || (requestUrl.length()==0)){
 			mMainActivity.hideActionBarProgressBar();
@@ -604,6 +640,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 						}
 						if(minResultSet.results ==  null){showNoDataMessage(false);return;}
 						if(minResultSet.results.size() ==  0){showNoDataMessage(false);return;}
+						mVolleyRequest = null;
 						mCacheManager.getCardDetails(minResultSet.results,IndexHandler.OperationType.IDSEARCH,CardExplorer.this);
 					}
 				} catch (Exception e) {
@@ -683,11 +720,6 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			if (v.getTag() instanceof FilterMenudata) {
 				String label = ((FilterMenudata) v.getTag()).label.replaceAll("\\(.*?\\)","").trim();
 				if (label != null && label.equalsIgnoreCase("All")) {
-//					mMainActivity.setActionBarTitle("All");
-					Map<String,String> params=new HashMap<String, String>();
-					params.put(Analytics.SEARCH_TYPE_PROPERTY, Analytics.SEARCH_TYPES.Filter.toString());
-					params.put(Analytics.SEARCH_FILTER_TYPE_PROPERTY,label);
-					Analytics.trackEvent(Analytics.EVENT_SEARCH,params);
 					sort(mData.mMasterEntries);
 					return;
 				}
@@ -707,17 +739,14 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 						localData.add(data);
 					}
 				}
+
+				Analytics.mixPanelFilter(mData,label,localData);
 //				mMainActivity.setActionBarTitle(label/*+" ("+localData.size()+"+)"*/);
-				Map<String,String> params=new HashMap<String, String>();
-				params.put(Analytics.SEARCH_TYPE_PROPERTY, Analytics.SEARCH_TYPES.Filter.toString());
-				params.put(Analytics.SEARCH_NUMBER_FOUND_PROPERTY, String.valueOf(localData.size()));
-				params.put(Analytics.SEARCH_FILTER_TYPE_PROPERTY,label);
-				Analytics.trackEvent(Analytics.EVENT_SEARCH,params);
 				sort(localData);
 			}
 		}
 	};
-
+	
 	private void sort(ArrayList<CardData> localData) {
 		if(getResources().getBoolean(R.bool.isTablet)){
 			mTabletAdapter.forceUpdateData(localData);
@@ -725,11 +754,13 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			mCardView.forceUpdateData(localData);
 		}
 	}
-
+	
 	private void applyData() {
+		
 		if(mData.mMasterEntries == null || mData.mMasterEntries.size() == 0){
 			return;
 		}
+		//Analytics.mixPanelBrowsingEvents(mData,mfirstTime);
 		if(!isAdded())
 		{
 			Log.e(TAG, "acitivty is NULL");
@@ -773,8 +804,6 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		return new Response.ErrorListener() {
 			@Override
 			public void onErrorResponse(VolleyError error) {
-				//Analytics.endTimedEvent(Analytics.cardBrowseDuration);
-				//Analytics.endTimedEvent(Analytics.cardBrowseScreen);
 				Log.d(TAG,"Error from server "+error.networkResponse);
 				if(mData.mMasterEntries == null || mData.mMasterEntries.size() == 0){
 					showErrorDialog();
@@ -784,6 +813,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			}
 		};
 	}
+	
+	
 	@Override
 	public void favouriteAction(final CardData data,final int type){
 		FavouriteUtil favUtil = new FavouriteUtil();
@@ -797,10 +828,14 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				String status="";
 				if(value){
 					status="Not Favourite";
-					if(type == FavouriteUtil.FAVOURITEUTIL_ADD)
+					if(type == FavouriteUtil.FAVOURITEUTIL_ADD) {
+						Analytics.mixPanelAddFavorite(data,Analytics.NUMBER_FAVOURITE);
 						Util.showToast(getContext(), data.generalInfo.title+" set as favourite",Toast.LENGTH_SHORT);
-					else
+					}
+					else {
+						Analytics.mixPanelAddFavorite(data,2);
 						Util.showToast(getContext(), data.generalInfo.title+" removed from favourites",Toast.LENGTH_SHORT);
+					}
 //					Toast.makeText(getContext(), "Chan", Toast.LENGTH_SHORT).show();
 				}else{
 					status="Favourite";
@@ -808,23 +843,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 //					Toast.makeText(getContext(), "Add as Favourite", Toast.LENGTH_SHORT).show();
 				}
 				
-				Map<String,String> params=new HashMap<String, String>();
-				/*params.put("Status", status);
-				params.put("CardId", data._id);
-				if(data.generalInfo != null){
-					params.put("CardType", data.generalInfo.type);
-					params.put("CardName", data.generalInfo.title);
-				}*/
-				//???
-				params.put(Analytics.BROWSE_TYPE_PROPERTY, status);
-				params.put(Analytics.CONTENT_ID_PROPERTY, data._id);
-				if(data.generalInfo != null){
-					params.put(Analytics.CONTENT_TYPE_PROPERTY, data.generalInfo.type);
-					params.put(Analytics.CONTENT_NAME_PROPERTY, data.generalInfo.title);
-				}
 				
-				//Analytics.trackEvent(Analytics.cardBrowseFavorite,params);
-				Analytics.trackEvent(Analytics.EVENT_BROWSE,params);
 				if(getResources().getBoolean(R.bool.isTablet)){
 					mTabletAdapter.notifyDataSetChanged();
 				}else{
@@ -843,20 +862,13 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			showStackedFrame();
 		}
 		Map<String,String> params=new HashMap<String, String>();
-		/*params.put("CardId", data._id);
-		if(data.generalInfo != null){
-			params.put("CardType", data.generalInfo.type);
-			params.put("CardName", data.generalInfo.title);
-		}
-		Analytics.trackEvent(Analytics.cardBrowseSelect,params);*/
-		
+			
 		params.put(Analytics.CONTENT_ID_PROPERTY, data._id);
 		if(data.generalInfo != null){
 			params.put(Analytics.CONTENT_TYPE_PROPERTY, data.generalInfo.type);
 			params.put(Analytics.CONTENT_NAME_PROPERTY, data.generalInfo.title);
 		}
-		//Analytics.trackEvent(Analytics.EVENT_BROWSE,params);
-		
+				
 		mData.currentSelectedCard = index;
 		mSelectedCard = data;
 		isDownloadView(mSelectedCard);
@@ -892,14 +904,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	}
 	@Override
 	public void deletedCard(CardData data) {
-		// TODO Auto-generated method stub
-		Map<String,String> params=new HashMap<String, String>();
-		params.put("CardId", data._id);
-		if(data.generalInfo != null){
-			params.put("CardType", data.generalInfo.type);
-			params.put("CardName", data.generalInfo.title);
-		}
-		//Analytics.trackEvent(Analytics.cardBrowseCancel,params);
+		
 	}
 
 	@Override
@@ -907,21 +912,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		PackagePopUp popup = new PackagePopUp(getContext(),mRootView);
 		mData.cardDataToSubscribe = data;
 		popup.showPackDialog(data, getActionBar().getCustomView());
-		Map<String,String> params=new HashMap<String, String>();
-		/*params.put("CardId", data._id);
-		if(data.generalInfo != null){
-			params.put("CardType", data.generalInfo.type);
-			params.put("CardName", data.generalInfo.title);
-		}
-		Analytics.trackEvent(Analytics.cardBrowsePurchase,params);*/
 		
-		params.put(Analytics.CONTENT_ID_PROPERTY, data._id);
-		if(data.generalInfo != null){
-			params.put(Analytics.CONTENT_TYPE_PROPERTY, data.generalInfo.type);
-			params.put(Analytics.CONTENT_NAME_PROPERTY, data.generalInfo.title);
-		}
-		params.put(Analytics.PAY_STATUS_PROPERTY, Analytics.PAY_COMMERCIAL_TYPES.Buy.toString());
-		Analytics.trackEvent(Analytics.EVENT_PAY,params);
 	}
 
 	@Override
@@ -949,9 +940,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				params.put(Analytics.CONTENT_TYPE_PROPERTY, mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo.type);
 				params.put(Analytics.CONTENT_NAME_PROPERTY, mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo.title);
 			}
-			//doesnot have data how control comes her. whether through filter|search etc
-			//params.put(Analytics.BROWSE_TYPE_PROPERTY,Analytics.BROWSE_CARDACTION_TYPES.Swipe.toString());
-			//Analytics.trackEvent(Analytics.EVENT_BROWSE,params);
+			
 		}
 	}
 	
@@ -982,6 +971,9 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		if(mData.mMasterEntries.size() != 0){
 			showNoDataMessage(issuedRequest);
 		}
+		if(mData.requestType != CardExplorerData.REQUEST_SEARCH){
+			Analytics.mixPanelBrowsingEvents(mData,mfirstTime);
+		}
 		applyData();
 		if(mOldDataAdded){
 			mOldDataAdded = false;
@@ -1005,7 +997,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				params.put("Network", "Mobile");
 			}
 			
-			//Analytics.trackEvent(Analytics.cardBrowseScreen,params);
+			
 		}
 		else
 		{
@@ -1024,7 +1016,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				params.put("Network", "Mobile");
 			}
 			
-			//Analytics.trackEvent(Analytics.cardBrowseScreen,params);
+			
 		}
 	}
 
@@ -1057,9 +1049,12 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				params.put("Network", "Mobile");
 			}
 			
-			//Analytics.trackEvent(Analytics.cardBrowseScreen,params);
+			
 		showNoDataMessage(false);
-		applyData();		
+		if(mData.requestType == CardExplorerData.REQUEST_SEARCH){
+			Analytics.mixPanelBrowsingEvents(mData,mfirstTime);
+		}
+		applyData();
 		if(mOldDataAdded){
 			mOldDataAdded = false;
 			if(itemsAdded){
@@ -1140,6 +1135,10 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		mMainActivity.hideActionBarProgressBar();
 		dismissProgressBar();
 		Util.showToast(mContext, message, Util.TOAST_TYPE_INFO);
+	}
+	//analytics
+	public CardView getmCardView() {
+		return mCardView;
 	}
 	
 }

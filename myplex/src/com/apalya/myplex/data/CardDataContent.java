@@ -21,5 +21,7 @@ public class CardDataContent implements Serializable{
 	public boolean drmEnabled;
 	public String parentId;
 	public String categoryType;
+	public String serialNo;
+	public String siblingOrder;
 	public CardDataContent(){}
 }

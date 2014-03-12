@@ -149,7 +149,7 @@
             android:gravity="top|center_horizontal"
             android:layout_centerHorizontal="true"
             android:id="@+id/filter_levle"
-            android:text="filter_level"
+            android:text=""
             android:layout_below="@+id/customactionbar_filter_text"/>
 
         <TextView

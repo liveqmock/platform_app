@@ -6,46 +6,99 @@
     android:layout_height="match_parent"
     android:background="#e6e6e6" >
 
+
+            <RelativeLayout
+                android:id="@+id/carddetail_videolayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:background="#000000" >
+            </RelativeLayout>
+
+            <ProgressBar
+                android:id="@+id/carddetail_progressBar"
+                style="@style/CustomProgressBar"
+                android:layout_width="fill_parent"
+                android:layout_height="4dp"
+                android:layout_below="@+id/carddetail_videolayout"
+                android:indeterminate="true"
+                android:indeterminateDrawable="@drawable/custom_progress_bar_horizontal"
+                android:visibility="invisible" />
+			 <LinearLayout
+				android:id="@+id/epg_linear_layout"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:layout_below="@+id/carddetail_progressBar"
+				android:layout_marginLeft="@dimen/margin_gap_12"
+				android:layout_marginRight="@dimen/margin_gap_12"	
+				android:background="@android:color/transparent"		
+				>
+			</LinearLayout>
+			<LinearLayout
+				android:id="@+id/tvshow_linear_layout"
+				android:layout_width="match_parent"
+				android:layout_height="120dp"
+				android:layout_below="@+id/epg_linear_layout"
+				android:layout_marginLeft="@dimen/margin_gap_12"
+				android:layout_marginRight="@dimen/margin_gap_12"			
+				android:visibility="gone"
+				android:background="@drawable/carddetails_bg">
+				
+			    
+			    
+			    <com.apalya.myplex.utils.NumberPicker
+                        android:id="@+id/numberPickerSeason"
+                        android:layout_width="60dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="6dp"
+                       
+                        />
+
+                    <com.apalya.myplex.utils.NumberPicker
+            	         android:id="@+id/numberPickerEpisode"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="6dp"
+                         android:layout_marginLeft="12dip" 
+                      />
+				
+			    
+			</LinearLayout>	
+			
+			
+			
+			
+			<!--      Removed Margin           android:layout_marginTop="@dimen/margin_gap_12"
+			 -->
+			
+			
+
+            <com.apalya.myplex.views.CustomScrollView
+                android:id="@+id/carddetail_scroll_view"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tvshow_linear_layout"
+                android:background="#e6e6e6"
+                android:scrollbars="none" >
+
+                <LinearLayout
+                    android:id="@+id/carddetail_detaillayout"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/margin_gap_12"
+                    android:layout_marginLeft="@dimen/margin_gap_12"
+                    android:layout_marginRight="@dimen/margin_gap_12"
+                    android:animateLayoutChanges="true"
+                    android:orientation="vertical" >
+                </LinearLayout>
+            </com.apalya.myplex.views.CustomScrollView>
+        </RelativeLayout>
+
+       
+        
+
+    <!--
     <RelativeLayout
-        android:id="@+id/carddetail_videolayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:background="#000000" >
-    </RelativeLayout>
-
-    <ProgressBar
-        android:id="@+id/carddetail_progressBar"
-        style="@style/CustomProgressBar"
-        android:layout_width="fill_parent"
-        android:indeterminateDrawable="@drawable/custom_progress_bar_horizontal"
-        android:layout_height="4dp"
-        android:layout_below="@+id/carddetail_videolayout"
-        android:indeterminate="true"
-        android:visibility="invisible" />
-
-    <com.apalya.myplex.views.CustomScrollView
-        android:id="@+id/carddetail_scroll_view"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/carddetail_videolayout"
-        android:layout_marginTop="@dimen/margin_gap_12"
-        android:background="#e6e6e6"
-        android:scrollbars="none" >
-
-        <LinearLayout
-            android:id="@+id/carddetail_detaillayout"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/margin_gap_12"
-            android:layout_marginLeft="@dimen/margin_gap_12"
-            android:layout_marginRight="@dimen/margin_gap_12"
-            android:animateLayoutChanges="true"
-            android:orientation="vertical" >
-        </LinearLayout>
-    </com.apalya.myplex.views.CustomScrollView>
-
-   <!--  <RelativeLayout
         android:id="@+id/carddetail_bottomactionbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -91,6 +144,5 @@
                     android:src="@drawable/social_share" />
             </LinearLayout>
         </LinearLayout>
-    </RelativeLayout> -->
-
-</RelativeLayout>
+    </RelativeLayout>
+    -->

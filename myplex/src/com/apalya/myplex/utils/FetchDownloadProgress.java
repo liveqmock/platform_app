@@ -1,6 +1,7 @@
 package com.apalya.myplex.utils;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import android.app.DownloadManager;
 import android.content.Context;
@@ -103,6 +104,19 @@ public class FetchDownloadProgress {
 					if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
 						mDownloadData.mCompleted = true;
 						mDownloadData.mPercentage = 100;
+						//for Analytics //Util.java startDownload() method the Analytics.downloadStartTime is initialized
+						String key = mCardData.generalInfo._id+Analytics.UNDERSCORE+Analytics.downLoadStartTime;
+						long startTime = SharedPrefUtils.getLongFromSharedPreference(mContext, key);
+						long timetakenForDownload = System.currentTimeMillis() - startTime;
+						long timeInMinutes = TimeUnit.MILLISECONDS.toMinutes(timetakenForDownload);
+						long mb=1024L*1024L;
+						long bytesinMB = 0;
+						if(bytes_total !=0 ){
+							bytesinMB = (bytes_total/mb);
+						}
+						Analytics.mixPanelDownloadsMovie(mCardData.generalInfo.title,mCardData._id,bytesinMB+"",timeInMinutes+"");
+						//Analytics.downloadStartTime = 0;//setting the starting time to zero
+						SharedPrefUtils.writeToSharedPref(mContext, Analytics.downLoadStartTime, 0);
 						
 					}else if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_FAILED) {
 						mDownloadData.mCompleted = true;

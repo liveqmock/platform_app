@@ -74,6 +74,7 @@ public class ConsumerApi {
 	public static final String STREAMDOWNLOAD = "download";
 	
 	public static final String PAYMENT_CHANNEL_INAPP="INAPP";
+	public static final String IMAGE_COVERPOSTER_MDPI="imageType=coverposter&imageProfile=mdpi";
 	
 	// min: returns only content ids.
 	// static: returns static sub-entities.
@@ -99,12 +100,28 @@ public class ConsumerApi {
 	public static final String VIDEO_TYPE_MOVIE = "movie";
 	public static final String VIDEO_TYPE_LIVE = "live";
 	public static final String VIDEO_TYPE_TRAILER = "trailer";
+	public static final String PACKAGE_ = "package";
+
 	
+	// for live tv epg
+	public static final String EPG_BASE_URL = "http://d2capp.apalya-auth.com/recording/epg/whatsOnIndiaXml.action?serviceId=";
+//	public static final String EPG_BASE_URL = "http://192.168.200.16:8080/recording/epg/getEPGScheduleXML.action?serviceId=";
+//	public static final String EPG_BASE_URL = "http://220.226.22.120:8080/recording/epg/getEPGScheduleXML.action?serviceId=";
+	public static final String DAYS  = "days=";
+	public static final String DATE  = "rdate=";
 	// list of content types
 	
 	public static final String CONTENT_SPORTS_LIVE = "sportsEvent";
 	public static final String CONTENT_SPORTS_VOD = "sportsEventVod";
-		
+	
+	// for tv shows
+	public static final String CONTENT_RELATED_CONTEXT = "contentRelated";
+	public static final String TYPE_TV_SERIES = "tvseries";
+	public static final String TYPE_TV_SEASON= "tvseason";
+	public static final String TYPE_TV_EPISODE = "tvepisode";	
+	
+	public static final String  HEADER_RESPONSE_TYPE_CACHED="cache-hit";
+	
 	public static String getSearch(String queryStr, String level,int startIndex, String searchType) {
 		if(queryStr == null||(queryStr != null && queryStr.length() ==0)){
 			queryStr = "*";
@@ -157,12 +174,12 @@ public class ConsumerApi {
 				+ startIndex + AMPERSAND + LEVEL
 				+ level + AMPERSAND+COUNT;
 	}
-	public static String getPurchases(String level,int startIndex) {
+	public static String getPurchases(String level,int startIndex , String searchType) {
 		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH 
 				+ PURCHASEDLIST_ACTION + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY
 				+  AMPERSAND + STARTINDEX
 				+ startIndex + AMPERSAND + LEVEL
-				+ level + AMPERSAND+COUNT;
+				+ level + AMPERSAND + COUNT ;//+ AMPERSAND ;// +  BROWSETYPE + searchType ;
 	}
 	public static String getFavourite(String contentId) {
 		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + CONTENT_TAG +SLASH + contentId +SLASH
@@ -176,9 +193,14 @@ public class ConsumerApi {
 				+ AMPERSAND + LEVEL + level ;
 	}
 	public static String getContentDetail(String contentID,String level){
+//		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH + CONTENTDETAILS_ACTION
+//				+ SLASH + contentID + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY  + AMPERSAND
+//		        + LEVEL + level + AMPERSAND+COUNT;
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH + CONTENTDETAILS_ACTION
 				+ SLASH + contentID + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY  + AMPERSAND
-		        + LEVEL + level + AMPERSAND+COUNT;
+		        + AMPERSAND+COUNT + AMPERSAND 
+		        + "fields=user/currentdata,images,generalInfo,contents,comments,reviews/user,_id,relatedMedia,packages,relatedCast,dynamicMeta,_lastModifiedAt,_expiresAt" 
+		        + AMPERSAND + IMAGE_COVERPOSTER_MDPI;
 	}
 	public static String getVideosDetail(String contentID){
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT_V3 +  SLASH + CONTENTDETAILS_ACTION
@@ -247,5 +269,33 @@ public class ConsumerApi {
 	public static String getMatchStatus(String contentID){
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH + CONTENT_TAG +SLASH + contentID
 				+ SLASH +  MATCHSTATUS_ACTION + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY ;
+	}
+	
+	public static String getBundleUrl(String packageID){
+				return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH + PACKAGE_ +SLASH + packageID
+						+ SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY ;
+			}
+
+	
+	public static String getEpgUrl(String title,String days, String date){
+		String dateString  = "";
+		if(date!=null){
+			dateString = AMPERSAND+ DATE + date;
+		}
+		return EPG_BASE_URL  +  title.toUpperCase() + AMPERSAND +DAYS +days + dateString ;		
+	}
+	
+	public static String getTVShowSeasonListUrl(String contentId ){
+		
+		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH + CONTENT_RELATED_CONTEXT + SLASH + contentId 
+				+ SLASH + QUESTION_MARK+ CLIENTKEY + DEBUGCLIENTKEY + AMPERSAND + LEVEL + LEVELDYNAMIC 
+				+ AMPERSAND + BROWSETYPE + TYPE_TV_SEASON + AMPERSAND +"count=-1";
+	}
+	
+	public static String getEpisodesUrl(String contentId){
+		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH + CONTENT_RELATED_CONTEXT + SLASH + contentId 
+				+ SLASH + QUESTION_MARK+ CLIENTKEY + DEBUGCLIENTKEY + 
+				AMPERSAND + BROWSETYPE + TYPE_TV_EPISODE +  AMPERSAND +"count=-1" 
+				+ "&fields=images,generalInfo,contents,comments,reviews/user,_id,relatedMedia" ;
 	}
 }

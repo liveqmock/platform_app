@@ -11,13 +11,19 @@ import android.util.DisplayMetrics;
 import com.apalya.myplex.R;
 import com.apalya.myplex.adapters.NavigationOptionsMenuAdapter;
 import com.apalya.myplex.cache.CacheHolder;
+import com.apalya.myplex.receivers.ConnectivityReceiver;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.LocationUtil;
 import com.apalya.myplex.utils.MyVolley;
+
+import com.google.analytics.tracking.android.EasyTracker;
+import com.google.analytics.tracking.android.Tracker;
+
 import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.utils.Util;
 import com.crashlytics.android.Crashlytics;
 import com.flurry.android.FlurryAgent;
+
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 
 public class myplexapplication extends Application {
@@ -31,7 +37,13 @@ public class myplexapplication extends Application {
 	private static CacheHolder mCache ;
 	private static MixpanelAPI mixPanel;
 	public static int mSelectedOption_Tablet = NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION;
+	private static Context context;
+	
+	private static EasyTracker mTracker;
+	
+
 	public static boolean isInitlized=false;
+
 	private static final String MIXPANEL_DISTINCT_ID_NAME = "Mixpanel Example $distinctid";
 	/*
 	 * You will use a Mixpanel API token to allow your app to send data to Mixpanel. To get your token
@@ -43,8 +55,8 @@ public class myplexapplication extends Application {
 	 *
 	 *   Paste it below (where you see "YOUR API TOKEN")
 	 */
-	public static final String MIXPANEL_API_TOKEN = "20541460115650ad4e07ab10de528e81";
 
+	
 	/*
 	 * In order for your app to receive push notifications, you will need to enable
 	 * the Google Cloud Messaging for Android service in your Google APIs console. To do this:
@@ -68,7 +80,7 @@ public class myplexapplication extends Application {
 	 * declare the permissions and receiver capabilities you'll need to get your push notifications working.
 	 * You can take a look at this application's AndroidManifest.xml file for an example of what is needed.
 	 */
-	public static final String ANDROID_PUSH_SENDER_ID = "976964091787";
+
 	public static LocationUtil locationUtil;
 
 	@Override
@@ -76,12 +88,23 @@ public class myplexapplication extends Application {
 		// TODO Auto-generated method stub
 		super.onCreate();
 		init();
-		mixPanel = MixpanelAPI.getInstance(this, MIXPANEL_API_TOKEN);
+		initializeGa();
+		mixPanel = MixpanelAPI.getInstance(this,getResources().getString(R.string.config_mixpanel_token));
+		myplexapplication.context = getApplicationContext();
 	}
+	
+	public static Context getAppContext() {
+        return myplexapplication.context;
+    }
+	
 	private void init() {
+		ConnectivityReceiver.isConnected=Util.isNetworkAvailable(this);
 		MyVolley.init(this);
 		locationUtil = LocationUtil.getInstance(this);
 		locationUtil.init();
+		ApplicationSettings.ENABLE_SENSOR_SCROLL = SharedPrefUtils.getBoolFromSharedPreference(
+				getApplicationContext(), getApplicationContext().getString(R.string.isSensorScrollEnabled),
+				false);
 	}
 	public static ApplicationConfig getApplicationConfig(){
 		if(mDisplayInfo == null){
@@ -108,6 +131,17 @@ public class myplexapplication extends Application {
 		return mCache;
 	}
 	
+
+	 private void initializeGa() {
+		mTracker = EasyTracker.getInstance(this);		    
+	 }
+	 
+	 public static EasyTracker getGaTracker() {
+	    return mTracker;
+	}
+	 
+	 
+
 	public static void init(Activity activity) {
 
 		isInitlized=true;
@@ -153,7 +187,7 @@ public class myplexapplication extends Application {
 		// Log.d(TAG,
 		// "******************************************************************");
 
-		ConsumerApi.DOMAIN = activity.getString(R.string.domain_name);
+		ConsumerApi.DOMAIN = activity.getString(R.string.config_domain_name);
 
 		String clientKey = SharedPrefUtils.getFromSharedPreference(activity,
 				activity.getString(R.string.devclientkey));
@@ -220,4 +254,5 @@ public class myplexapplication extends Application {
 			}
 		}
 	}
+
 }

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.Map.Entry;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,6 +17,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -61,9 +63,12 @@ import com.apalya.myplex.cache.IndexHandler;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardExplorerData;
 import com.apalya.myplex.data.FilterMenudata;
+import com.apalya.myplex.data.NavigationOptionsMenu;
 import com.apalya.myplex.data.SearchData;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.data.SearchData.ButtonData;
+import com.apalya.myplex.receivers.ConnectivityReceiver;
+import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
@@ -110,14 +115,18 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 		prepareNavipane();
 		prepareCustomActionBar();
 		enableFilterAction(true);
+		onHandleExternalIntent(getIntent());
 	}
 	@Override
 	protected void onResume() {
+		createCardExplorer();
+/*
+		
 		if(myplexapplication.mSelectedOption_Tablet != NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION){
 			createCardExplorer();
 		}else{
 			OnSelectedOption(myplexapplication.mSelectedOption_Tablet, "live tv");
-		}
+		}*/
 		super.onResume();
 	}
 	@Override
@@ -137,7 +146,7 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 			return;
 		}
 //		mMainActivity.showActionBarProgressBar();
-
+		Analytics.SEARCH_TYPE = "actionbar";
 		String searchQuery = new String();
 		final List<CardData> searchString = new ArrayList<CardData>();
 		for (ButtonData data : mSearchbleTags) {
@@ -172,6 +181,7 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 			@Override
 			public void onClick(View v) {
 				Animation slideDown = AnimationUtils.loadAnimation(mContext, R.anim.slide_down);
+				Analytics.mixPanelDiscoveryOptionSelected();
 				slideDown.setAnimationListener(new AnimationListener() {
 					@Override
 					public void onAnimationStart(Animation animation) {
@@ -682,5 +692,129 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 	{
 		super.setUpShareButton(toBeShared);
 		
+	}
+	
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) {
+	  super.onSaveInstanceState(savedInstanceState);
+	  // Save UI state changes to the savedInstanceState.
+	  // This bundle will be passed to onCreate if the process is
+	  // killed and restarted.
+	  
+	  /*
+	  savedInstanceState.putBoolean("MyBoolean", true);
+	  savedInstanceState.putDouble("myDouble", 1.9);
+	  savedInstanceState.putInt("MyInt", 1);
+	  savedInstanceState.putString("MyString", "Welcome back to Android");	  
+	  */	  
+	  // etc.
+	}
+	@Override
+	public void onRestoreInstanceState(Bundle savedInstanceState) {
+	  super.onRestoreInstanceState(savedInstanceState);
+	  // Restore UI state from the savedInstanceState.
+	  // This bundle has also been passed to onCreate.
+	  
+	  /*
+	  boolean myBoolean = savedInstanceState.getBoolean("MyBoolean");
+	  double myDouble = savedInstanceState.getDouble("myDouble");
+	  int myInt = savedInstanceState.getInt("MyInt");
+	  
+	  
+	  String myString = savedInstanceState.getString("MyString");
+	
+	
+*/	
+	}
+	
+	private String _id;
+	
+	private boolean onHandleExternalIntent(Intent intent) {
+		
+		if(intent==null)
+			return false;
+		
+		if(!ConnectivityReceiver.isConnected){			
+			return false;								
+		} 
+		
+		boolean intentHandled = false;
+		
+		Analytics.mixPanelNotificationReceived(mContext, getIntent());
+		
+		if(getIntent().hasExtra(mContext.getString(R.string._id))){
+			showActionBarProgressBar();
+			_id = getIntent().getExtras().getString(mContext.getString(R.string._id));
+			List<CardData> cards  =  new ArrayList<CardData>();
+			CardData cardData  = new CardData();
+			cardData._id = _id;
+			cards.add(cardData);
+			if(_id!=null && _id.length() >0){
+				mCacheManager.getCardDetails(cards, IndexHandler.OperationType.FTSEARCH, new CacheManagerCallback() {					
+					@Override
+					public void OnOnlineResults(List<CardData> dataList) {
+						for (CardData cardData : dataList) {
+							if(cardData._id.equalsIgnoreCase(_id)){
+								mCacheManager.unRegisterCallback();
+								hideActionBarProgressBar();
+								myplexapplication.mSelectedCard = cardData;
+								startActivity(new Intent(getApplicationContext(),TabletCardDetails.class));
+								finish();
+								break;
+							}
+						}
+					}					
+					@Override
+					public void OnOnlineError(VolleyError error) {
+					}					
+					@Override
+					public void OnCacheResults(HashMap<String, CardData> obj,
+							boolean issuedRequest) {
+						CardData data = null;
+						
+						 Iterator<Entry<String, CardData>> it = obj.entrySet().iterator();
+						    while (it.hasNext()) {
+						        Entry<String, CardData> pair = it.next();
+						        if(pair.getValue()._id.equalsIgnoreCase(_id)){
+						        	data = pair.getValue();
+						        	break;
+						        }
+						    }
+						
+						if(data == null){							
+							return;
+						}
+						    
+						hideActionBarProgressBar();
+						mCacheManager.unRegisterCallback();
+						myplexapplication.mSelectedCard = data;
+						startActivity(new Intent(getApplicationContext(),TabletCardDetails.class));
+						finish();
+					}
+				});
+			}
+			intentHandled=true;
+		}
+		String action  = "";
+		if(intent.hasExtra(mContext.getString(R.string.page))){
+			action = intent.getStringExtra(mContext.getString(R.string.page));
+		}
+		if(action.length()>0){
+			if(action.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
+				OnSelectedOption(1,NavigationOptionsMenuAdapter.LIVETV);
+				intentHandled=true;
+			}else if(action.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_MOVIE)){
+				OnSelectedOption(1,NavigationOptionsMenuAdapter.MOVIES);
+				intentHandled=true;
+			}else if(action.equalsIgnoreCase(NavigationOptionsMenuAdapter.RECOMMENDED)){
+				OnSelectedOption(1,NavigationOptionsMenuAdapter.RECOMMENDED);
+				intentHandled=true;
+			}else if(action.equalsIgnoreCase(NavigationOptionsMenuAdapter.TVSHOWS)){
+				OnSelectedOption(1,NavigationOptionsMenuAdapter.TVSHOWS);
+				intentHandled=true;
+			}
+			return intentHandled;
+		}
+		return intentHandled;
 	}
 }

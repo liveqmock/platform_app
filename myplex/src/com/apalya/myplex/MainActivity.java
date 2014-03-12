@@ -2,8 +2,10 @@ package com.apalya.myplex;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
 import java.util.Timer;
@@ -35,6 +37,7 @@ import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -78,6 +81,7 @@ import com.apalya.myplex.fragments.CardExplorer;
 import com.apalya.myplex.fragments.SearchSuggestions;
 import com.apalya.myplex.fragments.SetttingsFragment;
 import com.apalya.myplex.menu.FilterMenuProvider;
+import com.apalya.myplex.receivers.ConnectivityReceiver;
 import com.apalya.myplex.utils.Blur;
 import com.apalya.myplex.utils.Blur.BlurResponse;
 import com.apalya.myplex.utils.ConsumerApi;
@@ -87,9 +91,11 @@ import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.LogOutUtil;
 import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.utils.Util;
+import com.apalya.myplex.views.CardView;
 import com.apalya.myplex.views.RatingDialog;
 import com.facebook.Session;
-import com.flurry.android.FlurryAgent;
+
+import com.google.analytics.tracking.android.EasyTracker;
 
 public class MainActivity extends Activity implements MainBaseOptions, CacheManagerCallback {
 	private SearchView mSearchView;
@@ -103,13 +109,14 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 	private boolean mIsUserLoggedIn = true ;
 	public static final String TAG = "MainActivity";
 	private CacheManager mCacheManager = new CacheManager();
-	
+	private EasyTracker easyTracker = null;
 	public FrameLayout mContentLayout;
 	public Context mContext;
 	private Stack<BaseFragment> mFragmentStack = new Stack<BaseFragment>();
 	private TextView socialShare;
 	private TextView tvOrMovie;
 	private Handler handler= new Handler();
+	private String hintString= null;
 
 	NavigationOptionsMenuAdapter mNavigationAdapter;
 	private TextView mFilterLevle;
@@ -118,15 +125,11 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 	protected void onStart() {
 		// TODO Auto-generated method stub
 		super.onStart();
-		FlurryAgent.onStartSession(this, "X6WWX57TJQM54CVZRB3K");
 	}
 	
 	@Override
 	protected void onStop() {
 		// TODO Auto-generated method stub
-		
-		FlurryAgent.onEndSession(this);
-		
 		super.onStop();
 	}
 	
@@ -154,6 +157,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		changeVisibility(mTitleFilterSymbol,View.GONE);
 	}
 	private List<NavigationOptionsMenu> mMenuItemList = new ArrayList<NavigationOptionsMenu>();
+	private String _id;
 	private void fillMenuItem() {
 		
 	String email = myplexapplication.getUserProfileInstance().getUserEmail();
@@ -173,9 +177,11 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
     mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LIVETV,R.string.iconlivetv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
     mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.MOVIES,R.string.iconmovie, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
     mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.RECOMMENDED,R.string.iconhome, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.TVSHOWS,R.string.iconlivetv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 //    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.SPORTS,R.string.iconcricket, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
     mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGO,R.string.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
 
+    
     mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FAVOURITE,R.string.iconfav, null, screenType,R.layout.navigation_menuitemsmall));
     mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.PURCHASES,R.string.iconpurchases, null,screenType,R.layout.navigation_menuitemsmall));
     mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.DOWNLOADS,R.string.icondnload, null, screenType,R.layout.navigation_menuitemsmall));
@@ -299,7 +305,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		};
 		mDrawerLayout.setDrawerListener(mDrawerToggle);
 
-		if(!prepareWidgetEvent(getIntent())){
+		if(!onHandleExternalIntent(getIntent())){
 			if(ApplicationSettings.MODE_APP_TYPE == APP_TYPE.OFFLINE )
 				selectItem(2);
 			else
@@ -318,21 +324,94 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		Util.deserializeData(MainActivity.this);
 	}
 
-	private boolean prepareWidgetEvent(Intent intent) {
+	private boolean onHandleExternalIntent(Intent intent) {
 		if(intent==null)
 			return false;
+		
+		boolean intentHandled = false;
+		
+		Analytics.mixPanelNotificationReceived(mContext, getIntent());
+		
+		if(getIntent().hasExtra(mContext.getString(R.string._id))){
+			showActionBarProgressBar();
+			_id = getIntent().getExtras().getString(mContext.getString(R.string._id));
+			List<CardData> cards  =  new ArrayList<CardData>();
+			CardData cardData  = new CardData();
+			cardData._id = _id;
+			cards.add(cardData);
+			if(_id!=null && _id.length() >0){
+				mCacheManager.getCardDetails(cards, IndexHandler.OperationType.FTSEARCH, new CacheManagerCallback() {					
+					@Override
+					public void OnOnlineResults(List<CardData> dataList) {
+						for (CardData cardData : dataList) {
+							if(cardData._id.equalsIgnoreCase(_id)){
+								mCacheManager.unRegisterCallback();
+								hideActionBarProgressBar();
+								BaseFragment fragment = createFragment(NavigationOptionsMenuAdapter.CARDDETAILS_ACTION);
+								fragment.setMainActivity(MainActivity.this);
+								fragment.setDataObject(cardData);
+								bringFragment(fragment);
+								break;
+							}
+						}
+					}					
+					@Override
+					public void OnOnlineError(VolleyError error) {
+					}					
+					@Override
+					public void OnCacheResults(HashMap<String, CardData> obj,
+							boolean issuedRequest) {
+						CardData data = null;
+						
+						 Iterator<Entry<String, CardData>> it = obj.entrySet().iterator();
+						    while (it.hasNext()) {
+						        Entry<String, CardData> pair = it.next();
+						        if(pair.getValue()._id.equalsIgnoreCase(_id)){
+						        	data = pair.getValue();
+						        	break;
+						        }
+						    }
+						
+						if(data == null){
+							if(!ConnectivityReceiver.isConnected){
+								mCacheManager.unRegisterCallback();
+								selectItem(3);								
+							} 
+							return;
+						}
+						    
+						hideActionBarProgressBar();
+						mCacheManager.unRegisterCallback();
+						BaseFragment fragment = createFragment(NavigationOptionsMenuAdapter.CARDDETAILS_ACTION);
+						fragment.setDataObject(data);
+						bringFragment(fragment);
+					}
+				});
+			}
+			intentHandled=true;
+		}
 		String action  = "";
-		if(intent.hasExtra("widget_click_event")){
-			action = intent.getStringExtra("widget_click_event");
+		if(intent.hasExtra(mContext.getString(R.string.page))){
+			action = intent.getStringExtra(mContext.getString(R.string.page));
 		}
+		
 		if(action.length()>0){
-			if(action.equalsIgnoreCase("live_tv"))
-				selectItem(3);
-			else if(action.equalsIgnoreCase("movie"))
+			if(action.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
+				selectItem(1);
+				intentHandled=true;
+			}else if(action.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_MOVIE)){
 				selectItem(2);
-			return true;
+				intentHandled=true;
+			}else if(action.equalsIgnoreCase(NavigationOptionsMenuAdapter.RECOMMENDED)){
+				selectItem(3);
+				intentHandled=true;
+			}else if(action.equalsIgnoreCase(NavigationOptionsMenuAdapter.TVSHOWS)){
+				selectItem(4);
+				intentHandled=true;
+			}
+			return intentHandled;
 		}
-		return false;
+		return intentHandled;
 	}
 
 	private void showNavigationFullImage(boolean value){
@@ -389,6 +468,30 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 			v.setVisibility(value);
 		}
 	}
+	
+	private String getCurrentScreen() {
+		String currentScreen = null;
+		if(mCurrentFragment != null) {
+			currentScreen = mCurrentFragment.getClass().getName();
+			if(currentScreen.contains("CardDetails")) {
+				currentScreen = "CardDetails";
+			}
+			else if(currentScreen.contains("SearchSuggestions")) {
+				currentScreen = "SearchSuggestions";
+			}
+			else if(currentScreen.contains("SettingsFragment")) {
+				currentScreen = "SettingsFragment";
+			}
+			else {
+				currentScreen = "CardExplorer";
+			}
+			return currentScreen;
+		}
+		else{
+			return "CardExplorer Screen";
+		}		
+	}
+	
 	private ImageView mNavigationMenu;
 	public void prepareCustomActionBar() {
 		getActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
@@ -459,6 +562,8 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 			} else {
 				mDrawerLayout.openDrawer(mDrawerList);
 				mNavigationDrawerOpened = true;
+				String screenOpenedFrom = getCurrentScreen();
+				Analytics.mixPanelNavigationOpened(screenOpenedFrom);
 			}
 		}
 	};
@@ -579,6 +684,11 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		if(mCurrentFragment instanceof CardDetails){
 			if(mCurrentFragment.onBackClicked())
 				return;
+			if(mFragmentStack.size() == 1){				
+				exitApp();
+				super.onBackPressed();
+				return;
+			}
 		}
 		try {
 			if (mDrawerLayout!=null && mNavigationDrawerOpened) {
@@ -765,8 +875,9 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 				setSearchviewHint("search live tv");
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.TVSHOWS)){
 				removeLiveTvActionBarIcon();
-				data.requestType = CardExplorerData.REQUEST_BROWSE;
-				data.searchQuery ="tvshows";
+				data.requestType = CardExplorerData.REQUEST_TV_SHOWS;
+				data.searchQuery = ConsumerApi.TYPE_TV_SERIES;
+				data.searchScope = ConsumerApi.TYPE_TV_SERIES;
 				setActionBarTitle(NavigationOptionsMenuAdapter.TVSHOWS);
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.DOWNLOADS)){
 				removeLiveTvActionBarIcon();
@@ -1129,6 +1240,8 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 			@Override
 			public void onClick(View v) {
 				Log.i(TAG,"onClick");
+				Analytics.mixPanelInlineSearchInitiated(getCurrentScreen());
+				
 //				changeVisibility(mCustomActionBarTitleLayout,View.GONE);
 				if (mDrawerLayout!=null && mNavigationDrawerOpened) {
 					mDrawerLayout.closeDrawer(mDrawerList);
@@ -1178,11 +1291,15 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 			@Override
 			public boolean onQueryTextChange(String newText) {
 				String type = null;
-				if((myplexapplication.getCardExplorerData() != null) &&
+				/*if((myplexapplication.getCardExplorerData() != null) &&
 						(myplexapplication.getCardExplorerData().searchScope!=null) &&
 						(myplexapplication.getCardExplorerData().searchScope.equals(ConsumerApi.VIDEO_TYPE_LIVE))){
 					type = ConsumerApi.VIDEO_TYPE_LIVE;
+				}*/
+				if(hintString!= null && hintString.equalsIgnoreCase("search live tv")){
+					type = ConsumerApi.VIDEO_TYPE_LIVE;
 				}
+				
 				//Addanalytics just record textchanges
 				if(mSearchSuggestionFrag != null && newText.length() >0)
 					mSearchSuggestionFrag.setQuery(newText,type);
@@ -1193,6 +1310,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 	
 	private void setSearchviewHint(String hint)
 	{
+		hintString = hint;
 		if(mSearchView !=null)
 			mSearchView.setQueryHint(hint);
 	}
@@ -1200,27 +1318,20 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
     protected boolean isAlwaysExpanded() {
         return false;
     }
-    
+    //action bar search
     private void doSearch(String query)
     {
 		showActionBarProgressBar();
-
+		Analytics.SEARCH_TYPE = "actionbar";//SEARCHED_FOR action bar search
 		String searchQuery = new String();
 		final List<CardData> searchString = new ArrayList<CardData>();
-			CardData temp = new CardData();
-			// temp._id = data.getButtonId() != null ? data.getButtonId() :
-			// data.getButtonName();
-			temp._id = query;
-			searchString.add(temp);
-			searchQuery = query;
-			
-			Map<String,String> params=new HashMap<String, String>();
-			params.put(Analytics.SEARCH_TYPE_PROPERTY,Analytics.SEARCH_TYPES.Discover.toString());
-			params.put(Analytics.SEARCH_QUERY_PROPERTY,searchQuery);
-			//params.put("tagsSelected", searchQuery);
-			//Analytics.trackEvent(Analytics.SearchQuery,params);
-			
-			Analytics.trackEvent(Analytics.EVENT_SEARCH,params);
+		CardData temp = new CardData();
+		// temp._id = data.getButtonId() != null ? data.getButtonId() :
+		// data.getButtonName();
+		temp._id = query;
+		searchString.add(temp);
+		searchQuery = query;
+				
 		mSearchQuery = searchQuery;
 		setActionBarTitle(query);
 		IndexHandler.OperationType searchType = IndexHandler.OperationType.DONTSEARCHDB;
@@ -1356,7 +1467,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 					tvOrMovie.setEnabled(true);
 				}
 			}, 3000);
-			selectItem(3);
+			selectItem(2);
 		}		
 	};
 	
@@ -1375,6 +1486,22 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		tvOrMovie.setVisibility(View.GONE);
 	}
 	
-	
-	
+	//for analytics
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event)  {
+		Log.d(TAG, "Back button pressed");
+	    if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+			Log.d(TAG, "Testing"); 
+	    	if(mCardExplorer != null) {
+	    		CardView cardView = mCardExplorer.getmCardView();
+	    		if(cardView != null) {
+	    			if(cardView.swipeCount > 1) {
+	    				cardView.mixpanelBrowsing();
+	    			}
+	    		}//if(cardView != null)
+	    	}//if(mCardExplorer != null)
+		}
+	    return super.onKeyDown(keyCode, event);
+	}
+			
 }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="config.fbapp_id">188304078025485</string>
+    <string name="config.domain_name">api.myplex.com</string>
+    <string name="config.crashlytics.ApiKey">88a1a7f8e71e82ff715fb86c8638aa28f475ab02</string> 
+    <string name="config.mixpanel.token">1c663d8de79a40b4c89b242d828fc475</string>
+    <string name="config.android.push.senderid">976964091787</string>
+    <string name="app_name">myplex</string>
+    <string name="ga_trackingId">UA-47802668-1</string>
+    <bool name="config.crashlytics.enable">true</bool>
+</resources>

@@ -25,6 +25,7 @@ import android.graphics.drawable.shapes.OvalShape;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -97,12 +98,17 @@ public class CardView extends ScrollView {
 
 	private int mLoadMoreLastCalledNumberofItems;
 	
+	public int swipeCount = 1;
+	
+	public static String ScreenName = null;
+	
     public CardView(Context context) {
     	super(context);
     }
 
     public CardView(Context context, AttributeSet attrs) {
     	super(context, attrs);
+    	setScreenNameForAnalytics();
     }
 
     public CardView(Context context, AttributeSet attrs, int defStyle) {
@@ -457,6 +463,10 @@ public class CardView extends ScrollView {
 //			dataHolder.mRentText.setText(mContext.getString(R.string.cardstatuspaid));
 			dataHolder.mRentLayout.setOnClickListener(null);
 			Log.i("CacheManager", "in purchases");
+		}else if(myplexapplication.getCardExplorerData().requestType == CardExplorerData.REQUEST_TV_SHOWS){
+			dataHolder.mRentText.setText(mContext.getString(R.string.jump_to_episode));
+			if(data.packages == null || data.packages.size() ==0)
+				dataHolder.mRentLayout.setOnClickListener(null);
 		}
 		else if(data.packages == null || data.packages.size() == 0){
 			dataHolder.mRentText.setText(mContext.getString(R.string.cardstatusfree));
@@ -538,6 +548,7 @@ public class CardView extends ScrollView {
 		
 		mScroller.fling(getScrollX(), getScrollY(), 0, velocityY, 0, 0, 0 - d, maxY + d);
 		mScroller.setFinalY(mCardsLayout.getSnapPosition(mScroller.getFinalY()));
+		swipeCount = swipeCount + 1;
     }	
 	
 	@Override
@@ -572,6 +583,10 @@ public class CardView extends ScrollView {
 			        	Log.e(TAG,"onInterceptTouchEvent actioup");
 			        	if(trackClickForOpen(ev) && mCardActionListener != null){
 			    			Log.e(TAG,"click on open");
+			    			//mixpanelBrowsing(true);
+			    			if(swipeCount > 1) {
+			    				mixpanelBrowsing();
+			    			}
 			    			mCardActionListener.open(mDataList.get(mCurrentSelectedIndex));			
 			    		}
 //			        	customSmoothScroll(getScrollX(), i * mCardPositions[1]);
@@ -581,6 +596,49 @@ public class CardView extends ScrollView {
 			}
 		}
 		return eventStealed;
+	}
+	//invoked when 1) card is selected 2) purchase on card is clicked 
+	
+	private static void setScreenNameForAnalytics() {
+		CardExplorerData data = myplexapplication.getCardExplorerData();
+		String ctype = data.searchQuery;
+		if(ctype == null || ctype.length() == 0) {
+			int requestType = data.requestType;
+			ctype = Analytics.getRequestType(requestType);
+		}
+		ScreenName = ctype;		
+	}
+	
+	public void mixpanelBrowsing() {
+		String event = null;
+				
+		Map<String,String> params=new HashMap<String, String>();
+		String ctype = ScreenName;
+		if(	Analytics.CONSTANT_RECOMMENDATIONS.equalsIgnoreCase(ctype) )  {
+			event = Analytics.EVENT_BROWSED_RECOMMENDATIONS;
+			params.put(Analytics.NUMBER_OF_MOVIE_CARDS,swipeCount+"");
+		}
+		
+		if(	Analytics.CONSTANT_MOVIE.equalsIgnoreCase(ctype) )  {
+			params.put(Analytics.NUMBER_OF_MOVIE_CARDS,swipeCount+"");
+			event = Analytics.EVENT_BROWSED_MOVIES;
+		}
+		
+		if(Analytics.CONSTANT_LIVE.equalsIgnoreCase(ctype) )  {
+			params.put(Analytics.NUMBER_OF_LIVETV_CARDS,swipeCount+"");
+			event = Analytics.EVENT_BROWSED_TV_CHANNELS;
+		}
+		
+		if(Analytics.CONSTANT_TV_SERIES.equalsIgnoreCase(ctype) )  {
+			params.put(Analytics.NUMBER_OF_LIVETV_SHOW_CARDS,swipeCount+"");
+			event = Analytics.EVENT_BROWSED_TV_SHOWS;
+		}
+		if(Analytics.CONSTANT_RECOMMENDATIONS.equalsIgnoreCase(ctype) || Analytics.CONSTANT_MOVIE.equalsIgnoreCase(ctype) || Analytics.CONSTANT_LIVE.equalsIgnoreCase(ctype)|| Analytics.CONSTANT_TV_SERIES.equalsIgnoreCase(ctype)) {
+				Analytics.trackEvent(event,params);
+				Analytics.gaBrowse(ctype,swipeCount);
+				swipeCount = 1;			
+		}
+				
 	}
 	public void sendViewReadyMsg(boolean value){
 		mCardsLayout.sendViewReadyMsg(value);
@@ -678,7 +736,16 @@ public class CardView extends ScrollView {
     }
 
 	
-
+    private void mixPanelDeleteCard(CardData mCardData) {
+    	String ctype = Analytics.movieOrLivetv(mCardData.generalInfo.type);
+		Map<String,String> params=new HashMap<String, String>();
+		params.put(Analytics.CONTENT_NAME_PROPERTY,mCardData.generalInfo.title);
+		params.put(Analytics.CONTENT_TYPE_PROPERTY,ctype);
+		params.put(Analytics.CONTENT_ID_PROPERTY,mCardData._id);
+		params.put(Analytics.USER_ID,Analytics.getUserEmail());
+		String event = Analytics.EVENT_DELETED_FROM_CARDS;
+		Analytics.trackEvent(event,params);
+    }
 	// CallBack Listeners
 
 	private CardItemClickListener mDeleteListener = new CardItemClickListener() {
@@ -697,7 +764,8 @@ public class CardView extends ScrollView {
 			}
 			int index = mDataList.indexOf(dataHolder.mDataObject);
 			/*****************************DELTEING DOWNLOAD DATA************************************/
-			
+			if(dataHolder.mDataObject != null)
+			mixPanelDeleteCard(dataHolder.mDataObject);
 			if(myplexapplication.mDownloadList != null){
 				CardDownloadData mDownloadData = myplexapplication.mDownloadList.mDownloadedList.get(mDataList.get(index)._id);
 				if(mDownloadData!=null){
@@ -850,6 +918,8 @@ public class CardView extends ScrollView {
 				if(dataHolder == null){return;}
 				if(dataHolder.mDataObject == null){return;}
 				if(mCurrentSelectedIndex != mDataList.indexOf(dataHolder.mDataObject)){return;}
+				//mixpanelBrowsing(true);
+				mixpanelBrowsing();
 				mCardActionListener.purchase(dataHolder.mDataObject);
 			}
 		}
@@ -1090,5 +1160,16 @@ class CardsLayout extends RelativeLayout {
 		}
 
 		setMeasuredDimension(w, h);
+	}
+	
+	//for analytics
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event)  {
+		 Log.d(TAG, "ScrollView Back button pressed");
+	    if (keyCode == KeyEvent.KEYCODE_BACK && event.getRepeatCount() == 0) {
+	        // do something on back.
+	        return true;
+	    }
+	    return super.onKeyDown(keyCode, event);
 	}
 }

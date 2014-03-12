@@ -39,7 +39,13 @@ import android.widget.MediaController;
 import android.widget.MediaController.*;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
+
+import com.apalya.myplex.data.CardData;
+import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.utils.Analytics;
+import com.google.analytics.tracking.android.EasyTracker;
 
 /**
  * Displays a video file.  The VideoView class
@@ -370,7 +376,10 @@ public class VideoView extends SurfaceView implements MediaPlayerControl {
              */
             if (getWindowToken() != null) {
                 Resources r = mContext.getResources();
-
+               
+                //mixPanelUnableToPlayVideo("Cannot play video");
+                Analytics.mixPanelUnableToPlayVideo("Cannot play video");
+        		Analytics.createExceptionGA("Cannot play video", false);
                 new AlertDialog.Builder(mContext)
                         .setTitle("Error")
                         .setMessage("Cannot play video")
@@ -391,7 +400,7 @@ public class VideoView extends SurfaceView implements MediaPlayerControl {
             return true;
         }
     };
-
+   
     private MediaPlayer.OnBufferingUpdateListener mBufferingUpdateListener =
         new MediaPlayer.OnBufferingUpdateListener() {
         public void onBufferingUpdate(MediaPlayer mp, int percent) {
@@ -573,7 +582,7 @@ public class VideoView extends SurfaceView implements MediaPlayerControl {
 
     public int getCurrentPosition() {
         if (isInPlaybackState()) {
-            return mMediaPlayer.getCurrentPosition();
+        	return mMediaPlayer.getCurrentPosition();
         }
         return 0;
     }

@@ -43,6 +43,7 @@ import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MessagePost.MessagePostCallback;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
+import com.google.analytics.tracking.android.EasyTracker;
 
 public class CardDetailViewFactory {
 	
@@ -53,6 +54,9 @@ public class CardDetailViewFactory {
 	public static final String SECTION_CREDITS = "Credits";
 	public static final String SECTION_COMMENTS = "Comments";
 	public static final String SECTION_RELATEDMULTIMEDIA = "Related Multimedia";
+	
+	public static String COMMENT_POSTED = null; //useful to getdata from MessagePost to CardDetailViewFactory
+	public static String RATING_POSTED = null; //useful to getdata from MessagePost to CardDetailViewFactory
 	
 	private View mDetails;
 	private View mDescription;
@@ -192,9 +196,7 @@ public class CardDetailViewFactory {
 	//			addSpace(layout, 16);
 				mCommentContentLayout.addView(child);
 				
-				Map<String,String> params=new HashMap<String, String>();
-				params.put("Action", "Submit");
-				//Analytics.trackEvent(Analytics.cardDetailsComment,params);
+				
 			}
 		}else if(type == COMMENTSECTION_REVIEW){
 			if(card.userReviews == null){return ;}
@@ -215,10 +217,7 @@ public class CardDetailViewFactory {
 				commentMessage.setTypeface(FontUtil.Roboto_Regular);
 	//			addSpace(layout, 16);
 				mCommentContentLayout.addView(child);
-				
-				Map<String,String> params=new HashMap<String, String>();
-				params.put("Action", "Submit");
-				//Analytics.trackEvent(Analytics.cardDetailsReview,params);
+								
 			}
 		}
 	}
@@ -257,7 +256,7 @@ public class CardDetailViewFactory {
 			
 			@Override
 			public void onClick(View arg0) {
-				String label = (String) editBox.getText();
+				final String label = (String) editBox.getText();
 				if(label.equalsIgnoreCase(mContext.getResources().getString(R.string.carddetailcommentsection_editcomment))){
 					CommentDialog dialog = new CommentDialog(mContext);
 					dialog.showDialog(new MessagePostCallback() {
@@ -265,11 +264,20 @@ public class CardDetailViewFactory {
 						@Override
 						public void sendMessage(boolean status) {
 							if(status){
-								Util.showToast(mContext, "Comment has posted successfully.",Util.TOAST_TYPE_INFO);
-//								Toast.makeText(mContext, "Comment has posted successfully.", Toast.LENGTH_SHORT).show();
+								Util.showToast(mContext, "Comment has been posted successfully.",Util.TOAST_TYPE_INFO);
+								if(COMMENT_POSTED != null) {
+									//mixPanelEneteredCommentsReviews(COMMENT_POSTED,"comment");
+									Analytics.mixPanelEnteredCommentsReviews(mData,COMMENT_POSTED,"comment","0");
+								}
+								//final String label = (String) editBox.getText();
+								//Toast.makeText(mContext, "Comment has posted successfully.", Toast.LENGTH_SHORT).show();
 								mCurrentCommentViewType = COMMENTSECTION_COMMENTS;
 								refreshSection();
 							}else{
+								//remove this
+								if(COMMENT_POSTED != null) {
+									Analytics.mixPanelEnteredCommentsReviews(mData,COMMENT_POSTED,"comment","0");
+								}
 								Util.showToast(mContext, "Unable to post your comment.",Util.TOAST_TYPE_ERROR);
 //								Toast.makeText(mContext, "Unable to post your comment.", Toast.LENGTH_SHORT).show();
 							}
@@ -292,10 +300,17 @@ public class CardDetailViewFactory {
 						public void sendMessage(boolean status) {
 							if(status){
 								Util.showToast(mContext, "Review has posted successfully.",Util.TOAST_TYPE_INFO);
+								if(COMMENT_POSTED != null) {
+									Analytics.mixPanelEnteredCommentsReviews(mData,COMMENT_POSTED,"review",RATING_POSTED);
+								}
 //								Toast.makeText(mContext, "Review has posted successfully.", Toast.LENGTH_SHORT).show();
 								mCurrentCommentViewType = COMMENTSECTION_REVIEW;
 								refreshSection();
 							}else{
+								//remove this
+								if(COMMENT_POSTED != null) {
+									Analytics.mixPanelEnteredCommentsReviews(mData,COMMENT_POSTED,"review",RATING_POSTED);
+								}
 								Util.showToast(mContext, "Unable to post your review.",Util.TOAST_TYPE_ERROR);
 //								Toast.makeText(mContext, "Unable to post your review.", Toast.LENGTH_SHORT).show();
 							}
@@ -532,10 +547,12 @@ public class CardDetailViewFactory {
 		TextView secondaryname = (TextView)similarContentDummyView.findViewById(R.id.carddetailmultimedia_secondaryname);
 		secondaryname.setTypeface(FontUtil.Roboto_Medium);
 		ImageView similarImage  = (ImageView)similarContentDummyView.findViewById(R.id.carddetailmultimedia_stackview);
+		if( mData.images.values != null ||  mData.images.values.size() > 0){
 		String link  = mData.images.values.get(0).link;		
-		if(link!=null){
-			CircleImageLoader imageLoader = new CircleImageLoader();
-			imageLoader.loadImage(mContext, similarImage, link);
+			if(link!=null){
+				CircleImageLoader imageLoader = new CircleImageLoader();
+				imageLoader.loadImage(mContext, similarImage, link);
+			}
 		}
 		if(mData._id.equalsIgnoreCase("0"))
 		{
@@ -787,9 +804,12 @@ public class CardDetailViewFactory {
 		text.setTypeface(FontUtil.Roboto_Regular);
 		return v;
 	}
-
+		
 	private View createFullDescriptionView() {
 		if(mData.generalInfo == null){mDetails = null; return null;}
+		
+		//mixPanelExpandedCastCrew();		
+		Analytics.mixPanelExpandedCastCrew(mData);
 		View v = mInflator.inflate(R.layout.carddetailfulldescription, null);
 		mDetails  = v;
 		TextView movieName = (TextView)v.findViewById(R.id.carddetaildesc_movename);
@@ -842,7 +862,7 @@ public class CardDetailViewFactory {
 		
 		RelativeLayout expand = (RelativeLayout)v.findViewById(R.id.carddetailfulldescription_expandlayout);
 		if(mContext.getResources().getBoolean(R.bool.isTablet)){
-			expand.setVisibility(View.INVISIBLE);
+			//.setVisibility(View.VISIBLE);
 		}
 		expand.setOnClickListener(new OnClickListener() {
 			
@@ -873,7 +893,7 @@ public class CardDetailViewFactory {
 			layout.addView(createCastCrewView());
 		}
 		mFullDescPackageButton = (Button)v.findViewById(R.id.carddetaildesc_purchasebutton);
-		UpdateSubscriptionStatus();
+		UpdateSubscriptionStatus(mData);
 //		createPlayInPlaceView(layout);
 		addSpace(layout,(int)mContext.getResources().getDimension(R.dimen.margin_gap_12));
 		return v;
@@ -943,7 +963,7 @@ public class CardDetailViewFactory {
 		}
 		moviedescription.setTypeface(FontUtil.Roboto_Regular);
 		mBriefDescPackageButton = (Button)v.findViewById(R.id.carddetailbriefdescription_purchasebutton);
-		UpdateSubscriptionStatus();
+		UpdateSubscriptionStatus(mData);
 		
 		
 		
@@ -960,13 +980,31 @@ public class CardDetailViewFactory {
 		Util.showFeedback(expand);
 		return v;
 	}
-	public void UpdateSubscriptionStatus(){
-		UpdatePackageButton(mBriefDescPackageButton);
-		UpdatePackageButton(mFullDescPackageButton);
+	public void UpdateSubscriptionStatus(CardData data){
+		UpdatePackageButton(mBriefDescPackageButton,data);
+		UpdatePackageButton(mFullDescPackageButton,data);
 	}
-	private void UpdatePackageButton(Button packageButton){
+	private void UpdatePackageButton(Button packageButton,CardData data){
+		final CardData mData = data;
 		if(packageButton == null){return;}
-		packageButton.setOnClickListener(packageButtonListener);
+		packageButton.setOnClickListener(new OnClickListener() {			
+			@Override
+			public void onClick(View v) {
+				final View view = v;
+					view.setEnabled(false);
+					view.postDelayed(new Runnable() {					
+						@Override
+						public void run() {
+							view.setEnabled(true);
+						}
+					}, 2000);
+					PackagePopUp popup = new PackagePopUp(mContext,mParentView);
+					myplexapplication.getCardExplorerData().cardDataToSubscribe =  mData;
+					popup.showPackDialog(mData, ((Activity)mContext).getActionBar().getCustomView());	
+							
+			
+			}
+		});
 		Util.showFeedbackOnSame(packageButton);
 		packageButton.setTypeface(FontUtil.Roboto_Medium);
 		float price = 10000.99f;
@@ -1100,4 +1138,6 @@ public class CardDetailViewFactory {
 		}	
 		return returnValue;
 	}
+	
+	
 }

@@ -47,6 +47,7 @@ import com.apalya.myplex.MainBaseOptions;
 import com.apalya.myplex.R;
 import com.apalya.myplex.SubscriptionView;
 import com.apalya.myplex.data.ApplicationConfig;
+import com.apalya.myplex.data.ApplicationSettings;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDataImagesItem;
 import com.apalya.myplex.data.CardDataPurchaseItem;
@@ -77,10 +78,12 @@ import com.apalya.myplex.utils.SportsStatusRefresh.OnResponseListener;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.utils.WidevineDrm.Settings;
 import com.apalya.myplex.views.DownloadStreamDialog.DownloadListener;
+import com.google.analytics.tracking.android.EasyTracker;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.internal.co;
 import com.google.android.gms.location.LocationClient;
+import com.apalya.myplex.data.myplexapplication;
 
 public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDialogListener,VideoUrlFetchListener  {
 	private Context mContext;
@@ -89,7 +92,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 	private LayoutParams mParentLayoutParams;
 	private FadeInNetworkImageView mPreviewImage;
 	private TextView mPlayButton;
-	private TextView mTrailerButton;
+	private TextView mTrailerButton,recordedProgName;
 	private TextView mBufferPercentage;
 	private RelativeLayout mProgressBarLayout;
 	private RelativeLayout mVideoViewParent;
@@ -186,6 +189,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		
 		mTrailerButton = (TextView)v.findViewById(R.id.cardmediasubitemtrailer_play);
 		mTrailerButton.setTypeface(FontUtil.ss_symbolicons_line);
+		recordedProgName = (TextView)v.findViewById(R.id.recordedProgName);
 		
 		mTrailerButton.setVisibility(mTrailerAvailable == true ? View.VISIBLE : View.GONE);
 		
@@ -210,16 +214,12 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 								{
 									if(mmItem.content !=null && mmItem.content.categoryName !=null && mmItem.content.categoryName.equalsIgnoreCase("trailer") && mmItem.generalInfo !=null && mmItem.generalInfo._id !=null)
 									{
+										Analytics.isTrailer = true;
+										Analytics.startVideoTime();
+										
+										FetchTrailerUrl(mmItem.generalInfo._id);
+
 										Map<String,String> params=new HashMap<String, String>();
-										/*
-										params.put("CardId", mmItem.generalInfo._id);
-										params.put("CardCategory", mmItem.content.categoryName);
-										Analytics.trackEvent(Analytics.PlayerPlaySelect,params);*/
-										//???
-										params.put(Analytics.CONTENT_ID_PROPERTY, mmItem.generalInfo._id);
-										params.put(Analytics.CONTENT_NAME_PROPERTY, mmItem.content.categoryName);
-										params.put(Analytics.CONTENT_CATEGORY_PROPERTY,Analytics.CONTENT_ACTION_TYPES.PlayTrailer.toString());
-										Analytics.trackEvent(Analytics.EVENT_PLAY,params);
 										//FetchTrailerUrl(mmItem.generalInfo._id);
 										if(canBePlayed(true)){	
 											isTriler = true;
@@ -281,9 +281,11 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		return v;
 	}
 
+
 	 	
 	public void fetchUrl(String id){			
 
+		recordedProgName.setVisibility(View.GONE);
 		mPlayButton.setVisibility(View.INVISIBLE);			
 		mTrailerButton.setVisibility(View.INVISIBLE);			
 		mProgressBarLayout.setVisibility(View.VISIBLE);			
@@ -361,30 +363,21 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		@Override
 		public void onClick(View v) {
 			
-			
-			
-			Map<String,String> params=new HashMap<String, String>();
-			/*params.put("CardId", mData._id);
-			params.put("CardType", mData.generalInfo.type);
-			params.put("CardName", mData.generalInfo.title);
-			Analytics.trackEvent(Analytics.PlayerPlaySelect,params);*/
-			
-			params.put(Analytics.CONTENT_ID_PROPERTY, mData._id);
-			params.put(Analytics.CONTENT_NAME_PROPERTY, mData.generalInfo.title);
-			params.put(Analytics.CONTENT_TYPE_PROPERTY,Analytics.CONTENT_ACTION_TYPES.movie.toString());
-			Analytics.trackEvent(Analytics.EVENT_PLAY,params);
-			
+			//This event is handled in CardDEtails
 			if(canBePlayed(true)){
 				isTriler = false;
 				//FetchUrl();
 				 fetchUrl(null);
 				mVideoViewParent.setOnClickListener(null);
+				Analytics.startVideoTime();
+				Analytics.gaPlayedMovieEvent(mData, 0);
 			}
 			// TODO Auto-generated method stub
 
 		}
 	};
 	private boolean lastWatchedStatus = false;
+	
 
 	public void closePlayer() {
 		mPlayerState = PLAYER_STOPPED; 
@@ -401,6 +394,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		mProgressBarLayout.setVisibility(View.GONE);
 		mPreviewImage.setVisibility(View.VISIBLE);
 		mVideoView.setVisibility(View.INVISIBLE);
+		mVideoViewParent.setEnabled(true);
 		if(mScoreCardLayout != null){
 			mScoreCardLayout.setVisibility(View.VISIBLE);
 		}
@@ -410,18 +404,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		if(!mContext.getResources().getBoolean(R.bool.isTablet)){
 			((MainBaseOptions) mContext).setOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		}
-		
-		Map<String,String> params=new HashMap<String, String>();
-		/*params.put("CardId", mData._id);
-		params.put("CardType", mData.generalInfo.type);
-		params.put("CardName", mData.generalInfo.title);
-		Analytics.trackEvent(Analytics.PlayerPlayComplete,params);*/
-		
-		params.put(Analytics.CONTENT_ID_PROPERTY, mData._id);
-		params.put(Analytics.CONTENT_NAME_PROPERTY, mData.generalInfo.title);
-		params.put(Analytics.CONTENT_TYPE_PROPERTY,mData.generalInfo.type);
-		Analytics.trackEvent(Analytics.EVENT_PLAY,params);
-		
+				
 	}
 
 	public void FetchUrl() {	
@@ -475,6 +458,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 					
 					if(mPlayerStatusListener != null){
 						mPlayerStatusListener.playerStatusUpdate("Failed in fetching the url.");
+						mixPanelUnableToPlayVideo(Analytics.FAILED_TO_FETCH_URL);
 					}
 //					Toast.makeText(mContext, "Failed in fetching the url.",
 //							Toast.LENGTH_SHORT).show();
@@ -484,6 +468,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 					closePlayer();
 					if(mPlayerStatusListener != null){
 						mPlayerStatusListener.playerStatusUpdate("No url to play.");
+						mixPanelUnableToPlayVideo(Analytics.NO_URL_TO_PLAY);
 					}
 					Util.showToast(mContext, "No url to play.",Util.TOAST_TYPE_ERROR);
 //					Toast.makeText(mContext, "No url to play.",
@@ -563,7 +548,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 					if(mVideoViewPlayer ==null){						
 						mVideoViewPlayer = new  VideoViewPlayer(mVideoView, mContext,null ,StreamType.VOD);
 					}
-					mVideoViewPlayer.setmPositionWhenPaused(ellapseTime*1000);
+//					mVideoViewPlayer.setmPositionWhenPaused(ellapseTime*1000);
 				}
 			}
 
@@ -577,6 +562,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 			if(data._id.equalsIgnoreCase(mData._id))
 			{
 				lastWatchedStatus=true;
+				
 			}
 		}
 		/*if(!lastWatchedStatus)
@@ -805,8 +791,8 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		}
 	});
 	
-	 int ellapseTime = SharedPrefUtils.getIntFromSharedPreference(mContext, mData._id);
-		mVideoViewPlayer.setmPositionWhenPaused(ellapseTime *1000);	
+//	 int ellapseTime = SharedPrefUtils.getIntFromSharedPreference(mContext, mData._id);
+//		mVideoViewPlayer.setmPositionWhenPaused(ellapseTime *1000);	
 }
 	private void FetchTrailerUrl(String contentId)
 	{
@@ -857,6 +843,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 					
 					if(mPlayerStatusListener != null){
 						mPlayerStatusListener.playerStatusUpdate("Failed in fetching the url.");
+						mixPanelUnableToPlayVideo(Analytics.FAILED_TO_FETCH_URL);
 					}
 					return;
 				}
@@ -865,6 +852,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 					if(mPlayerStatusListener != null){
 						mPlayerStatusListener.playerStatusUpdate("No url to play.");
 					}
+					mixPanelUnableToPlayVideo(Analytics.NO_URL_TO_PLAY);
 					Util.showToast(mContext, "No url to play.",Util.TOAST_TYPE_ERROR);
 					return;
 				}
@@ -909,7 +897,22 @@ private void playVideoFile(CardDownloadData mDownloadData){
         MediaUtil.setContext(mContext);
         MediaUtil.getVideoUrl(contentId,qualityType,streamingType,isESTPackPurchased,ConsumerApi.STREAMINGFORMATHTTP);
 	}
-
+	
+	private void mixPanelUnableToPlayVideo(String error) {
+    	
+       	int selected = myplexapplication.getCardExplorerData().currentSelectedCard;
+		CardData  cardData = myplexapplication.getCardExplorerData().mMasterEntries.get(selected);
+		String contentName = cardData.generalInfo.title;
+		Map<String,String> params = new HashMap<String, String>();
+		params.put(Analytics.CONTENT_NAME_PROPERTY,contentName);
+		params.put(Analytics.CONTENT_ID_PROPERTY,cardData._id);
+		params.put(Analytics.CONTENT_TYPE_PROPERTY,Analytics.movieOrLivetv(cardData.generalInfo.type));
+		params.put(Analytics.REASON_FAILURE,error);
+		String event = Analytics.EVENT_UNABLE_TO_PLAY + Analytics.EMPTY_SPACE + contentName;
+		Analytics.trackEvent(event,params);
+		//Analytics.createEventGA(easyTracker, Analytics.EVENT_PLAY,Analytics.CONTENT_PLAY_ERROR,contentName );
+    }
+	
 	public View CreateTabletPlayerView(View parentLayout) {
 
 		mWidth = myplexapplication.getApplicationConfig().screenWidth;
@@ -938,6 +941,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		mTrailerButton = (TextView)v.findViewById(R.id.cardmediasubitemtrailer_play);
 		mTrailerButton.setTypeface(FontUtil.ss_symbolicons_line);
 		mTrailerButton.setVisibility(mTrailerAvailable == true ? View.VISIBLE : View.GONE);
+		recordedProgName = (TextView)v.findViewById(R.id.recordedProgName);
 		
 //		initSportsStatusLayout(v);
 		mTrailerButton.setOnClickListener(new OnClickListener() {
@@ -952,14 +956,9 @@ private void playVideoFile(CardDownloadData mDownloadData){
 						{
 							if(mmItem.content !=null && mmItem.content.categoryName !=null && mmItem.content.categoryName.equalsIgnoreCase("trailer") && mmItem.generalInfo !=null && mmItem.generalInfo._id !=null)
 							{
-								Map<String,String> params=new HashMap<String, String>();
-								/*params.put("CardId", mmItem.generalInfo._id);
-								params.put("CardCategory", mmItem.content.categoryName);
-								Analytics.trackEvent(Analytics.PlayerPlaySelect,params);*/
-								params.put(Analytics.CONTENT_ID_PROPERTY, mmItem.generalInfo._id);
-								params.put(Analytics.CONTENT_NAME_PROPERTY, mmItem.generalInfo.title);
-								params.put(Analytics.CONTENT_CATEGORY_PROPERTY,mmItem.content.categoryName);
-								Analytics.trackEvent(Analytics.EVENT_PLAY,params);
+								Analytics.isTrailer = true;
+								Analytics.startVideoTime();
+																
 								FetchTrailerUrl(mmItem.generalInfo._id);
 								mVideoViewParent.setOnClickListener(null);
 								break;
@@ -986,7 +985,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		if (mData.images != null) {
 			for (CardDataImagesItem imageItem : mData.images.values) {
 				if (imageItem.type != null && imageItem.type.equalsIgnoreCase("coverposter") && imageItem.profile != null
-						&& imageItem.profile.equalsIgnoreCase(ApplicationConfig.HDPI)) {
+						&& imageItem.profile.equalsIgnoreCase(ApplicationConfig.MDPI)) {
 					if (imageItem.link == null
 							|| imageItem.link.compareTo("Images/NoImage.jpg") == 0) {
 						mPreviewImage.setImageResource(0);
@@ -1218,9 +1217,14 @@ private void playVideoFile(CardDownloadData mDownloadData){
 
 		int derviedWidth = myplexapplication.getApplicationConfig().screenWidth;
 		int derviedHeight = myplexapplication.getApplicationConfig().screenHeight;
+		int modifiedWidth=derviedWidth;
 		if(!mContext.getResources().getBoolean(R.bool.isTablet)){
 			derviedWidth = myplexapplication.getApplicationConfig().screenHeight;
 			derviedHeight = myplexapplication.getApplicationConfig().screenWidth - statusBarHeight;
+			// only for live
+			modifiedWidth=derviedWidth;
+			if(mData.generalInfo.type.equalsIgnoreCase("live"))
+				modifiedWidth = (derviedHeight * 4)/3;
 		}
 		if(mContext.getResources().getBoolean(R.bool.isTablet)){
 			derviedHeight = myplexapplication.getApplicationConfig().screenHeight - statusBarHeight;
@@ -1228,14 +1232,20 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			mParentLayout.setLayoutParams(layoutparams);
 		}
 		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(derviedWidth,derviedHeight);
-		mVideoViewParent.setLayoutParams(params);
+		RelativeLayout.LayoutParams parent = new RelativeLayout.LayoutParams(derviedWidth,derviedHeight);
+		// only for live
+		if(mData.generalInfo.type.equalsIgnoreCase("live"))
+			params.addRule(RelativeLayout.CENTER_HORIZONTAL);
+		mVideoViewParent.setLayoutParams(parent);
+		mVideoViewParent.setEnabled(false);
 		mVideoView.setLayoutParams(params);
-		mVideoView.resizeVideo(derviedWidth,derviedHeight);
+		mVideoView.resizeVideo(modifiedWidth,derviedHeight);
 		((MainBaseOptions) mContext).hideActionBar();
 		if(mPlayerFullScreen != null){
 			mPlayerFullScreen.playerInFullScreen(true);
 		}
 		// mParentLayout.setLayoutParams(mParentLayoutParams);
+		mParentLayout.setBackgroundColor(Color.BLACK);
 	}
 	public void playInPortrait() {
 		if(mPlayerStatusListener != null){
@@ -1269,7 +1279,6 @@ private void playVideoFile(CardDownloadData mDownloadData){
 	@Override
 	public void onStateChanged(int state , int elapsedTime) 
 	{
-		System.out.println("state changed" + state + elapsedTime);
 		this.state = PlayerListener.STATE_PAUSED;
 		currentDuration = elapsedTime;
 		switch (state) {
@@ -1365,6 +1374,8 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		
 		if(mData.generalInfo.type.equalsIgnoreCase("live"))	
 			return true;
+		if(mData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_SEASON) || mData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_SERIES))
+			return false;
 
 		String networkInfo = Util.getInternetConnectivity(mContext);
 		if (networkInfo.equalsIgnoreCase("2G")) {
@@ -1520,9 +1531,26 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			chooseStreamOrDownload(items);
 		}else if(videoType.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
 			chooseLiveStreamType(items,false);			
+		}else if(videoType.equalsIgnoreCase(ConsumerApi.TYPE_TV_EPISODE)){
+			chooseStreamOrDownload(items);
 		}
 		
 	}
+	
+	/*@Override
+	public void onUrlFetched(List<CardDataVideosItem> items) 
+	{
+		String videoType = mData.generalInfo.type;		
+		Log.d(TAG,"Video type "+ videoType);
+		
+		initPlayBack("https://myplexv2betadrmstreaming.s3.amazonaws.com/813/813_sd_est_1391082325821.wvm");
+		if(videoType.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_MOVIE)){		
+			chooseStreamOrDownload(items);
+		}else if(videoType.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
+			chooseLiveStreamType(items,false);			
+		}
+		
+	}*/
 	@Override
 	public void onTrailerUrlFetched(List<CardDataVideosItem> videos) {
 		chooseLiveStreamType(videos,true);
@@ -1630,6 +1658,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		if(adaptive!=null){			
 			adaptive_link = adaptive.link;
 		}
+		final int ellapseTime = adaptive.elapsedTime;
 		if(SharedPrefUtils.getBoolFromSharedPreference(mContext, mContext.getString(R.string.is_dont_ask_again))){
 			if(SharedPrefUtils.getBoolFromSharedPreference(mContext, mContext.getString(R.string.isDownload))){
 				if(download_link!=null)					
@@ -1654,6 +1683,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 							initPlayBack(download_link);
 						}else{
 							initPlayBack(adaptive_link);
+							onLastPausedTimeFetched(ellapseTime);
 						}					
 					}
 				});
@@ -1671,8 +1701,12 @@ private void playVideoFile(CardDownloadData mDownloadData){
 	@Override
 	public void onUrlFetchFailed(String message) 
 	{
+		closePlayer();
 		if(message != null && message.equalsIgnoreCase("ERR_USER_NOT_SUBSCRIBED")){
-			closePlayer();
+			if(mData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_EPISODE)){
+				mPlayerStatusListener.playerStatusUpdate("ERR_USER_NOT_SUBSCRIBED");
+				return;
+			}
 			PackagePopUp popup = new PackagePopUp(mContext,(View)mParentLayout.getParent());
 			myplexapplication.getCardExplorerData().cardDataToSubscribe =  mData;
 			popup.showPackDialog(mData, ((Activity)mContext).getActionBar().getCustomView());	
@@ -1682,6 +1716,28 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		
 	}
 	
+	private void setBitrateForTrailer(String url) {
+		if(url == null) return;
+		String bitrateTrailer = null;
+		if(Analytics.isTrailer) {
+			if(url.contains("high")) bitrateTrailer = "high";
+			if(url.contains("low")) bitrateTrailer = "low";
+			if(url.contains("veryhigh")) bitrateTrailer = "veryhigh";
+			if(url.contains("medium")) bitrateTrailer = "medium";
+		}
+		else {
+			if(url.contains("vhigh")) bitrateTrailer = "vhigh";
+			if(url.contains("low")) bitrateTrailer = "low";
+			if(url.contains("medium")) bitrateTrailer = "medium";
+		}
+		if(bitrateTrailer != null) {
+			if(mData != null && mData.generalInfo != null) {
+				String cardId = mData.generalInfo._id;
+				String key = Analytics.TRAILER_BITRATE+cardId;
+				SharedPrefUtils.writeToSharedPref(myplexapplication.getAppContext(), key, bitrateTrailer);
+			}			
+		}
+	}
 	public void initPlayBack(String url){
 		Log.d(TAG,"Got the link for playback = "+url);
 		if (url == null) {
@@ -1701,6 +1757,15 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			{
 				if(Util.isWifiEnabled(mContext))
 				{
+					/*if(ApplicationSettings.ENABLE_SHOW_PLAYER_LOGS_SETTINGS){
+                        if(mData._id != null && mData._id.equalsIgnoreCase("413")){
+                                url="http://192.168.60.36/myplex/413_sd_est_1388644246475.wvm";
+                        }else if(mData._id != null && mData._id.equalsIgnoreCase("415")){
+                                url="http://192.168.60.36/myplex/415_sd_est_1388645176954.wvm";
+                        }else if(mData._id != null && mData._id.equalsIgnoreCase("446")){
+                                url="http://192.168.60.36/myplex/446_sd_est_1386786732268.wvm";
+                        }
+                }*/
 					Util.startDownload(url, mData, mContext);
 				}
 				else
@@ -1740,6 +1805,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		if(mPlayerStatusListener != null){
 			mPlayerStatusListener.playerStatusUpdate("Playing :: "+url);
 		}
+		setBitrateForTrailer(url);//url not uri
 		initializeVideoPlay(uri);
 	}
 	
@@ -1780,5 +1846,78 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		}
 	};
 	
+	public void updateCardPreviewImage(CardData data){
+		if(data == null || data.images==null || data.images.values==null)
+			return;
+		mData = data;
+		if(mData.relatedMultimedia==null 
+				|| mData.relatedMultimedia.values==null 
+					|| mData.relatedMultimedia.values.size()==0){
+			mTrailerAvailable = false;
+		}else{
+			for (CardDataRelatedMultimediaItem mmItem : mData.relatedMultimedia.values) {
+				{
+					if(mmItem.content !=null && mmItem.content.categoryName !=null 
+							&& mmItem.content.categoryName.equalsIgnoreCase("trailer") 
+								&& mmItem.generalInfo !=null && mmItem.generalInfo._id !=null)
+					{
+						mTrailerAvailable = true;
+						break;
+					}
+				}
+			}
+		}
+		if(isMediaPlaying())
+			return;
+		mTrailerButton.setVisibility(mTrailerAvailable == true ? View.VISIBLE : View.GONE);
+		for(CardDataImagesItem imageItem : mData.images.values) {
+			mPreviewImage.setImageUrl(imageItem.link,MyVolley.getImageLoader());
+		}
+	}
 	
+	public void createRecordPlayView(String url,String programmName){
+		final String urlString = url;
+		mTrailerButton.setVisibility(View.VISIBLE);
+		mTrailerButton.setText(mContext.getString(R.string.record_play));
+		mTrailerButton.setOnClickListener(new OnClickListener() {			
+			@Override
+			public void onClick(View arg0) {	
+				mVideoViewParent.setOnClickListener(null);
+				mProgressBarLayout.setVisibility(View.VISIBLE);	
+				mPreviewImage.setVisibility(View.INVISIBLE);
+				mTrailerButton.setVisibility(View.INVISIBLE);
+				mPlayButton.setVisibility(View.INVISIBLE);
+//				mPlayButton.setOnClickListener(null);
+//				mVideoViewParent.setEnabled(false);
+				recordedProgName.setVisibility(View.INVISIBLE);
+				initPlayBack(urlString);
+				
+			}
+		});
+		recordedProgName.setVisibility(View.VISIBLE);
+		recordedProgName.setText(programmName);
+		recordedProgName.setOnClickListener(new OnClickListener() {			
+			@Override
+			public void onClick(View v) {
+				mTrailerButton.performClick();
+			}
+		});
+	}
+	public void removeRecordPay(){
+		closePlayer();
+		mTrailerButton.setVisibility(View.GONE);
+		recordedProgName.setVisibility(View.GONE);
+		mPlayButton.setVisibility(View.VISIBLE);		
+	}
+	public void removeProgrammeName(){
+		if(mPreviewImage!=null)
+			mPreviewImage.setVisibility(View.INVISIBLE);	
+		if(recordedProgName!=null)
+			recordedProgName.setVisibility(View.GONE);
+		if(mTrailerButton!=null)
+			mTrailerButton.setVisibility(View.GONE);
+		if(mPlayButton!=null)
+			mPlayButton.setVisibility(View.GONE);
+		
+	}
 }
