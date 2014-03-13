@@ -460,6 +460,9 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			public void completed() {
 			showNoDataMessage(false);
 				applyData();
+				if(mData.mMasterEntries != null || mData.mMasterEntries.size() != 0){
+					Analytics.mixPanelBrowsingEvents(mData,mfirstTime);				
+				}
 			}
 		});
 	}
