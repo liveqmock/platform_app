@@ -321,7 +321,7 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 		Util.showFeedback(dataHolder.mFavLayout);
 		//17 chars
 		float price = 10000.99f;
-		if(data.generalInfo.type.equals(ConsumerApi.TYPE_TV_SERIES)){
+		if((data.generalInfo.type.equals(ConsumerApi.TYPE_TV_SERIES)) || (data.generalInfo.type.equals(ConsumerApi.TYPE_TV_SEASON))){
 			dataHolder.mRentText.setText(mContext.getString(R.string.jump_to_episode));
 			if(data.packages == null || data.packages.size() ==0)
 				dataHolder.mRentLayout.setOnClickListener(null);			
