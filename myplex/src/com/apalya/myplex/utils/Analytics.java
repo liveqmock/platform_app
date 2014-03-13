@@ -720,6 +720,7 @@ public class Analytics {
 			mMixPanel.getPeople().increment(Analytics.TIME_PLAYED_PROPERTY,ptime);
 			mMixPanel.getPeople().increment("testcount",333);
 			Analytics.gaPlayedTrailerTimings(ptime, mData.generalInfo.title);
+			Analytics.createEventGA(Analytics.EVENT_PLAYED_TRAILER, "play", mData.generalInfo.title, ptime);//ga
 			return;
 		}
 		
@@ -1564,6 +1565,10 @@ public class Analytics {
 		if(cardData == null) return;
 		if(cardData.generalInfo == null) return;
 		if(Analytics.CONSTANT_MOVIE.equals(cardData.generalInfo.type)) {
+			if(Analytics.isTrailer){
+				Analytics.createEventGA(Analytics.EVENT_PLAYED_TRAILER, Analytics.ACTION_TYPES.play.toString(), cardData.generalInfo.title, 1l);
+				return;
+			}
 			Analytics.createEventGA(Analytics.CATEGORY_MOVIE, Analytics.ACTION_TYPES.play.toString(), cardData.generalInfo.title, 1l);
 		}else if(Analytics.CONSTANT_TV_EPISODE.equals(cardData.generalInfo.type)) {
 			Analytics.createEventGA(Analytics.CONSTANT_TV_SHOW, Analytics.ACTION_TYPES.play.toString(), cardData.generalInfo.title, 1l);
