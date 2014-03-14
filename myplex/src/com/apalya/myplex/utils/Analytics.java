@@ -1595,6 +1595,10 @@ public class Analytics {
 		String contentType = mData.generalInfo.type; //movie or livetv
 		String ctype = Analytics.movieOrLivetv(contentType);
 		if(CONSTANT_MOVIES.equalsIgnoreCase(ctype)) {
+			if(isTrailer){
+				Analytics.createEventGA(EVENT_PLAYED_TRAILER, action, mData.generalInfo.title, stopPauseLocation);
+				return;
+			}
 			Analytics.createEventGA(CONSTANT_MOVIES, action, mData.generalInfo.title, stopPauseLocation);
 		}else if(CONSTANT_LIVETV.equalsIgnoreCase(ctype)){
 			Analytics.createEventGA(CONSTANT_LIVETV, action, mData.generalInfo.title, stopPauseLocation);
