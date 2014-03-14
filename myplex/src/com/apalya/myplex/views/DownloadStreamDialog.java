@@ -131,7 +131,12 @@ public class DownloadStreamDialog  implements OnClickListener
 				public void run() {
 					if(alwaysAskLayout.getVisibility() != View.GONE){
 						if(always_ask.isChecked()){
-							listener.onOptionSelected(false);
+							handler.post(new Runnable() {								
+								@Override
+								public void run() {
+									listener.onOptionSelected(false);
+								}
+							});
 							SharedPrefUtils.writeToSharedPref(context, context.getString(R.string.is_dont_ask_again), false);
 						}else{
 							SharedPrefUtils.writeToSharedPref(context, context.getString(R.string.is_dont_ask_again), true);

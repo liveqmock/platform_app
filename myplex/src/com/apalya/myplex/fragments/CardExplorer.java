@@ -417,11 +417,15 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		}
 		Log.d(TAG,"onResume");
 		boolean isMovie = false;  
-		if((mData.requestType == CardExplorerData.REQUEST_RECOMMENDATION )||( mData.requestType ==CardExplorerData.REQUEST_BROWSE))
+		if((mData.requestType == CardExplorerData.REQUEST_RECOMMENDATION )||( mData.requestType ==CardExplorerData.REQUEST_BROWSE)
+																		  ||( mData.requestType ==CardExplorerData.REQUEST_TV_SHOWS))
 		{
 			if(mData.requestType == CardExplorerData.REQUEST_BROWSE 
 					&& mData.searchQuery!=null 
 						&& mData.searchQuery.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_MOVIE)){
+				isMovie = true;
+				mMainActivity.setUpLivetvOrMovie(isMovie);
+			}else if(mData.searchQuery.equalsIgnoreCase(ConsumerApi.TYPE_TV_SERIES)){
 				isMovie = true;
 				mMainActivity.setUpLivetvOrMovie(isMovie);
 			}else{
@@ -460,6 +464,9 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			public void completed() {
 			showNoDataMessage(false);
 				applyData();
+				if(mData.mMasterEntries != null || mData.mMasterEntries.size() != 0){
+					Analytics.mixPanelBrowsingEvents(mData,mfirstTime);				
+				}
 			}
 		});
 	}
@@ -559,7 +566,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			screenName="Purchases";
 			String searchType = ConsumerApi.VIDEO_TYPE_LIVE+","+ConsumerApi.VIDEO_TYPE_MOVIE+","+ConsumerApi.TYPE_TV_SEASON;
 			requestUrl = ConsumerApi.getPurchases(ConsumerApi.LEVELDYNAMIC,mData.mStartIndex,searchType);
-			requestMethod = Method.POST;
+			requestUrl = requestUrl+ "&type=live,movie,tvseason";
+			requestMethod = Method.GET;
 		}else if(mData.requestType == CardExplorerData.REQUEST_BROWSE){
 			screenName="Browse" + mData.searchQuery;
 			requestUrl = ConsumerApi.getBrowse(mData.searchQuery,ConsumerApi.LEVELDYNAMIC, mData.mStartIndex);
@@ -591,7 +599,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		
 		
 		requestUrl = requestUrl.replaceAll(" ", "%20");
-		mVolleyRequest = new GZipRequest(requestMethod, requestUrl, deviceMinSuccessListener(), responseErrorListener()){
+		mVolleyRequest = new GZipRequest(requestMethod, requestUrl, deviceMinSuccessListener(), responseErrorListener());/*{
 			@Override
 			protected Map<String, String> getParams() throws AuthFailureError {
 				if(mData.requestType == CardExplorerData.REQUEST_PURCHASES){
@@ -601,7 +609,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				}
 				return super.getParams();
 			}
-		};
+		};*/
 		Log.d(TAG,"Min Request:"+requestUrl);
 		if(requestUrl.equals("0") || (requestUrl.length()==0)){
 			mMainActivity.hideActionBarProgressBar();

@@ -291,7 +291,7 @@ public class Analytics {
 	public static String CATEGORY_SEARCH = "search";
 	public static String CATEGORY_SUBMIT = "submit";
 	public static String CATEGORY_NETWORK = "network";
-	public static String CATEGORY_MOVIE = "movie";
+	public static String CATEGORY_MOVIE = "movies";
 	public static enum  CATEGORY_SOCIAL_NETWORK_TYPES {facebook,twitter,google};
 	public static String CATEGORY_PLAYED_MOVIE = "played movie";
 	public static String CATEGORY_PLAYED_TRAILER = "played trailer";
@@ -383,7 +383,7 @@ public class Analytics {
 	public static void  createTransactionGA(String transactionid,String affiliation,Double revenue, Double tax, Double shippingCost) {
 		easyTracker.send(MapBuilder
 			      .createTransaction(transactionid,       // (String) Transaction ID
-			                         Analytics.GA_AFFILIATION,   // (String) Affiliation
+			                         affiliation,         // (String) Affiliation
 			                         revenue,            // (Double) Order revenue
 			                         tax,            // (Double) Tax
 			                         shippingCost,             // (Double) Shipping
@@ -720,6 +720,7 @@ public class Analytics {
 			mMixPanel.getPeople().increment(Analytics.TIME_PLAYED_PROPERTY,ptime);
 			mMixPanel.getPeople().increment("testcount",333);
 			Analytics.gaPlayedTrailerTimings(ptime, mData.generalInfo.title);
+			Analytics.createEventGA(Analytics.EVENT_PLAYED_TRAILER, "play", mData.generalInfo.title, ptime);//ga
 			return;
 		}
 		
@@ -1564,6 +1565,10 @@ public class Analytics {
 		if(cardData == null) return;
 		if(cardData.generalInfo == null) return;
 		if(Analytics.CONSTANT_MOVIE.equals(cardData.generalInfo.type)) {
+			if(Analytics.isTrailer){
+				Analytics.createEventGA(Analytics.EVENT_PLAYED_TRAILER, Analytics.ACTION_TYPES.play.toString(), cardData.generalInfo.title, 1l);
+				return;
+			}
 			Analytics.createEventGA(Analytics.CATEGORY_MOVIE, Analytics.ACTION_TYPES.play.toString(), cardData.generalInfo.title, 1l);
 		}else if(Analytics.CONSTANT_TV_EPISODE.equals(cardData.generalInfo.type)) {
 			Analytics.createEventGA(Analytics.CONSTANT_TV_SHOW, Analytics.ACTION_TYPES.play.toString(), cardData.generalInfo.title, 1l);
@@ -1590,6 +1595,10 @@ public class Analytics {
 		String contentType = mData.generalInfo.type; //movie or livetv
 		String ctype = Analytics.movieOrLivetv(contentType);
 		if(CONSTANT_MOVIES.equalsIgnoreCase(ctype)) {
+			if(isTrailer){
+				Analytics.createEventGA(EVENT_PLAYED_TRAILER, action, mData.generalInfo.title, stopPauseLocation);
+				return;
+			}
 			Analytics.createEventGA(CONSTANT_MOVIES, action, mData.generalInfo.title, stopPauseLocation);
 		}else if(CONSTANT_LIVETV.equalsIgnoreCase(ctype)){
 			Analytics.createEventGA(CONSTANT_LIVETV, action, mData.generalInfo.title, stopPauseLocation);
