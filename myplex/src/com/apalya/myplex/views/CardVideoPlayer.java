@@ -217,8 +217,8 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 										Analytics.isTrailer = true;
 										Analytics.startVideoTime();
 										
-										FetchTrailerUrl(mmItem.generalInfo._id);
-
+//										FetchTrailerUrl(mmItem.generalInfo._id);
+										Analytics.gaPlayedMovieEvent(mData, 0);
 										Map<String,String> params=new HashMap<String, String>();
 										//FetchTrailerUrl(mmItem.generalInfo._id);
 										if(canBePlayed(true)){	
@@ -1920,5 +1920,8 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		if(mPlayButton!=null)
 			mPlayButton.setVisibility(View.GONE);
 		
+	}
+	public boolean getTrailer(){
+		return isTriler;
 	}
 }
