@@ -201,7 +201,7 @@ public class Analytics {
 	public static String TRAILER_DATA_RATE = "data rate";
 	
 	public static String EVENT_PLAY = "played";
-	public static String EVENT_PLAYED_TRAILER = "played trailer";
+//	public static String EVENT_PLAYED_TRAILER = "played trailer";
 	public static String EVENT_PLAYED_TV_CHANNEL = "played tv channel";
 	public static String EVENT_PLAYED_TV_SHOW = "played tv show";
 	public static String TRAILER = "trailer";
@@ -292,6 +292,7 @@ public class Analytics {
 	public static String CATEGORY_SUBMIT = "submit";
 	public static String CATEGORY_NETWORK = "network";
 	public static String CATEGORY_MOVIE = "movies";
+	public static String CATEGORY_TRAILER = "trailers";
 	public static enum  CATEGORY_SOCIAL_NETWORK_TYPES {facebook,twitter,google};
 	public static String CATEGORY_PLAYED_MOVIE = "played movie";
 	public static String CATEGORY_PLAYED_TRAILER = "played trailer";
@@ -614,7 +615,7 @@ public class Analytics {
 		if(Analytics.isTrailer)  {
 			String bitrate = SharedPrefUtils.getFromSharedPreference(myplexapplication.getAppContext(), Analytics.TRAILER_BITRATE+mCardData.generalInfo._id);
 			params.put(Analytics.TRAILER_DATA_RATE, bitrate);
-			event = Analytics.EVENT_PLAYED_TRAILER;
+			event = Analytics.CATEGORY_TRAILER;
 			mMixPanel.getPeople().increment(Analytics.PEOPLE_TRAILERS_PLAYED,getTotalPlayedTimeInMinutes());
 			Analytics.trackEvent(event,params);	
 			Analytics.isTrailer = false;
@@ -713,14 +714,14 @@ public class Analytics {
 			String bitrate = SharedPrefUtils.getFromSharedPreference(myplexapplication.getAppContext(), Analytics.TRAILER_BITRATE+mData.generalInfo._id);
 			params.put(Analytics.TRAILER_DATA_RATE, bitrate);
 			//params.put(Analytics.TRAILER_DATA_RATE, "256kbps");
-			event = Analytics.EVENT_PLAYED_TRAILER;
+			event = Analytics.CATEGORY_TRAILER;
 			mMixPanel.getPeople().increment(Analytics.PEOPLE_TRAILERS_PLAYED,ptime);
 			Analytics.trackEvent(event,params);	
 			Analytics.isTrailer = false;
 			mMixPanel.getPeople().increment(Analytics.TIME_PLAYED_PROPERTY,ptime);
 			mMixPanel.getPeople().increment("testcount",333);
 			Analytics.gaPlayedTrailerTimings(ptime, mData.generalInfo.title);
-			Analytics.createEventGA(Analytics.EVENT_PLAYED_TRAILER, "play", mData.generalInfo.title, ptime);//ga
+			Analytics.createEventGA(Analytics.CATEGORY_TRAILER, "play", mData.generalInfo.title, ptime);//ga
 			return;
 		}
 		
@@ -1564,11 +1565,13 @@ public class Analytics {
 	public static void gaPlayedMovieEvent(CardData cardData,long rating) {
 		if(cardData == null) return;
 		if(cardData.generalInfo == null) return;
-		if(Analytics.CONSTANT_MOVIE.equals(cardData.generalInfo.type)) {
-			if(Analytics.isTrailer){
-				Analytics.createEventGA(Analytics.EVENT_PLAYED_TRAILER, Analytics.ACTION_TYPES.play.toString(), cardData.generalInfo.title, 1l);
-				return;
-			}
+		
+		if(Analytics.isTrailer){
+			Analytics.createEventGA(Analytics.CATEGORY_TRAILER, Analytics.ACTION_TYPES.play.toString(), cardData.generalInfo.title, 1l);
+			return;
+		}
+		
+		if(Analytics.CONSTANT_MOVIE.equals(cardData.generalInfo.type)) {			
 			Analytics.createEventGA(Analytics.CATEGORY_MOVIE, Analytics.ACTION_TYPES.play.toString(), cardData.generalInfo.title, 1l);
 		}else if(Analytics.CONSTANT_TV_EPISODE.equals(cardData.generalInfo.type)) {
 			Analytics.createEventGA(Analytics.CONSTANT_TV_SHOW, Analytics.ACTION_TYPES.play.toString(), cardData.generalInfo.title, 1l);
@@ -1596,7 +1599,7 @@ public class Analytics {
 		String ctype = Analytics.movieOrLivetv(contentType);
 		if(CONSTANT_MOVIES.equalsIgnoreCase(ctype)) {
 			if(isTrailer){
-				Analytics.createEventGA(EVENT_PLAYED_TRAILER, action, mData.generalInfo.title, stopPauseLocation);
+				Analytics.createEventGA(CATEGORY_TRAILER, action, mData.generalInfo.title, stopPauseLocation);
 				return;
 			}
 			Analytics.createEventGA(CONSTANT_MOVIES, action, mData.generalInfo.title, stopPauseLocation);
@@ -1610,6 +1613,11 @@ public class Analytics {
 		
 		String contentType = mData.generalInfo.type; //movie or livetv
 		String ctype = Analytics.movieOrLivetv(contentType);
+		if(isTrailer){
+			Analytics.createEventGA(CATEGORY_TRAILER, action, mData.generalInfo.title, stopPauseLocation);
+			isTrailer = false;
+			return;
+		}
 		if(CONSTANT_MOVIES.equalsIgnoreCase(ctype)) {
 			Analytics.createEventGA(CONSTANT_MOVIES, action, mData.generalInfo.title, stopPauseLocation);
 		}else if(CONSTANT_LIVETV.equalsIgnoreCase(ctype)){
