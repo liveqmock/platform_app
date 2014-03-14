@@ -2,6 +2,8 @@ package com.apalya.myplex.views;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import android.content.Context;
@@ -42,6 +44,7 @@ public class TVShowView  {
 
 	public TVShowView(Context context, List<CardData> mCardDataList,View rootView,TVShowSelectListener listener) {
 		this.mCardDataList = mCardDataList;
+//		Collections.sort(mCardDataList, new EpisodeComparator());
 		tvShowSelectListener =  listener;
 		
 		npSeason = (NumberPicker) rootView.findViewById(R.id.numberPickerSeason);
@@ -133,7 +136,7 @@ public class TVShowView  {
 			}				
 	
 		}
-		Arrays.sort(seasons);
+//		Arrays.sort(seasons);
 		
 		int max = npSeason.getMaxValue();
 
@@ -208,7 +211,7 @@ public class TVShowView  {
 			programmes[i]= appends[i].concat(programmes[i]);
 		}
 		
-		Arrays.sort(programmes);
+//		Arrays.sort(programmes);
 		
 		int max = npEpisode.getMaxValue();
 
@@ -278,6 +281,8 @@ public class TVShowView  {
 	}
 	private class OnSeasonChangeListener implements OnScrollListener,OnValueChangeListener {
 		private int oldValue ;
+		boolean scrollingSeason = false;
+
 		
         public OnSeasonChangeListener(int initialValue) {
             oldValue = initialValue;
@@ -286,8 +291,13 @@ public class TVShowView  {
         @Override
 		public void onScrollStateChange(android.widget.NumberPicker picker,	int scrollState){
         	final android.widget.NumberPicker picker2 = picker;
-			 if (scrollState == NumberPicker.OnScrollListener.SCROLL_STATE_IDLE ){									
-						
+        	if(scrollState == NumberPicker.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL){
+        		scrollingSeason =true;
+			}
+			 if (scrollState == NumberPicker.OnScrollListener.SCROLL_STATE_IDLE){				 
+									
+						Log.d("amlan","fetched "+scrollState);
+						//We get the different between oldValue and the new value
 						setProgrammLoading();				 
 						handler.postDelayed(new Runnable(){
 
@@ -307,28 +317,62 @@ public class TVShowView  {
 				    			}                
 							}
 						},300);
+						scrollingSeason =false;
 					
 				}			 
 			 
 		}
 
 		@Override
-		public void onValueChange(android.widget.NumberPicker picker,
-				int oldVal, int newVal) {
+		public void onValueChange(final android.widget.NumberPicker picker,int oldVal, int newVal) {
 			if(mSoundUtils!=null){mSoundUtils= null;}
 			mSoundUtils = new SoundUtils(mContext,R.raw.keypress);
 			mSoundUtils.playSound();
 			// TODO Auto-generated method stub
 			
-		};
+			if(scrollingSeason ==false){
+				setProgrammLoading();	
+				Handler h = new Handler();
+				h.postDelayed(new Runnable(){
+					@Override
+					public void run() {
+						handler.postDelayed(new Runnable(){
+
+							@Override
+							public void run() {
+								// TODO Auto-generated method stub
+				                int newVal = picker.getValue() ;	
+				                seasonIndex = newVal;
+				                if(mCardDataList.get(newVal).chields == null){
+				    				if(tvShowSelectListener != null){
+				    					tvShowSelectListener.onSeasonChange(mCardDataList.get(newVal));
+				    					return;
+				    				}
+				    			}else{
+				    				tvShowSelectListener.onSeasonChange(mCardDataList.get(newVal));
+				    				fillEpisode(mCardDataList.get(newVal).chields, npEpisode);
+				    			}                
+							}
+						},300);
+						
+					}
+				},700);			
+				
+			}			
+		}
 	}
 	
 	private class EpisodeScrollerManager implements OnScrollListener,OnValueChangeListener{
-
+	private	int mScrollState = NumberPicker.OnScrollListener.SCROLL_STATE_IDLE;
 		@Override
-		public void onScrollStateChange(final android.widget.NumberPicker view,int scrollState) {			
+		public void onScrollStateChange(final android.widget.NumberPicker view,int scrollState) {
+			if(scrollState == NumberPicker.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL){
+				mScrollState = NumberPicker.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL ;
+			}
 			if (scrollState == NumberPicker.OnScrollListener.SCROLL_STATE_IDLE ){
-				if(tvShowSelectListener != null){					
+				if(tvShowSelectListener != null){		
+					
+					mScrollState = NumberPicker.OnScrollListener.SCROLL_STATE_IDLE ;
 					handler.postDelayed(new Runnable(){
 						@Override
 						public void run() {
@@ -341,8 +385,29 @@ public class TVShowView  {
 		}
 
 		@Override
-		public void onValueChange(android.widget.NumberPicker picker,
+		public void onValueChange(final android.widget.NumberPicker picker,
 				int oldVal, int newVal) {
+			Handler h = new Handler();
+			h.postDelayed(new Runnable(){
+				@Override
+				public void run(){
+					if(mScrollState == NumberPicker.OnScrollListener.SCROLL_STATE_IDLE){
+						if(tvShowSelectListener != null){
+						handler.postDelayed(new Runnable(){
+
+							@Override
+							public void run() {
+						tvShowSelectListener.onEpisodeSelect(episodes.get(picker.getValue()),seasons.get(seasonIndex));
+							}	
+						},300);
+						
+						}	
+					}
+					
+				}
+				
+			}
+			,700);
 			
 			/*
 			if(mSoundUtils!=null){mSoundUtils= null;}
@@ -350,6 +415,13 @@ public class TVShowView  {
 			mSoundUtils.playSound();*/
 			// TODO Auto-generated method stub
 			
+		}
+		
+	}
+	private class EpisodeComparator implements Comparator<CardData>{
+		@Override
+		public int compare(CardData lhs, CardData rhs) {			
+			return rhs._id.compareTo(lhs._id);
 		}
 		
 	}

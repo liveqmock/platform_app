@@ -217,8 +217,8 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 										Analytics.isTrailer = true;
 										Analytics.startVideoTime();
 										
-										FetchTrailerUrl(mmItem.generalInfo._id);
-
+//										FetchTrailerUrl(mmItem.generalInfo._id);
+										Analytics.gaPlayedMovieEvent(mData, 0);
 										Map<String,String> params=new HashMap<String, String>();
 										//FetchTrailerUrl(mmItem.generalInfo._id);
 										if(canBePlayed(true)){	
@@ -1704,7 +1704,8 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		closePlayer();
 		if(message != null && message.equalsIgnoreCase("ERR_USER_NOT_SUBSCRIBED")){
 			if(mData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_EPISODE)){
-				mPlayerStatusListener.playerStatusUpdate("ERR_USER_NOT_SUBSCRIBED");
+				if(mPlayerStatusListener!=null)
+					mPlayerStatusListener.playerStatusUpdate("ERR_USER_NOT_SUBSCRIBED");
 				return;
 			}
 			PackagePopUp popup = new PackagePopUp(mContext,(View)mParentLayout.getParent());
@@ -1919,5 +1920,8 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		if(mPlayButton!=null)
 			mPlayButton.setVisibility(View.GONE);
 		
+	}
+	public boolean getTrailer(){
+		return isTriler;
 	}
 }
