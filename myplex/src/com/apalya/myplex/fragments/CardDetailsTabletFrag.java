@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.Set;
 
 import android.animation.LayoutTransition;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -59,9 +60,11 @@ import com.apalya.myplex.views.CardDetailViewFactory;
 import com.apalya.myplex.views.CardDetailViewFactory.CardDetailViewFactoryListener;
 import com.apalya.myplex.views.CardVideoPlayer;
 import com.apalya.myplex.views.CardVideoPlayer.PlayerFullScreen;
+import com.apalya.myplex.views.CardVideoPlayer.PlayerStatusUpdate;
 import com.apalya.myplex.views.CustomDialog;
 import com.apalya.myplex.views.CustomScrollView;
 import com.apalya.myplex.views.FadeInNetworkImageView;
+import com.apalya.myplex.views.PackagePopUp;
 import com.apalya.myplex.views.ItemExpandListener.ItemExpandListenerCallBackListener;
 import com.apalya.myplex.views.JazzyViewPager;
 import com.apalya.myplex.views.JazzyViewPager.TransitionEffect;
@@ -74,7 +77,7 @@ import com.google.analytics.tracking.android.Fields;
 import com.google.analytics.tracking.android.MapBuilder;
 
 public class CardDetailsTabletFrag extends BaseFragment implements
-ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirection,CacheManagerCallback,PlayerFullScreen {
+ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirection,CacheManagerCallback,PlayerFullScreen, PlayerStatusUpdate {
 	public static final String TAG = "CardDetails";
 	private LayoutInflater mInflater;
 	private CardDetailViewFactory mCardDetailViewFactory;
@@ -135,6 +138,7 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		RelativeLayout videoLayout = (RelativeLayout)rootView.findViewById(R.id.carddetailtablet_videolayout);
 		mPlayer = new CardVideoPlayer(mContext, mCardData);
 		mPlayer.setFullScreenListener(this);
+		mPlayer.setPlayerStatusUpdateListener(this);
 		videoLayout.addView(mPlayer.CreateTabletPlayerView(videoLayout));
 		mCardDetailViewFactory = new CardDetailViewFactory(getContext());
 		mCardDetailViewFactory.setOnCardDetailExpandListener(this);
@@ -785,6 +789,18 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		View epgView  = epgview.createEPGView();		
 		mEPGLayout.addView(epgView);		
 
+	}
+	@Override
+	public void playerStatusUpdate(String value) {
+		if(value==null)
+			return;
+		if(value.equalsIgnoreCase("ERR_USER_NOT_SUBSCRIBED") &&
+				(mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_EPISODE))){
+			PackagePopUp popup = new PackagePopUp(mContext,(View)mParentContentLayout.getParent());
+			myplexapplication.getCardExplorerData().cardDataToSubscribe =  mSeasonData;
+			popup.showPackDialog(mSeasonData, ((Activity)mContext).getActionBar().getCustomView());
+		}
+		
 	}
 	
 	
