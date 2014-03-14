@@ -417,11 +417,15 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		}
 		Log.d(TAG,"onResume");
 		boolean isMovie = false;  
-		if((mData.requestType == CardExplorerData.REQUEST_RECOMMENDATION )||( mData.requestType ==CardExplorerData.REQUEST_BROWSE))
+		if((mData.requestType == CardExplorerData.REQUEST_RECOMMENDATION )||( mData.requestType ==CardExplorerData.REQUEST_BROWSE)
+																		  ||( mData.requestType ==CardExplorerData.REQUEST_TV_SHOWS))
 		{
 			if(mData.requestType == CardExplorerData.REQUEST_BROWSE 
 					&& mData.searchQuery!=null 
 						&& mData.searchQuery.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_MOVIE)){
+				isMovie = true;
+				mMainActivity.setUpLivetvOrMovie(isMovie);
+			}else if(mData.searchQuery.equalsIgnoreCase(ConsumerApi.TYPE_TV_SERIES)){
 				isMovie = true;
 				mMainActivity.setUpLivetvOrMovie(isMovie);
 			}else{

@@ -7,6 +7,7 @@ import java.util.Random;
 import java.util.Set;
 
 import android.animation.LayoutTransition;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -59,9 +60,11 @@ import com.apalya.myplex.views.CardDetailViewFactory;
 import com.apalya.myplex.views.CardDetailViewFactory.CardDetailViewFactoryListener;
 import com.apalya.myplex.views.CardVideoPlayer;
 import com.apalya.myplex.views.CardVideoPlayer.PlayerFullScreen;
+import com.apalya.myplex.views.CardVideoPlayer.PlayerStatusUpdate;
 import com.apalya.myplex.views.CustomDialog;
 import com.apalya.myplex.views.CustomScrollView;
 import com.apalya.myplex.views.FadeInNetworkImageView;
+import com.apalya.myplex.views.PackagePopUp;
 import com.apalya.myplex.views.ItemExpandListener.ItemExpandListenerCallBackListener;
 import com.apalya.myplex.views.JazzyViewPager;
 import com.apalya.myplex.views.JazzyViewPager.TransitionEffect;
@@ -74,7 +77,7 @@ import com.google.analytics.tracking.android.Fields;
 import com.google.analytics.tracking.android.MapBuilder;
 
 public class CardDetailsTabletFrag extends BaseFragment implements
-ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirection,CacheManagerCallback,PlayerFullScreen {
+ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirection,CacheManagerCallback,PlayerFullScreen, PlayerStatusUpdate {
 	public static final String TAG = "CardDetails";
 	private LayoutInflater mInflater;
 	private CardDetailViewFactory mCardDetailViewFactory;
@@ -82,14 +85,10 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 	private LinearLayout mDescriptionContentLayout;
 	private LinearLayout mMediaContentLayout;
 	private LinearLayout mCommentsContentLayout;
-
 	private LinearLayout mRightScrollViewLayout;
-	private ScrollView mBottomScrollView;
-	
-	
+	private ScrollView mBottomScrollView;	
 	private CardVideoPlayer mPlayer;
-	private boolean mDescriptionExpanded = false;
-	
+	private boolean mDescriptionExpanded = false;	
 	private int mDetailType = Profile;
 	public static final int Profile = 0;
 	public static final int MovieDetail = 1;
@@ -97,10 +96,6 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 	public static final int LiveTvDetail = 3;
 	public View rootView;
 	public boolean mPlayStarted = false;
-	
-
-	
-
 	private List<CardData> childSubList = new ArrayList<CardData>();
 	private SeasonFetchHelper helper = null;
 	private TVShowView mTVShowView = null;
@@ -114,15 +109,6 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 	
 	private NumberPicker datePicker;
 	private NumberPicker programmePicker;
-
-	
-
-
-
-
-
-
-	
 	
 	private CacheManager mCacheManager = new CacheManager();
 	@Override
@@ -152,6 +138,7 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		RelativeLayout videoLayout = (RelativeLayout)rootView.findViewById(R.id.carddetailtablet_videolayout);
 		mPlayer = new CardVideoPlayer(mContext, mCardData);
 		mPlayer.setFullScreenListener(this);
+		mPlayer.setPlayerStatusUpdateListener(this);
 		videoLayout.addView(mPlayer.CreateTabletPlayerView(videoLayout));
 		mCardDetailViewFactory = new CardDetailViewFactory(getContext());
 		mCardDetailViewFactory.setOnCardDetailExpandListener(this);
@@ -163,78 +150,56 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		mRightSideLayout =(LinearLayout) rootView.findViewById(R.id.carddetailtablet_rightscrollviewlayout);
 		
 		
-		mParentContentLayout = (LinearLayout) rootView
-				.findViewById(R.id.carddetailtablet_rightlayout);
+		mParentContentLayout = (LinearLayout) rootView.findViewById(R.id.carddetailtablet_rightlayout);
 		
 //		prepareContent();
 		
 		if(mCardData.generalInfo != null){
 			mMainActivity.setActionBarTitle(mCardData.generalInfo.title.toLowerCase());
 		}
-	Analytics.mixPanelcardSelected(mCardData);
+		Analytics.mixPanelcardSelected(mCardData);
 		
 		if( mCardData.generalInfo.type != null && mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_SERIES)){
+			
 			mBottomScrollView.setVisibility(View.GONE);
-
 			helper  = new SeasonFetchHelper(mCardData,new TvShowManager());
 			helper.fetchSeason();
-			initialiseTVShow(rootView);
-			
+			initialiseTVShow(rootView);			
 			seasonPicker = (NumberPicker)rootView.findViewById(R.id.numberPickerSeason);
 			episodePicker = (NumberPicker)rootView.findViewById(R.id.numberPickerEpisode);
 			initNumberPickerWithLoading(seasonPicker);
 			initNumberPickerWithLoading(episodePicker);
 			mRightSideLayout.setVisibility(View.GONE);
 			mCustomScrollView.setVisibility(View.VISIBLE);
-			fillDataForTV();			//mPickerLayout.setVisibility(View.VISIBLE);
+			fillDataForTV();			
 
 		}
 		
-		if(mCardData.generalInfo.type != null && mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
-			
-		//	mBottomScrollView.setVisibility(View.GONE);
-//			mPickerLayout.setVisibility(View.VISIBLE);
-//			datePicker = (NumberPicker)rootView.findViewById(R.id.datePicker);
-//			programmePicker = (NumberPicker)rootView.findViewById(R.id.programmPicker);		
-//			datePicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
-//			programmePicker.setDescendantFocusability(NumberPicker.FOCUS_BLOCK_DESCENDANTS);
-//			initNumberPickerWithLoading(datePicker);
-//			initNumberPickerWithLoading(programmePicker);
-//			
+		if(mCardData.generalInfo.type != null && mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){			
 			mRightSideLayout.setVisibility(View.GONE);
 			mCustomScrollView.setVisibility(View.VISIBLE);
-			
-
 			createEPGView(rootView);
 			fillDataForTV();
 
-		}else if(mEPGLayout!=null){
-			
+		}else if(mEPGLayout!=null){			
 				mEPGLayout.setVisibility(View.GONE);
 				mBottomScrollView.setVisibility(View.VISIBLE);
-
-
 		}		
 		
 		else if( mCardData.generalInfo.type != null && mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_SEASON)){
+			
 			mBottomScrollView.setVisibility(View.GONE);
 			seasonPicker = (NumberPicker)rootView.findViewById(R.id.numberPickerSeason);
 			episodePicker = (NumberPicker)rootView.findViewById(R.id.numberPickerEpisode);
 			initialiseTVShow(rootView);
-
 			initNumberPickerWithLoading(seasonPicker);
 			initNumberPickerWithLoading(episodePicker);
 			mCustomScrollView.setVisibility(View.VISIBLE);
 			mRightSideLayout.setVisibility(View.GONE);
 			fillDataForTV();
-			
-			
-
-			//mPickerLayout.setVisibility(View.VISIBLE);
-
+		}else{		
+			prepareContent();
 		}
-		
-		prepareContent();
 		return rootView;
 	}
 	@Override
@@ -614,11 +579,21 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 	@Override
 	public void playerInFullScreen(boolean value) {
 		if(value){
-			mRightScrollViewLayout.setVisibility(View.GONE);
+
 			mBottomScrollView.setVisibility(View.GONE);
+			mRightScrollViewLayout.setVisibility(View.GONE);
+			mCustomScrollView.setVisibility(View.GONE);
 		}else{
-			mRightScrollViewLayout.setVisibility(View.VISIBLE);
-			mBottomScrollView.setVisibility(View.VISIBLE);			
+			mBottomScrollView.setVisibility(View.VISIBLE);	
+			if(mCardData.generalInfo.type != null && ( mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)||mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_SEASON)||mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_SERIES)||mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_SEASON)||mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_EPISODE)))
+			{
+			mCustomScrollView.setVisibility(View.VISIBLE);
+			mRightSideLayout.setVisibility(View.GONE);
+			}else{
+			mCustomScrollView.setVisibility(View.GONE);
+			mRightSideLayout.setVisibility(View.VISIBLE);
+			}
+
 		}
 	}
 	@Override
@@ -691,7 +666,6 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 	private void removePreviousViews(){
 		mDescriptionContentLayout.removeAllViews(); //1
 		mMediaContentLayout.removeAllViews(); //2
-
 		mCommentsContentLayout.removeAllViews(); //3
 	}
 	
@@ -701,8 +675,6 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		tvshowtransition.setStartDelay(LayoutTransition.CHANGE_APPEARING, 0);
 		mTvShowLinear.setLayoutTransition(tvshowtransition);
 		//LinearLayout.LayoutParams params = (LayoutParams) mTvShowLinear.getLayoutParams();
-				
-		
 		mTvShowLinear.setVisibility(View.VISIBLE);
 	
 	}
@@ -751,11 +723,10 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 
 		mPlayerLogsLayout = new LinearLayout(getContext());
 		mPlayerLogsLayout.setBackgroundResource(R.drawable.card_background);
-		LinearLayout.LayoutParams playParams = new LinearLayout.LayoutParams(
-				LinearLayout.LayoutParams.MATCH_PARENT,
-				LinearLayout.LayoutParams.WRAP_CONTENT);
-		playParams.bottomMargin = (int) getContext().getResources()
-				.getDimension(R.dimen.margin_gap_12);
+		LinearLayout.LayoutParams playParams = 
+				new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+		
+		playParams.bottomMargin = (int) getContext().getResources().getDimension(R.dimen.margin_gap_12);
 		mPlayerLogsLayout.setLayoutParams(playParams);
 		mPlayerLogsLayout.setOrientation(LinearLayout.VERTICAL);
 		LayoutTransition transition = new LayoutTransition();
@@ -764,44 +735,41 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		mParentContentLayout.addView(mPlayerLogsLayout);
 
 		mDescriptionContentLayout = new LinearLayout(getContext());
-		LinearLayout.LayoutParams descParams = new LinearLayout.LayoutParams(
-				LinearLayout.LayoutParams.MATCH_PARENT,
-				LinearLayout.LayoutParams.WRAP_CONTENT);
+		
+		LinearLayout.LayoutParams descParams =
+				new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+		
 		mDescriptionContentLayout.setLayoutParams(descParams);
 
 		mMediaContentLayout = new LinearLayout(getContext());
-		LinearLayout.LayoutParams mediaParams = new LinearLayout.LayoutParams(
-				LinearLayout.LayoutParams.MATCH_PARENT,
-				LinearLayout.LayoutParams.WRAP_CONTENT);
-		mediaParams.topMargin = (int) getContext().getResources().getDimension(
-				R.dimen.margin_gap_12);
+		LinearLayout.LayoutParams mediaParams = 
+				new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+		
+		mediaParams.topMargin = (int) getContext().getResources().getDimension(R.dimen.margin_gap_12);
 		mMediaContentLayout.setLayoutParams(mediaParams);
 		mMediaContentLayout.setBackgroundResource(R.drawable.card_background);
 
 		mCommentsContentLayout = new LinearLayout(getContext());
-		LinearLayout.LayoutParams commentParams = new LinearLayout.LayoutParams(
-				LinearLayout.LayoutParams.MATCH_PARENT,
-				LinearLayout.LayoutParams.WRAP_CONTENT);
-		commentParams.topMargin = (int) getContext().getResources()
-				.getDimension(R.dimen.margin_gap_12);
+		LinearLayout.LayoutParams commentParams = 
+				new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT,LinearLayout.LayoutParams.WRAP_CONTENT);
+		
+		commentParams.topMargin = (int) getContext().getResources().getDimension(R.dimen.margin_gap_12);
 		mCommentsContentLayout.setLayoutParams(commentParams);
 		mCommentsContentLayout.setBackgroundResource(R.drawable.card_background);
 		
-		View v = mCardDetailViewFactory.CreateView(mCardData,
-				CardDetailViewFactory.CARDDETAIL_BRIEF_DESCRIPTION);
+		View v = mCardDetailViewFactory.CreateView(mCardData,CardDetailViewFactory.CARDDETAIL_BRIEF_DESCRIPTION);
 		if (v != null) {
 			mParentContentLayout.addView(mDescriptionContentLayout);
 			mDescriptionContentLayout.addView(v);
 		}
-		v = mCardDetailViewFactory.CreateView(mCardData,
-				CardDetailViewFactory.CARDDETAIL_BREIF_RELATED_MULTIMEDIA);
+		v = mCardDetailViewFactory.CreateView(mCardData,CardDetailViewFactory.CARDDETAIL_BREIF_RELATED_MULTIMEDIA);
 		if (v != null) {
 			mParentContentLayout.addView(mMediaContentLayout);
 			addSpace();
 			mMediaContentLayout.addView(v);
 		}
-		v = mCardDetailViewFactory.CreateView(mCardData,
-				CardDetailViewFactory.CARDDETAIL_BRIEF_COMMENTS);
+		v = mCardDetailViewFactory.CreateView(mCardData,CardDetailViewFactory.CARDDETAIL_COMMENTS);
+		
 		if (v != null) {
 			mParentContentLayout.addView(mCommentsContentLayout);
 			addSpace();
@@ -815,29 +783,24 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		LayoutTransition epgtransition = new LayoutTransition();
 		epgtransition.setStartDelay(LayoutTransition.CHANGE_APPEARING, 0);
 		mEPGLayout.setLayoutTransition(epgtransition);
-		//RelativeLayout.LayoutParams params = (LayoutParams) mEPGLayout.getLayoutParams();
-				
 		EpgView epgview =new EpgView(mCardData, mContext);
 		epgview.setCardVideoPlayer(mPlayer);
-		mEPGLayout.setVisibility(View.VISIBLE);
+		mEPGLayout.setVisibility(View.VISIBLE);		
+		View epgView  = epgview.createEPGView();		
+		mEPGLayout.addView(epgView);		
+
+	}
+	@Override
+	public void playerStatusUpdate(String value) {
+		if(value==null)
+			return;
+		if(value.equalsIgnoreCase("ERR_USER_NOT_SUBSCRIBED") &&
+				(mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_EPISODE))){
+			PackagePopUp popup = new PackagePopUp(mContext,(View)mParentContentLayout.getParent());
+			myplexapplication.getCardExplorerData().cardDataToSubscribe =  mSeasonData;
+			popup.showPackDialog(mSeasonData, ((Activity)mContext).getActionBar().getCustomView());
+		}
 		
-		View epgView  = epgview.createEPGView();
-		
-		mEPGLayout.addView(epgView);
-		
-		
-		/*
-		if(epgView != null){
-			Log.d("amlan","card view visible");
-			mEPGLayout.setVisibility(View.VISIBLE);
-			
-			params.topMargin = (int) getContext().getResources()
-					.getDimension(R.dimen.margin_gap_12);
-					
-			mEPGLayout.addView(epgView);
-		}else{
-			mEPGLayout.setVisibility(View.GONE);
-		}*/
 	}
 	
 	

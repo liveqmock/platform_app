@@ -44,7 +44,7 @@ public class TVShowView  {
 
 	public TVShowView(Context context, List<CardData> mCardDataList,View rootView,TVShowSelectListener listener) {
 		this.mCardDataList = mCardDataList;
-		Collections.sort(mCardDataList, new EpisodeComparator());
+//		Collections.sort(mCardDataList, new EpisodeComparator());
 		tvShowSelectListener =  listener;
 		
 		npSeason = (NumberPicker) rootView.findViewById(R.id.numberPickerSeason);
@@ -421,7 +421,7 @@ public class TVShowView  {
 	private class EpisodeComparator implements Comparator<CardData>{
 		@Override
 		public int compare(CardData lhs, CardData rhs) {			
-			return lhs._id.compareTo(rhs._id);
+			return rhs._id.compareTo(lhs._id);
 		}
 		
 	}
