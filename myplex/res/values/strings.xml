@@ -142,7 +142,7 @@
     <string name="iconcricket">&#x26BE;</string>
     <string name="icontv">&#x1F4FA;</string>
     <string name="iconshare">&#xF601;</string>
-    <string name="record_play">&#x25B6;</string>
+    <string name="record_play">&#x25B6;</string>   
     <!--Navigation drawer icons-->
 
 	<string name="reminder_icon">&#x23F0;</string>
@@ -266,4 +266,10 @@
     <string name="notification_type">message_type</string>
     <string name="notification_msg">message</string>
     
+    <!--FIFA related strings  -->
+    <string name="iconsoccer">&#x26BD;</string>
+    <string name="iconlivesoccer">&#x1F3C3;</string>
+    <string name="iconmatch">&#x2691;</string>
+    <string name="fifa_live">Fifa Live</string>
+    <string name="fifa_matches">Fifa Matches</string>
 </resources>
