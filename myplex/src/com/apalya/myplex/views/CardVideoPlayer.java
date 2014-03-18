@@ -55,6 +55,7 @@ import com.apalya.myplex.data.CardDataRelatedMultimediaItem;
 import com.apalya.myplex.data.CardDataVideosItem;
 import com.apalya.myplex.data.CardDownloadData;
 import com.apalya.myplex.data.MatchStatus;
+import com.apalya.myplex.data.MatchStatus.MATCH_TYPE;
 import com.apalya.myplex.data.Team;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.media.PlayerListener;
@@ -193,7 +194,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		
 		mTrailerButton.setVisibility(mTrailerAvailable == true ? View.VISIBLE : View.GONE);
 		
-//        initSportsStatusLayout(v);
+        initSportsStatusLayout(v);
 		int[] location = new int[2];
 		mTrailerButton.getLocationOnScreen(location);
 		if(location.length >0)
@@ -1456,7 +1457,29 @@ private void playVideoFile(CardDownloadData mDownloadData){
 							"alpha", 0f, 1f);
 					fadeAnim2.setDuration(800);
 					fadeAnim2.start();
-															
+					
+					if(matchStatus.matchType == MATCH_TYPE.FIFA){
+						
+						Team team1= matchStatus.teams.get(0);
+						Team team2= matchStatus.teams.get(1);
+						
+						
+						if(team1.validate() && team2.validate()){
+
+							String text = "("+team1.score+") "+ team1.sname + " " + "vs"							
+									+" "+team2.sname + " ("+team2.score+")";
+							textView1.setText(text);
+						}
+						
+						if(!TextUtils.isEmpty(matchStatus.statusDescription)){
+							textView2.setVisibility(View.VISIBLE);
+							textView2.setText(matchStatus.statusDescription);	
+							textView2.setSelected(true);
+						}
+						
+						return;
+					}
+					
 					if(!TextUtils.equals(MatchStatus.STATUS_LIVE, matchStatus.status) || 
 							matchStatus.teams == null || 
 							matchStatus.teams.isEmpty()){

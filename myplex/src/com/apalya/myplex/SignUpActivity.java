@@ -130,8 +130,8 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 			mPassword = (EditText) findViewById(R.id.loginPassword);
 			mPassword.setTypeface(FontUtil.Roboto_Regular);
 			mSubmit = (Button) findViewById(R.id.loginsubmit);
-			mSubmit.setTypeface(FontUtil.Roboto_Regular);
-			mSubmit.setText("Sign into myplex");
+			mSubmit.setTypeface(FontUtil.Roboto_Regular);			
+			mSubmit.setText(getResources().getString(R.string.theme_text_signin));
 			final View line=(View)findViewById(R.id.loginsp1);
 			mFpwd.setOnClickListener(new OnClickListener() {
 
@@ -142,9 +142,9 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 					{
 
 						mPassword.setVisibility(View.GONE);
-						line.setVisibility(View.GONE);
-						mFpwd.setText("Sign into myplex");
-						mSubmit.setText("Reset myplex password");
+						line.setVisibility(View.GONE);						
+						mFpwd.setText(getResources().getString(R.string.theme_text_signin));
+						mSubmit.setText(getResources().getString(R.string.theme_text_resetpass));
 					}
 					else
 					{
@@ -152,6 +152,7 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 						line.setVisibility(View.VISIBLE);
 						mFpwd.setText("Forgot password,Let's fix it here?");
 						mSubmit.setText("Sign into myplex");	
+						mSubmit.setText(getResources().getString(R.string.theme_text_signin));
 					}
 				}
 			});
@@ -301,8 +302,8 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 			mPassword = (EditText) findViewById(R.id.editPassword);
 			mPassword.setTypeface(FontUtil.Roboto_Regular);
 			mSubmit = (Button) findViewById(R.id.signsubmit);
-			mSubmit.setTypeface(FontUtil.Roboto_Regular);
-			mSubmit.setText("Join myplex");
+			mSubmit.setTypeface(FontUtil.Roboto_Regular);		
+			mSubmit.setText(getResources().getString(R.string.theme_text_signup));
 			
 			Analytics.mixPanelJoinMyplexInitiated();
 
