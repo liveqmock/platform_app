@@ -359,7 +359,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 			if(ApplicationSettings.MODE_APP_TYPE == APP_TYPE.OFFLINE )
 				selectItem(2);
 			else if(ApplicationSettings.MODE_APP_TYPE == APP_TYPE.FIFA )
-				selectItem(2);
+				selectItem(1);
 			else
 				selectItem(1);
 		}
@@ -947,9 +947,17 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 				setActionBarTitle(NavigationOptionsMenuAdapter.SPORTS);
 				setSearchviewHint("search live tv");
 			}*/
-			else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.FIFA_MATCHES)){
+			else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.FIFA_LIVE)){
 				data.requestType = CardExplorerData.REQUEST_RECOMMENDATION;
-				setActionBarTitle(mContext.getString(R.string.fifa_matches));
+				setActionBarTitle(NavigationOptionsMenuAdapter.FIFA_LIVE);
+				setSearchviewHint("search");
+			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.FIFA_MATCHES)){
+				removeLiveTvActionBarIcon();
+				data.requestType = CardExplorerData.REQUEST_BROWSE;
+				data.searchQuery =ConsumerApi.CONTENT_SPORTS_LIVE+","+ConsumerApi.CONTENT_SPORTS_VOD;
+				data.searchScope = "sportsEvent";
+				setActionBarTitle(NavigationOptionsMenuAdapter.FIFA_MATCHES);
+				setSearchviewHint("search");
 			}
 			else
 			{
