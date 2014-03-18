@@ -194,13 +194,14 @@ public class CardDetails extends BaseFragment implements
 		if (mCardData.generalInfo != null) {
 			mMainActivity.setActionBarTitle(mCardData.generalInfo.title.toLowerCase());
 		}
-		prepareContent();
+		
 		if(mCardData.generalInfo.type != null && mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
 			createEPGView(rootView);
 		}else{
 			if(mEPGLayout!=null)
 				mEPGLayout.setVisibility(View.GONE);
-		}		
+		}	
+		prepareContent();
 		if( mCardData.generalInfo.type != null && mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_SERIES)){
 			childSubList.removeAll(childSubList);
 			helper  = new SeasonFetchHelper(mCardData,new TvShowManager());
@@ -404,7 +405,7 @@ public class CardDetails extends BaseFragment implements
 		// mParentContentLayout.addView(gap);
 	}
 
-	private void fillData() {
+	private void fillData() {	
 		mDescriptionExpanded = false;
 
 		mPlayerLogsLayout = new LinearLayout(getContext());

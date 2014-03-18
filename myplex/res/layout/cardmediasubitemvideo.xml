@@ -83,7 +83,7 @@
             android:layout_gravity="center_vertical"
             android:layout_margin="3dp"            
             android:singleLine="true"
-            android:text="NZ vs IN"
+            android:text=""
             android:textColor="@color/textcolor_score"           
             android:textSize="12sp" 
             />

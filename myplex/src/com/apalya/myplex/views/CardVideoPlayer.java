@@ -193,7 +193,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		
 		mTrailerButton.setVisibility(mTrailerAvailable == true ? View.VISIBLE : View.GONE);
 		
-//        initSportsStatusLayout(v);
+        initSportsStatusLayout(v);
 		int[] location = new int[2];
 		mTrailerButton.getLocationOnScreen(location);
 		if(location.length >0)
