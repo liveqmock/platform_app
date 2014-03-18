@@ -9,4 +9,5 @@
     <string name="theme_text_signup">Join Viva</string>
     <string name="theme_text_browseasguest">browse as guest</string>
     <string name="theme_text_resetpass">reset Viva password</string>
+    <string name="theme_actionbar_default_title">FIFA</string>
 </resources>

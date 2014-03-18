@@ -952,7 +952,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		mTrailerButton.setVisibility(mTrailerAvailable == true ? View.VISIBLE : View.GONE);
 		recordedProgName = (TextView)v.findViewById(R.id.recordedProgName);
 		
-//		initSportsStatusLayout(v);
+		initSportsStatusLayout(v);
 		mTrailerButton.setOnClickListener(new OnClickListener() {
 			
 			@Override
