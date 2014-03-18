@@ -9,5 +9,5 @@
     <string name="theme_text_signup">join myplex</string>
     <string name="theme_text_browseasguest">browse as guest</string>
     <string name="theme_text_resetpass">Reset myplex password</string>
-
+	<string name="theme_actionbar_default_title">myplex home</string>
 </resources>
