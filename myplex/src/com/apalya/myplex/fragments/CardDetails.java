@@ -133,8 +133,6 @@ public class CardDetails extends BaseFragment implements
 	private NumberPicker seasonPicker,episodePicker;
 	private LinearLayout mTvShowLinear;
 
-
-
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -1014,6 +1012,7 @@ public class CardDetails extends BaseFragment implements
 				mPlayer.onStateChanged(PlayerListener.STATE_PAUSED, mPlayer.getStopPosition());
 				Analytics.stoppedAt();
 				Analytics.mixPanelVideoTimeCalculation(mCardData);
+				Analytics.isTrailer = mPlayer.getTrailer();
 				Analytics.gaStopPauseMediaTime("stop",mPlayer.getStopPosition(),mCardData);
 				mPlayer.closePlayer();
 				return true;
