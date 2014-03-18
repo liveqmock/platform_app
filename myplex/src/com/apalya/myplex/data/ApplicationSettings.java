@@ -16,6 +16,6 @@ public class ApplicationSettings {
 		OFFLINE, NORMAL,FIFA
 	};
 	
-	public static APP_TYPE MODE_APP_TYPE=APP_TYPE.FIFA;
+	public static APP_TYPE MODE_APP_TYPE=APP_TYPE.NORMAL;
 
 }
