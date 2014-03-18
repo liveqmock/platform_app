@@ -46,7 +46,7 @@
             android:paddingLeft="@dimen/margin_gap_16"
             android:paddingRight="@dimen/margin_gap_16"
             android:paddingTop="@dimen/margin_gap_12"
-            android:text="@string/letme"
+            android:text="@string/theme_text_browseasguest"
             android:textColor="#9f9f9f"
             android:textSize="@dimen/textsize_14" />
 
