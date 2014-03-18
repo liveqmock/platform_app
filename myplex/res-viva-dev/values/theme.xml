@@ -4,7 +4,9 @@
     <color name="theme_app_color">#C8101A</color>
     <color name="theme_list_selector">#C8101A</color>
     <color name="theme_text_selector">#C8101A</color>
+    
     <string name="theme_text_signin">sign into viva</string>
     <string name="theme_text_signup">join viva</string>
+    <string name="theme_text_browseasguest">browse as guest</string>
     <string name="theme_text_resetpass">reset viva password</string>
 </resources>
