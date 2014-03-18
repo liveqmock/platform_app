@@ -46,8 +46,8 @@ public class NavigationOptionsMenuAdapter extends BaseAdapter {
 	public final static String LOGIN = "login";
 	public final static String LOGO = "ApplicationLogo";
 	public final static String INVITEFRIENDS = "invite friends";
-	public final static String FIFA_LIVE = "FIFA Live";
-	public final static String FIFA_MATCHES = "FIFA Matches";
+	public final static String FIFA_LIVE = "FIFA 2014 Live";
+	public final static String FIFA_MATCHES = "ALL Matches";
 			
 	public Context mContext;
 	private boolean isLoggedIn = true;

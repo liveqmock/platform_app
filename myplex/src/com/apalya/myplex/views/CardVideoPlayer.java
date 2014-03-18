@@ -1564,6 +1564,10 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			chooseLiveStreamType(items,false);			
 		}else if(videoType.equalsIgnoreCase(ConsumerApi.TYPE_TV_EPISODE)){
 			chooseStreamOrDownload(items);
+		}else if(videoType.equalsIgnoreCase(ConsumerApi.CONTENT_SPORTS_LIVE)){
+			chooseLiveStreamType(items,false);	
+		}else if(videoType.equalsIgnoreCase(ConsumerApi.CONTENT_SPORTS_VOD)){
+			chooseLiveStreamType(items,true);	
 		}
 		
 	}
