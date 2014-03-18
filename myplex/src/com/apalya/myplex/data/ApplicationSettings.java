@@ -13,9 +13,9 @@ public class ApplicationSettings {
 	public static boolean ENABLE_SENSOR_SCROLL = false;
 	
 	public enum APP_TYPE{
-		OFFLINE, NORMAL
+		OFFLINE, NORMAL,FIFA
 	};
 	
-	public static APP_TYPE MODE_APP_TYPE=APP_TYPE.NORMAL;
+	public static APP_TYPE MODE_APP_TYPE=APP_TYPE.FIFA;
 
 }

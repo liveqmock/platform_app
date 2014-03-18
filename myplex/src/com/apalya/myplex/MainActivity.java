@@ -223,6 +223,54 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
         mNavigationAdapter.setLoginStatus(mIsUserLoggedIn);
 	}
 
+	private void fillSportsMenuItem() {
+
+		
+		String email = myplexapplication.getUserProfileInstance().getUserEmail();
+	    if(email.equalsIgnoreCase("NA") || email.equalsIgnoreCase(""))
+	    {
+	            mIsUserLoggedIn = false;
+	    }
+	            
+	    mMenuItemList.add(new NavigationOptionsMenu(myplexapplication.getUserProfileInstance().getName(),
+	                    R.drawable.menu_profile, myplexapplication.getUserProfileInstance().getProfilePic(),NavigationOptionsMenuAdapter.CARDDETAILS_ACTION,R.layout.navigation_menuitemlarge));
+	    
+	    int screenType = NavigationOptionsMenuAdapter.NOFOCUS_ACTION;
+	    if(mIsUserLoggedIn)
+	    {
+	            screenType = NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION;
+	    }	   
+	    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FIFA_LIVE,R.string.iconsoccer,
+	    		null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+	    
+	    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FIFA_MATCHES,R.string.iconmatch,
+	    		null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+	    
+	    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGO,
+	    		R.string.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
+
+	    
+	    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FAVOURITE,R.string.iconfav, null, screenType,R.layout.navigation_menuitemsmall));
+	    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.PURCHASES,R.string.iconpurchases, null,screenType,R.layout.navigation_menuitemsmall));
+//	    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.DOWNLOADS,R.string.icondnload, null, screenType,R.layout.navigation_menuitemsmall));
+	    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.DISCOVER,R.string.icondiscover, null, NavigationOptionsMenuAdapter.SEARCH_ACTION,R.layout.navigation_menuitemsmall));
+	    
+	    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGO,R.string.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
+	    
+	    
+	    Session fbSession=Session.getActiveSession();
+	    if(fbSession!=null && fbSession.isOpened())
+	            mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.INVITEFRIENDS,R.string.iconfriends, null, NavigationOptionsMenuAdapter.INVITE_ACTION,R.layout.navigation_menuitemsmall));
+	    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.SETTINGS,R.string.iconsettings, null, NavigationOptionsMenuAdapter.SETTINGS_ACTION,R.layout.navigation_menuitemsmall));
+	    if(mIsUserLoggedIn)
+	            mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGOUT,R.string.iconlogout, null, NavigationOptionsMenuAdapter.LOGOUT_ACTION,R.layout.navigation_menuitemsmall));
+	    else
+	            mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGIN,R.string.iconlogout, null, NavigationOptionsMenuAdapter.LOGOUT_ACTION,R.layout.navigation_menuitemsmall));
+//	    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.TVSHOWS,R.drawable.icontv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+	    mNavigationAdapter.setMenuList(mMenuItemList);
+	    mNavigationAdapter.setLoginStatus(mIsUserLoggedIn);
+	    
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -257,6 +305,8 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		mNavigationAdapter = new NavigationOptionsMenuAdapter(this);
 		if(ApplicationSettings.MODE_APP_TYPE == APP_TYPE.OFFLINE)
 			fillMenuItemOffline();
+		else if(ApplicationSettings.MODE_APP_TYPE == APP_TYPE.FIFA)
+			fillSportsMenuItem();
 		else
 			fillMenuItem();
 		mDrawerList.setAdapter(mNavigationAdapter);
@@ -307,6 +357,8 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 
 		if(!onHandleExternalIntent(getIntent())){
 			if(ApplicationSettings.MODE_APP_TYPE == APP_TYPE.OFFLINE )
+				selectItem(2);
+			else if(ApplicationSettings.MODE_APP_TYPE == APP_TYPE.FIFA )
 				selectItem(2);
 			else
 				selectItem(1);
@@ -895,6 +947,10 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 				setActionBarTitle(NavigationOptionsMenuAdapter.SPORTS);
 				setSearchviewHint("search live tv");
 			}*/
+			else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.FIFA_MATCHES)){
+				data.requestType = CardExplorerData.REQUEST_RECOMMENDATION;
+				setActionBarTitle(mContext.getString(R.string.fifa_matches));
+			}
 			else
 			{
 				setActionBarTitle("myplex");
