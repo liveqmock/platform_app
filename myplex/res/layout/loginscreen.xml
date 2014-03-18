@@ -67,7 +67,7 @@
             android:paddingBottom="6dp"
             android:paddingRight="32dp"
             android:paddingTop="6dp"
-            android:text="sign into myplex"
+            android:text="@string/theme_text_signin"
             android:textColor="#9f9f9f" />
 
         <TextView
@@ -79,7 +79,7 @@
             android:paddingBottom="6dp"
             android:paddingLeft="32dp"
             android:paddingTop="6dp"
-            android:text="@string/signup"
+            android:text="@string/theme_text_signup"
             android:textColor="#9f9f9f" />
 
         <LinearLayout
