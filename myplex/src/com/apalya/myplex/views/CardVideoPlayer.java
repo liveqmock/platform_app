@@ -293,6 +293,14 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		mVideoView.setVisibility(View.VISIBLE);			
 		mPreviewImage.setVisibility(View.INVISIBLE);			
 
+		if(mScoreCardLayout != null){
+			mScoreCardLayout.setVisibility(View.INVISIBLE);
+		}
+		
+		if(sportsStatusRefresh !=null){
+			sportsStatusRefresh.stop();
+		}
+		
 		if(checkForLocalPlayback()){
 			return;
 		}
