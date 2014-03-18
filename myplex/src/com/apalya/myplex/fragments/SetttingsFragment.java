@@ -192,7 +192,7 @@ public class SetttingsFragment extends BaseFragment {
 			
 		}
 		String version= Util.getAppVersionName(mContext);
-		mSettingsList.add(new SettingsData(SettingsData.SECTION, "myplex"+ " "+version, 0,SettingsData.VIEWTYPE_NORMAL));
+		mSettingsList.add(new SettingsData(SettingsData.SECTION, mContext.getString(R.string.app_name) + " "+version, 0,SettingsData.VIEWTYPE_NORMAL));
 		mSettingsList.add(new SettingsData(SettingsData.ITEM, FEEDBACK, 0,SettingsData.VIEWTYPE_NORMAL));
 		mSettingsList.add(new SettingsData(SettingsData.ITEM, TANDC, 0,SettingsData.VIEWTYPE_NORMAL));
 		mSettingsList.add(new SettingsData(SettingsData.ITEM, PRIVACYPOLIY, 0,SettingsData.VIEWTYPE_NORMAL));
