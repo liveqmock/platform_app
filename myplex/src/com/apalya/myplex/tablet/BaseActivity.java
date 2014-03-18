@@ -61,6 +61,8 @@ import com.apalya.myplex.R;
 import com.apalya.myplex.SearchActivity;
 import com.apalya.myplex.adapters.FliterMenuAdapter;
 import com.apalya.myplex.adapters.NavigationOptionsMenuAdapter;
+import com.apalya.myplex.data.ApplicationSettings;
+import com.apalya.myplex.data.ApplicationSettings.APP_TYPE;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDataGenralInfo;
 import com.apalya.myplex.data.CardDataImages;
@@ -211,18 +213,25 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 			screenType = NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION;
 		}
 		
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LIVETV,R.string.iconlivetv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.MOVIES,R.string.iconmovie, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.RECOMMENDED,R.string.iconhome, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.TVSHOWS,R.string.icontvshows, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-
-		
+		if(ApplicationSettings.MODE_APP_TYPE == APP_TYPE.FIFA){
+			mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FIFA_LIVE,R.string.iconsoccer,
+		    		null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+		    
+		    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FIFA_MATCHES,R.string.iconmatch,
+		    		null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+		}else{				
+			mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LIVETV,R.string.iconlivetv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+			mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.MOVIES,R.string.iconmovie, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+			mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.RECOMMENDED,R.string.iconhome, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+			mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.TVSHOWS,R.string.icontvshows, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+		}	
 		//		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.SPORTS,R.string.iconcricket, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGO,R.string.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
 
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FAVOURITE,R.string.iconfav, null, screenType,R.layout.navigation_menuitemsmall));
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.PURCHASES,R.string.iconpurchases, null,screenType,R.layout.navigation_menuitemsmall));
-		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.DOWNLOADS,R.string.icondnload, null, screenType,R.layout.navigation_menuitemsmall));
+		if(ApplicationSettings.MODE_APP_TYPE != APP_TYPE.FIFA)
+			mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.DOWNLOADS,R.string.icondnload, null, screenType,R.layout.navigation_menuitemsmall));
 		
 		mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGO,R.string.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
 		
@@ -631,8 +640,15 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 				data.searchQuery =ConsumerApi.CONTENT_SPORTS_LIVE+","+ConsumerApi.CONTENT_SPORTS_VOD;				
 				setActionBarTitle(NavigationOptionsMenuAdapter.SPORTS);				
 			}*/
-			else
-			{
+			else if(label.equalsIgnoreCase(NavigationOptionsMenuAdapter.FIFA_LIVE)){
+				data.requestType = CardExplorerData.REQUEST_RECOMMENDATION;
+				setActionBarTitle(NavigationOptionsMenuAdapter.FIFA_LIVE);
+			}else if(label.equalsIgnoreCase(NavigationOptionsMenuAdapter.FIFA_MATCHES)){
+				data.requestType = CardExplorerData.REQUEST_BROWSE;
+				data.searchQuery =ConsumerApi.CONTENT_SPORTS_LIVE+","+ConsumerApi.CONTENT_SPORTS_VOD;
+				data.searchScope = "sportsEvent";
+				setActionBarTitle(NavigationOptionsMenuAdapter.FIFA_MATCHES);
+			}else{
 				setActionBarTitle("myplex");
 				Log.e("", label);
 			}
