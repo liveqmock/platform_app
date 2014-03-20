@@ -406,7 +406,9 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	@Override
 	public void setActionBarHeight(int height) {
 		super.setActionBarHeight(height);
-		mCardView.setActionBarHeight(height);
+		if(mCardView != null){
+			mCardView.setActionBarHeight(height);
+		}
 	}
 
 	@Override

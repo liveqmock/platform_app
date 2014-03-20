@@ -275,6 +275,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
 //		getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 		mContext = this;
 		Util.prepareDisplayinfo(this);
@@ -1001,7 +1002,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 	}
 
 	private void pushFragment() {
-		addFilterData(new ArrayList<FilterMenudata>(), null);
+		addFilterData(new ArrayList<FilterMenudata>(), null);		
 		mFragmentStack.push(mCurrentFragment);
 		mCurrentFragment.setContext(this);
 		mCurrentFragment.setActionBar(getActionBar());
@@ -1314,7 +1315,8 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 				findViewById(R.id.customactionbar_drawer).setVisibility(View.INVISIBLE);
 				findViewById(R.id.customactionbar_filter).setVisibility(View.INVISIBLE);
 				findViewById(R.id.customactionbar_back).setVisibility(View.VISIBLE);
-				mSearchSuggestionFrag = new SearchSuggestions(mContext);
+				mSearchSuggestionFrag = new SearchSuggestions();
+				mSearchSuggestionFrag.setContext(mContext);
 				overlayFragment(mSearchSuggestionFrag);
 			}
 		});
