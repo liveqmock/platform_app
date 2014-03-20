@@ -6,6 +6,6 @@
     <string name="config.mixpanel.token">1c663d8de79a40b4c89b242d828fc475</string>
     <string name="config.android.push.senderid">976964091787</string>
     <string name="app_name">myplex</string>
-    <string name="ga_trackingId">UA-47802668-1</string>
+    <string name="ga_trackingId">UA-46302770-2</string>
     <bool name="config.crashlytics.enable">true</bool>
 </resources>
