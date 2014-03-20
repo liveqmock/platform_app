@@ -17,6 +17,7 @@
 package com.android.volley.toolbox;
 
 import android.os.SystemClock;
+import android.util.Log;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Cache;
@@ -30,6 +31,7 @@ import com.android.volley.ServerError;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
+import com.apalya.myplex.utils.Util;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -111,8 +113,19 @@ public class BasicNetwork implements Network {
                 }
                 return new NetworkResponse(statusCode, responseContents, responseHeaders, false);
             } catch (SocketTimeoutException e) {
+            	Log.d("volley", "SocketTimeoutException for "+request.getUrl());
+            	if(Util.isExpiredResponseAllowed(request) && request.getCacheEntry() != null && request.getCacheEntry().data != null ){
+            		return new NetworkResponse(HttpStatus.SC_NOT_MODIFIED,
+                            request.getCacheEntry().data, responseHeaders, true);
+            	}
+            	
                 attemptRetryOnException("socket", request, new TimeoutError());
             } catch (ConnectTimeoutException e) {
+            	Log.d("volley", "ConnectTimeoutException for "+request.getUrl());
+            	if(Util.isExpiredResponseAllowed(request) && request.getCacheEntry() != null && request.getCacheEntry().data != null ){
+            		return new NetworkResponse(HttpStatus.SC_NOT_MODIFIED,
+                            request.getCacheEntry().data, responseHeaders, true);
+            	}
                 attemptRetryOnException("connection", request, new TimeoutError());
             } catch (MalformedURLException e) {
                 throw new RuntimeException("Bad URL " + request.getUrl(), e);

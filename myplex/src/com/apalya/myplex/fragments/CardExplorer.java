@@ -610,6 +610,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				return super.getParams();
 			}
 		};*/
+		
+		mVolleyRequest.setRetryPolicy(Util.getRetryPolicy(mData.requestType,mContext));
 		Log.d(TAG,"Min Request:"+requestUrl);
 		if(requestUrl.equals("0") || (requestUrl.length()==0)){
 			mMainActivity.hideActionBarProgressBar();

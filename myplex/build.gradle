@@ -63,6 +63,14 @@ android {
             packageName "com.apalya.myplexbeta"
             signingConfig signingConfigs.myplex
         }
+        demo {		
+            println "build : myplex_demo"
+			println "build :delete file : ${buildDir}/../res/values/config.xml"
+			delete '${buildDir}/../res/values/config.xml'
+			delete '${buildDir}/../res/values/theme.xml'
+            packageName "com.apalya.myplexdemo"
+            signingConfig signingConfigs.myplex
+        }
         vivadev {		
             println "build : viva-dev"
 			println "build :delete file : ${buildDir}/../res/values/config.xml"
@@ -79,6 +87,10 @@ android {
 	
 	sourceSets.beta {
         res.srcDirs = ['res', 'res-beta']
+    }
+    
+    sourceSets.demo {
+        res.srcDirs = ['res', 'res-demo']
     }
     
     sourceSets.vivadev {
