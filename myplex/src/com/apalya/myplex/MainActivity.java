@@ -130,6 +130,10 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 	@Override
 	protected void onStop() {
 		// TODO Auto-generated method stub
+		Log.d(TAG,"onStop");
+		if(mCacheManager != null){
+			mCacheManager.deRegistration();
+		}
 		super.onStop();
 	}
 	
@@ -275,6 +279,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
 //		getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 		mContext = this;
 		Util.prepareDisplayinfo(this);
@@ -384,8 +389,8 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		
 		Analytics.mixPanelNotificationReceived(mContext, getIntent());
 		
-		if(getIntent().hasExtra(mContext.getString(R.string._id))){
-			showActionBarProgressBar();
+		if(getIntent().hasExtra(mContext.getString(R.string._id))){			
+			showActionBarProgressBar();			
 			_id = getIntent().getExtras().getString(mContext.getString(R.string._id));
 			List<CardData> cards  =  new ArrayList<CardData>();
 			CardData cardData  = new CardData();
@@ -399,6 +404,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 							if(cardData._id.equalsIgnoreCase(_id)){
 								mCacheManager.unRegisterCallback();
 								hideActionBarProgressBar();
+								if(mCurrentFragment != null || isFinishing()) {return;}
 								BaseFragment fragment = createFragment(NavigationOptionsMenuAdapter.CARDDETAILS_ACTION);
 								fragment.setMainActivity(MainActivity.this);
 								fragment.setDataObject(cardData);
@@ -433,7 +439,9 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 						}
 						    
 						hideActionBarProgressBar();
-						mCacheManager.unRegisterCallback();
+						mCacheManager.unRegisterCallback();					
+						Log.d(TAG,"OnCacheResults for _id intent");
+						if(mCurrentFragment != null || isFinishing()) {return;}
 						BaseFragment fragment = createFragment(NavigationOptionsMenuAdapter.CARDDETAILS_ACTION);
 						fragment.setDataObject(data);
 						bringFragment(fragment);
@@ -1001,7 +1009,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 	}
 
 	private void pushFragment() {
-		addFilterData(new ArrayList<FilterMenudata>(), null);
+		addFilterData(new ArrayList<FilterMenudata>(), null);		
 		mFragmentStack.push(mCurrentFragment);
 		mCurrentFragment.setContext(this);
 		mCurrentFragment.setActionBar(getActionBar());
@@ -1314,7 +1322,8 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 				findViewById(R.id.customactionbar_drawer).setVisibility(View.INVISIBLE);
 				findViewById(R.id.customactionbar_filter).setVisibility(View.INVISIBLE);
 				findViewById(R.id.customactionbar_back).setVisibility(View.VISIBLE);
-				mSearchSuggestionFrag = new SearchSuggestions(mContext);
+				mSearchSuggestionFrag = new SearchSuggestions();
+				mSearchSuggestionFrag.setContext(mContext);
 				overlayFragment(mSearchSuggestionFrag);
 			}
 		});

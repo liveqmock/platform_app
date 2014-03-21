@@ -53,9 +53,6 @@ public class SearchSuggestions extends BaseFragment {
 	private ListView mSearchSuggestionList;
 	private CacheManager mCacheManager = new CacheManager();
 
-	public SearchSuggestions(Context context) {
-		mContext = context;
-	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {

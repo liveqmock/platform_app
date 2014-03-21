@@ -129,6 +129,17 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 		}*/
 		super.onResume();
 	}
+	
+	@Override
+	protected void onStop() {
+		
+		Log.d(TAG,"onStop");
+		if(mCacheManager != null){
+			mCacheManager.deRegistration();
+		}
+		super.onStop();
+	}
+	
 	@Override
 	public void fillMenuItem() {
 		super.fillMenuItem();
@@ -757,6 +768,7 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 							if(cardData._id.equalsIgnoreCase(_id)){
 								mCacheManager.unRegisterCallback();
 								hideActionBarProgressBar();
+								if(mCurrentFragment != null || isFinishing()) {return;}
 								myplexapplication.mSelectedCard = cardData;
 								startActivity(new Intent(getApplicationContext(),TabletCardDetails.class));
 								finish();
@@ -787,6 +799,7 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 						    
 						hideActionBarProgressBar();
 						mCacheManager.unRegisterCallback();
+						if(mCurrentFragment != null || isFinishing()) {return;}
 						myplexapplication.mSelectedCard = data;
 						startActivity(new Intent(getApplicationContext(),TabletCardDetails.class));
 						finish();

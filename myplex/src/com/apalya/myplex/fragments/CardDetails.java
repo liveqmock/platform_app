@@ -146,7 +146,12 @@ public class CardDetails extends BaseFragment implements
 			mCardData = (CardData) mDataObject;
 			Log.d(TAG, "content ID =" + mCardData._id);
 		}		
-			
+		
+		
+		if(mMainActivity == null){
+			return null;
+		}
+		
 		mMainActivity.setOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		mInflater = LayoutInflater.from(getContext());
 		rootView = inflater.inflate(R.layout.carddetails, container, false);
