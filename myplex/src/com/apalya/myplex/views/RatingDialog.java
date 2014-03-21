@@ -101,6 +101,13 @@ public class RatingDialog {
 			
 			@Override
 			public void onClick(View v) {
+				mOkButton.setEnabled(false);
+				mOkButton.postDelayed(new Runnable() {					
+					@Override
+					public void run() {
+						mOkButton.setEnabled(true);
+					}
+				}, 3000);
 				MessagePost post = new MessagePost();
 				mProgressBar.setVisibility(View.VISIBLE);
 				String str = mMessageBox.getEditableText().toString();

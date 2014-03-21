@@ -61,14 +61,15 @@
             android:layout_below="@+id/separator"
             android:orientation="horizontal" >
 
+            
             <Button
                 android:id="@+id/feedback_cancel_button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:textColor="#ADADAD"
-                android:textSize="18sp"
-                android:background="#CCFFFFFF"
+                android:textSize="18sp"               
+                android:background="@drawable/button_rect_selector"
                 android:text="@string/feedbackcancelbutton" />
 
             <View
@@ -83,7 +84,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:textColor="#ADADAD"
-                android:background="#CCFFFFFF"
+                android:background="@drawable/button_rect_selector"
                 android:textSize="18sp"
                 android:text="@string/feedbackokbutton" />
         </LinearLayout>
