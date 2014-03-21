@@ -117,6 +117,7 @@
         android:background="@drawable/carddetailbutton_bg"
         android:paddingRight="4dp"
         android:textColor="@color/theme_app_color"
+        android:lines="1"
         android:textSize="15sp" />
 
     <View

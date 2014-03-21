@@ -133,6 +133,8 @@ public class CardDetails extends BaseFragment implements
 	private NumberPicker seasonPicker,episodePicker;
 	private LinearLayout mTvShowLinear;
 
+	private boolean mAutoPlay = false;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -339,7 +341,9 @@ public class CardDetails extends BaseFragment implements
 				mCardDetailViewFactory.UpdateSubscriptionStatus(mSeasonData);
 		}
 		checkForSurvey();
-		
+		if(mAutoPlay && mPlayer != null){
+			mPlayer.playContent();
+		}
 	}
 	
 	private void checkForSurvey(){
@@ -1125,6 +1129,10 @@ public class CardDetails extends BaseFragment implements
 			np.setDisplayedValues(seasonValues);
 			
 		}
+	}
+	
+	public void setAutoPlay(boolean mAutoPlay) {
+		this.mAutoPlay = mAutoPlay;
 	}
 	
 }

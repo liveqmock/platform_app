@@ -1052,6 +1052,9 @@ public class CardDetailViewFactory {
 					
 				}	
 			}
+			if(mData.promoText != null){
+				packageButton.setText(packageButton.getText().toString()+" (" + mData.promoText + ")");
+			}
 		}
 		if(mData._id.equalsIgnoreCase("0")){
 			packageButton.setVisibility(View.GONE);

@@ -373,18 +373,25 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		public void onClick(View v) {
 			
 			//This event is handled in CardDEtails
-			if(canBePlayed(true)){
-				isTriler = false;
-				//FetchUrl();
-				 fetchUrl(null);
-				mVideoViewParent.setOnClickListener(null);
-				Analytics.startVideoTime();
-				Analytics.gaPlayedMovieEvent(mData, 0);
-			}
+			playContent();
 			// TODO Auto-generated method stub
 
 		}
 	};
+	
+	public void playContent(){
+		
+		if(canBePlayed(true)){
+			
+			isTriler = false;
+			//FetchUrl();
+			 fetchUrl(null);
+			mVideoViewParent.setOnClickListener(null);
+			Analytics.startVideoTime();
+			Analytics.gaPlayedMovieEvent(mData, 0);
+		}
+		
+	}
 	private boolean lastWatchedStatus = false;
 	
 

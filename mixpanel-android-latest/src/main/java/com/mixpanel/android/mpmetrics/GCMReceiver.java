@@ -95,6 +95,8 @@ public class GCMReceiver extends BroadcastReceiver {
     String LOGTAG = "MPGCMReceiver";
 //    public static final String PLAYSTORE_DOWNLOAD_PATH="market://details?id=com.apalya.myplex&referrer=utm_source%3Dgoogle%26utm_medium%3Dcpc%26utm_term%3Drunning%252Bshoes%26utm_content%3DdisplayAd1%26utm_campaign%3Dshoe%252Bcampaign";    
     public static final String PLAYSTORE_DOWNLOAD_PATH="market://details?id=";
+    public static final String NOTIFICATION_ACTION = "action";
+    public static final String NOTIFICATION_PROMO_TXT ="promo";
     
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -159,6 +161,16 @@ public class GCMReceiver extends BroadcastReceiver {
     	
         if(!TextUtils.isEmpty(_id)){
         	appIntent.putExtra("_id", _id);
+        	String action = intent.getExtras().getString(NOTIFICATION_ACTION);
+        	String promo = intent.getExtras().getString(NOTIFICATION_PROMO_TXT);
+        	if(!TextUtils.isEmpty(action)){
+        		appIntent.putExtra(NOTIFICATION_ACTION, action);
+        	}
+        	
+        	if(!TextUtils.isEmpty(promo)){
+        		appIntent.putExtra(NOTIFICATION_PROMO_TXT, promo);
+        	}
+        	
         }else if (!TextUtils.isEmpty(page)){
         	appIntent.putExtra("page", page);
         }else if (!TextUtils.isEmpty(latestVersion)){        	
