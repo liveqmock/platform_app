@@ -130,6 +130,10 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 	@Override
 	protected void onStop() {
 		// TODO Auto-generated method stub
+		Log.d(TAG,"onStop");
+		if(mCacheManager != null){
+			mCacheManager.deRegistration();
+		}
 		super.onStop();
 	}
 	
@@ -385,8 +389,8 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		
 		Analytics.mixPanelNotificationReceived(mContext, getIntent());
 		
-		if(getIntent().hasExtra(mContext.getString(R.string._id))){
-			showActionBarProgressBar();
+		if(getIntent().hasExtra(mContext.getString(R.string._id))){			
+			showActionBarProgressBar();			
 			_id = getIntent().getExtras().getString(mContext.getString(R.string._id));
 			List<CardData> cards  =  new ArrayList<CardData>();
 			CardData cardData  = new CardData();
@@ -400,6 +404,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 							if(cardData._id.equalsIgnoreCase(_id)){
 								mCacheManager.unRegisterCallback();
 								hideActionBarProgressBar();
+								if(mCurrentFragment != null || isFinishing()) {return;}
 								BaseFragment fragment = createFragment(NavigationOptionsMenuAdapter.CARDDETAILS_ACTION);
 								fragment.setMainActivity(MainActivity.this);
 								fragment.setDataObject(cardData);
@@ -434,7 +439,9 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 						}
 						    
 						hideActionBarProgressBar();
-						mCacheManager.unRegisterCallback();
+						mCacheManager.unRegisterCallback();					
+						Log.d(TAG,"OnCacheResults for _id intent");
+						if(mCurrentFragment != null || isFinishing()) {return;}
 						BaseFragment fragment = createFragment(NavigationOptionsMenuAdapter.CARDDETAILS_ACTION);
 						fragment.setDataObject(data);
 						bringFragment(fragment);
