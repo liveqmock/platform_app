@@ -40,6 +40,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class SubcriptionEngine {
 	public static final String TAG = "SubcriptionEngine";
@@ -99,7 +100,7 @@ public class SubcriptionEngine {
 		String contentName = subscribedData.generalInfo.title;
 		msg = msg +" "+ mSelectedPackageItem.contentType + " "  +contentName + " pack for "+ "Rs." + mSelectedPriceItem.price;
 		textView.setText(msg);
-		Button ok = (Button)mAlbumDialog.findViewById(R.id.subscription_ok_button);
+		final Button ok = (Button)mAlbumDialog.findViewById(R.id.subscription_ok_button);
 		Button cancel = (Button)mAlbumDialog.findViewById(R.id.subscription_cancel_button);
 		cancel.setOnClickListener(new OnClickListener() {
 			
@@ -112,7 +113,8 @@ public class SubcriptionEngine {
 			
 			@Override
 			public void onClick(View arg0) {
-				mAlbumDialog.dismiss();	
+				ok.setEnabled(false);
+				mAlbumDialog.dismiss();					
 				doOperatorBilling();
 			}
 		});
@@ -137,10 +139,17 @@ public class SubcriptionEngine {
 			}
 		});
 	}
-	private void sendSubscriptionRequest(final MsisdnData data){
+	
+	private String lastRequestUrl = null;
+	
+	private void sendSubscriptionRequest(final MsisdnData data){		
 		Log.e(TAG, "sendSubscriptionRequest");
 		RequestQueue queue = MyVolley.getRequestQueue();
+		if(lastRequestUrl != null){			
+			return;
+		}
 		String requestUrl = ConsumerApi.getSusbcriptionRequest(mSelectedPriceItem.paymentChannel, mSelectedPackageItem.packageId);
+		lastRequestUrl = requestUrl;
 		StringRequest myReg = new StringRequest(Method.POST,requestUrl, onlineRequestSuccessListener(), onlineRequestErrorListener()){
 			protected Map<String, String> getParams() throws com.android.volley.AuthFailureError {
 				
@@ -155,7 +164,7 @@ public class SubcriptionEngine {
 		};
 		Log.e(TAG, "request: "+requestUrl);
 		myReg.setShouldCache(false);
-		myReg.setRetryPolicy(new DefaultRetryPolicy(15 * 1000, 1, 1.0f));
+		myReg.setRetryPolicy(new DefaultRetryPolicy(20 * 1000, 0, 0f));
 		queue.add(myReg);
 	}
 	
