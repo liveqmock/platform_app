@@ -69,6 +69,7 @@
     <string name="ratingmessageheading">add a movie review </string>
     <string name="ratingmessagehint">add a review</string>
     <string name="commentpopupheading">add a comment</string>
+     <string name="comment_ok_adding">adding..</string>
     <string name="commentpopuphint">add a comment</string>
     <string name="feedbackheading">rate myplex </string>
     <string name="feedbackmessageheading">share your experience </string>
@@ -265,6 +266,9 @@
     <string name="_id">_id</string>
     <string name="notification_type">message_type</string>
     <string name="notification_msg">message</string>
+    <string name="notification_action">action</string>
+    <string name="notification_action_autoplay">autoplay</string>
+    <string name="notification_promo">promo</string>
     
     <!--FIFA related strings  -->
     <string name="iconsoccer">&#x26BD;</string>

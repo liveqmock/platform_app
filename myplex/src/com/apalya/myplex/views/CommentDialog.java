@@ -30,6 +30,7 @@ public class CommentDialog {
 	public EditText mMessageBox;
 	public ProgressBar mProgressBar;
 	
+	
 	public MessagePostCallback mListener;
 	public CommentDialog(Context context){
 		mContext = context;
@@ -58,6 +59,8 @@ public class CommentDialog {
 			public void onClick(View v) {
 				MessagePost post = new MessagePost();
 				mProgressBar.setVisibility(View.VISIBLE);
+				mOkButton.setEnabled(false);
+				mOkButton.setText(mContext.getString(R.string.comment_ok_adding));
 				post.sendComment(mMessageBox.getEditableText().toString(), 0, data,MessagePost.POST_COMMENT, new MessagePostCallback() {
 					
 					@Override

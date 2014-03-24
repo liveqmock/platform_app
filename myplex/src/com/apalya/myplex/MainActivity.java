@@ -36,6 +36,7 @@ import android.os.Looper;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -392,11 +393,15 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		if(getIntent().hasExtra(mContext.getString(R.string._id))){			
 			showActionBarProgressBar();			
 			_id = getIntent().getExtras().getString(mContext.getString(R.string._id));
+			
 			List<CardData> cards  =  new ArrayList<CardData>();
 			CardData cardData  = new CardData();
 			cardData._id = _id;
 			cards.add(cardData);
 			if(_id!=null && _id.length() >0){
+				final String action = getIntent().getExtras().getString(mContext.getString(R.string.notification_action));
+				final String promoText = getIntent().getExtras().getString(mContext.getString(R.string.notification_promo));
+				
 				mCacheManager.getCardDetails(cards, IndexHandler.OperationType.FTSEARCH, new CacheManagerCallback() {					
 					@Override
 					public void OnOnlineResults(List<CardData> dataList) {
@@ -406,6 +411,15 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 								hideActionBarProgressBar();
 								if(mCurrentFragment != null || isFinishing()) {return;}
 								BaseFragment fragment = createFragment(NavigationOptionsMenuAdapter.CARDDETAILS_ACTION);
+								
+								if(ConnectivityReceiver.isConnected &&
+										action != null && action.equalsIgnoreCase(mContext.getString(R.string.notification_action_autoplay))){
+									((CardDetails)fragment).setAutoPlay(true);
+								}
+								
+								if(!TextUtils.isEmpty(promoText)){
+									cardData.promoText=promoText;
+								}
 								fragment.setMainActivity(MainActivity.this);
 								fragment.setDataObject(cardData);
 								bringFragment(fragment);
@@ -443,6 +457,17 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 						Log.d(TAG,"OnCacheResults for _id intent");
 						if(mCurrentFragment != null || isFinishing()) {return;}
 						BaseFragment fragment = createFragment(NavigationOptionsMenuAdapter.CARDDETAILS_ACTION);
+						
+						if(ConnectivityReceiver.isConnected &&
+								action != null && action.equalsIgnoreCase(mContext.getString(R.string.notification_action_autoplay))){
+							
+							((CardDetails)fragment).setAutoPlay(true);
+						}
+						
+						if(!TextUtils.isEmpty(promoText)){
+							data.promoText=promoText;
+						}
+						
 						fragment.setDataObject(data);
 						bringFragment(fragment);
 					}
