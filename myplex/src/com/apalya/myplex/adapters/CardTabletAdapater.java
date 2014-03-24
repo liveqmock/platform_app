@@ -291,7 +291,7 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 			dataHolder.mReviewsText.setText("0");
 		}
 		if(data.comments != null){
-			dataHolder.mCommentsText.setText(""+data.comments.values.size());	
+			dataHolder.mCommentsText.setText(""+data.comments.numComments);	
 		}else{
 			dataHolder.mCommentsText.setText("0");
 		}
