@@ -36,7 +36,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="#CCFFFFFF"
+                android:background="@drawable/button_rect_selector"
                 android:text="@string/feedbackcancelbutton"
                 android:textColor="#ADADAD"
                 android:textSize="18sp" />
@@ -52,7 +52,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:background="#CCFFFFFF"
+                android:background="@drawable/button_rect_selector"
                 android:text="@string/feedbackokbutton"
                 android:textColor="#ADADAD"
                 android:textSize="18sp" />

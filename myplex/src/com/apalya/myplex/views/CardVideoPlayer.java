@@ -312,7 +312,16 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		else{			
 			utility = new MediaUtility(mContext,this,true);			
 			utility.fetchVideoUrl(id);			
-		}			
+		}	
+		
+		for(CardData data:myplexapplication.getUserProfileInstance().lastVisitedCardData)
+		{
+			if(data._id.equalsIgnoreCase(mData._id))
+			{
+				lastWatchedStatus=true;
+				
+			}
+		}
 	}			
 	        			
         
@@ -536,8 +545,10 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 						e.printStackTrace();
 					}	
 				}
-				if(!lastWatchedStatus)
+				if(!lastWatchedStatus){
 					myplexapplication.getUserProfileInstance().lastVisitedCardData.add(mData);
+					lastWatchedStatus = true;
+				}
 				Util.showAdultToast(mContext.getString(R.string.adultwarning), mData, mContext);
 				Uri uri ;
 //				uri = Uri.parse("rtsp://46.249.213.87:554/playlists/bollywood-action_qcif.hpl.3gp");
@@ -872,8 +883,10 @@ private void playVideoFile(CardDownloadData mDownloadData){
 					Util.showToast(mContext, "No url to play.",Util.TOAST_TYPE_ERROR);
 					return;
 				}
-				if(!lastWatchedStatus)
+				if(!lastWatchedStatus){
 					myplexapplication.getUserProfileInstance().lastVisitedCardData.add(mData);
+					lastWatchedStatus = true;
+				}
 				Uri uri ;
 //				uri = Uri.parse("rtsp://46.249.213.87:554/playlists/bollywood-action_qcif.hpl.3gp");
 //				uri = Uri.parse("http://59.162.166.211:8080/player/3G_H264_320x240_600kbps.3gp");
@@ -1840,8 +1853,10 @@ private void playVideoFile(CardDownloadData mDownloadData){
 				e.printStackTrace();
 			}	
 		}
-		if(!lastWatchedStatus)
+		if(!lastWatchedStatus){
 			myplexapplication.getUserProfileInstance().lastVisitedCardData.add(mData);
+			lastWatchedStatus = true;
+		}
 		Util.showAdultToast(mContext.getString(R.string.adultwarning), mData, mContext);
 		Uri uri ;	
 		uri = Uri.parse(url);
