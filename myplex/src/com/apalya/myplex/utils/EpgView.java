@@ -311,7 +311,7 @@ public class EpgView implements ProgrammActionListener{
 											EpgContent content = epgContents.get(position1);
 											Intent alarmintent = new Intent(mContext, ReminderReceiver.class);
 											alarmintent.putExtra("title",content.Name);
-											alarmintent.putExtra("note","The programm is scheduled at "+getTime(getDate(content.StartTime)));
+											alarmintent.putExtra("note", "Starting at "+getTime(getDate(content.StartTime))+ " on " + mData.generalInfo.title );
 											alarmintent.putExtra("_id",mData._id);
 											 
 											PendingIntent sender = PendingIntent.getBroadcast(mContext, 0,
