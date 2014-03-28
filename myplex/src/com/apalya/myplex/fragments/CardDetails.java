@@ -329,7 +329,7 @@ public class CardDetails extends BaseFragment implements
 	public void onResume() {
 		super.onResume();
 		if(mMainActivity == null){
-			return null;
+			return;
 		}
 		updatePlayerLogVisiblity();
 		if (myplexapplication.getCardExplorerData().cardDataToSubscribe != null && mCardData != null && mCardData._id != null) {
