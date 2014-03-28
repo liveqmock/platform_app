@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="theme_app_color">#54B5E9</color>
+    <color name="theme_list_selector">#54B5E9</color>
+    <color name="theme_text_selector">#6CBEE9</color>
+
+    <string name="theme_text_signin">sign into myplex</string>
+    <string name="theme_text_signup">join myplex</string>
+    <string name="theme_text_browseasguest">browse as guest</string>
+    <string name="theme_text_resetpass">Reset myplex password</string>
+	<string name="theme_actionbar_default_title">myplex home</string>
+</resources>

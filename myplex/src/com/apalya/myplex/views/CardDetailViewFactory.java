@@ -12,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -23,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.apalya.myplex.R;
+
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDataCertifiedRatingsItem;
 import com.apalya.myplex.data.CardDataCommentsItem;
@@ -121,6 +124,8 @@ public class CardDetailViewFactory {
 	public static final int CARDDETAIL_EXTRA_RELATED_MULTIMEDIA = 10;
 	public static final int CARDDETAIL_COMMENTS = 11;
 	public static final int CARDDETAIL_BRIEF_COMMENTS = 12;
+	public static final int CARDDETAIL_WEBVIEW = 13;
+	
 	public View CreateView(CardData data, int type) {
 		mData = data;
 		switch (type) {
@@ -158,6 +163,8 @@ public class CardDetailViewFactory {
 			return null;	
 			}
 			return createCommentsView();
+		case CARDDETAIL_WEBVIEW:
+			return createWebView();
 		default:
 			break;
 		}
@@ -322,13 +329,13 @@ public class CardDetailViewFactory {
 		});
 		
 		commentImage.setImageResource(R.drawable.card_iconcommentblue);
-		commentHeading.setTextColor(Color.parseColor("#6CBEE9"));
+		commentHeading.setTextColor(mContext.getResources().getColor(R.color.theme_text_selector));
 		commentLayout.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View arg0) {
 				commentImage.setImageResource(R.drawable.card_iconcommentblue);
-				commentHeading.setTextColor(Color.parseColor("#6CBEE9"));
+				commentHeading.setTextColor(mContext.getResources().getColor(R.color.theme_text_selector));
 				reviewImage.setImageResource(R.drawable.card_iconuser);
 				reviewHeading.setTextColor(Color.parseColor("#000000"));
 				editBox.setText(R.string.carddetailcommentsection_editcomment);
@@ -348,7 +355,7 @@ public class CardDetailViewFactory {
 				commentImage.setImageResource(R.drawable.card_iconcomment);
 				commentHeading.setTextColor(Color.parseColor("#000000"));
 				reviewImage.setImageResource(R.drawable.card_iconuserblue);
-				reviewHeading.setTextColor(Color.parseColor("#6CBEE9"));
+				reviewHeading.setTextColor(mContext.getResources().getColor(R.color.theme_text_selector));
 				editBox.setText(R.string.carddetailcommentsection_editreview);
 //				editBox.setOnClickListener(mRateListener);
 //				fillCommentSectionData(COMMENTSECTION_REVIEW,mData);
@@ -1045,6 +1052,9 @@ public class CardDetailViewFactory {
 					
 				}	
 			}
+			if(mData.promoText != null){
+				packageButton.setText(packageButton.getText().toString()+" (" + mData.promoText + ")");
+			}
 		}
 		if(mData._id.equalsIgnoreCase("0")){
 			packageButton.setVisibility(View.GONE);
@@ -1139,5 +1149,27 @@ public class CardDetailViewFactory {
 		return returnValue;
 	}
 	
+	private View createWebView() {
+		
+		if(mData.generalInfo == null ){
+			return null;
+		}
+		
+		View v = mInflator.inflate(R.layout.carddetails_webview, null);
+		
+		WebView webView = (WebView) v.findViewById(R.id.webview);
+		
+		String url = "http://touch.fifa.com/u17womensworldcup/matches/index.html";
+		
+		webView.setVerticalScrollBarEnabled(false);
+		webView.setHorizontalScrollBarEnabled(false);	
+		WebSettings webSettings = webView.getSettings();
+//		webSettings.setJavaScriptEnabled(true);
+		webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+		webSettings.setLoadsImagesAutomatically(true);
+		webView.loadUrl(url);
+		
+		return v;
+	}
 	
 }

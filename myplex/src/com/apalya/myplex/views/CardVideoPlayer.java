@@ -55,6 +55,7 @@ import com.apalya.myplex.data.CardDataRelatedMultimediaItem;
 import com.apalya.myplex.data.CardDataVideosItem;
 import com.apalya.myplex.data.CardDownloadData;
 import com.apalya.myplex.data.MatchStatus;
+import com.apalya.myplex.data.MatchStatus.MATCH_TYPE;
 import com.apalya.myplex.data.Team;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.media.PlayerListener;
@@ -193,7 +194,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		
 		mTrailerButton.setVisibility(mTrailerAvailable == true ? View.VISIBLE : View.GONE);
 		
-//        initSportsStatusLayout(v);
+        initSportsStatusLayout(v);
 		int[] location = new int[2];
 		mTrailerButton.getLocationOnScreen(location);
 		if(location.length >0)
@@ -292,6 +293,14 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		mVideoView.setVisibility(View.VISIBLE);			
 		mPreviewImage.setVisibility(View.INVISIBLE);			
 
+		if(mScoreCardLayout != null){
+			mScoreCardLayout.setVisibility(View.INVISIBLE);
+		}
+		
+		if(sportsStatusRefresh !=null){
+			sportsStatusRefresh.stop();
+		}
+		
 		if(checkForLocalPlayback()){
 			return;
 		}
@@ -303,7 +312,16 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		else{			
 			utility = new MediaUtility(mContext,this,true);			
 			utility.fetchVideoUrl(id);			
-		}			
+		}	
+		
+		for(CardData data:myplexapplication.getUserProfileInstance().lastVisitedCardData)
+		{
+			if(data._id.equalsIgnoreCase(mData._id))
+			{
+				lastWatchedStatus=true;
+				
+			}
+		}
 	}			
 	        			
         
@@ -364,18 +382,25 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		public void onClick(View v) {
 			
 			//This event is handled in CardDEtails
-			if(canBePlayed(true)){
-				isTriler = false;
-				//FetchUrl();
-				 fetchUrl(null);
-				mVideoViewParent.setOnClickListener(null);
-				Analytics.startVideoTime();
-				Analytics.gaPlayedMovieEvent(mData, 0);
-			}
+			playContent();
 			// TODO Auto-generated method stub
 
 		}
 	};
+	
+	public void playContent(){
+		
+		if(canBePlayed(true)){
+			
+			isTriler = false;
+			//FetchUrl();
+			 fetchUrl(null);
+			mVideoViewParent.setOnClickListener(null);
+			Analytics.startVideoTime();
+			Analytics.gaPlayedMovieEvent(mData, 0);
+		}
+		
+	}
 	private boolean lastWatchedStatus = false;
 	
 
@@ -520,8 +545,10 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 						e.printStackTrace();
 					}	
 				}
-				if(!lastWatchedStatus)
+				if(!lastWatchedStatus){
 					myplexapplication.getUserProfileInstance().lastVisitedCardData.add(mData);
+					lastWatchedStatus = true;
+				}
 				Util.showAdultToast(mContext.getString(R.string.adultwarning), mData, mContext);
 				Uri uri ;
 //				uri = Uri.parse("rtsp://46.249.213.87:554/playlists/bollywood-action_qcif.hpl.3gp");
@@ -856,8 +883,10 @@ private void playVideoFile(CardDownloadData mDownloadData){
 					Util.showToast(mContext, "No url to play.",Util.TOAST_TYPE_ERROR);
 					return;
 				}
-				if(!lastWatchedStatus)
+				if(!lastWatchedStatus){
 					myplexapplication.getUserProfileInstance().lastVisitedCardData.add(mData);
+					lastWatchedStatus = true;
+				}
 				Uri uri ;
 //				uri = Uri.parse("rtsp://46.249.213.87:554/playlists/bollywood-action_qcif.hpl.3gp");
 //				uri = Uri.parse("http://59.162.166.211:8080/player/3G_H264_320x240_600kbps.3gp");
@@ -943,7 +972,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		mTrailerButton.setVisibility(mTrailerAvailable == true ? View.VISIBLE : View.GONE);
 		recordedProgName = (TextView)v.findViewById(R.id.recordedProgName);
 		
-//		initSportsStatusLayout(v);
+		initSportsStatusLayout(v);
 		mTrailerButton.setOnClickListener(new OnClickListener() {
 			
 			@Override
@@ -1456,7 +1485,29 @@ private void playVideoFile(CardDownloadData mDownloadData){
 							"alpha", 0f, 1f);
 					fadeAnim2.setDuration(800);
 					fadeAnim2.start();
-															
+					
+					if(matchStatus.matchType == MATCH_TYPE.FIFA){
+						
+						Team team1= matchStatus.teams.get(0);
+						Team team2= matchStatus.teams.get(1);
+						
+						
+						if(team1.validate() && team2.validate()){
+
+							String text = "("+team1.score+") "+ team1.sname + " " + "vs"							
+									+" "+team2.sname + " ("+team2.score+")";
+							textView1.setText(text);
+						}
+						
+						if(!TextUtils.isEmpty(matchStatus.statusDescription)){
+							textView2.setVisibility(View.VISIBLE);
+							textView2.setText(matchStatus.statusDescription);	
+							textView2.setSelected(true);
+						}
+						
+						return;
+					}
+					
 					if(!TextUtils.equals(MatchStatus.STATUS_LIVE, matchStatus.status) || 
 							matchStatus.teams == null || 
 							matchStatus.teams.isEmpty()){
@@ -1533,6 +1584,10 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			chooseLiveStreamType(items,false);			
 		}else if(videoType.equalsIgnoreCase(ConsumerApi.TYPE_TV_EPISODE)){
 			chooseStreamOrDownload(items);
+		}else if(videoType.equalsIgnoreCase(ConsumerApi.CONTENT_SPORTS_LIVE)){
+			chooseLiveStreamType(items,false);	
+		}else if(videoType.equalsIgnoreCase(ConsumerApi.CONTENT_SPORTS_VOD)){
+			chooseLiveStreamType(items,true);	
 		}
 		
 	}
@@ -1798,8 +1853,10 @@ private void playVideoFile(CardDownloadData mDownloadData){
 				e.printStackTrace();
 			}	
 		}
-		if(!lastWatchedStatus)
+		if(!lastWatchedStatus){
 			myplexapplication.getUserProfileInstance().lastVisitedCardData.add(mData);
+			lastWatchedStatus = true;
+		}
 		Util.showAdultToast(mContext.getString(R.string.adultwarning), mData, mContext);
 		Uri uri ;	
 		uri = Uri.parse(url);

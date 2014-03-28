@@ -69,6 +69,7 @@
     <string name="ratingmessageheading">add a movie review </string>
     <string name="ratingmessagehint">add a review</string>
     <string name="commentpopupheading">add a comment</string>
+     <string name="comment_ok_adding">adding..</string>
     <string name="commentpopuphint">add a comment</string>
     <string name="feedbackheading">rate myplex </string>
     <string name="feedbackmessageheading">share your experience </string>
@@ -142,7 +143,7 @@
     <string name="iconcricket">&#x26BE;</string>
     <string name="icontv">&#x1F4FA;</string>
     <string name="iconshare">&#xF601;</string>
-    <string name="record_play">&#x25B6;</string>
+    <string name="record_play">&#x25B6;</string>   
     <!--Navigation drawer icons-->
 
 	<string name="reminder_icon">&#x23F0;</string>
@@ -265,5 +266,14 @@
     <string name="_id">_id</string>
     <string name="notification_type">message_type</string>
     <string name="notification_msg">message</string>
+    <string name="notification_action">action</string>
+    <string name="notification_action_autoplay">autoplay</string>
+    <string name="notification_promo">promo</string>
     
+    <!--FIFA related strings  -->
+    <string name="iconsoccer">&#x26BD;</string>
+    <string name="iconlivesoccer">&#x1F3C3;</string>
+    <string name="iconmatch">&#x2691;</string>
+    <string name="fifa_live">Fifa Live</string>
+    <string name="fifa_matches">Fifa Matches</string>
 </resources>

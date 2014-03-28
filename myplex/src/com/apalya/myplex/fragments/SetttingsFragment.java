@@ -65,6 +65,9 @@ public class SetttingsFragment extends BaseFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		if(mMainActivity == null){
+			return null;
+		}
 		mRootView = inflater.inflate(R.layout.settingslayout, container, false);
 		mSettingsListView = (PinnedSectionListView) mRootView
 				.findViewById(R.id.settings_list);		
@@ -192,7 +195,7 @@ public class SetttingsFragment extends BaseFragment {
 			
 		}
 		String version= Util.getAppVersionName(mContext);
-		mSettingsList.add(new SettingsData(SettingsData.SECTION, "myplex"+ " "+version, 0,SettingsData.VIEWTYPE_NORMAL));
+		mSettingsList.add(new SettingsData(SettingsData.SECTION, mContext.getString(R.string.app_name) + " "+version, 0,SettingsData.VIEWTYPE_NORMAL));
 		mSettingsList.add(new SettingsData(SettingsData.ITEM, FEEDBACK, 0,SettingsData.VIEWTYPE_NORMAL));
 		mSettingsList.add(new SettingsData(SettingsData.ITEM, TANDC, 0,SettingsData.VIEWTYPE_NORMAL));
 		mSettingsList.add(new SettingsData(SettingsData.ITEM, PRIVACYPOLIY, 0,SettingsData.VIEWTYPE_NORMAL));

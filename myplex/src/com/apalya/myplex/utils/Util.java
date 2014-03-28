@@ -82,6 +82,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.DefaultRetryPolicy;
+import com.android.volley.Request;
 import com.android.volley.Request.Method;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -99,6 +101,7 @@ import com.apalya.myplex.data.ApplicationConfig;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDownloadData;
 import com.apalya.myplex.data.CardDownloadedDataList;
+import com.apalya.myplex.data.CardExplorerData;
 import com.apalya.myplex.data.FetchDownloadData;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.tablet.MultiPaneActivity;
@@ -1282,5 +1285,71 @@ public class Util {
         public void onKeyRenewed();
         public void onKeyRenewFailed(String message);
     }
+	
+	public static boolean isExpiredResponseAllowed(Request<?> request) {
+
+		if (request == null || request.getUrl() == null)
+			return false;
+
+		if (request.getUrl().contains(ConsumerApi.CONTENTLIST)
+				|| request.getUrl()
+						.contains(ConsumerApi.RECOMMENDATIONS_ACTION)) {
+			return true;
+		}
+
+		return false;
+	}
+
+	public static DefaultRetryPolicy getRetryPolicy(int req_type,
+			Context context) {
+
+		int timeout = 15;
+
+		ConnectivityManager manager = (ConnectivityManager) context
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
+		NetworkInfo active_network = manager.getActiveNetworkInfo();
+
+		if (active_network != null) {
+
+			switch (active_network.getType()) {
+
+			case ConnectivityManager.TYPE_WIFI:
+				timeout = 7;
+				break;
+			case ConnectivityManager.TYPE_MOBILE:
+
+				if (active_network.getSubtype() > TelephonyManager.NETWORK_TYPE_EDGE) {
+					timeout = 10;
+				}
+
+				switch (active_network.getSubtype()) {
+				
+				case TelephonyManager.NETWORK_TYPE_GPRS:
+
+				case TelephonyManager.NETWORK_TYPE_EDGE:
+
+					timeout = 15;
+					break;
+
+				}
+			}
+		}
+
+		DefaultRetryPolicy defaultRetryPolicy = new DefaultRetryPolicy();
+
+		switch (req_type) {
+
+		case CardExplorerData.REQUEST_BROWSE:
+		case CardExplorerData.REQUEST_RECOMMENDATION:
+			defaultRetryPolicy = new DefaultRetryPolicy(timeout * 1000, 2, 1f);
+			break;
+
+		default:
+			break;
+		}
+
+		return defaultRetryPolicy;
+	}
 
 }
+

@@ -223,7 +223,7 @@
                 android:layout_marginRight="@dimen/margin_gap_24"
                 android:layout_marginTop="32dp"
                 android:background="@drawable/buttonbackground"
-                android:text="@string/signup"
+                android:text="@string/theme_text_signup"
                 android:textColor="#464B55"
                 android:typeface="sans" />
 

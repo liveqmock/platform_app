@@ -1,5 +1,7 @@
 package com.apalya.myplex.utils;
 
+import com.apalya.myplex.R;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -20,7 +22,7 @@ public class AlertDialogUtil{
    public static void showAlert(Context mContext,String aMsg, String aOption1, String aOption2,NoticeDialogListener listener){
 	   mListener=listener;
 	   AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-       builder.setTitle("myplex");
+       builder.setTitle(mContext.getString(R.string.app_name));
        builder.setMessage(aMsg);
        builder.setNegativeButton(aOption1, new DialogInterface.OnClickListener() {
 

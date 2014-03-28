@@ -117,8 +117,9 @@
         android:layout_marginTop="12dp"
         android:background="@drawable/carddetailbutton_bg"
         android:paddingRight="4dp"
-        android:textColor="#54b5e9"
-        android:textSize="15sp" />
+        android:textColor="@color/theme_app_color"
+        android:textSize="15sp" 
+        android:lines="1"/>
     
 
     <TextView

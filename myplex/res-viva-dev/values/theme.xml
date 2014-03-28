@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="theme_app_color">#C8101A</color>
+    <color name="theme_list_selector">#C8101A</color>
+    <color name="theme_text_selector">#C8101A</color>
+    
+    <string name="theme_text_signin">Sign into Viva</string>
+    <string name="theme_text_signup">Join Viva</string>
+    <string name="theme_text_browseasguest">browse as guest</string>
+    <string name="theme_text_resetpass">reset Viva password</string>
+    <string name="theme_actionbar_default_title">FIFA</string>
+</resources>

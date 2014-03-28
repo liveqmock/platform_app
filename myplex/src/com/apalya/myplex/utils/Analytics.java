@@ -201,7 +201,7 @@ public class Analytics {
 	public static String TRAILER_DATA_RATE = "data rate";
 	
 	public static String EVENT_PLAY = "played";
-//	public static String EVENT_PLAYED_TRAILER = "played trailer";
+	public static String EVENT_PLAYED_TRAILER = "played trailer";
 	public static String EVENT_PLAYED_TV_CHANNEL = "played tv channel";
 	public static String EVENT_PLAYED_TV_SHOW = "played tv show";
 	public static String TRAILER = "trailer";
@@ -615,7 +615,7 @@ public class Analytics {
 		if(Analytics.isTrailer)  {
 			String bitrate = SharedPrefUtils.getFromSharedPreference(myplexapplication.getAppContext(), Analytics.TRAILER_BITRATE+mCardData.generalInfo._id);
 			params.put(Analytics.TRAILER_DATA_RATE, bitrate);
-			event = Analytics.CATEGORY_TRAILER;
+			event = Analytics.EVENT_PLAYED_TRAILER;
 			mMixPanel.getPeople().increment(Analytics.PEOPLE_TRAILERS_PLAYED,getTotalPlayedTimeInMinutes());
 			Analytics.trackEvent(event,params);	
 			Analytics.isTrailer = false;

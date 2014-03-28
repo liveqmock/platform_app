@@ -38,6 +38,7 @@ public class CardData implements Serializable{
 	public CardDownloadData downloadData;
 	public MatchInfo matchInfo;
 	public List<CardData> chields;
+	public String promoText;
 	public CardData(){
 		
 	}

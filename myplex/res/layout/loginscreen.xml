@@ -46,7 +46,7 @@
             android:paddingLeft="@dimen/margin_gap_16"
             android:paddingRight="@dimen/margin_gap_16"
             android:paddingTop="@dimen/margin_gap_12"
-            android:text="@string/letme"
+            android:text="@string/theme_text_browseasguest"
             android:textColor="#9f9f9f"
             android:textSize="@dimen/textsize_14" />
 
@@ -67,7 +67,7 @@
             android:paddingBottom="6dp"
             android:paddingRight="32dp"
             android:paddingTop="6dp"
-            android:text="sign into myplex"
+            android:text="@string/theme_text_signin"
             android:textColor="#9f9f9f" />
 
         <TextView
@@ -79,7 +79,7 @@
             android:paddingBottom="6dp"
             android:paddingLeft="32dp"
             android:paddingTop="6dp"
-            android:text="@string/signup"
+            android:text="@string/theme_text_signup"
             android:textColor="#9f9f9f" />
 
         <LinearLayout

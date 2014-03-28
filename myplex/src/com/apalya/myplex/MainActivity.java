@@ -36,6 +36,7 @@ import android.os.Looper;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -130,6 +131,10 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 	@Override
 	protected void onStop() {
 		// TODO Auto-generated method stub
+		Log.d(TAG,"onStop");
+		if(mCacheManager != null){
+			mCacheManager.deRegistration();
+		}
 		super.onStop();
 	}
 	
@@ -223,10 +228,59 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
         mNavigationAdapter.setLoginStatus(mIsUserLoggedIn);
 	}
 
+	private void fillSportsMenuItem() {
+
+		
+		String email = myplexapplication.getUserProfileInstance().getUserEmail();
+	    if(email.equalsIgnoreCase("NA") || email.equalsIgnoreCase(""))
+	    {
+	            mIsUserLoggedIn = false;
+	    }
+	            
+	    mMenuItemList.add(new NavigationOptionsMenu(myplexapplication.getUserProfileInstance().getName(),
+	                    R.drawable.menu_profile, myplexapplication.getUserProfileInstance().getProfilePic(),NavigationOptionsMenuAdapter.CARDDETAILS_ACTION,R.layout.navigation_menuitemlarge));
+	    
+	    int screenType = NavigationOptionsMenuAdapter.NOFOCUS_ACTION;
+	    if(mIsUserLoggedIn)
+	    {
+	            screenType = NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION;
+	    }	   
+	    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FIFA_LIVE,R.string.iconsoccer,
+	    		null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+	    
+	    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FIFA_MATCHES,R.string.iconmatch,
+	    		null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+	    
+	    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGO,
+	    		R.string.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
+
+	    
+	    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FAVOURITE,R.string.iconfav, null, screenType,R.layout.navigation_menuitemsmall));
+	    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.PURCHASES,R.string.iconpurchases, null,screenType,R.layout.navigation_menuitemsmall));
+//	    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.DOWNLOADS,R.string.icondnload, null, screenType,R.layout.navigation_menuitemsmall));
+	    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.DISCOVER,R.string.icondiscover, null, NavigationOptionsMenuAdapter.SEARCH_ACTION,R.layout.navigation_menuitemsmall));
+	    
+	    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGO,R.string.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
+	    
+	    
+	    Session fbSession=Session.getActiveSession();
+	    if(fbSession!=null && fbSession.isOpened())
+	            mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.INVITEFRIENDS,R.string.iconfriends, null, NavigationOptionsMenuAdapter.INVITE_ACTION,R.layout.navigation_menuitemsmall));
+	    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.SETTINGS,R.string.iconsettings, null, NavigationOptionsMenuAdapter.SETTINGS_ACTION,R.layout.navigation_menuitemsmall));
+	    if(mIsUserLoggedIn)
+	            mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGOUT,R.string.iconlogout, null, NavigationOptionsMenuAdapter.LOGOUT_ACTION,R.layout.navigation_menuitemsmall));
+	    else
+	            mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGIN,R.string.iconlogout, null, NavigationOptionsMenuAdapter.LOGOUT_ACTION,R.layout.navigation_menuitemsmall));
+//	    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.TVSHOWS,R.drawable.icontv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+	    mNavigationAdapter.setMenuList(mMenuItemList);
+	    mNavigationAdapter.setLoginStatus(mIsUserLoggedIn);
+	    
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
 //		getWindow().requestFeature(Window.FEATURE_ACTION_BAR_OVERLAY);
 		mContext = this;
 		Util.prepareDisplayinfo(this);
@@ -257,6 +311,8 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		mNavigationAdapter = new NavigationOptionsMenuAdapter(this);
 		if(ApplicationSettings.MODE_APP_TYPE == APP_TYPE.OFFLINE)
 			fillMenuItemOffline();
+		else if(ApplicationSettings.MODE_APP_TYPE == APP_TYPE.FIFA)
+			fillSportsMenuItem();
 		else
 			fillMenuItem();
 		mDrawerList.setAdapter(mNavigationAdapter);
@@ -308,6 +364,8 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		if(!onHandleExternalIntent(getIntent())){
 			if(ApplicationSettings.MODE_APP_TYPE == APP_TYPE.OFFLINE )
 				selectItem(2);
+			else if(ApplicationSettings.MODE_APP_TYPE == APP_TYPE.FIFA )
+				selectItem(1);
 			else
 				selectItem(1);
 		}
@@ -332,14 +390,18 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		
 		Analytics.mixPanelNotificationReceived(mContext, getIntent());
 		
-		if(getIntent().hasExtra(mContext.getString(R.string._id))){
-			showActionBarProgressBar();
+		if(getIntent().hasExtra(mContext.getString(R.string._id))){			
+			showActionBarProgressBar();			
 			_id = getIntent().getExtras().getString(mContext.getString(R.string._id));
+			
 			List<CardData> cards  =  new ArrayList<CardData>();
 			CardData cardData  = new CardData();
 			cardData._id = _id;
 			cards.add(cardData);
 			if(_id!=null && _id.length() >0){
+				final String action = getIntent().getExtras().getString(mContext.getString(R.string.notification_action));
+				final String promoText = getIntent().getExtras().getString(mContext.getString(R.string.notification_promo));
+				
 				mCacheManager.getCardDetails(cards, IndexHandler.OperationType.FTSEARCH, new CacheManagerCallback() {					
 					@Override
 					public void OnOnlineResults(List<CardData> dataList) {
@@ -347,7 +409,17 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 							if(cardData._id.equalsIgnoreCase(_id)){
 								mCacheManager.unRegisterCallback();
 								hideActionBarProgressBar();
+								if(mCurrentFragment != null || isFinishing()) {return;}
 								BaseFragment fragment = createFragment(NavigationOptionsMenuAdapter.CARDDETAILS_ACTION);
+								
+								if(ConnectivityReceiver.isConnected &&
+										action != null && action.equalsIgnoreCase(mContext.getString(R.string.notification_action_autoplay))){
+									((CardDetails)fragment).setAutoPlay(true);
+								}
+								
+								if(!TextUtils.isEmpty(promoText)){
+									cardData.promoText=promoText;
+								}
 								fragment.setMainActivity(MainActivity.this);
 								fragment.setDataObject(cardData);
 								bringFragment(fragment);
@@ -381,8 +453,21 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 						}
 						    
 						hideActionBarProgressBar();
-						mCacheManager.unRegisterCallback();
+						mCacheManager.unRegisterCallback();					
+						Log.d(TAG,"OnCacheResults for _id intent");
+						if(mCurrentFragment != null || isFinishing()) {return;}
 						BaseFragment fragment = createFragment(NavigationOptionsMenuAdapter.CARDDETAILS_ACTION);
+						
+						if(ConnectivityReceiver.isConnected &&
+								action != null && action.equalsIgnoreCase(mContext.getString(R.string.notification_action_autoplay))){
+							
+							((CardDetails)fragment).setAutoPlay(true);
+						}
+						
+						if(!TextUtils.isEmpty(promoText)){
+							data.promoText=promoText;
+						}
+						
 						fragment.setDataObject(data);
 						bringFragment(fragment);
 					}
@@ -895,6 +980,18 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 				setActionBarTitle(NavigationOptionsMenuAdapter.SPORTS);
 				setSearchviewHint("search live tv");
 			}*/
+			else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.FIFA_LIVE)){
+				data.requestType = CardExplorerData.REQUEST_RECOMMENDATION;
+				setActionBarTitle(NavigationOptionsMenuAdapter.FIFA_LIVE);
+				setSearchviewHint("search");
+			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.FIFA_MATCHES)){
+				removeLiveTvActionBarIcon();
+				data.requestType = CardExplorerData.REQUEST_BROWSE;
+				data.searchQuery =ConsumerApi.CONTENT_SPORTS_LIVE+","+ConsumerApi.CONTENT_SPORTS_VOD;
+				data.searchScope = "sportsEvent";
+				setActionBarTitle(NavigationOptionsMenuAdapter.FIFA_MATCHES);
+				setSearchviewHint("search");
+			}
 			else
 			{
 				setActionBarTitle("myplex");
@@ -937,7 +1034,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 	}
 
 	private void pushFragment() {
-		addFilterData(new ArrayList<FilterMenudata>(), null);
+		addFilterData(new ArrayList<FilterMenudata>(), null);		
 		mFragmentStack.push(mCurrentFragment);
 		mCurrentFragment.setContext(this);
 		mCurrentFragment.setActionBar(getActionBar());
@@ -1250,7 +1347,8 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 				findViewById(R.id.customactionbar_drawer).setVisibility(View.INVISIBLE);
 				findViewById(R.id.customactionbar_filter).setVisibility(View.INVISIBLE);
 				findViewById(R.id.customactionbar_back).setVisibility(View.VISIBLE);
-				mSearchSuggestionFrag = new SearchSuggestions(mContext);
+				mSearchSuggestionFrag = new SearchSuggestions();
+				mSearchSuggestionFrag.setContext(mContext);
 				overlayFragment(mSearchSuggestionFrag);
 			}
 		});

@@ -133,6 +133,8 @@ public class CardDetails extends BaseFragment implements
 	private NumberPicker seasonPicker,episodePicker;
 	private LinearLayout mTvShowLinear;
 
+	private boolean mAutoPlay = false;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -146,7 +148,12 @@ public class CardDetails extends BaseFragment implements
 			mCardData = (CardData) mDataObject;
 			Log.d(TAG, "content ID =" + mCardData._id);
 		}		
-			
+		
+		
+		if(mMainActivity == null){
+			return null;
+		}
+		
 		mMainActivity.setOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		mInflater = LayoutInflater.from(getContext());
 		rootView = inflater.inflate(R.layout.carddetails, container, false);
@@ -192,13 +199,14 @@ public class CardDetails extends BaseFragment implements
 		if (mCardData.generalInfo != null) {
 			mMainActivity.setActionBarTitle(mCardData.generalInfo.title.toLowerCase());
 		}
-		prepareContent();
+		
 		if(mCardData.generalInfo.type != null && mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
 			createEPGView(rootView);
 		}else{
 			if(mEPGLayout!=null)
 				mEPGLayout.setVisibility(View.GONE);
-		}		
+		}	
+		prepareContent();
 		if( mCardData.generalInfo.type != null && mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_SERIES)){
 			childSubList.removeAll(childSubList);
 			helper  = new SeasonFetchHelper(mCardData,new TvShowManager());
@@ -320,6 +328,9 @@ public class CardDetails extends BaseFragment implements
 	@Override
 	public void onResume() {
 		super.onResume();
+		if(mMainActivity == null){
+			return;
+		}
 		updatePlayerLogVisiblity();
 		if (myplexapplication.getCardExplorerData().cardDataToSubscribe != null && mCardData != null && mCardData._id != null) {
 			if(myplexapplication.getCardExplorerData().cardDataToSubscribe._id.equalsIgnoreCase(mCardData._id))
@@ -333,7 +344,9 @@ public class CardDetails extends BaseFragment implements
 				mCardDetailViewFactory.UpdateSubscriptionStatus(mSeasonData);
 		}
 		checkForSurvey();
-		
+		if(mAutoPlay && mPlayer != null){
+			mPlayer.playContent();
+		}
 	}
 	
 	private void checkForSurvey(){
@@ -402,7 +415,7 @@ public class CardDetails extends BaseFragment implements
 		// mParentContentLayout.addView(gap);
 	}
 
-	private void fillData() {
+	private void fillData() {	
 		mDescriptionExpanded = false;
 
 		mPlayerLogsLayout = new LinearLayout(getContext());
@@ -888,6 +901,9 @@ public class CardDetails extends BaseFragment implements
 	}
 	
 	private void updatePlayerLogVisiblity() {
+		if(mPlayerLogsLayout == null){
+			return;
+		}
 		if (myplexapplication.getApplicationSettings().showPlayerLogs) {
 			mPlayerLogsLayout.setVisibility(View.VISIBLE);
 		} else {
@@ -1119,6 +1135,10 @@ public class CardDetails extends BaseFragment implements
 			np.setDisplayedValues(seasonValues);
 			
 		}
+	}
+	
+	public void setAutoPlay(boolean mAutoPlay) {
+		this.mAutoPlay = mAutoPlay;
 	}
 	
 }
