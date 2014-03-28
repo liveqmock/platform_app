@@ -328,6 +328,9 @@ public class CardDetails extends BaseFragment implements
 	@Override
 	public void onResume() {
 		super.onResume();
+		if(mMainActivity == null){
+			return null;
+		}
 		updatePlayerLogVisiblity();
 		if (myplexapplication.getCardExplorerData().cardDataToSubscribe != null && mCardData != null && mCardData._id != null) {
 			if(myplexapplication.getCardExplorerData().cardDataToSubscribe._id.equalsIgnoreCase(mCardData._id))
@@ -898,6 +901,9 @@ public class CardDetails extends BaseFragment implements
 	}
 	
 	private void updatePlayerLogVisiblity() {
+		if(mPlayerLogsLayout == null){
+			return;
+		}
 		if (myplexapplication.getApplicationSettings().showPlayerLogs) {
 			mPlayerLogsLayout.setVisibility(View.VISIBLE);
 		} else {
