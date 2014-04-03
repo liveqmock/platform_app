@@ -251,6 +251,8 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 	    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FIFA_MATCHES,R.string.iconmatch,
 	    		null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 	    
+	    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LIVETV,R.string.iconlivetv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+	    
 	    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGO,
 	    		R.string.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
 

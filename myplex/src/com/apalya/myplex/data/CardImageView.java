@@ -1,8 +1,11 @@
 package com.apalya.myplex.data;
 
+import com.android.volley.toolbox.NetworkImageView;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.ImageView;
 
 public class CardImageView extends ImageView{
@@ -27,6 +30,13 @@ public class CardImageView extends ImageView{
 	public CardImageView(Context context) {
 		super(context);
 		// TODO Auto-generated constructor stub
+	}
+	
+	@Override
+	protected void onDetachedFromWindow() {		
+//		setImageBitmap(null);
+//		setImageDrawable(null);
+		super.onDetachedFromWindow();
 	}
 
 }
