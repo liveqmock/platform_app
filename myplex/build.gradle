@@ -38,11 +38,11 @@ android {
     }
 	
 	 signingConfigs {
-       myplex{
-           storeFile file("F:\\Samir\\Android\\cert\\myplexv2\\d2c_android.keystore")
-           storePassword "pass"
-           keyAlias "d2capp"
-           keyPassword "pass"
+       myplex{       	  
+           storeFile file("$System.env.BUILD_KEYSTORE_PATH")
+           storePassword "$System.env.BUILD_KEYSTORE_PASS"
+           keyAlias "$System.env.BUILD_KEY_ALIAS"
+           keyPassword "$System.env.BUILD_KEY_PASS"
        }
     }	
 
