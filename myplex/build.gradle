@@ -76,7 +76,7 @@ android {
 			println "build :delete file : ${buildDir}/../res/values/config.xml"
 			delete '${buildDir}/../res/values/config.xml'
 			delete '${buildDir}/../res/values/theme.xml'
-            packageName "com.apalya.vivadev"
+            packageName "com.apalya.myplex.riodev"
             signingConfig signingConfigs.myplex
         }        
     }
