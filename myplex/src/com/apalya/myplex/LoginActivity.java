@@ -586,7 +586,17 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		// is important to call flush() to send any unsent events
 		// before your application is taken out of memory.		
 		mMixpanel.flush();
+		releaseMemory();
 	}
+	
+	private void releaseMemory(){
+		ImageView imageView = (ImageView)findViewById(R.id.imageView1);
+		if(imageView != null){
+			imageView.setImageBitmap(null);
+			imageView.setImageDrawable(null);
+		}
+	}
+	
 	private void prepareSlideNotifiation() {
 		mSlideNotificationLayout = (RelativeLayout)findViewById(R.id.slidenotificationlayout);
 		mSlideNotificationText = (TextView)findViewById(R.id.slidenotificationtextview);
