@@ -818,8 +818,8 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		}
 	});
 	
-//	 int ellapseTime = SharedPrefUtils.getIntFromSharedPreference(mContext, mData._id);
-//		mVideoViewPlayer.setmPositionWhenPaused(ellapseTime *1000);	
+	int ellapseTime = SharedPrefUtils.getIntFromSharedPreference(mContext, mData._id);
+	mVideoViewPlayer.setmPositionWhenPaused(ellapseTime *1000);	
 }
 	private void FetchTrailerUrl(String contentId)
 	{
