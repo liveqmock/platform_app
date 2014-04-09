@@ -26,6 +26,7 @@ public class ConsumerApi {
 	public static final String FIELD_CURRENTUSERDATA = "user/currentdata";
 	public static final String FIELD_USERREVIEWS = "reviews/user";
 	public static final String FIELD_VIDEOS = "videos";
+	public static final String FIELD_CURRENTUSERDATA_PACKAGES = "user/currentdata,packages";
 	public static final String PAYMENTCHANNEL = "paymentChannel=";
 	public static final String PACKAGEID = "packageId=";
 	public static final String CONTENT_CONTEXT = "content/v2";
@@ -120,7 +121,9 @@ public class ConsumerApi {
 	public static final String TYPE_TV_SEASON= "tvseason";
 	public static final String TYPE_TV_EPISODE = "tvepisode";	
 	
-	public static final String  HEADER_RESPONSE_TYPE_CACHED="cache-hit";
+	public static final String  HEADER_RESPONSE_HTTP_SOURCE="http_source";
+	
+	
 	
 	public static String getSearch(String queryStr, String level,int startIndex, String searchType) {
 		if(queryStr == null||(queryStr != null && queryStr.length() ==0)){
@@ -128,8 +131,8 @@ public class ConsumerApi {
 		}
 		queryStr.replace(" ", "%20");
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH
-				+ SEARCH_ACTION + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY
-				+  AMPERSAND + QUERY + queryStr +  AMPERSAND + BROWSETYPE + searchType 
+				+ SEARCH_ACTION + SLASH + QUESTION_MARK /*+ CLIENTKEY + DEBUGCLIENTKEY
+				+  AMPERSAND*/ + QUERY + queryStr +  AMPERSAND + BROWSETYPE + searchType 
 				+ AMPERSAND + STARTINDEX
 				+ startIndex + AMPERSAND + LEVEL 
 				+ level + AMPERSAND+COUNT;
@@ -145,16 +148,17 @@ public class ConsumerApi {
 	
 	public static String getBrowse(String type, String level,int startIndex) {
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH
-				+ CONTENTLIST + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY
-				+  AMPERSAND + BROWSETYPE + type + AMPERSAND + STARTINDEX
+				+ CONTENTLIST + SLASH + QUESTION_MARK /*+ CLIENTKEY + DEBUGCLIENTKEY
+				+  AMPERSAND */+ BROWSETYPE + type + AMPERSAND + STARTINDEX
 				+ startIndex + AMPERSAND + LEVEL 
 				+ level + AMPERSAND+COUNT;
+
 	}
 	
 	public static String getRecommendation(String level,int startIndex) {
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH
-				+ RECOMMENDATIONS_ACTION + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY
-				+  AMPERSAND + BROWSETYPE + "movie" +  AMPERSAND + STARTINDEX
+				+ RECOMMENDATIONS_ACTION + SLASH + QUESTION_MARK /*+ CLIENTKEY + DEBUGCLIENTKEY
+				+  AMPERSAND*/ + BROWSETYPE + "movie" +  AMPERSAND + STARTINDEX
 				+ startIndex + AMPERSAND + LEVEL
 				+ level + AMPERSAND+COUNT;
 	}
@@ -169,15 +173,15 @@ public class ConsumerApi {
 	}
 	public static String getFavourites(String level,int startIndex) {
 		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH  
-				+ FAVORITELIST_ACTION + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY
-				+  AMPERSAND + STARTINDEX
+				+ FAVORITELIST_ACTION + SLASH + QUESTION_MARK /*+ CLIENTKEY + DEBUGCLIENTKEY
+				+  AMPERSAND */+ STARTINDEX
 				+ startIndex + AMPERSAND + LEVEL
 				+ level + AMPERSAND+COUNT;
 	}
 	public static String getPurchases(String level,int startIndex , String searchType) {
 		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH 
-				+ PURCHASEDLIST_ACTION + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY
-				+  AMPERSAND + STARTINDEX
+				+ PURCHASEDLIST_ACTION + SLASH + QUESTION_MARK /*+ CLIENTKEY + DEBUGCLIENTKEY
+				+  AMPERSAND */ + STARTINDEX
 				+ startIndex + AMPERSAND + LEVEL
 				+ level + AMPERSAND + COUNT ;//+ AMPERSAND ;// +  BROWSETYPE + searchType ;
 	}
@@ -198,8 +202,8 @@ public class ConsumerApi {
 //		        + LEVEL + level + AMPERSAND+COUNT;
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH + CONTENTDETAILS_ACTION
 				+ SLASH + contentID + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY  + AMPERSAND
-		        + AMPERSAND+COUNT + AMPERSAND 
-		        + "fields=user/currentdata,images,generalInfo,contents,comments,reviews/user,_id,relatedMedia,packages,relatedCast,dynamicMeta,_lastModifiedAt,_expiresAt" 
+		        + COUNT + AMPERSAND 
+		        + "fields=user/currentdata,images,generalInfo,contents,comments,reviews/user,_id,relatedMedia,packages,relatedCast,dynamicMeta,_lastModifiedAt,_expiresAt,matchInfo" 
 		        + AMPERSAND + IMAGE_COVERPOSTER_MDPI;
 	}
 	public static String getVideosDetail(String contentID){
