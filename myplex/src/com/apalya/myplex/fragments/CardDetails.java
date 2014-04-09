@@ -335,7 +335,12 @@ public class CardDetails extends BaseFragment implements
 
 	@Override
 	public void onResume() {
-		super.onResume();		
+
+		super.onResume();
+		if(mMainActivity == null){
+			return;
+		}
+
 		updatePlayerLogVisiblity();
 		if (myplexapplication.getCardExplorerData().cardDataToSubscribe != null && mCardData != null && mCardData._id != null) {
 			if(myplexapplication.getCardExplorerData().cardDataToSubscribe._id.equalsIgnoreCase(mCardData._id))
@@ -904,7 +909,12 @@ public class CardDetails extends BaseFragment implements
 		showAlbumDialog();
 	}
 	
-	private void updatePlayerLogVisiblity() {	
+
+	private void updatePlayerLogVisiblity() {
+		if(mPlayerLogsLayout == null){
+			return;
+		}
+
 		if (myplexapplication.getApplicationSettings().showPlayerLogs) {
 			mPlayerLogsLayout.setVisibility(View.VISIBLE);
 		} else {
@@ -1142,6 +1152,7 @@ public class CardDetails extends BaseFragment implements
 		this.mAutoPlay = mAutoPlay;
 	}
 	
+
 	private void updateCardData(){
 		FetchCardField fetch = new FetchCardField();
 		fetch.Fetch(mCardData, ConsumerApi.FIELD_CURRENTUSERDATA_PACKAGES, new FetchComplete() {
@@ -1177,3 +1188,4 @@ public class CardDetails extends BaseFragment implements
 	}
 	
 }
+

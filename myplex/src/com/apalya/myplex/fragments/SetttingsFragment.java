@@ -65,6 +65,9 @@ public class SetttingsFragment extends BaseFragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		if(mMainActivity == null){
+			return null;
+		}
 		mRootView = inflater.inflate(R.layout.settingslayout, container, false);
 		mSettingsListView = (PinnedSectionListView) mRootView
 				.findViewById(R.id.settings_list);		
