@@ -1280,13 +1280,11 @@ public class Analytics {
 	
 	
 	
-	public static void mixPanelCouponEntered(String couponCode,String couponPrice) {
+	public static void mixPanelCouponEntered(String couponCode,String couponPrice, CardData selectedCard) {
 		
 		Map<String,String> params=new HashMap<String, String>();
-		int selected = myplexapplication.getCardExplorerData().currentSelectedCard;
-		CardData  mData = myplexapplication.getCardExplorerData().mMasterEntries.get(selected);
-		params.put(Analytics.CONTENT_ID_PROPERTY, mData._id);
-		params.put(Analytics.CONTENT_NAME_PROPERTY, mData.generalInfo.title);
+		params.put(Analytics.CONTENT_ID_PROPERTY, selectedCard._id);
+		params.put(Analytics.CONTENT_NAME_PROPERTY, selectedCard.generalInfo.title);
 		params.put(Analytics.PAY_COUPON_CODE, couponCode);
 		params.put(Analytics.PAY_COUPON_VALUE, couponPrice);
 		params.put(Analytics.USER_ID, getUserEmail());
