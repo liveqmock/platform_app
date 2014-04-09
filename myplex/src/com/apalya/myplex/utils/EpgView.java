@@ -14,6 +14,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -76,10 +77,8 @@ public class EpgView implements ProgrammActionListener{
 		setProgrammLoding();
 		String requestString = "";
 		Log.d(TAG,"title="+mData.generalInfo.title);
-		if(mData.generalInfo.title.equalsIgnoreCase("headlines today"))
-			 requestString = ConsumerApi.getEpgUrl(mData.generalInfo.title.replace(" ", ""), "1", date);
-		else
-			 requestString = ConsumerApi.getEpgUrl(mData.generalInfo.title.trim().split(" ")[0], "1", date);
+		if(TextUtils.isEmpty(mData.generalInfo.title)) { return ;}
+		requestString = ConsumerApi.getEpgUrl(mData.generalInfo.title.trim().replace(" ", "%20"), "1", date);
 		Log.d(TAG ,requestString);
 		EPGRequest request = new EPGRequest(requestString,new OnEPGfetched(), new OnEPGFetchFailed());
 		request.setShouldCache(false);
