@@ -369,7 +369,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 			else if(ApplicationSettings.MODE_APP_TYPE == APP_TYPE.FIFA )
 				selectItem(1);
 			else
-				selectItem(1);
+				selectItem(mNavigationAdapter.getDefaultMenuItem());
 		}
 /*		if (savedInstanceState == null) {
 			Session fbSession=Session.getActiveSession();
@@ -382,6 +382,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		}*/
 		
 		Util.deserializeData(MainActivity.this);
+
 	}
 
 	private boolean onHandleExternalIntent(Intent intent) {

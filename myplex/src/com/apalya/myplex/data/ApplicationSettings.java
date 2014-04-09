@@ -18,4 +18,17 @@ public class ApplicationSettings {
 	
 	public static APP_TYPE MODE_APP_TYPE=APP_TYPE.NORMAL;
 
+	/**
+	 * @param true - volley deliver the expired cached response first, but it will
+	 *        also send the request to the network for refreshing.
+	 * @param false - volley doesn't use expired cached response and sends the network
+	 *        request.
+	 */
+	public static final boolean ENABLE_USE_EXPIRED_RESPONSE = true;
+	
+	/**
+	 * @param true -  Enables the random default menu selection from live tv, movies and myplex picks.
+	 * @param false - no random selection, live tv as default.
+	 */
+	public static boolean ENABLE_DEFAULT_RANDOM_MENUSELECTION = true;
 }
