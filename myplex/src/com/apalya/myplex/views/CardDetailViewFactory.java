@@ -27,6 +27,7 @@ import android.widget.Toast;
 import com.apalya.myplex.R;
 
 import com.apalya.myplex.data.CardData;
+import com.apalya.myplex.data.CardData.HTTP_SOURCE;
 import com.apalya.myplex.data.CardDataCertifiedRatingsItem;
 import com.apalya.myplex.data.CardDataCommentsItem;
 import com.apalya.myplex.data.CardDataImagesItem;
@@ -1054,7 +1055,12 @@ public class CardDetailViewFactory {
 			}
 			if(mData.promoText != null){
 				packageButton.setText(packageButton.getText().toString()+" (" + mData.promoText + ")");
-			}
+			}else if(mData.httpSource == HTTP_SOURCE.CACHE_REFRESH_NEEDED){
+
+				packageButton.setText(packageButton.getText().toString()+ " "+mContext.getString(R.string.carddetailsection_refresh_msg));
+
+ 			}
+
 		}
 		if(mData._id.equalsIgnoreCase("0")){
 			packageButton.setVisibility(View.GONE);

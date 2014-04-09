@@ -142,7 +142,9 @@ public class IndexHandler {
 					Document doc = createCardDoc(indexObject);
 					if(doc != null)
 					{
-						mIndexWriter.addDocument(doc, new StandardAnalyzer(LuceneVersion, words));
+//						mIndexWriter.addDocument(doc, new StandardAnalyzer(LuceneVersion, words));
+						Term idTerm = new Term(LUCENE_CONTENT_ID,indexObject._id);
+						mIndexWriter.updateDocument(idTerm,doc, new StandardAnalyzer(LuceneVersion, words));
 						doc = null;
 						temp = null;
 					}
@@ -205,7 +207,7 @@ public class IndexHandler {
 			IndexReader changedReader = IndexReader.openIfChanged(mIndexReader);
 			if(changedReader != null)
 			{
-				Log.i(TAG,"oldIndexReader"+"numDocs:"+mIndexReader.numDocs() +":: maxDocs:"+mIndexReader.maxDoc());
+				Log.i(TAG,"oldIndexReader"+"numDocs:"+mIndexReader.numDocs() +":: maxDocs:"+mIndexReader.maxDoc() );
 				if(changedReader.numDocs() > mIndexReader.numDocs())
 				{
 					mIndexReader.close(); // close the old Reader.
@@ -269,6 +271,7 @@ public class IndexHandler {
 			long startTime = System.currentTimeMillis();
 			
 			TopDocs topDocs = indexSearcher.search(query, mIndexReader.maxDoc());
+			Log.i(TAG, "time to get indexSearcher.search : "+searchType+"::"+(System.currentTimeMillis()-startTime)+" milliseconds");
 			ScoreDoc[] scoreDoc = topDocs.scoreDocs;
 			int totalHits = topDocs.totalHits;
 			Log.i(TAG,"no. of search result: "+totalHits);
@@ -352,7 +355,7 @@ public class IndexHandler {
 					Log.e(TAG," numDocs is -1");
 					return null;
 				}
-				Log.i(TAG,"numDocs:"+mIndexReader.numDocs() +":: maxDocs:"+mIndexReader.maxDoc());
+				Log.i(TAG,"numDocs:"+mIndexReader.numDocs() +":: maxDocs:"+mIndexReader.maxDoc() +":: numDeletedDocs:"+mIndexReader.numDeletedDocs());
 				indexSearcher = new IndexSearcher(mIndexReader);
 				QueryParser qp =null;
 				switch (this.mSearchType) {
@@ -395,7 +398,7 @@ public class IndexHandler {
 				ScoreDoc[] scoreDoc = topDocs.scoreDocs;
 				int totalHits = topDocs.totalHits;
 				Log.i(TAG,"no. of search result: "+totalHits);
-				
+				Log.i(TAG, "time to get indexSearcher.search : "+params[0]+"::"+(System.currentTimeMillis()-startTime)+" milliseconds");
 				for (int i = 0; i < totalHits; i++) {
 					Document document = indexSearcher.doc(scoreDoc[i].doc);
 					CardData data = (CardData) Util.fromJson(document.get(LUCENE_CONTENT_INFO), CardData.class);

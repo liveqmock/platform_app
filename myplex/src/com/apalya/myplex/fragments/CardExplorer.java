@@ -2,6 +2,7 @@ package com.apalya.myplex.fragments;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -52,7 +53,10 @@ import com.apalya.myplex.cache.CacheManager;
 import com.apalya.myplex.cache.IndexHandler;
 import com.apalya.myplex.data.ApplicationSettings;
 import com.apalya.myplex.data.CardData;
+import com.apalya.myplex.data.CardDataCurrentUserData;
+import com.apalya.myplex.data.CardDataGenralInfo;
 import com.apalya.myplex.data.CardDataGenre;
+import com.apalya.myplex.data.CardDataPurchaseItem;
 import com.apalya.myplex.data.CardDownloadData;
 import com.apalya.myplex.data.CardExplorerData;
 import com.apalya.myplex.data.CardResponseData;
@@ -61,6 +65,7 @@ import com.apalya.myplex.data.FetchDownloadData.FetchDownloadDataListener;
 import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.listboxanimation.OnDismissCallback;
+import com.apalya.myplex.media.VideoViewPlayer.OnLicenseExpiry;
 import com.apalya.myplex.tablet.TabletCardDetails;
 import com.apalya.myplex.utils.AlertDialogUtil;
 import com.apalya.myplex.utils.Analytics;
@@ -97,11 +102,17 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	public static  boolean mfirstTime = false;
 	private View mProgressView = null;
 	private SensorScrollUtil mSensorScrollUtil ;
+	private static final String EMPTY_CARD_ID = "0";
+	
 	//private EasyTracker easyTracker = null;
 	
 
 	@Override
 	public void open(CardData object) {
+		
+		if(object._id == null || object._id.equalsIgnoreCase(EMPTY_CARD_ID)){
+			return;
+		}
 		
 		mMainActivity.saveActionBarTitle();
 		if(getResources().getBoolean(R.bool.isTablet)){
@@ -343,7 +354,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		}
 		mMainActivity.setSearchBarVisibilty(View.INVISIBLE);
 		mMainActivity.setSearchViewVisibilty(View.VISIBLE);
-		delayedAction();
+		delayedAction();		
 		hideNewArrivals();
 		mSensorScrollUtil.init(mCardView);
 		return mRootView;
@@ -385,6 +396,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				}else{
 	//				prepareDummyData();
 					if(verifyResume()){
+//						applyEmptyData();
 						fetchMinData();	
 					}
 					applyData();
@@ -612,8 +624,9 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				return super.getParams();
 			}
 		};*/
+		mVolleyRequest.mStartIndex = mData.mStartIndex;
 		
-		mVolleyRequest.setRetryPolicy(Util.getRetryPolicy(mData.requestType,mContext));
+
 		Log.d(TAG,"Min Request:"+requestUrl);
 		if(requestUrl.equals("0") || (requestUrl.length()==0)){
 			mMainActivity.hideActionBarProgressBar();
@@ -621,6 +634,9 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			queue.add(mVolleyRequest);
 		}
 	}
+	
+	private HashSet< Integer> mArrivedRequestHashSet = new HashSet<Integer>();
+
 	
 	private Response.Listener<CardResponseData> deviceMinSuccessListener() {
 		return new Response.Listener<CardResponseData>() {
@@ -652,8 +668,16 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 						}
 						if(minResultSet.results ==  null){showNoDataMessage(false);return;}
 						if(minResultSet.results.size() ==  0){showNoDataMessage(false);return;}
+						if(mArrivedRequestHashSet.contains(minResultSet.mStartIndex)){
+							// cache-refresh hit response , just save to lucene
+							CacheManager cacheManager = new CacheManager();
+							cacheManager.getCardDetails(minResultSet.results,IndexHandler.OperationType.IDSEARCH,null);
+							return;
+						}
+						
 						mVolleyRequest = null;
 						mCacheManager.getCardDetails(minResultSet.results,IndexHandler.OperationType.IDSEARCH,CardExplorer.this);
+						mArrivedRequestHashSet.add(minResultSet.mStartIndex);
 					}
 				} catch (Exception e) {
 					showNoDataMessage(false);
@@ -767,6 +791,43 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		}
 	}
 	
+	CardData emptyCard = new CardData();
+	
+	private void applyEmptyData(){
+		
+		if(!mData.mMasterEntries.isEmpty()){
+			emptyCard = null;
+			return;
+		}
+		emptyCard._id = EMPTY_CARD_ID;
+		CardDataGenralInfo generalInfo = new CardDataGenralInfo();
+		CardDataCurrentUserData currentUserData = new CardDataCurrentUserData();
+		currentUserData.purchase = new ArrayList<CardDataPurchaseItem>();
+		emptyCard.currentUserData = currentUserData;
+		generalInfo.title = "loading";
+		emptyCard.generalInfo = generalInfo;
+		mData.mEntries.put(EMPTY_CARD_ID, emptyCard);
+		mData.mMasterEntries.add(emptyCard);
+		mData.mMasterEntries.add(emptyCard);
+		mData.mMasterEntries.add(emptyCard);
+		mData.mMasterEntries.add(emptyCard);
+		mData.mMasterEntries.add(emptyCard);			
+	}
+	
+	private void removeEmptyData(){
+		
+		if(emptyCard == null) return;
+		
+		mData.mEntries.remove(EMPTY_CARD_ID);
+		mData.mMasterEntries.remove(emptyCard);
+		mData.mMasterEntries.remove(emptyCard);
+		mData.mMasterEntries.remove(emptyCard);
+		mData.mMasterEntries.remove(emptyCard);
+		mData.mMasterEntries.remove(emptyCard);
+		emptyCard=null;
+		
+	}
+	
 	private void applyData() {
 		
 		if(mData.mMasterEntries == null || mData.mMasterEntries.size() == 0){
@@ -863,6 +924,20 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				}
 			}
 		});
+		
+		if (type == FavouriteUtil.FAVOURITEUTIL_ADD
+				&& data.generalInfo != null
+				&& data.generalInfo.type != null
+				&& data.generalInfo.type
+						.equalsIgnoreCase(ConsumerApi.CONTENT_SPORTS_LIVE)
+				&& data.matchInfo != null
+				&& data.matchInfo.matchStartTime != null) {
+
+			// show reminder for sports content
+			Util.showReminder(data.generalInfo.title,
+					data.matchInfo.matchStartTime, data.generalInfo.title,
+					data._id, mContext);
+		}
 	}
 	private FetchDownloadProgress mDownloadProgressManager; 
 	@Override
@@ -955,8 +1030,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			
 		}
 	}
-	
 
+    
 	@Override
 	public void OnCacheResults(HashMap<String, CardData> object ,boolean issuedRequest) {
 		if(object == null){
@@ -966,7 +1041,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		boolean itemsAdded = false;
 		int count = 0;
 		Set<String> keySet = object.keySet();
-			
+//		removeEmptyData();
+		
 		for(String key:keySet){
 //			mData.mEntries.add(object.get(key));
 			if(mData.mEntries.get(key) == null){
@@ -1036,6 +1112,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	public void OnOnlineResults(List<CardData> dataList) {
 		if(dataList == null){return;}
 		boolean itemsAdded = false;
+//		removeEmptyData();
 		for(CardData data:dataList){
 			
 //			mData.mEntries.add(data);

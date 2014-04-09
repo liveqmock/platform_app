@@ -16,6 +16,7 @@ import com.android.volley.toolbox.GZipRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.apalya.myplex.adapters.CacheManagerCallback;
 import com.apalya.myplex.data.CardData;
+import com.apalya.myplex.data.CardData.HTTP_SOURCE;
 import com.apalya.myplex.data.CardResponseData;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.ConsumerApi;
@@ -26,13 +27,14 @@ import com.fasterxml.jackson.core.JsonParseException;
 
 public class CacheManager {
 	public static final String TAG = "CacheManager";
-	private boolean mAutoSave = true;
+	private boolean mAutoSave = true;	
 	private CacheManagerCallback mListener;
 
 	private List<CardData> mDynamicDetailList;
 	public void autoSaved(boolean value){
 		this.mAutoSave = value;
 	}
+	
 	public void deRegistration(){
 		mListener = null;
 	}
@@ -79,8 +81,11 @@ public class CacheManager {
 						issuedOnlineRequest = true;
 						issueOnlineRequest(missingCardId);
 					}
+					
+					
+					fillDynamicData(resultMap);
+					
 					if(mListener != null){
-						fillDynamicData(resultMap);
 						mListener.OnCacheResults(resultMap,issuedOnlineRequest);
 					}
 				}
@@ -113,11 +118,14 @@ public class CacheManager {
 				resultData.criticReviews = data.criticReviews;
 				resultData._expiresAt = data._expiresAt;
 				resultData.packages=data.packages;
+				resultData.httpSource=data.httpSource;
 				if(data.comments != null){
 					Log.d(TAG,"number of comments for  "+data._id+" "+data.comments.numComments);	
 				}
 				resultData.comments = data.comments;
-				modifiedDataList.add(resultData);
+				if(resultData.httpSource == HTTP_SOURCE.ONLINE){
+					modifiedDataList.add(resultData);
+				}
 			}
 		}
 		if(modifiedDataList.size() > 0){
@@ -136,7 +144,7 @@ public class CacheManager {
 		RequestQueue queue = MyVolley.getRequestQueue();
 		GZipRequest myReg = new GZipRequest(url, onlineRequestSuccessListener(), onlineRequestErrorListener());
 //		myReg.printLogs(true);
-//		myReg.setShouldCache(true);
+		myReg.setShouldCache(false);
 		myReg.setRetryPolicy(new HttpTimeOut(10000));
 		queue.add(myReg);
 		Log.d(TAG,"issueOnlineRequest :"+url+" timeout "+myReg.getRetryPolicy().getCurrentTimeout());
