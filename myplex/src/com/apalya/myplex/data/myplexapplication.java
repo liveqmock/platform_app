@@ -197,6 +197,10 @@ public class myplexapplication extends Application {
 		String clientKeyExp = SharedPrefUtils.getFromSharedPreference(activity,
 				activity.getString(R.string.devclientkeyexp));
 
+		if(activity.getResources().getBoolean(R.bool.config_crashlytics_enable)){
+			Crashlytics.start(activity);
+		}
+		
 		// Check if client is available, if not give device registration request
 		if (clientKey != null) {
 			getUserProfileInstance();
