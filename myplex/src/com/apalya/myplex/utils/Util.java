@@ -36,6 +36,7 @@ import android.animation.Animator.AnimatorListener;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.DownloadManager;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -104,7 +105,10 @@ import com.apalya.myplex.data.CardDownloadedDataList;
 import com.apalya.myplex.data.CardExplorerData;
 import com.apalya.myplex.data.FetchDownloadData;
 import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.receivers.ReminderReceiver;
 import com.apalya.myplex.tablet.MultiPaneActivity;
+import com.apalya.myplex.utils.AlertDialogUtil.NoticeDialogListener;
+import com.apalya.myplex.views.MyplexDialog;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookException;
 import com.facebook.FacebookOperationCanceledException;
@@ -123,7 +127,7 @@ public class Util {
 
 	public final static int TOAST_TYPE_INFO = 1;
 	public final static int TOAST_TYPE_ERROR = 2;
-	public final static String downloadStoragePath="/sdcard/Android/data/com.apalya.myplex/files/";
+	public static String downloadStoragePath="/sdcard/Android/data/com.apalya.myplex/files/";
 	public static KeyRenewListener keyRenewListener;
 	
 	
@@ -246,7 +250,9 @@ public class Util {
 			//Replace internalPath with appDirectory to store in memory card.
 			//Remember to add WRITE_EXTERNAL_STORAGE permission in Manifest file
 			myplexapplication.getApplicationConfig().indexFilePath = ""+internalPath;
-
+			
+			downloadStoragePath = "/sdcard/Android/data/" + activity.getPackageName() + "/files/";
+			
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
@@ -1149,6 +1155,38 @@ public class Util {
 			return null;
 	}
 	
+	public static String getUTCtoLocalDate(String dateInStringUTC) {
+		
+		String datetTimeFormat = "";
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		format.setTimeZone(TimeZone.getTimeZone("UTC"));
+		Date date = null;
+		try {
+			date = format.parse(dateInStringUTC);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		if (date == null) {
+			return datetTimeFormat;
+		}
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTimeZone(TimeZone.getDefault());
+		calendar.setTime(date);
+
+		datetTimeFormat = calendar.getDisplayName(Calendar.MONTH,
+				Calendar.SHORT, Locale.getDefault())
+				+ " "
+				+ calendar.get(Calendar.DAY_OF_MONTH);
+
+		SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
+		sdf.setTimeZone(TimeZone.getDefault());
+
+		datetTimeFormat = datetTimeFormat+ " "+ sdf.format(date);
+
+		return datetTimeFormat;
+	}
+	
 	public static String getExpiry(String dateInString) {
 		Log.d(TAG," got time ="+dateInString);
 		String expiryMessage =  "";
@@ -1351,5 +1389,83 @@ public class Util {
 		return defaultRetryPolicy;
 	}
 
+	public static Date getUTCDate(String dateString){
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");		
+		format.setTimeZone(TimeZone.getTimeZone("UTC"));
+		Date date = null;
+		try {
+			date   = format.parse(dateString);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return date;
+	}
+	
+	public static void showReminder(String contentName, String dateInString,
+			final String notificationTitle, final String _id, final Context context) {
+
+		final Date now = new Date();
+		final Date programmeTime = getUTCDate(dateInString);
+		if(programmeTime == null) {return;}
+		final Calendar prg = Calendar.getInstance();
+		prg.setTimeZone(TimeZone.getDefault());
+		prg.setTime(programmeTime);
+
+		if (!now.before(programmeTime)) {
+			return;
+		}
+
+		MyplexDialog dialog = new MyplexDialog(context, context.getResources()
+				.getString(R.string.app_name), "Set reminder for "
+				+ contentName + " starting at " + getTimeHHMM(programmeTime),
+				"no", "yes", new NoticeDialogListener() {
+
+					@Override
+					public void onDialogOption2Click() {
+
+						Calendar calendar = Calendar.getInstance();
+						calendar.set(Calendar.SECOND, prg.get(Calendar.SECOND));
+						calendar.set(Calendar.MINUTE, prg.get(Calendar.MINUTE));
+						calendar.set(Calendar.HOUR_OF_DAY,
+								prg.get(Calendar.HOUR_OF_DAY));
+						calendar.set(Calendar.DAY_OF_MONTH,
+								prg.get(Calendar.DAY_OF_MONTH));
+
+						Intent alarmintent = new Intent(context,
+								ReminderReceiver.class);
+						alarmintent.putExtra("title", notificationTitle);
+						alarmintent.putExtra("note",
+								"The programm is scheduled at "
+										+ getTimeHHMM(programmeTime));
+						alarmintent.putExtra("_id", _id);
+
+						PendingIntent sender = PendingIntent.getBroadcast(
+								context, 0, alarmintent,
+								PendingIntent.FLAG_UPDATE_CURRENT
+										| Intent.FILL_IN_DATA);
+
+						AlarmManager am = (AlarmManager) context
+								.getSystemService(Context.ALARM_SERVICE);
+						am.set(AlarmManager.RTC_WAKEUP, prg.getTimeInMillis(),
+								sender);
+					}
+
+					@Override
+					public void onDialogOption1Click() {
+						// TODO Auto-generated method stub
+
+					}
+				});
+
+		dialog.showDialog();
+	}		
+	
+
+	public static String getTimeHHMM(Date date)
+	{
+		SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
+		sdf.setTimeZone(TimeZone.getDefault());
+		return sdf.format(date);
+	}	
 }
 

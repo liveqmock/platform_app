@@ -472,7 +472,16 @@ public class CardView extends ScrollView {
 			dataHolder.mRentText.setText(mContext.getString(R.string.cardstatusfree));
 			dataHolder.mRentLayout.setOnClickListener(null);
 		}else{
-			if(data.currentUserData != null && data.currentUserData.purchase != null && data.currentUserData.purchase.size() != 0){
+			if (data.generalInfo != null
+					&& data.generalInfo.type != null
+					&& data.generalInfo.type
+							.equalsIgnoreCase(ConsumerApi.CONTENT_SPORTS_LIVE)
+					&& data.matchInfo != null
+					&& data.matchInfo.matchStartTime != null) {
+				dataHolder.mRentText.setText(Util
+						.getUTCtoLocalDate(data.matchInfo.matchStartTime));
+			}
+			else if(data.currentUserData != null && data.currentUserData.purchase != null && data.currentUserData.purchase.size() != 0){
 				List<CardDataPurchaseItem> purchase = data.currentUserData.purchase;
 				String validity = "";
 				for(CardDataPurchaseItem item : purchase){

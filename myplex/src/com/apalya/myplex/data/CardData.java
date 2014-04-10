@@ -39,6 +39,8 @@ public class CardData implements Serializable{
 	public MatchInfo matchInfo;
 	public List<CardData> chields;
 	public String promoText;
+	public enum HTTP_SOURCE { CACHE , CACHE_REFRESH_NEEDED , ONLINE };
+	public HTTP_SOURCE httpSource = HTTP_SOURCE.ONLINE;
 	public CardData(){
 		
 	}

@@ -2,6 +2,7 @@ package com.apalya.myplex.adapters;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 
 import com.android.volley.toolbox.NetworkImageView;
 import com.apalya.myplex.R;
+import com.apalya.myplex.data.ApplicationSettings;
 import com.apalya.myplex.data.NavigationOptionsMenu;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.FontUtil;
@@ -129,6 +131,23 @@ public class NavigationOptionsMenuAdapter extends BaseAdapter {
 //			image.setImageResource(menu.mDefaultResId);
 		}
 		return v;
+	}
+	
+	public int getDefaultMenuItem(){
+		
+		if(!ApplicationSettings.ENABLE_DEFAULT_RANDOM_MENUSELECTION){
+			return 1;
+		}
+		
+		int High = 4;
+		int Low = 1;
+		
+		Random rnd = new Random();
+		int no = rnd.nextInt(High - Low) + Low;
+		if(no == 1 || no == 2 || no == 3){
+			return no;
+		}
+		return 1;
 	}
 
 };

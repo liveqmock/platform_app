@@ -199,7 +199,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			
 		};
 		task.execute();
-
+		
 		mContext = LoginActivity.this;
 		if(getResources().getBoolean(R.bool.config_crashlytics_enable)){
 			Crashlytics.start(this);
@@ -235,10 +235,6 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		if(TextUtils.isEmpty(username)){
 			Analytics.setMixPanelFirstName(Analytics.PEOPLE_DEFAULT_NAME);
 		}
-		Map<String,String> params1 = new HashMap<String, String>();
-		params1.put(Analytics.ALL_LOGIN_OPTIONS,"facebook google twitter myplex");
-		Analytics.trackEvent(Analytics.EVENT_LOGIN_OPTIONS_PRESENTED,params1);
-		Analytics.createScreenGA(Analytics.SCREEN_LOGINACTIVITY);
 		
 		Intent intent = this.getIntent();
 	    Uri uri = intent.getData();
@@ -901,8 +897,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		}
 	}
 	private void onSessionStateChange(Session session, SessionState state, Exception exception) {
-		if (exception instanceof FacebookOperationCanceledException || exception instanceof FacebookAuthorizationException) {
-
+		if (exception instanceof FacebookOperationCanceledException || exception instanceof FacebookAuthorizationException) {		
 			Log.d(TAG,getString(R.string.userCancelled));
 		} else {
 
@@ -1876,8 +1871,9 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				{	
 					finish();
 					Util.launchMainActivity(LoginActivity.this);
-				}
-
+					return;
+				}				
+				sendLoginScreenEvent();
 			}else{
 				//Generatey new Key
 				Util.setKeyListener(LoginActivity.this);
@@ -1917,11 +1913,19 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 			//Util.showToast(mDevInfo.getDeviceSNo(),this);
 
 			devRegRequest(getString(R.string.devRegPath),params);
-
+			sendLoginScreenEvent();
+			
 		}		
 	}
 
 
+	private void sendLoginScreenEvent(){
+		Map<String,String> params1 = new HashMap<String, String>();
+		params1.put(Analytics.ALL_LOGIN_OPTIONS,"facebook google twitter myplex");
+		Analytics.trackEvent(Analytics.EVENT_LOGIN_OPTIONS_PRESENTED,params1);
+		Analytics.createScreenGA(Analytics.SCREEN_LOGINACTIVITY);
+	}
+	
 	@Override
 	public void onTwitterLogin(String token, String secret) {
 		mUserInfo.setLoginStatus(true);

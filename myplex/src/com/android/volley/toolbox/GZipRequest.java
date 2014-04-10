@@ -11,13 +11,18 @@ import java.util.zip.GZIPInputStream;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.Cache.Entry;
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.Request.Method;
 import com.android.volley.Response.ErrorListener;
 import com.android.volley.Response.Listener;
+import com.apalya.myplex.data.CardData;
+import com.apalya.myplex.data.CardData.HTTP_SOURCE;
 import com.apalya.myplex.data.CardResponseData;
+import com.apalya.myplex.utils.ConsumerApi;
+import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -25,6 +30,8 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 public class GZipRequest extends Request<CardResponseData> {
 	public static final String TAG = "GZipRequest";
 	private boolean mShowLogs = false;
+	public int mStartIndex = 1;
+	
 	 private final Listener<CardResponseData> mListener;
 	  /**
 	     * Creates a new request with the given method.
@@ -59,6 +66,7 @@ public class GZipRequest extends Request<CardResponseData> {
 		public Map<String, String> getHeaders() throws AuthFailureError {
 			Map<String, String> params = new HashMap<String, String>();
 	        params.put("Accept-Encoding", "gzip, deflate");
+	        params.put("clientKey",ConsumerApi.DEBUGCLIENTKEY);
 	        return params;
 		}
 		public void printLogs(boolean value){
@@ -121,7 +129,19 @@ public class GZipRequest extends Request<CardResponseData> {
 	        
 	        CardResponseData minResultSet=null;
 	        try {
-	        	minResultSet =(CardResponseData) Util.fromJson(parsed, CardResponseData.class);
+	        	Log.d("volley", "CardResponseData received");
+	        	minResultSet =(CardResponseData) Util.fromJson(parsed, CardResponseData.class);	       
+	        	minResultSet.responseHeaders = response.headers;	  
+	        	minResultSet.mStartIndex = mStartIndex;
+	        	if(minResultSet == null || minResultSet.code != 200 || minResultSet.results == null || minResultSet.results.isEmpty()){
+	        		// remove cache entry if response is is not valid
+	        		return Response.success(minResultSet, null);
+	        	}
+	        	if(response.headers != null && response.headers.containsKey(ConsumerApi.HEADER_RESPONSE_HTTP_SOURCE)){
+	        		for (CardData cardData : minResultSet.results) {
+						cardData.httpSource=HTTP_SOURCE.valueOf(response.headers.get(ConsumerApi.HEADER_RESPONSE_HTTP_SOURCE));
+					}
+	        	}
 			} catch (JsonMappingException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

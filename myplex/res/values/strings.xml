@@ -38,11 +38,13 @@
     <string name="carddetailcommentsection_editreview">add a review</string>
     <string name="tnc">"By creating an account and signing up to myplex, I accept the Terms of Service and Privacy Policy"</string>
     <string name="carddetailsectionheader_comment">comments</string>
+    <string name="carddetailsectionheader_loadmore">load more</string>
     <string name="carddetailsectionheader_credits">credits</string>
     <string name="carddetailsectionheader_description">description</string>
     <string name="carddetailsectionheader_myplexdescription">myplex description</string>
     <string name="carddetailsectionheader_rate">rate</string>
     <string name="carddetailsectionheader_relatedMultimedia">related multimedia</string>
+     <string name="carddetailsection_refresh_msg">  (updating..)</string>
     <string name="pricepopupdiscount">off</string>
     <string name="pricepopuprent">rent</string>
     <string name="carddetailsectionheader_reviews">reviews </string>

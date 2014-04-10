@@ -222,6 +222,7 @@ public class Analytics {
 	public static String EVENT_PAID_FOR = "paid for";
 	public static String EVENT_PAID_FOR_CONTENT = "paid for content";
 	public static String EVENT_COUPON_ENTERED = "coupon entered";
+	public static String EVENT_COUPON_FAILURE = "coupon failure";
 	public static String PAY_COUPON_CODE = "coupon code";
 	public static String PAY_COUPON_VALUE = "coupon value";
 	public static String COUPON_USED = "coupon used";
@@ -1280,17 +1281,27 @@ public class Analytics {
 	
 	
 	
-	public static void mixPanelCouponEntered(String couponCode,String couponPrice) {
+	public static void mixPanelCouponEntered(String couponCode,String couponPrice, CardData selectedCard) {
 		
 		Map<String,String> params=new HashMap<String, String>();
-		int selected = myplexapplication.getCardExplorerData().currentSelectedCard;
-		CardData  mData = myplexapplication.getCardExplorerData().mMasterEntries.get(selected);
-		params.put(Analytics.CONTENT_ID_PROPERTY, mData._id);
-		params.put(Analytics.CONTENT_NAME_PROPERTY, mData.generalInfo.title);
+		params.put(Analytics.CONTENT_ID_PROPERTY, selectedCard._id);
+		params.put(Analytics.CONTENT_NAME_PROPERTY, selectedCard.generalInfo.title);
 		params.put(Analytics.PAY_COUPON_CODE, couponCode);
 		params.put(Analytics.PAY_COUPON_VALUE, couponPrice);
 		params.put(Analytics.USER_ID, getUserEmail());
 		Analytics.trackEvent(Analytics.EVENT_COUPON_ENTERED,params);
+		
+	}
+	
+	public static void mixPanelCouponFailure(String couponCode,String error , CardData selectedCard) {
+		
+		Map<String,String> params=new HashMap<String, String>();
+		params.put(Analytics.CONTENT_ID_PROPERTY, selectedCard._id);
+		params.put(Analytics.CONTENT_NAME_PROPERTY, selectedCard.generalInfo.title);
+		params.put(Analytics.PAY_COUPON_CODE, couponCode);
+		params.put(Analytics.REASON_FAILURE, error);
+		params.put(Analytics.USER_ID, getUserEmail());
+		Analytics.trackEvent(Analytics.EVENT_COUPON_FAILURE,params);
 		
 	}
 	

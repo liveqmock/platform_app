@@ -8,4 +8,6 @@
     <string name="app_name">Viva Beta</string>
     <string name="ga_trackingId">UA-49659483-1</string>
     <bool name="config.crashlytics.enable">true</bool>
+    
+    <string name="config.package_name">com.apalya.myplex.riodev</string>
 </resources>

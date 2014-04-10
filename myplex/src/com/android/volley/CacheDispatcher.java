@@ -21,7 +21,10 @@ import android.util.Log;
 
 import java.util.concurrent.BlockingQueue;
 
+import com.apalya.myplex.data.ApplicationSettings;
+import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.receivers.ConnectivityReceiver;
+import com.apalya.myplex.utils.ConsumerApi;
 
 /**
  * Provides a thread for performing cache triage on a queue of requests.
@@ -111,7 +114,7 @@ public class CacheDispatcher extends Thread {
                 }
 
                 // If it is completely expired, just send it to the network.
-                if (entry.isExpired() && ConnectivityReceiver.isConnected) {
+                if (!ApplicationSettings.ENABLE_USE_EXPIRED_RESPONSE && entry.isExpired() && ConnectivityReceiver.isConnected) {
                 	Log.d("volley", "cache-hit-expire for "+request.getUrl());
                     request.addMarker("cache-hit-expired");
                     request.setCacheEntry(entry);
@@ -122,30 +125,36 @@ public class CacheDispatcher extends Thread {
                 Log.d("volley", "cache-found for "+request.getUrl());
                 // We have a cache hit; parse its data for delivery back to the request.
                 request.addMarker("cache-hit");
+                
+               
+                entry.responseHeaders.put(ConsumerApi.HEADER_RESPONSE_HTTP_SOURCE,
+                			entry.refreshNeeded()?CardData.HTTP_SOURCE.CACHE_REFRESH_NEEDED.toString():CardData.HTTP_SOURCE.CACHE.toString());
+                
+                
                 Response<?> response = request.parseNetworkResponse(
                         new NetworkResponse(entry.data, entry.responseHeaders));
                 request.addMarker("cache-hit-parsed");
 
                 if (!entry.refreshNeeded()) {
-                    // Completely unexpired cache hit. Just deliver the response.
+                    // Completely unexpired cache hit. Just deliver the response.                	
                     mDelivery.postResponse(request, response);
                 } else {
                     // Soft-expired cache hit. We can deliver the cached response,
                     // but we need to also send the request to the network for
                     // refreshing.
-                    request.addMarker("cache-hit-refresh-needed");
+                    request.addMarker("cache-hit-refresh-needed");                    
                     request.setCacheEntry(entry);
 
                     // Mark the response as intermediate.
                     response.intermediate = true;
-
+                    
                     // Post the intermediate response back to the user and have
                     // the delivery then forward the request along to the network.
                     mDelivery.postResponse(request, response, new Runnable() {
                         @Override
                         public void run() {
                             try {
-                            	if(ConnectivityReceiver.isConnected){
+                            	if(ConnectivityReceiver.isConnected){                            		 
                             		mNetworkQueue.put(request);
                             	}
                             } catch (InterruptedException e) {
