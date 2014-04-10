@@ -358,7 +358,7 @@ public class Analytics {
 		
 		if(ApplicationSettings.ENABLE_MIXPANEL_API) {
 			MixpanelAPI.People people = mMixPanel.getPeople();
-			people.identify(trackingId);
+//			people.identify(trackingId);
 			people.trackCharge(price, null);
 		}
 	}
