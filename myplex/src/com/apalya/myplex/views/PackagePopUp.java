@@ -235,7 +235,7 @@ public class PackagePopUp {
 									}else{
 										// ERROR										
 											error = coupon.errors.get(0);
-										
+											Analytics.mixPanelCouponFailure(COUPON_CODE, error, cardDataAnalytics);
 									}
 								}
 							}
