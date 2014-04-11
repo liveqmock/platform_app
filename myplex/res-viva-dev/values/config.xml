@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="config.fbapp_id">582364305158936</string>
+    <string name="config.fbapp_id">719839881402037</string>
     <string name="config.domain_name">api-fifadev.myplex.in</string>
-    <string name="config.crashlytics.ApiKey">72b7799d77db95d39c33cbba030236fdf7fb1bf5</string> 
-    <string name="config.mixpanel.token">20541460115650ad4e07ab10de528e81</string>
-    <string name="config.android.push.senderid">976964091787</string>
-    <string name="app_name">Viva</string>
-    <string name="ga_trackingId">UA-47802668-1</string>
+    <string name="config.crashlytics.ApiKey">7230e98126fb81e8e586672d680511b0cfab25ba</string> 
+    <string name="config.mixpanel.token">ab8e505d7f6efb2c2bf7b3a6ec5728c8</string>
+    <string name="config.android.push.senderid">1053641403193</string>
+    <string name="app_name">Viva Beta</string>
+    <string name="ga_trackingId">UA-49659483-1</string>
     <bool name="config.crashlytics.enable">true</bool>
+    
+    <string name="config.package_name">com.apalya.myplex.riodev</string>
 </resources>

@@ -51,8 +51,10 @@ import com.apalya.myplex.adapters.NavigationOptionsMenuAdapter;
 import com.apalya.myplex.adapters.ScrollingDirection;
 import com.apalya.myplex.cache.CacheManager;
 import com.apalya.myplex.cache.IndexHandler;
+import com.apalya.myplex.cache.InsertionResult;
 import com.apalya.myplex.data.ApplicationSettings;
 import com.apalya.myplex.data.CardData;
+import com.apalya.myplex.data.CardData.HTTP_SOURCE;
 import com.apalya.myplex.data.CardDataImagesItem;
 import com.apalya.myplex.data.CardDataPackagePriceDetailsItem;
 import com.apalya.myplex.data.CardDataPackages;
@@ -61,6 +63,7 @@ import com.apalya.myplex.data.CardDetailMediaData;
 import com.apalya.myplex.data.CardDetailMediaListData;
 import com.apalya.myplex.data.CardDetailMultiMediaGroup;
 import com.apalya.myplex.data.CardExplorerData;
+import com.apalya.myplex.data.CardResponseData;
 import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.media.PlayerListener;
@@ -69,7 +72,9 @@ import com.apalya.myplex.utils.Blur;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.EpgView;
 import com.apalya.myplex.utils.FavouriteUtil;
+import com.apalya.myplex.utils.FetchCardField;
 import com.apalya.myplex.utils.FavouriteUtil.FavouriteCallback;
+import com.apalya.myplex.utils.FetchCardField.FetchComplete;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.NumberPicker;
@@ -95,7 +100,7 @@ import com.apalya.myplex.views.OutlineContainer;
 import com.apalya.myplex.views.TVShowView;
 import com.apalya.myplex.views.TVShowView.TVShowSelectListener;
 import com.apalya.myplex.views.docketVideoWidget;
-import com.mixpanel.android.mpmetrics.SurveyState;
+
 
 public class CardDetails extends BaseFragment implements
 		ItemExpandListenerCallBackListener, CardDetailViewFactoryListener,
@@ -297,6 +302,9 @@ public class CardDetails extends BaseFragment implements
 		if(mCardData != null)
 			Analytics.mixPanelcardSelected(mCardData);
 
+		if(mCardData.httpSource == HTTP_SOURCE.CACHE_REFRESH_NEEDED){
+			updateCardData();
+		}
 		return rootView;
 	}
 	private CardVideoPlayer mPlayer;
@@ -327,10 +335,12 @@ public class CardDetails extends BaseFragment implements
 
 	@Override
 	public void onResume() {
+
 		super.onResume();
 		if(mMainActivity == null){
 			return;
 		}
+
 		updatePlayerLogVisiblity();
 		if (myplexapplication.getCardExplorerData().cardDataToSubscribe != null && mCardData != null && mCardData._id != null) {
 			if(myplexapplication.getCardExplorerData().cardDataToSubscribe._id.equalsIgnoreCase(mCardData._id))
@@ -367,7 +377,6 @@ public class CardDetails extends BaseFragment implements
 				return true;
 			}
 		});
-		
 		SurveyUtil.getInstance().checkForSurvey(getActivity());
 	}
 	
@@ -900,10 +909,12 @@ public class CardDetails extends BaseFragment implements
 		showAlbumDialog();
 	}
 	
+
 	private void updatePlayerLogVisiblity() {
 		if(mPlayerLogsLayout == null){
 			return;
 		}
+
 		if (myplexapplication.getApplicationSettings().showPlayerLogs) {
 			mPlayerLogsLayout.setVisibility(View.VISIBLE);
 		} else {
@@ -1141,4 +1152,40 @@ public class CardDetails extends BaseFragment implements
 		this.mAutoPlay = mAutoPlay;
 	}
 	
+
+	private void updateCardData(){
+		FetchCardField fetch = new FetchCardField();
+		fetch.Fetch(mCardData, ConsumerApi.FIELD_CURRENTUSERDATA_PACKAGES, new FetchComplete() {
+			
+			@Override
+			public void response(CardResponseData data) {
+				
+				if (data == null || data.results == null || data.results.size() == 0) {
+					return;
+				}
+				
+				if(!data.results.get(0)._id.equalsIgnoreCase(mCardData._id)){
+					return;
+				}
+				
+				mCardData.currentUserData =  data.results.get(0).currentUserData;
+				mCardData.packages = data.results.get(0).packages;
+				
+				List<CardData> dataToSave = new ArrayList<CardData>();
+				mCardData.httpSource=HTTP_SOURCE.ONLINE;
+				dataToSave.add(mCardData);
+				mCardDetailViewFactory.UpdateSubscriptionStatus(mCardData);
+//				myplexapplication.getCacheHolder().UpdataDataAsync(dataToSave, new InsertionResult() {
+//					
+//					@Override
+//					public void updateComplete(Boolean updateStatus) {
+//						Util.showToast(mContext, "refresh your screen to see purchases",Util.TOAST_TYPE_INFO);
+////						Toast.makeText(SubscriptionView.this, "Subscription Info updated", Toast.LENGTH_SHORT).show();
+//					}
+//				});					
+			}
+		});
+	}
+	
 }
+

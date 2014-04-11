@@ -251,6 +251,8 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 	    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FIFA_MATCHES,R.string.iconmatch,
 	    		null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 	    
+	    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LIVETV,R.string.iconlivetv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+	    
 	    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGO,
 	    		R.string.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
 
@@ -367,7 +369,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 			else if(ApplicationSettings.MODE_APP_TYPE == APP_TYPE.FIFA )
 				selectItem(1);
 			else
-				selectItem(1);
+				selectItem(mNavigationAdapter.getDefaultMenuItem());
 		}
 /*		if (savedInstanceState == null) {
 			Session fbSession=Session.getActiveSession();
@@ -380,6 +382,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		}*/
 		
 		Util.deserializeData(MainActivity.this);
+
 	}
 
 	private boolean onHandleExternalIntent(Intent intent) {

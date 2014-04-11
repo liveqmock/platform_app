@@ -235,7 +235,7 @@ public class PackagePopUp {
 									}else{
 										// ERROR										
 											error = coupon.errors.get(0);
-										
+											Analytics.mixPanelCouponFailure(COUPON_CODE, error, cardDataAnalytics);
 									}
 								}
 							}
@@ -689,7 +689,7 @@ public class PackagePopUp {
 					String oldPrice = new_price.getText().toString().trim();
 					double couponPrice = Double.parseDouble(oldPrice) - priceTobecharged; //for analytics
 					Analytics.couponDiscountINR = couponPrice; 
-					Analytics.mixPanelCouponEntered(COUPON_CODE,couponPrice+"");
+					Analytics.mixPanelCouponEntered(COUPON_CODE,couponPrice+"",cardDataAnalytics );
 					StrikeTextView oldprice = (StrikeTextView) layout2.findViewById(R.id.purchasepackItem1_price_before_coupon);
 					oldprice.setVisibility(View.VISIBLE);
 //					oldprice.setPaintFlags(oldprice.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);

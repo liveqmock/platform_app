@@ -38,11 +38,11 @@ android {
     }
 	
 	 signingConfigs {
-       myplex{
-           storeFile file("F:\\Samir\\Android\\cert\\myplexv2\\d2c_android.keystore")
-           storePassword "pass"
-           keyAlias "d2capp"
-           keyPassword "pass"
+       myplex{       	  
+           storeFile file("$System.env.BUILD_KEYSTORE_PATH")
+           storePassword "$System.env.BUILD_KEYSTORE_PASS"
+           keyAlias "$System.env.BUILD_KEY_ALIAS"
+           keyPassword "$System.env.BUILD_KEY_PASS"
        }
     }	
 
@@ -76,7 +76,7 @@ android {
 			println "build :delete file : ${buildDir}/../res/values/config.xml"
 			delete '${buildDir}/../res/values/config.xml'
 			delete '${buildDir}/../res/values/theme.xml'
-            packageName "com.apalya.vivadev"
+            packageName "com.apalya.myplex.riodev"
             signingConfig signingConfigs.myplex
         }        
     }
@@ -105,5 +105,49 @@ android {
         }
     }
 
+	android.applicationVariants.all{ variant ->
+
+
+        variant.processManifest.doLast{
+
+            def variantNameStr = variant.name;
+            println "applicationVariants variant name ${variantNameStr}"
+
+            def str_c2dm;
+
+            if(variantNameStr.contains("Vivadev")){
+                str_c2dm="com.apalya.myplex.riodev.permission.C2D_MESSAGE";
+                println "applicationVariants build c2dm vivadev";
+            }else if (variantNameStr.contains("Beta")){
+                str_c2dm="com.apalya.myplexbeta.permission.C2D_MESSAGE";
+                println "applicationVariants build c2dm myplex beta";
+            }else {
+            	println "applicationVariants no changes required";
+                return ;
+            }
+            
+            copy{
+                println "applicationVariants Copy started";
+                from("${buildDir}/manifests/${variant.dirName}") {
+                    include "AndroidManifest.xml"
+                }
+                into("${buildDir}/manifests/${variant.dirName}/modified")
+
+               
+                filter{
+                    String line -> line.replaceAll("com.apalya.myplex.permission.C2D_MESSAGE","${str_c2dm}")
+                }
+               
+            }
+
+            copy {
+                from("${buildDir}/manifests/${variant.dirName}/modified") {
+                    include "AndroidManifest.xml"
+                }
+                into("${buildDir}/manifests/${variant.dirName}")
+            }
+        }
+   }
+	
 	
 }
