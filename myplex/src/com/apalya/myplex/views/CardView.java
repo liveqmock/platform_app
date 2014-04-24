@@ -467,6 +467,11 @@ public class CardView extends ScrollView {
 			dataHolder.mRentText.setText(mContext.getString(R.string.jump_to_episode));
 			if(data.packages == null || data.packages.size() ==0)
 				dataHolder.mRentLayout.setOnClickListener(null);
+		} else if (data.generalInfo.type != null
+				&& data.generalInfo.type
+						.equalsIgnoreCase(ConsumerApi.TYPE_YOUTUBE)) {
+			dataHolder.mRentText.setText("NDTV | " + Util.getHoursDayDiffString(data.content.startDate));
+			dataHolder.mRentLayout.setOnClickListener(null);
 		}
 		else if(data.packages == null || data.packages.size() == 0){
 			dataHolder.mRentText.setText(mContext.getString(R.string.cardstatusfree));
@@ -596,7 +601,9 @@ public class CardView extends ScrollView {
 			    			if(swipeCount > 1) {
 			    				mixpanelBrowsing();
 			    			}
-			    			mCardActionListener.open(mDataList.get(mCurrentSelectedIndex));			
+			    			if(mCardActionListener != null){
+//			    				mCardActionListener.open(mDataList.get(mCurrentSelectedIndex));	
+			    			}
 			    		}
 //			        	customSmoothScroll(getScrollX(), i * mCardPositions[1]);
 			        	smoothScrollTo(getScrollX(), i * mCardPositions[1]);
@@ -945,7 +952,7 @@ public class CardView extends ScrollView {
 					if(dataHolder == null){ Log.e(TAG, "mOpenCardListener dataholder null"); return;}
 					if(dataHolder.mDataObject == null){ Log.e(TAG, "mOpenCardListener object null "); return;}
 					if(mCurrentSelectedIndex != mDataList.indexOf(dataHolder.mDataObject)){ Log.e(TAG, "mOpenCardListener index not matching"); return;}
-					mCardActionListener.open(dataHolder.mDataObject);
+					mCardActionListener.open(dataHolder.mDataObject);					
 				}
 			}
 		}
