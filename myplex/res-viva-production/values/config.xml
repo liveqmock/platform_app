@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="config.fbapp_id">719839881402037</string>
-    <string name="config.domain_name">api-beta.vivall.tv</string>
+    <string name="config.fbapp_id">616066488477087</string>
+    <string name="config.domain_name">api.vivall.tv/string>
     <string name="config.crashlytics.ApiKey">7230e98126fb81e8e586672d680511b0cfab25ba</string> 
     <string name="config.mixpanel.token">f2d7f7d943574f9f5bcf9f9d4d6632a4</string>
     <string name="config.android.push.senderid">1053641403193</string>
-    <string name="app_name">Viva</string>
-    <string name="ga_trackingId">UA-49659483-1</string>
+    <string name="app_name">Vivall</string>
+    <string name="ga_trackingId">UA-49659483-3</string>
     <bool name="config.crashlytics.enable">true</bool>
     
     <string name="config.package_name">com.apalya.myplex.rio</string>
