@@ -29,6 +29,32 @@
             android:text="@string/carddetailsectionheader_comment"
             android:textSize="@dimen/textsize_14" />
     </LinearLayout>
+    
+     <LinearLayout
+        android:id="@+id/carddetailcomment_twitterlayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="@dimen/margin_gap_12"
+        android:layout_marginTop="@dimen/margin_gap_12" android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/carddetailcomment_twitterimage"
+            android:layout_width="@dimen/size_24"
+            android:layout_height="@dimen/size_24"
+            android:layout_marginRight="@dimen/margin_gap_6"
+            android:contentDescription="@string/hello_world"
+            android:src="@drawable/card_iconcomment" />
+
+        <TextView
+            android:id="@+id/carddetailcomment_twitterheading"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="twitter"
+            android:textSize="@dimen/textsize_14" />
+    </LinearLayout>
 
     <RelativeLayout
         android:id="@+id/carddetailcomment_editlayout"
@@ -100,5 +126,5 @@
         android:layout_alignParentRight = "true" 
         android:visibility="gone"
         android:layout_toRightOf="@+id/carddetailcomment_commentlayout" />
-
+  
 </RelativeLayout>
