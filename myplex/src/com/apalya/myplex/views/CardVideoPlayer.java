@@ -84,6 +84,7 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.internal.co;
 import com.google.android.gms.location.LocationClient;
+import com.google.android.youtube.player.YouTubeStandalonePlayer;
 import com.apalya.myplex.data.myplexapplication;
 
 public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDialogListener,VideoUrlFetchListener  {
@@ -1405,6 +1406,12 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			return true;
 		if(mData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_SEASON) || mData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_TV_SERIES))
 			return false;
+		
+		if(mData.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_YOUTUBE)){
+			Util.launchYouyubePlayer((Activity) mContext, mData._id);
+			return false;
+		}
+			
 
 		String networkInfo = Util.getInternetConnectivity(mContext);
 		if (networkInfo.equalsIgnoreCase("2G")) {

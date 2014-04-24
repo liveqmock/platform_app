@@ -55,6 +55,7 @@ import android.widget.PopupWindow;
 import android.widget.SearchView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.SearchView.OnCloseListener;
 import android.widget.SearchView.OnQueryTextListener;
@@ -97,6 +98,8 @@ import com.apalya.myplex.views.RatingDialog;
 import com.facebook.Session;
 
 import com.google.analytics.tracking.android.EasyTracker;
+import com.google.android.youtube.player.YouTubeInitializationResult;
+import com.google.android.youtube.player.YouTubeStandalonePlayer;
 
 public class MainActivity extends Activity implements MainBaseOptions, CacheManagerCallback {
 	private SearchView mSearchView;
@@ -183,6 +186,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
     mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.MOVIES,R.string.iconmovie, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
     mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.RECOMMENDED,R.string.iconhome, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
     mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.TVSHOWS,R.string.icontvshows, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.YOUTUBE,R.string.icontvshows, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 //    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.SPORTS,R.string.iconcricket, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
     mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGO,R.string.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
 
@@ -994,6 +998,13 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 				data.searchScope = "sportsEvent";
 				setActionBarTitle(NavigationOptionsMenuAdapter.FIFA_MATCHES);
 				setSearchviewHint("search");
+			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.YOUTUBE)){
+				removeLiveTvActionBarIcon();
+				data.requestType = CardExplorerData.REQUEST_BROWSE;
+				data.searchQuery = ConsumerApi.TYPE_YOUTUBE;
+				data.searchScope = ConsumerApi.TYPE_YOUTUBE;
+				setActionBarTitle(NavigationOptionsMenuAdapter.YOUTUBE);
+				setSearchviewHint("search");
 			}
 			else
 			{
@@ -1328,6 +1339,20 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		if(requestCode == ConsumerApi.SUBSCRIPTIONREQUEST){
 			
 		}
+		
+		if (requestCode == 101 && resultCode != RESULT_OK) {
+
+			// to handle youtube intent on Result
+			YouTubeInitializationResult errorReason = YouTubeStandalonePlayer
+					.getReturnedInitializationResult(data);
+			if (errorReason.isUserRecoverableError()) {
+				errorReason.getErrorDialog(this, 0).show();
+			} else {				
+				String errorMessage = "failed to start video:"+errorReason;
+				Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
+			}
+		}
+		 
 	}
 	
 	private void setupSearchView(final SearchView searchView) {

@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="config.fbapp_id">648826508519300</string>
-    <string name="config.domain_name">api-fifadev.myplex.in</string>
+    <string name="config.fbapp_id">719839881402037</string>
+    <string name="config.domain_name">api-beta.vivall.tv</string>
     <string name="config.crashlytics.ApiKey">7230e98126fb81e8e586672d680511b0cfab25ba</string> 
-    <string name="config.mixpanel.token">994a2e8287d3381a5811d999fef5a7b7</string>
+    <string name="config.mixpanel.token">ab8e505d7f6efb2c2bf7b3a6ec5728c8</string>
     <string name="config.android.push.senderid">1053641403193</string>
-    <string name="app_name">Vivall Dev</string>
-    <string name="ga_trackingId">UA-49659483-2</string>
+    <string name="app_name">Vivall Beta</string>
+    <string name="ga_trackingId">UA-49659483-1</string>
     <bool name="config.crashlytics.enable">true</bool>
     
-    <string name="config.package_name">com.apalya.myplex.riodev</string>
+    <string name="config.package_name">com.apalya.myplex.riobeta</string>
     <string name="config.google.developerkey">AIzaSyD0rBK1E3lPvyCFET8wQ4SWDqW8582qBu0</string>
 </resources>

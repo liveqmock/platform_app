@@ -14,6 +14,7 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -110,8 +111,15 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	@Override
 	public void open(CardData object) {
 		
-		if(object._id == null || object._id.equalsIgnoreCase(EMPTY_CARD_ID)){
+		if(object == null || object._id == null || object._id.equalsIgnoreCase(EMPTY_CARD_ID)){
 			return;
+		}
+		
+		if(object.generalInfo != null 
+				&& object.generalInfo.type != null 
+				&& object.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_YOUTUBE)){
+			Util.launchYouyubePlayer((Activity) mContext, object._id);
+			return ;
 		}
 		
 		mMainActivity.saveActionBarTitle();

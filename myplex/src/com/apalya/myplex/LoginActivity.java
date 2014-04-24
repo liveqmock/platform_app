@@ -128,8 +128,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 	= "com.google.android.iosched.extra.FINISH_INTENT";
 
 
-	private static final String TWITTER_CONSUMER_KEY= "0ZHTN70CDo8JdwEKQWBag";
-	private static final String TWITTER_CONSUMER_SECRET= "hX13meHYmTHb07gt78lwKZG97YJgcx1FyOg8MDDhzo";
+	public static final String TWITTER_CONSUMER_KEY= "0ZHTN70CDo8JdwEKQWBag";
+	public static final String TWITTER_CONSUMER_SECRET= "hX13meHYmTHb07gt78lwKZG97YJgcx1FyOg8MDDhzo";
 
 	private static final int MESSAGE_SENT= 14;
 	public static final int TWITTER_CALLBACK= 31;
