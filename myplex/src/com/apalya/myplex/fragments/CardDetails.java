@@ -66,6 +66,7 @@ import com.apalya.myplex.data.CardExplorerData;
 import com.apalya.myplex.data.CardResponseData;
 import com.apalya.myplex.data.FilterMenudata;
 import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.media.AkamaiAnalyticsWrapper;
 import com.apalya.myplex.media.PlayerListener;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.Blur;
@@ -378,6 +379,9 @@ public class CardDetails extends BaseFragment implements
 			}
 		});
 		SurveyUtil.getInstance().checkForSurvey(getActivity());
+		
+		myplexapplication.getMixPanel().getPeople().showNotificationIfAvailable(getActivity());
+		
 	}
 	
 	//time analytics

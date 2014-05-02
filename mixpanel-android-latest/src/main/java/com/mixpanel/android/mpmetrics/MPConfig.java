@@ -13,7 +13,7 @@ import android.util.Log;
 public class MPConfig {
     public static final String VERSION = "4.1.0";
 
-    public static boolean DEBUG = true;
+    public static boolean DEBUG = false;
 
     // Name for persistent storage of app referral SharedPreferences
     /* package */ static final String REFERRER_PREFS_NAME = "com.mixpanel.android.mpmetrics.ReferralInfo";

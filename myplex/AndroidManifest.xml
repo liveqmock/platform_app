@@ -111,9 +111,10 @@
             android:value="@string/config.fbapp_id" />
 
         <meta-data
-      			android:name="com.mixpanel.android.MPConfig.AutoCheckForSurveys"
+      			android:name="com.mixpanel.android.MPConfig.AutoShowMixpanelUpdates"
       			android:value="false" />
-        <activity android:name="com.mixpanel.android.surveys.SurveyActivity" />
+        <activity android:name="com.mixpanel.android.surveys.SurveyActivity" 
+            android:theme="@style/com_mixpanel_android_SurveyActivityTheme"/>
         
         <receiver android:name="com.mixpanel.android.mpmetrics.GCMReceiver"
               android:permission="com.google.android.c2dm.permission.SEND" >
