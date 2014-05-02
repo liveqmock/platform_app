@@ -5,7 +5,7 @@ import android.graphics.Bitmap;
 /**
  * <p>StackBlur v1.0 for Android</p>
  *
- * <p>Author: Enrique López Mañas <eenriquelopez@gmail.com></p>
+ * <p>Author: Enrique  <eenriquelopez@gmail.com></p>
  * <p>http://www.neo-tech.es</p>
  *
  * <p>Author of the original algorithm: Mario Klingemann &lt;mario.quasimondo.com&gt;</p>
@@ -23,7 +23,7 @@ import android.graphics.Bitmap;
  * or reduced by one, depending on if they are on the right or
  * on the left side of the stack.</p>
  *
- * <p>Copyright: Enrique López Mañas</p>
+ * <p>Copyright: Enrique </p>
  * <p>License: Apache License 2.0</p>
  *
  * <p>This file has been modified from its original version by Mixpanel, Inc
