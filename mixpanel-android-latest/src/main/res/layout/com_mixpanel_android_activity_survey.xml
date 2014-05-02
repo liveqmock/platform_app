@@ -6,7 +6,8 @@
     android:layout_height="fill_parent"
     android:padding="20dp"
     android:clickable="true"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:visibility="gone" >
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -63,7 +64,6 @@
             android:layout_alignParentBottom="true"
             android:src="@drawable/com_mixpanel_android_logo"
             android:contentDescription="@string/com_mixpanel_android_logo"
-            android:visibility="gone"
             />
 
         <com.mixpanel.android.surveys.FadeOnPressButton
