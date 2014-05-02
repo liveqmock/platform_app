@@ -35,4 +35,7 @@ public class CardDataHolder {
 	public ProgressBar mESTDownloadBar;
 	public TextView mESTDownloadStatus;
 	public CardData mDataObject;
+	public TextView mCardDescText;
+	public TextView mVideoStatusText;
+	public TextView mVideoDurationText;
 }

@@ -122,7 +122,8 @@
             android:textColor="#6b6b6b"
             android:textSize="14sp" />
     </RelativeLayout>
-
+    
+     
     <RelativeLayout
         android:id="@+id/card_status_layout"
         android:layout_width="fill_parent"
@@ -198,4 +199,78 @@
         android:layout_alignTop="@+id/card_status_layout"
         android:visibility="invisible" />
 
+    <LinearLayout  android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical"
+        >
+    <RelativeLayout
+        android:id="@+id/card_desc_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/card_statusblock_bg"
+        android:visibility="invisible" >
+
+        <TextView
+            android:id="@+id/card_desc_text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="14dp"            
+            android:maxLines="3"
+            android:minLines="2"
+            android:text=""
+            android:textColor="#000000"
+            android:textSize="16sp" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/card_videoinfo_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/cardmoreinfoheight"              
+        android:background="#f4f5f5"
+        android:visibility="invisible" >
+
+        <TextView
+            android:id="@+id/card_video_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"   
+            android:layout_centerVertical="true"
+            android:layout_marginRight="14dp"        
+            android:singleLine="true"
+            android:text=""
+            android:textColor="#6b6b6b"
+            android:textSize="14sp" />
+        
+         <TextView
+            android:id="@+id/card_video_uploadtime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+			android:layout_alignParentLeft="true"   
+		    android:layout_centerVertical="true"
+            android:layout_marginLeft="14dp"        
+            android:singleLine="true"
+            android:text=""
+            android:textColor="#6b6b6b"
+            android:textSize="14sp" />
+    </RelativeLayout>
+    </LinearLayout>
+    
+    <TextView
+        android:id="@+id/cardmediasubitemvideo_play"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_centerInParent="true"
+        android:text="&#x25B6;"
+        android:textSize="28sp"
+        android:textColor="@color/white"
+        android:gravity="center"
+        android:shadowColor="@color/black"
+        android:shadowDx="-1"
+        android:shadowDy="1"
+        android:shadowRadius="0.01"
+        android:hint="@string/playhint" 
+        android:visibility="gone"/>
 </RelativeLayout>
