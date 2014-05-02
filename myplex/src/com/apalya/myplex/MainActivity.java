@@ -155,6 +155,15 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		if(actionBar != null){
 			actionBar.hide();
 		}
+		
+		try
+		{
+		  getActionBar().getClass().getDeclaredMethod("setShowHideAnimationEnabled", boolean.class).invoke(getActionBar(), false);
+		}
+		catch (Exception exception)
+		{
+		  // Too bad, the animation will be run ;(
+		}
 	}
 	@Override
 	public void showActionBar(){
@@ -186,7 +195,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
     mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.MOVIES,R.string.iconmovie, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
     mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.RECOMMENDED,R.string.iconhome, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
     mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.TVSHOWS,R.string.icontvshows, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.YOUTUBE,R.string.icontvshows, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.YOUTUBE,R.string.iconyoutube, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 //    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.SPORTS,R.string.iconcricket, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
     mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LOGO,R.string.iconrate, null, NavigationOptionsMenuAdapter.NOFOCUS_ACTION,R.layout.applicationlogolayout));
 
@@ -499,6 +508,9 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 				intentHandled=true;
 			}else if(action.equalsIgnoreCase(NavigationOptionsMenuAdapter.TVSHOWS)){
 				selectItem(4);
+				intentHandled=true;
+			}else if(action.equalsIgnoreCase(NavigationOptionsMenuAdapter.YOUTUBE)){
+				selectItem(5);
 				intentHandled=true;
 			}
 			return intentHandled;
