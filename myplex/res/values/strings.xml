@@ -192,7 +192,7 @@
     <string name="lastSharedTime">lastSharedTime</string>
         <!-- Transaction related errors-->
     <string name="transaction_server_error">our server thinks this is a duplicate transaction.if you think not, select ‘continue’, otherwise select ‘cancel’ and retry your transaction again in 60 seconds.</string>
-    <string name="retry">retry</string>
+    <string name="retry">continue</string>
     <string name="cancel">cancel</string>
     
      <string name="transaction_cancel_msg">Do you really want to cancel the transaction ?</string>
