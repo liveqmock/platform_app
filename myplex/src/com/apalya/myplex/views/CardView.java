@@ -26,6 +26,7 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -330,11 +331,15 @@ public class CardView extends ScrollView {
 				v.findViewById(R.id.card_status_layout).setVisibility(View.GONE);
 				v.findViewById(R.id.card_desc_layout).setVisibility(View.VISIBLE);
 				v.findViewById(R.id.card_rent_layout).setVisibility(View.GONE);
+				v.findViewById(R.id.card_desc_lllayout).setVisibility(View.VISIBLE);
 				v.findViewById(R.id.card_videoinfo_layout).setVisibility(View.VISIBLE);
-				
+				v.findViewById(R.id.card_title_favlayout).setVisibility(View.INVISIBLE);
 				TextView mPlayButton = (TextView) v .findViewById(R.id.cardmediasubitemvideo_play);
 				mPlayButton.setVisibility(View.VISIBLE);
 				mPlayButton.setTypeface(FontUtil.ss_symbolicons_line);
+			    TextView textView =	(TextView)v.findViewById(R.id.card_title_name);
+			    textView.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
+				
 			}
 			dataHolder.mTitleLayout = (RelativeLayout)v.findViewById(R.id.card_title_layout); 
 			dataHolder.mTitle = (TextView)v.findViewById(R.id.card_title_name);
@@ -369,7 +374,7 @@ public class CardView extends ScrollView {
 			
 			dataHolder.mTitle.setTypeface(FontUtil.Roboto_Medium);
 			dataHolder.mRentText.setTypeface(FontUtil.Roboto_Medium);
-			dataHolder.mCardDescText.setTypeface(FontUtil.Roboto_Medium);
+			dataHolder.mCardDescText.setTypeface(FontUtil.Roboto_Regular);
 			dataHolder.mVideoDurationText.setTypeface(FontUtil.Roboto_Medium);
 			dataHolder.mVideoStatusText.setTypeface(FontUtil.Roboto_Medium);
 			dataHolder.mCommentsText.setTypeface(FontUtil.Roboto_Medium);
@@ -403,8 +408,15 @@ public class CardView extends ScrollView {
 		}
 		if(data.generalInfo != null && data.generalInfo.title != null){
 			dataHolder.mTitle.setText(data.generalInfo.title.toLowerCase());
+
+			if (data.generalInfo.type != null
+					&& data.generalInfo.type
+							.equalsIgnoreCase(ConsumerApi.TYPE_YOUTUBE) ){
+				dataHolder.mTitle.setText(data.generalInfo.title);
+			}
 		}
 		
+	
 
 		if (data.generalInfo.type != null
 				&& data.generalInfo.type
@@ -414,7 +426,7 @@ public class CardView extends ScrollView {
 			}
 			
 			if( data.content != null && !TextUtils.isEmpty(data.content.duration)){
-				String duration = data.content.duration.startsWith("0:") ? data.content.duration.substring(2) : data.content.duration;
+				String duration = Util.getVideoDurationInString(data.content.duration);
 				dataHolder.mVideoDurationText.setText(duration);
 			}
 			
@@ -505,7 +517,7 @@ public class CardView extends ScrollView {
 		} else if (data.generalInfo.type != null
 				&& data.generalInfo.type
 						.equalsIgnoreCase(ConsumerApi.TYPE_YOUTUBE)) {
-			dataHolder.mRentText.setText("NDTV | " + Util.getHoursDayDiffString(data.content.startDate));
+			dataHolder.mRentText.setText(Util.getHoursDayDiffString(data.content.startDate));
 			dataHolder.mRentLayout.setOnClickListener(null);
 		}
 		else if(data.packages == null || data.packages.size() == 0){

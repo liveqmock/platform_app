@@ -17,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -1199,6 +1200,35 @@ public class Util {
 		return datetTimeFormat;
 	}
 	
+public static String getVideoDurationInString(String hhmmssinString) {
+		
+		try {		
+			SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+			Date date = sdf.parse(hhmmssinString);
+			Calendar calendar = GregorianCalendar.getInstance(); // creates a new calendar instance
+			calendar.setTime(date);   // assigns calendar to given date 		
+			int seconds = calendar.get(Calendar.HOUR);
+			int minutes = calendar.get(Calendar.MINUTE);
+			int hours = calendar.get(Calendar.HOUR);			
+			if(hours > 0){
+				return hours + " hrs";
+			}
+			
+			if(minutes > 0){
+				return minutes + " m";
+			}
+			
+			if(seconds > 0){
+				return seconds + " sec";
+			}
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			return hhmmssinString;
+		}		
+			return "";
+	}
+
 	public static String getHoursDayDiffString(String dateInString) {
 		
 		Log.d(TAG," got time ="+dateInString);
