@@ -723,7 +723,19 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		List<FilterMenudata> filteroptions = new ArrayList<FilterMenudata>();
 		List<String> tempList = new ArrayList<String>();
 		for (CardData data : mData.mMasterEntries) {
-			if(data.content != null && data.content.genre != null){
+			
+			// Use categoryName instead of genre for youtube content
+			if(data.generalInfo != null && data.generalInfo.type != null  && data.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_YOUTUBE)){					
+				
+				if(data.content != null && data.content.categoryName != null && !tempList.contains(data.content.categoryName)){
+					tempList.add(data.content.categoryName);
+					genreCounter.put(data.content.categoryName,1);
+				}				
+				continue;
+			}
+			
+			if(data.content != null && data.content.genre != null){				
+			
 				for(CardDataGenre genreData:data.content.genre){
 					if(genreData.name != null && !tempList.contains(genreData.name)){
 						tempList.add(genreData.name);
@@ -771,6 +783,17 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				ArrayList<CardData> localData = new ArrayList<CardData>();
 				for (CardData data : mData.mMasterEntries) {
 					boolean itemPresent = false;
+					
+					// Use categoryName instead of genre for youtube content
+					if(data.generalInfo != null && data.generalInfo.type != null  && data.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_YOUTUBE)							
+							&& data.content != null && data.content.categoryName != null 
+							&& data.content.categoryName.equalsIgnoreCase(label)){					
+						
+						localData.add(data);		
+						continue;
+					}
+
+					
 					if (data.content != null && data.content.genre!= null) {
 						for(CardDataGenre genreData:data.content.genre){
 							if(genreData.name!= null && genreData.name.equalsIgnoreCase(label)){

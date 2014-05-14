@@ -1546,7 +1546,9 @@ public class Analytics {
 		}
 		else if(Analytics.CONSTANT_TV_SERIES.equalsIgnoreCase(ctype)) {
 			Analytics.createEventGA(Analytics.CATEGORY_BROWSE, Analytics.EVENT_BROWSED_TV_SHOWS, Analytics.NUMBER_OF_CARDS, swipeCount);
-		}	
+		}else if(Analytics.CONSTANT_YOUTUBE.equalsIgnoreCase(ctype)) {
+			Analytics.createEventGA(Analytics.CATEGORY_BROWSE, Analytics.EVENT_BROWSED_YOUTUBE, Analytics.NUMBER_OF_CARDS, swipeCount);
+		}		
 	}
 	
 	public static void gaInlineSearch(String keyword,long results) {

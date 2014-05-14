@@ -203,13 +203,17 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:orientation="vertical"
+        
         >
+    <View  android:id="@+id/card_desc_lllayout" android:layout_width="fill_parent" android:layout_height="4dp" android:background="@drawable/card_statusblock_bg_dropshadow"
+        android:visibility="gone"/>
     <RelativeLayout
         android:id="@+id/card_desc_layout"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/card_statusblock_bg"
-        android:visibility="invisible" >
+        android:background="@drawable/card_videodesc_bg"
+        android:visibility="invisible"
+        >
 
         <TextView
             android:id="@+id/card_desc_text"
@@ -221,8 +225,8 @@
             android:maxLines="3"
             android:minLines="2"
             android:text=""
-            android:textColor="#000000"
-            android:textSize="16sp" />
+            android:textColor="#FFFFFF"
+            android:textSize="14sp" />
     </RelativeLayout>
 
     <RelativeLayout

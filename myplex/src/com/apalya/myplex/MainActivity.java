@@ -1016,7 +1016,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 				data.searchQuery = ConsumerApi.TYPE_YOUTUBE;
 				data.searchScope = ConsumerApi.TYPE_YOUTUBE;
 				setActionBarTitle(NavigationOptionsMenuAdapter.YOUTUBE);
-				setSearchviewHint("search");
+				setSearchviewHint("search "+NavigationOptionsMenuAdapter.YOUTUBE);
 			}
 			else
 			{
@@ -1436,6 +1436,8 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 				}*/
 				if(hintString!= null && hintString.equalsIgnoreCase("search live tv")){
 					type = ConsumerApi.VIDEO_TYPE_LIVE;
+				}else if(hintString!= null && hintString.contains(NavigationOptionsMenuAdapter.YOUTUBE)){
+					type = ConsumerApi.TYPE_YOUTUBE;
 				}
 				
 				//Addanalytics just record textchanges
@@ -1496,6 +1498,8 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		if(dataBundle != null){			
 			if((dataBundle.searchScope!=null) && dataBundle.searchScope.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
 				localSearchScope = ConsumerApi.VIDEO_TYPE_LIVE;
+			} else if ((dataBundle.searchScope!=null) && dataBundle.searchScope.equalsIgnoreCase(ConsumerApi.TYPE_YOUTUBE)){
+				localSearchScope = ConsumerApi.TYPE_YOUTUBE;
 			}
 			dataBundle.reset();
 			if(localSearchScope != null){
