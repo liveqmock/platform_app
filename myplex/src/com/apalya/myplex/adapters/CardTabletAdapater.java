@@ -17,6 +17,7 @@ import android.drm.DrmInfoEvent;
 import android.graphics.Color;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -209,10 +210,14 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 				v.findViewById(R.id.card_desc_layout).setVisibility(View.VISIBLE);
 				v.findViewById(R.id.card_rent_layout).setVisibility(View.GONE);
 				v.findViewById(R.id.card_videoinfo_layout).setVisibility(View.VISIBLE);
+				v.findViewById(R.id.card_title_favlayout).setVisibility(View.INVISIBLE);
+				v.findViewById(R.id.card_desc_lllayout).setVisibility(View.VISIBLE);
 				
 				TextView mPlayButton = (TextView) v .findViewById(R.id.cardmediasubitemvideo_play);
 				mPlayButton.setVisibility(View.VISIBLE);
 				mPlayButton.setTypeface(FontUtil.ss_symbolicons_line);
+				TextView textView =	(TextView)v.findViewById(R.id.card_title_name);				 
+				textView.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
 			}
 			
 			dataHolder.mTitleLayout = (RelativeLayout)v.findViewById(R.id.card_title_layout); 
@@ -277,6 +282,12 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 		
 		if(data.generalInfo != null && data.generalInfo.title != null){
 			dataHolder.mTitle.setText(data.generalInfo.title.toLowerCase());
+			
+			if (data.generalInfo.type != null
+					&& data.generalInfo.type
+							.equalsIgnoreCase(ConsumerApi.TYPE_YOUTUBE) ){
+				dataHolder.mTitle.setText(data.generalInfo.title);
+			}
 		}
 		
 
@@ -288,7 +299,7 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 			}
 			
 			if( data.content != null && !TextUtils.isEmpty(data.content.duration)){
-				String duration = data.content.duration.startsWith("0:") ? data.content.duration.substring(2) : data.content.duration;
+				String duration = Util.getVideoDurationInString(data.content.duration);
 				dataHolder.mVideoDurationText.setText(duration);
 			}
 			
