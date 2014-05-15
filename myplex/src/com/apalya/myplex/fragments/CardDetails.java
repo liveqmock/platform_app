@@ -378,6 +378,9 @@ public class CardDetails extends BaseFragment implements
 			}
 		});
 		SurveyUtil.getInstance().checkForSurvey(getActivity());
+		
+		myplexapplication.getMixPanel().getPeople().showNotificationIfAvailable(getActivity());
+		
 	}
 	
 	//time analytics

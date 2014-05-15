@@ -1,12 +1,20 @@
 package com.apalya.myplex.views;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import twitter4j.Status;
 
 import android.animation.LayoutTransition;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.text.util.Linkify;
+import android.text.util.Linkify.TransformFilter;
+import android.util.Patterns;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +34,7 @@ import android.widget.Toast;
 
 import com.apalya.myplex.R;
 
+import com.apalya.myplex.data.ApplicationSettings;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardData.HTTP_SOURCE;
 import com.apalya.myplex.data.CardDataCertifiedRatingsItem;
@@ -46,6 +55,8 @@ import com.apalya.myplex.utils.FetchCardField.FetchComplete;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MessagePost.MessagePostCallback;
 import com.apalya.myplex.utils.MyVolley;
+import com.apalya.myplex.utils.SearchTweets;
+import com.apalya.myplex.utils.SearchTweets.SearchTweetsListener;
 import com.apalya.myplex.utils.Util;
 import com.google.analytics.tracking.android.EasyTracker;
 
@@ -181,6 +192,8 @@ public class CardDetailViewFactory {
 	}
 	public static final int  COMMENTSECTION_COMMENTS = 101;
 	public static final int COMMENTSECTION_REVIEW = 102;
+	public static final int COMMENTSECTION_TWITTER = 103;
+	
 	private void fillCommentSectionData(int type,CardData card){
 		
 		mCommentContentLayout.removeAllViews();
@@ -229,6 +242,62 @@ public class CardDetailViewFactory {
 			}
 		}
 	}
+	
+	private void fillTwitterSectionData(List<twitter4j.Status> tweets) {
+
+		mCommentContentLayout.removeAllViews();
+
+		if (tweets == null) {
+			return;
+		}
+		if (tweets.isEmpty()) {
+			return;
+		}
+
+		for (Status tweet : tweets) {
+
+			View child = mInflator.inflate(R.layout.carddetailcomment_data,
+					null);
+			// VerticalLineRelativeLayout timelinelayout =
+			// (VerticalLineRelativeLayout)child.findViewById(R.id.timeLineLayout);
+			// timelinelayout.setWillNotDrawEnabled(false);
+			TextView personName = (TextView) child
+					.findViewById(R.id.carddetailcomment_personname);
+			personName.setText(tweet.getUser().getName());
+			personName.setTypeface(FontUtil.Roboto_Regular);
+			TextView commentTime = (TextView) child
+					.findViewById(R.id.carddetailcomment_time);
+			 commentTime.setText(Util.getDateFormat(tweet.getCreatedAt()));
+			// commentTime.setTypeface(FontUtil.Roboto_Regular);
+			TextView commentMessage = (TextView) child
+					.findViewById(R.id.carddetailcomment_comment);
+			
+			commentMessage.setText(tweet.getText());
+			commentMessage.setTypeface(FontUtil.Roboto_Regular);
+			
+			TransformFilter filter = new TransformFilter() {
+			    public final String transformUrl(final Matcher match, String url) {
+			        return match.group();
+			    }
+			};
+
+			Pattern mentionPattern = Pattern.compile("@([A-Za-z0-9_-]+)");
+			String mentionScheme = "http://www.twitter.com/";
+			Linkify.addLinks(commentMessage, mentionPattern, mentionScheme, null, filter);
+
+			Pattern hashtagPattern = Pattern.compile("#([A-Za-z0-9_-]+)");
+			String hashtagScheme = "http://www.twitter.com/search/";
+			Linkify.addLinks(commentMessage, hashtagPattern, hashtagScheme, null, filter);
+
+			Pattern urlPattern = Patterns.WEB_URL;
+			Linkify.addLinks(commentMessage, urlPattern, null, null, filter);
+			
+			
+			// addSpace(layout, 16);
+			mCommentContentLayout.addView(child);
+		}
+	}
+	
 	private LinearLayout mCommentContentLayout;
 	private int mCurrentCommentViewType = COMMENTSECTION_COMMENTS;
 	private View createCommentsView() {
@@ -250,12 +319,18 @@ public class CardDetailViewFactory {
 	
 		LinearLayout commentLayout = (LinearLayout)v.findViewById(R.id.carddetailcomment_commentlayout);
 		LinearLayout reviewLayout = (LinearLayout)v.findViewById(R.id.carddetailcomment_reviewlayout);
+		LinearLayout twitterLayout = (LinearLayout)v.findViewById(R.id.carddetailcomment_twitterlayout);
 		
+		if(ApplicationSettings.MODE_APP_TYPE == ApplicationSettings.APP_TYPE.FIFA){
+			twitterLayout.setVisibility(View.VISIBLE);
+		}
 		final ImageView commentImage = (ImageView)v.findViewById(R.id.carddetailcomment_commentimage);
 		final TextView commentHeading = (TextView)v.findViewById(R.id.carddetailcomment_commentheading);
 		commentHeading.setTypeface(FontUtil.Roboto_Regular);
 		final ImageView reviewImage = (ImageView)v.findViewById(R.id.carddetailcomment_reviewimage);
 		final TextView reviewHeading = (TextView)v.findViewById(R.id.carddetailcomment_reviewheading);
+		final ImageView twitterImage = (ImageView)v.findViewById(R.id.carddetailcomment_twitterimage);
+		final TextView twitterHeading = (TextView)v.findViewById(R.id.carddetailcomment_twitterheading);
 		reviewHeading.setTypeface(FontUtil.Roboto_Regular);
 		final Button editBox = (Button)v.findViewById(R.id.carddetailcomment_edittext);
 		editBox.setTypeface(FontUtil.Roboto_Regular);
@@ -339,6 +414,8 @@ public class CardDetailViewFactory {
 				commentHeading.setTextColor(mContext.getResources().getColor(R.color.theme_text_selector));
 				reviewImage.setImageResource(R.drawable.card_iconuser);
 				reviewHeading.setTextColor(Color.parseColor("#000000"));
+				twitterImage.setImageResource(R.drawable.card_iconcomment);
+				twitterHeading.setTextColor(Color.parseColor("#000000"));
 				editBox.setText(R.string.carddetailcommentsection_editcomment);
 //				editBox.setOnClickListener(null);
 //				fillCommentSectionData(COMMENTSECTION_COMMENTS,mData);
@@ -357,6 +434,8 @@ public class CardDetailViewFactory {
 				commentHeading.setTextColor(Color.parseColor("#000000"));
 				reviewImage.setImageResource(R.drawable.card_iconuserblue);
 				reviewHeading.setTextColor(mContext.getResources().getColor(R.color.theme_text_selector));
+				twitterImage.setImageResource(R.drawable.card_iconcomment);
+				twitterHeading.setTextColor(Color.parseColor("#000000"));
 				editBox.setText(R.string.carddetailcommentsection_editreview);
 //				editBox.setOnClickListener(mRateListener);
 //				fillCommentSectionData(COMMENTSECTION_REVIEW,mData);
@@ -364,6 +443,22 @@ public class CardDetailViewFactory {
 				refreshSection();
 			}
 		});
+		
+		twitterLayout.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View arg0) {
+				reviewImage.setImageResource(R.drawable.card_iconuser);
+				reviewHeading.setTextColor(Color.parseColor("#000000"));
+				commentImage.setImageResource(R.drawable.card_iconcomment);
+				commentHeading.setTextColor(Color.parseColor("#000000"));
+				twitterImage.setImageResource(R.drawable.card_iconcommentblue);
+				twitterHeading.setTextColor(mContext.getResources().getColor(R.color.theme_text_selector));
+				mCurrentCommentViewType = COMMENTSECTION_TWITTER;
+				refreshSection();
+			}
+		});
+	
 		mCommentSectionProgressBar  = (ProgressBar)v.findViewById(R.id.carddetailcomment_progressBar);
 //		
 //		mCommentRefresh = (ImageView)v.findViewById(R.id.carddetailcomment_expand);
@@ -414,9 +509,25 @@ public class CardDetailViewFactory {
 		String FieldName = new  String();
 		if(mCurrentCommentViewType == COMMENTSECTION_COMMENTS){
 			FieldName = ConsumerApi.FIELD_COMMENTS;
-		}else{
+		}else if (mCurrentCommentViewType == COMMENTSECTION_TWITTER){
+			
+			SearchTweets searchTweets = new SearchTweets("#Brazil2014");
+			searchTweets.setSearchTweetsListener(new SearchTweetsListener() {
+				
+				@Override
+				public void onSearchComplete(List<Status> tweets) {
+					stopRefresh();
+					fillTwitterSectionData(tweets);
+					
+				}
+			});
+			
+			searchTweets.search();
+			return;
+		} else {
 			FieldName = ConsumerApi.FIELD_USERREVIEWS;
 		}
+		
 		FetchCardField fetch = new FetchCardField();
 		fetch.Fetch(mData, FieldName, new FetchComplete() {
 			
@@ -1016,7 +1127,14 @@ public class CardDetailViewFactory {
 		Util.showFeedbackOnSame(packageButton);
 		packageButton.setTypeface(FontUtil.Roboto_Medium);
 		float price = 10000.99f;
-		if(mData.packages == null || mData.packages.size() == 0){
+		
+		if (data.generalInfo.type != null
+				&& data.generalInfo.type
+						.equalsIgnoreCase(ConsumerApi.TYPE_YOUTUBE)) {
+			packageButton.setText(mContext
+					.getString(R.string.cardstatuspaid));
+			packageButton.setOnClickListener(null);
+		}else if(mData.packages == null || mData.packages.size() == 0){
 			packageButton.setText(mContext.getString(R.string.cardstatusfree));
 			packageButton.setOnClickListener(null);
 		}else{

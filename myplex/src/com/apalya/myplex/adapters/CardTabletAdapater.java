@@ -15,7 +15,9 @@ import android.content.Context;
 import android.drm.DrmErrorEvent;
 import android.drm.DrmInfoEvent;
 import android.graphics.Color;
+import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -200,6 +202,24 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 		CardDataHolder dataHolder = (CardDataHolder)v.getTag();
 		if(dataHolder == null){
 			dataHolder = new CardDataHolder();
+			
+			if (data.generalInfo.type != null
+					&& data.generalInfo.type
+							.equalsIgnoreCase(ConsumerApi.TYPE_YOUTUBE)){
+				v.findViewById(R.id.card_status_layout).setVisibility(View.GONE);
+				v.findViewById(R.id.card_desc_layout).setVisibility(View.VISIBLE);
+				v.findViewById(R.id.card_rent_layout).setVisibility(View.GONE);
+				v.findViewById(R.id.card_videoinfo_layout).setVisibility(View.VISIBLE);
+				v.findViewById(R.id.card_title_favlayout).setVisibility(View.INVISIBLE);
+				v.findViewById(R.id.card_desc_lllayout).setVisibility(View.VISIBLE);
+				
+				TextView mPlayButton = (TextView) v .findViewById(R.id.cardmediasubitemvideo_play);
+				mPlayButton.setVisibility(View.VISIBLE);
+				mPlayButton.setTypeface(FontUtil.ss_symbolicons_line);
+				TextView textView =	(TextView)v.findViewById(R.id.card_title_name);				 
+				textView.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
+			}
+			
 			dataHolder.mTitleLayout = (RelativeLayout)v.findViewById(R.id.card_title_layout); 
 			dataHolder.mTitle = (TextView)v.findViewById(R.id.card_title_name);
 			dataHolder.mDelete = (TextView)v.findViewById(R.id.card_title_deleteText);
@@ -218,6 +238,9 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 			dataHolder.mFavProgressBar = (ProgressBar) v.findViewById(R.id.card_title_fav_progress);
 			dataHolder.mESTDownloadBar = (ProgressBar) v.findViewById(R.id.card_download_progressBar);
 			dataHolder.mESTDownloadStatus = (TextView) v.findViewById(R.id.card_download_status);
+			dataHolder.mCardDescText = (TextView) v.findViewById(R.id.card_desc_text);
+			dataHolder.mVideoDurationText = (TextView) v.findViewById(R.id.card_video_duration);
+			dataHolder.mVideoStatusText = (TextView) v.findViewById(R.id.card_video_uploadtime);
 			dataHolder.mFavProgressBar.getIndeterminateDrawable().setColorFilter(0xFF54B5E9, android.graphics.PorterDuff.Mode.MULTIPLY);
 			// fonts
 			Random rnd = new Random();
@@ -232,7 +255,9 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 			dataHolder.mRentText.setTypeface(FontUtil.Roboto_Medium);
 			dataHolder.mCommentsText.setTypeface(FontUtil.Roboto_Medium);
 			dataHolder.mReviewsText.setTypeface(FontUtil.Roboto_Medium);
-			
+			dataHolder.mCardDescText.setTypeface(FontUtil.Roboto_Medium);
+			dataHolder.mVideoDurationText.setTypeface(FontUtil.Roboto_Medium);
+			dataHolder.mVideoStatusText.setTypeface(FontUtil.Roboto_Medium);
 			dataHolder.mESTDownloadStatus.setTypeface(FontUtil.Roboto_Medium);
 			dataHolder.mDelete.setTypeface(FontUtil.ss_symbolicons_line);
 			dataHolder.mFavourite.setTypeface(FontUtil.ss_symbolicons_line);
@@ -257,9 +282,32 @@ public class CardTabletAdapater extends BaseAdapter implements OnScrollListener{
 		
 		if(data.generalInfo != null && data.generalInfo.title != null){
 			dataHolder.mTitle.setText(data.generalInfo.title.toLowerCase());
+			
+			if (data.generalInfo.type != null
+					&& data.generalInfo.type
+							.equalsIgnoreCase(ConsumerApi.TYPE_YOUTUBE) ){
+				dataHolder.mTitle.setText(data.generalInfo.title);
+			}
 		}
 		
 
+		if (data.generalInfo.type != null
+				&& data.generalInfo.type
+						.equalsIgnoreCase(ConsumerApi.TYPE_YOUTUBE) ){
+			if( data.generalInfo.description != null){
+				dataHolder.mCardDescText.setText(data.generalInfo.description);
+			}
+			
+			if( data.content != null && !TextUtils.isEmpty(data.content.duration)){
+				String duration = Util.getVideoDurationInString(data.content.duration);
+				dataHolder.mVideoDurationText.setText(duration);
+			}
+			
+			if( data.content != null && !TextUtils.isEmpty(data.content.startDate)){
+				dataHolder.mVideoStatusText.setText(Util.getHoursDayDiffString(data.content.startDate));
+			}
+		}
+		
         dataHolder.mPreview.setImageBitmap(null);
 //		Log.e(TAG,"Erasing "+position+" for "+dataHolder.mTitle.getTextSize()+"  "+dataHolder.mTitle.getWidth() );
 		if(data.images != null){
@@ -579,9 +627,14 @@ private void prepareDrmManager(String url){
 		else if(Analytics.CONSTANT_LIVE.equalsIgnoreCase(ctype) )  {
 			params.put(Analytics.NUMBER_OF_LIVETV_CARDS,swipeCount+"");
 			event = Analytics.EVENT_BROWSED_TV_CHANNELS;
+			
+		}else if(Analytics.CONSTANT_YOUTUBE.equalsIgnoreCase(ctype) )  {
+			params.put(Analytics.NUMBER_OF_YOUTUBE_CARDS,swipeCount+"");
+			event = Analytics.EVENT_BROWSED_YOUTUBE;
 		}
 		
-		if(Analytics.CONSTANT_RECOMMENDATIONS.equalsIgnoreCase(ctype) || Analytics.CONSTANT_MOVIE.equalsIgnoreCase(ctype) || Analytics.CONSTANT_LIVE.equalsIgnoreCase(ctype)) {
+		if(Analytics.CONSTANT_RECOMMENDATIONS.equalsIgnoreCase(ctype) || Analytics.CONSTANT_MOVIE.equalsIgnoreCase(ctype) || Analytics.CONSTANT_LIVE.equalsIgnoreCase(ctype)
+				|| Analytics.CONSTANT_YOUTUBE.equalsIgnoreCase(ctype)) {
 				Analytics.trackEvent(event,params);
 				Analytics.gaBrowse(ctype,swipeCount);
 				swipeCount = 1;			

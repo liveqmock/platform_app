@@ -120,6 +120,7 @@ public class ConsumerApi {
 	public static final String TYPE_TV_SERIES = "tvseries";
 	public static final String TYPE_TV_SEASON= "tvseason";
 	public static final String TYPE_TV_EPISODE = "tvepisode";	
+	public static final String TYPE_YOUTUBE = "youtube";
 	
 	public static final String  HEADER_RESPONSE_HTTP_SOURCE="http_source";
 	

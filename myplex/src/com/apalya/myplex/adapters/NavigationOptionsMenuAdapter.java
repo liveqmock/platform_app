@@ -50,6 +50,7 @@ public class NavigationOptionsMenuAdapter extends BaseAdapter {
 	public final static String INVITEFRIENDS = "invite friends";
 	public final static String FIFA_LIVE = "FIFA 2014 Live";
 	public final static String FIFA_MATCHES = "ALL Matches";
+	public final static String YOUTUBE = "breaking news";
 			
 	public Context mContext;
 	private boolean isLoggedIn = true;

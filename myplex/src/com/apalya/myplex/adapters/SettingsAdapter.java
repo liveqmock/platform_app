@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import twitter4j.RelatedResults;
+
 
 import com.apalya.myplex.R;
 import com.apalya.myplex.data.ApplicationSettings;

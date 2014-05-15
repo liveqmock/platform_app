@@ -10,4 +10,5 @@
     <bool name="config.crashlytics.enable">true</bool>
     
     <string name="config.package_name">com.apalya.myplex</string>
+    <string name="config.google.developerkey">AIzaSyAOgkb9AWtptd2jULcI3ygeZcIsvZjSbYY</string>
 </resources>

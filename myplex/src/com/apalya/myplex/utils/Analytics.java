@@ -93,6 +93,7 @@ public class Analytics {
 	public static String EVENT_BROWSED_TV_SHOWS = "browsed tv shows";
 	public static String EVENT_BROWSED_LIVE_TV_GA = "browsed live tv";
 	public static String EVENT_BROWSED_SETTINGS = "browsed settings";
+	public static String EVENT_BROWSED_YOUTUBE = "browsed breaking news";
 	//public static String EVENT_SELECTED_FEEDBACK = "selected feedback option";
 	public static String EVENT_INITIATING_FEEDBACK = "initiating feedback";
 	public static String EVENT_PROVIDED_FEEDBACK = "provided feedback";
@@ -170,6 +171,7 @@ public class Analytics {
 	public static String NUMBER_OF_CARDS = "number of cards";
 	public static String NUMBER_OF_LIVETV_CARDS = "number of live tv cards";
 	public static String NUMBER_OF_LIVETV_SHOW_CARDS = "number of live tv show cards";
+	public static String NUMBER_OF_YOUTUBE_CARDS = "number of youtube cards";
 	public static String NUMBER_OF_KEYWORDS = "number of keywords";
 	public static String NUMBER_OF_INVITEES = "number of invitees";
 	public static String INVITED_FRIENDS = "invited friends";
@@ -332,6 +334,8 @@ public class Analytics {
 	public static String CONSTANT_TV_SERIES = "tvseries";
 	public static String CONSTANT_TV_SHOW = "tv shows";
 	public static String CONSTANT_TV_EPISODE = "tvepisode";
+	public static String CONSTANT_YOUTUBE = "youtube";
+	
 	
 	public static String NOTIFICATION_OPEND = "notification opened";
 	
@@ -1542,7 +1546,9 @@ public class Analytics {
 		}
 		else if(Analytics.CONSTANT_TV_SERIES.equalsIgnoreCase(ctype)) {
 			Analytics.createEventGA(Analytics.CATEGORY_BROWSE, Analytics.EVENT_BROWSED_TV_SHOWS, Analytics.NUMBER_OF_CARDS, swipeCount);
-		}	
+		}else if(Analytics.CONSTANT_YOUTUBE.equalsIgnoreCase(ctype)) {
+			Analytics.createEventGA(Analytics.CATEGORY_BROWSE, Analytics.EVENT_BROWSED_YOUTUBE, Analytics.NUMBER_OF_CARDS, swipeCount);
+		}		
 	}
 	
 	public static void gaInlineSearch(String keyword,long results) {
@@ -1655,9 +1661,12 @@ public class Analytics {
 	}
 			
 	public static void setMixPanelEmail(String email){
-		mMixPanel.identify(email);		
-		mMixPanel.getPeople().identify(email);
+		
+		// alias device id to user's email id
+		mMixPanel.alias(email, mMixPanel.getDistinctId());
 		mMixPanel.getPeople().set("$email", email);
+
+		mMixPanel.flush();
 	}
 	
 	public static void setMixPanelFirstName(String firstName){

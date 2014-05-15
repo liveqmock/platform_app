@@ -23,5 +23,6 @@ public class CardDataContent implements Serializable{
 	public String categoryType;
 	public String serialNo;
 	public String siblingOrder;
+	public String startDate;
 	public CardDataContent(){}
 }

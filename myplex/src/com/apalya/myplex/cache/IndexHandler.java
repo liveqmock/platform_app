@@ -37,6 +37,7 @@ import android.util.Log;
 
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.Util;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -134,6 +135,14 @@ public class IndexHandler {
             List<String> stopWrods = new ArrayList<String>();
 			Log.i(TAG, "Indexing " +indexableObj.size() +"documents " +"Start");
 			for (CardData indexObject : indexableObj) {
+				
+				if(indexObject != null &&
+						indexObject.generalInfo.type != null 
+							&& indexObject.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_YOUTUBE)){
+					Log.i(TAG, "Indexing skip for youtube content");
+					return;
+				}
+							
 				if (indexObject != null) {
 					JSONObject temp = new JSONObject(Util.toJson(indexObject, false));
 					stopWrods.clear();

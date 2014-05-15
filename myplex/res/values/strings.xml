@@ -142,6 +142,7 @@
     <string name="iconmovie">&#xE8B1;</string>
     <string name="iconlivetv">&#xE8C0;</string>
     <string name="icontvshows">&#xE800;</string>
+    <string name="iconyoutube">&#x2607;</string>
     <string name="iconcricket">&#x26BE;</string>
     <string name="icontv">&#x1F4FA;</string>
     <string name="iconshare">&#xF601;</string>
@@ -191,7 +192,7 @@
     <string name="lastSharedTime">lastSharedTime</string>
         <!-- Transaction related errors-->
     <string name="transaction_server_error">our server thinks this is a duplicate transaction.if you think not, select ‘continue’, otherwise select ‘cancel’ and retry your transaction again in 60 seconds.</string>
-    <string name="retry">retry</string>
+    <string name="retry">continue</string>
     <string name="cancel">cancel</string>
     
      <string name="transaction_cancel_msg">Do you really want to cancel the transaction ?</string>

@@ -17,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -122,6 +123,8 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.analytics.tracking.android.EasyTracker;
+import com.google.android.youtube.player.YouTubeInitializationResult;
+import com.google.android.youtube.player.YouTubeStandalonePlayer;
 
 public class Util {
 
@@ -1155,6 +1158,16 @@ public class Util {
 			return null;
 	}
 	
+	public static String getDateFormat(Date date) {
+	
+		if(date!=null){
+			SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy hh:mm a");
+			sdf.setTimeZone(TimeZone.getDefault());			
+			return sdf.format(date).toString();
+		}else 
+			return "";
+	}
+	
 	public static String getUTCtoLocalDate(String dateInStringUTC) {
 		
 		String datetTimeFormat = "";
@@ -1185,6 +1198,76 @@ public class Util {
 		datetTimeFormat = datetTimeFormat+ " "+ sdf.format(date);
 
 		return datetTimeFormat;
+	}
+	
+public static String getVideoDurationInString(String hhmmssinString) {
+		
+		try {		
+			SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
+			Date date = sdf.parse(hhmmssinString);
+			Calendar calendar = GregorianCalendar.getInstance(); // creates a new calendar instance
+			calendar.setTime(date);   // assigns calendar to given date 		
+			int seconds = calendar.get(Calendar.HOUR);
+			int minutes = calendar.get(Calendar.MINUTE);
+			int hours = calendar.get(Calendar.HOUR);			
+			if(hours > 0){
+				return hours + " hrs";
+			}
+			
+			if(minutes > 0){
+				return minutes + " m";
+			}
+			
+			if(seconds > 0){
+				return seconds + " sec";
+			}
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			return hhmmssinString;
+		}		
+			return "";
+	}
+
+	public static String getHoursDayDiffString(String dateInString) {
+		
+		Log.d(TAG," got time ="+dateInString);
+		String expiryMessage =  "";
+		Date now  = new Date();
+		long difference = 0;
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		format.setTimeZone(TimeZone.getTimeZone("UTC"));
+		Date date = null;
+		try {
+			date = format.parse(dateInString);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		if(date!=null){
+			difference = (now.getTime() -date.getTime());
+			long seconds = difference / 1000;
+			long minutes = seconds / 60;
+			long hours = minutes / 60;		
+			long days = hours / 24;
+			
+			if(days > 1){
+				return days + " days ago";
+			}
+			
+			if(days == 1){
+				return days + " day ago";
+			}			
+			
+			if(hours > 0){
+				return hours + " hrs ago";
+			}
+			
+			if(minutes > 0){
+				return minutes + " minutes ago";
+			}
+		}
+		
+		return "";
 	}
 	
 	public static String getExpiry(String dateInString) {
@@ -1466,6 +1549,38 @@ public class Util {
 		SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a");
 		sdf.setTimeZone(TimeZone.getDefault());
 		return sdf.format(date);
-	}	
+	}
+	
+	public static  boolean canResolveIntent(Intent intent, Context context) {
+		List<ResolveInfo> resolveInfo = context.getPackageManager()
+				.queryIntentActivities(intent, 0);
+		return resolveInfo != null && !resolveInfo.isEmpty();
+	}
+	
+	private static final int REQ_START_STANDALONE_PLAYER = 1;
+	private static final int REQ_RESOLVE_SERVICE_MISSING = 2;
+	  
+	public static void launchYouyubePlayer(Activity activity, String video_id) {
+
+		String developerKey= activity.getString(R.string.config_google_developerkey);
+		
+		if(TextUtils.isEmpty(developerKey)){ return ;}
+		
+		Intent intent = YouTubeStandalonePlayer.createVideoIntent(
+				activity, developerKey,
+				video_id, 0, true, false);		
+
+		if (intent != null) {
+			if (canResolveIntent(intent, activity)) {
+				activity.startActivityForResult(intent,101);
+			} else {
+				// Could not resolve the intent - must need to install or update
+				// the YouTube API service.
+				YouTubeInitializationResult.SERVICE_MISSING.getErrorDialog(
+						activity, REQ_RESOLVE_SERVICE_MISSING).show();
+			}
+		}
+	}
+	
 }
 
