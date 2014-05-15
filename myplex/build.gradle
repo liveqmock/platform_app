@@ -139,8 +139,10 @@ android {
 
             def variantNameStr = variant.name;
             println "applicationVariants variant name ${variantNameStr}"
+            println "applicationVariants package name ${variant.processManifest.packageNameOverride}"
 
             def str_c2dm;
+            
 
             if(variantNameStr.contains("Vivadev")){
                 str_c2dm="com.apalya.myplex.riodev.permission.C2D_MESSAGE";
@@ -150,7 +152,7 @@ android {
                 println "applicationVariants build c2dm myplex beta";
             }else {
             	println "applicationVariants no changes required";
-                return ;
+                str_c2dm="com.apalya.myplex.permission.C2D_MESSAGE";
             }
             
             copy{
@@ -163,6 +165,10 @@ android {
                
                 filter{
                     String line -> line.replaceAll("com.apalya.myplex.permission.C2D_MESSAGE","${str_c2dm}")
+                }
+                
+                filter{
+                    String line -> line.replaceAll("@string/config.package_name","${variant.processManifest.packageNameOverride}")
                 }
                
             }
