@@ -679,8 +679,11 @@ public class Util {
 			intent = new Intent(activity, MainActivity.class);
 		}
 		
-		for (String key : bundle.keySet()) {			
-			intent.putExtra(key, bundle.getString(key).trim());
+		for (String key : bundle.keySet()) {
+			
+			if(bundle.containsKey(key) && bundle.getString(key) != null){
+				intent.putExtra(key, bundle.getString(key).trim());
+			}
 		}
 
 		launchMainActivity(activity, intent);
