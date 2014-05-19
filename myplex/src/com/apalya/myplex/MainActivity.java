@@ -451,6 +451,11 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 							boolean issuedRequest) {
 						CardData data = null;
 						
+						if(mCurrentFragment != null || isFinishing()) {							
+							mCacheManager.unRegisterCallback();
+							return;
+						}
+						
 						 Iterator<Entry<String, CardData>> it = obj.entrySet().iterator();
 						    while (it.hasNext()) {
 						        Entry<String, CardData> pair = it.next();
@@ -754,13 +759,14 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 				}, 3000);
 				return false;
 			} else {
-				exitApp();
+				exitApp();				
 				return true;
 			}	
 		}
 	}
 
 	private void exitApp() {
+		super.onBackPressed();
 		android.os.Process.killProcess(android.os.Process.myPid());
 		System.runFinalizersOnExit(true);
 		System.exit(0);
@@ -789,8 +795,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 			if(mCurrentFragment.onBackClicked())
 				return;
 			if(mFragmentStack.size() == 1){				
-				exitApp();
-				super.onBackPressed();
+				exitApp();				
 				return;
 			}
 		}
@@ -1096,9 +1101,11 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		transaction.commit();
 		mSearchSuggestionFrag = null;
 		
-		fragment = mFragmentStack.peek();
-		Log.i(TAG, "peeking" + fragment);
-		bringFragment(fragment);
+		if(!mFragmentStack.isEmpty()){			
+			fragment = mFragmentStack.peek();
+			Log.i(TAG, "peeking" + fragment);
+			bringFragment(fragment);
+		}
 	}
 	
 	@Override
