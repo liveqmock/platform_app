@@ -316,6 +316,11 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		Log.d(TAG,"onCreateView");
+		
+		if(mMainActivity == null){
+			return null;
+		}
+		
 		System.gc();
 		mAddDataAdded = false;
 		if(isVisible()){
@@ -929,6 +934,10 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			
 			@Override
 			public void response(boolean value) {
+				
+				if(!isAdded())
+					return;
+				
 				String status="";
 				if(value){
 					status="Not Favourite";
@@ -1052,11 +1061,13 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			mCardView.moveTo(mData.currentSelectedCard);
 			
 			Map<String,String> params=new HashMap<String, String>();
-			if(mData.currentSelectedCard <= mData.mMasterEntries.size())
+			if(mData.currentSelectedCard < mData.mMasterEntries.size()){
+				
 				params.put(Analytics.CONTENT_ID_PROPERTY, mData.mMasterEntries.get(mData.currentSelectedCard)._id);
-			if(mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo != null){
-				params.put(Analytics.CONTENT_TYPE_PROPERTY, mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo.type);
-				params.put(Analytics.CONTENT_NAME_PROPERTY, mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo.title);
+				if(mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo != null){
+					params.put(Analytics.CONTENT_TYPE_PROPERTY, mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo.type);
+					params.put(Analytics.CONTENT_NAME_PROPERTY, mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo.title);
+				}
 			}
 			
 		}
