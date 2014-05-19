@@ -177,7 +177,11 @@ public class AccountUtils {
             } catch (GooglePlayServicesAvailabilityException e) {
                 mCallback.onRecoverableException(e.getConnectionStatusCode());
             } catch (UserRecoverableAuthException e) {
-                mActivity.startActivityForResult(e.getIntent(), mRequestCode);
+            	 Intent intent = e.getIntent();
+            	
+                 if (intent != null) {
+                	 mActivity.startActivityForResult(e.getIntent(), mRequestCode);
+                 }
             } catch (IOException e) {
                 Log.e(TAG, "transient error encountered: " + e.getMessage());
                 mCallback.onUnRecoverableException(e.getMessage());
