@@ -119,9 +119,17 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		
+		if(mMainActivity == null){			
+			return null;
+		}
+		
 		if(mDataObject != null && mDataObject instanceof CardData){
 			mCardData = (CardData) mDataObject;
 		}
+		
+		if(mCardData == null) return null;
+		
 		Log.d(TAG,"content ID ="+mCardData._id);
 		mMainActivity.setOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
 		mInflater = LayoutInflater.from(getContext());
