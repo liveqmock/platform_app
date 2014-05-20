@@ -32,7 +32,6 @@ import com.apalya.myplex.data.UserProfile;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.fragments.CardExplorer;
 import com.apalya.myplex.views.CardDetailViewFactory;
-import com.flurry.android.monolithic.sdk.impl.in;
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.Fields;
 import com.google.analytics.tracking.android.MapBuilder;
