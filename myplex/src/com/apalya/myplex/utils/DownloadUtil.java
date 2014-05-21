@@ -16,8 +16,10 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
+import com.apalya.myplex.LoginActivity;
 import com.apalya.myplex.R;
 import com.apalya.myplex.adapters.CacheManagerCallback;
+import com.apalya.myplex.adapters.NavigationOptionsMenuAdapter;
 import com.apalya.myplex.cache.CacheManager;
 import com.apalya.myplex.cache.IndexHandler;
 import com.apalya.myplex.data.CardData;
@@ -29,6 +31,8 @@ import com.apalya.myplex.data.myplexapplication;
 public class DownloadUtil {
 
 	public static final String TAG = "DownloadUtil";
+	
+	private int mDownloadStatus = 0;
 
 	public void actionDownloadComplete(Context context, Intent intent) {
 
@@ -70,7 +74,13 @@ public class DownloadUtil {
 			
 			if (cardDownloadData.mDownloadId == download_id) {
 				
-				Log.d(TAG, "download complete for content id :" + contentId);				
+				Log.d(TAG, "download complete for content id :" + contentId);	
+				FetchDownloadProgress fetchDownloadProgress = new FetchDownloadProgress(context);
+				
+				mDownloadStatus = fetchDownloadProgress.getDownloadStatus(download_id);
+				
+				
+				Log.d(TAG, "download complete status :" + fetchDownloadProgress.getDownloadFailedReason(mDownloadStatus));	
 
 				if (ConsumerApi.DEBUGCLIENTKEY == null) {					
 					
@@ -79,7 +89,9 @@ public class DownloadUtil {
 					ConsumerApi.DEBUGCLIENTKEY = clientKey;
 				}
 				
-				notifyDownloadComplete(contentId);
+				if(DownloadManager.STATUS_SUCCESSFUL == mDownloadStatus){
+					notifyDownloadComplete(contentId);
+				}				
 				showNotification(context,contentId,cardDownloadData);
 				
 				
@@ -162,8 +174,17 @@ public class DownloadUtil {
 					CardData cardDatas = (CardData) obj.get(id);
 					String title   = cardDatas.generalInfo.title;
 					Log.d(TAG,"title ="+title);
-					acquireRights(cardDownloadData,context,id, cardDatas);
-					Util.showNotification(context, title);		
+					Intent notificationIntent = new Intent(context,	LoginActivity.class);					
+					notificationIntent.putExtra(context.getString(R.string.page), NavigationOptionsMenuAdapter.DOWNLOADS);
+					
+					if(DownloadManager.STATUS_SUCCESSFUL == mDownloadStatus){
+						acquireRights(cardDownloadData,context,id, cardDatas);
+						Util.showNotification(context, title, title +context.getString(R.string.notification_download_complete) , notificationIntent);	
+						return ;
+					}
+					
+					Util.showNotification(context, title, title +context.getString(R.string.notification_download_failed), notificationIntent);
+					
 				}
 			}
 		});
