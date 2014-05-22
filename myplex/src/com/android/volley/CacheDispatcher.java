@@ -114,7 +114,8 @@ public class CacheDispatcher extends Thread {
                 }
 
                 // If it is completely expired, just send it to the network.
-                if (!ApplicationSettings.ENABLE_USE_EXPIRED_RESPONSE && entry.isExpired() && ConnectivityReceiver.isConnected) {
+                // don't use expired response for youtube content
+                if ((!ApplicationSettings.ENABLE_USE_EXPIRED_RESPONSE ||  request.getUrl().contains(ConsumerApi.TYPE_YOUTUBE) )&& entry.isExpired() && ConnectivityReceiver.isConnected) {
                 	Log.d("volley", "cache-hit-expire for "+request.getUrl());
                     request.addMarker("cache-hit-expired");
                     request.setCacheEntry(entry);

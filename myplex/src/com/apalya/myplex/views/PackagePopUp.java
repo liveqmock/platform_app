@@ -10,6 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.animation.LayoutTransition;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -164,6 +165,11 @@ public class PackagePopUp {
 		}
 	}
 	private void showPopup(View v,View anchorView) {
+		
+		if(mContext instanceof Activity && ((Activity) mContext).isFinishing()){			
+			return ;
+		}
+		
 		dismissFilterMenuPopupWindow();
 		mFilterMenuPopupWindow = new PopupWindow(v,LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT, true);
 		mFilterMenuPopupWindowList.add(mFilterMenuPopupWindow);

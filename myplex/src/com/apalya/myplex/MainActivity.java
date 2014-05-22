@@ -451,6 +451,11 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 							boolean issuedRequest) {
 						CardData data = null;
 						
+						if(mCurrentFragment != null || isFinishing()) {							
+							mCacheManager.unRegisterCallback();
+							return;
+						}
+						
 						 Iterator<Entry<String, CardData>> it = obj.entrySet().iterator();
 						    while (it.hasNext()) {
 						        Entry<String, CardData> pair = it.next();
@@ -511,6 +516,9 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 				intentHandled=true;
 			}else if(action.equalsIgnoreCase(NavigationOptionsMenuAdapter.YOUTUBE)){
 				selectItem(5);
+				intentHandled=true;
+			}else if(action.equalsIgnoreCase(NavigationOptionsMenuAdapter.DOWNLOADS)){				
+				selectItem(9);
 				intentHandled=true;
 			}
 			return intentHandled;
@@ -754,13 +762,14 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 				}, 3000);
 				return false;
 			} else {
-				exitApp();
+				exitApp();				
 				return true;
 			}	
 		}
 	}
 
 	private void exitApp() {
+		super.onBackPressed();
 		android.os.Process.killProcess(android.os.Process.myPid());
 		System.runFinalizersOnExit(true);
 		System.exit(0);
@@ -789,8 +798,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 			if(mCurrentFragment.onBackClicked())
 				return;
 			if(mFragmentStack.size() == 1){				
-				exitApp();
-				super.onBackPressed();
+				exitApp();				
 				return;
 			}
 		}
@@ -988,7 +996,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 				data.requestType = CardExplorerData.REQUEST_DOWNLOADS;
 				setActionBarTitle("my "+NavigationOptionsMenuAdapter.DOWNLOADS);
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.PURCHASES)){
-				removeLiveTvActionBarIcon();
+				showLiveTvOrMovieIcon(NavigationOptionsMenuAdapter.PURCHASES);
 				data.requestType = CardExplorerData.REQUEST_PURCHASES;
 				setActionBarTitle("my "+NavigationOptionsMenuAdapter.PURCHASES);
 			}/*else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.SPORTS)){
@@ -1096,9 +1104,11 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		transaction.commit();
 		mSearchSuggestionFrag = null;
 		
-		fragment = mFragmentStack.peek();
-		Log.i(TAG, "peeking" + fragment);
-		bringFragment(fragment);
+		if(!mFragmentStack.isEmpty()){			
+			fragment = mFragmentStack.peek();
+			Log.i(TAG, "peeking" + fragment);
+			bringFragment(fragment);
+		}
 	}
 	
 	@Override
@@ -1244,7 +1254,9 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 						}
 					});
 					fadeAnim.start();
-					mCurrentFragment.getView().setDrawingCacheEnabled(false);
+					if(mCurrentFragment != null){
+						mCurrentFragment.getView().setDrawingCacheEnabled(false);
+					}
 				}
 			});
 		} catch (Exception e) {
@@ -1613,12 +1625,32 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		}		
 	};
 	
+	private class  PurchasesListener implements OnClickListener{
+		@Override
+		public void onClick(View v) {
+			tvOrMovie.setOnClickListener(null);
+			tvOrMovie.setEnabled(false);
+			handler.postDelayed(new Runnable() {				
+				@Override
+				public void run() {
+					tvOrMovie.setEnabled(true);
+				}
+			}, 3000);
+			selectItem(8);
+		}		
+	};
+	
 	public void showLiveTvOrMovieIcon(String liveTv){
 		if(liveTv.equalsIgnoreCase("live")){
 			tvOrMovie.setVisibility(View.VISIBLE);
 			tvOrMovie.setOnClickListener(new MovieListener());
 			tvOrMovie.setText(R.string.iconmovie);
-		}else{
+		} else if (liveTv.equalsIgnoreCase(NavigationOptionsMenuAdapter.PURCHASES)){
+			tvOrMovie.setVisibility(View.VISIBLE);
+			tvOrMovie.setOnClickListener(new PurchasesListener());
+			tvOrMovie.setText(R.string.iconrefresh);
+		}
+		else{
 			tvOrMovie.setVisibility(View.VISIBLE);
 			tvOrMovie.setText(R.string.iconlivetv);
 			tvOrMovie.setOnClickListener(new LiveTvListener());

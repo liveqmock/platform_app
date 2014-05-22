@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -1020,6 +1021,9 @@ public class CardDetails extends BaseFragment implements
 			mProgressBar.setVisibility(value);
 		}
 	}
+	
+	private boolean mShowReminder = true;
+	
 	@Override
 	public boolean onBackClicked() {
 		try{
@@ -1036,7 +1040,8 @@ public class CardDetails extends BaseFragment implements
 				}
 				mPlayer.setFullScreen(!mPlayer.isFullScreen());
 				return true;
-			}
+			}			
+			
 			if(mPlayer.isMediaPlaying()){
 				mPlayer.onStateChanged(PlayerListener.STATE_PAUSED, mPlayer.getStopPosition());
 				Analytics.stoppedAt();
@@ -1044,6 +1049,17 @@ public class CardDetails extends BaseFragment implements
 				Analytics.isTrailer = mPlayer.getTrailer();
 				Analytics.gaStopPauseMediaTime("stop",mPlayer.getStopPosition(),mCardData);
 				mPlayer.closePlayer();
+				
+				if( ApplicationSettings.ENABLE_AUTO_REMINDER_FOR_LIVETV  && mShowReminder && mCardData != null && mCardData.generalInfo != null &&
+						mCardData.generalInfo.type != null && mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
+					Calendar prg = Calendar.getInstance();
+					prg.add(Calendar.DATE, 1);
+					String message = "Set reminder for "+ mCardData.generalInfo.title +" tomorrow at same time";
+					Util.showReminder(mCardData.generalInfo.title, prg.getTime(),mCardData.generalInfo.title , mCardData._id, mContext, message, mContext.getString(R.string.notification_livetv_message));
+					mShowReminder = false;
+					return true;
+				}
+				
 				return true;
 			}
 			return false;

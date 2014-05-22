@@ -25,6 +25,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
+import android.view.View.OnSystemUiVisibilityChangeListener;
 import android.view.ViewTreeObserver;
 import android.view.View.OnClickListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
@@ -59,6 +60,8 @@ import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.LogOutUtil;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.SharedPrefUtils;
+import com.apalya.myplex.utils.SyncPurchasesUtil;
+import com.apalya.myplex.utils.SyncPurchasesUtil.SyncPurchasesCallback;
 import com.apalya.myplex.utils.Util;
 import com.crashlytics.android.Crashlytics;
 
@@ -600,9 +603,19 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 						
 						Crashlytics.setUserName(userIdSha1);
 						Crashlytics.setUserIdentifier(userIdSha1);
+						
+						SyncPurchasesUtil syncPurchasesUtil = new SyncPurchasesUtil();
+						syncPurchasesUtil.setListener(syncPurchasesCallback);
+						if(syncPurchasesUtil.syncPurchases(0, getApplicationContext()))
+						{
+							if(mProgressDialog != null) mProgressDialog.setMessage(getString(R.string.syncing_purchases));
+							return;
+							
+						}
 						finish();
 						Util.launchMainActivity(SignUpActivity.this);
-						//						Util.launchActivity(MainActivity.class,SignUpActivity.this , null);
+						dismissProgressBar();
+						
 					}
 					else
 					{
@@ -621,11 +634,17 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 							if(!TextUtils.isEmpty(jsonResponse.getString("message")))
 								sendNotification(jsonResponse.getString("message"));
 						}
+						dismissProgressBar();
 					}
 				} catch (JSONException e) {
+					dismissProgressBar();
 					e.printStackTrace();
 				}
-				dismissProgressBar();
+				
+				
+				
+				
+				
 			}
 		};
 	}
@@ -761,6 +780,19 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 		};
 	}
 
+	private SyncPurchasesCallback syncPurchasesCallback  = new SyncPurchasesCallback(){
+
+		@Override
+		public void onComplete(boolean value) {
+			
+			finish();
+			Util.launchMainActivity(SignUpActivity.this);
+			dismissProgressBar();
+			
+		}
+		
+	};
+	
 	protected Listener<String> userLoginSuccessListener() {
 		
 		return new Response.Listener<String>() {
@@ -808,8 +840,17 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 						
 						Crashlytics.setUserName(userIdSha1);
 						Crashlytics.setUserIdentifier(userIdSha1);
+						
+						SyncPurchasesUtil syncPurchasesUtil = new SyncPurchasesUtil();
+						syncPurchasesUtil.setListener(syncPurchasesCallback);
+						if(syncPurchasesUtil.syncPurchases(0, getApplicationContext()))
+						{
+							if(mProgressDialog != null) mProgressDialog.setMessage(getString(R.string.syncing_purchases));
+							return;
+						}
 						finish();
 						Util.launchMainActivity(SignUpActivity.this);
+						dismissProgressBar();
 					}
 					else
 					{
@@ -838,11 +879,13 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 						Log.d(TAG, "code: "+jsonResponse.getString("code"));
 						Log.d(TAG, "message: "+jsonResponse.getString("message"));
 						sendNotification("Err: "+jsonResponse.getString("code")+" \nErr Msg: "+jsonResponse.getString("message"));
+						dismissProgressBar();
 					}
 				} catch (JSONException e) {
+					dismissProgressBar();
 					e.printStackTrace();
 				}
-				dismissProgressBar();
+				
 			}
 		};
 	}

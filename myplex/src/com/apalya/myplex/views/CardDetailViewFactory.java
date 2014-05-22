@@ -12,6 +12,7 @@ import android.animation.LayoutTransition;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.text.TextUtils;
 import android.text.util.Linkify;
 import android.text.util.Linkify.TransformFilter;
 import android.util.Patterns;
@@ -52,6 +53,7 @@ import com.apalya.myplex.utils.CircleImageLoader;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FetchCardField;
 import com.apalya.myplex.utils.FetchCardField.FetchComplete;
+import com.apalya.myplex.utils.FetchCommentsField;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MessagePost.MessagePostCallback;
 import com.apalya.myplex.utils.MyVolley;
@@ -196,11 +198,21 @@ public class CardDetailViewFactory {
 	
 	private void fillCommentSectionData(int type,CardData card){
 		
-		mCommentContentLayout.removeAllViews();
+		if(mStartIndexComment == 1)
+			mCommentContentLayout.removeAllViews();
+		
 		if(type == COMMENTSECTION_COMMENTS){
-			if(card.comments == null){return ;}
-			if(card.comments.values == null ){return ;}
-			if(card.comments.values.size() == 0){return ;}
+			if(card.comments == null || card.comments.values == null || card.comments.values.size() == 0){
+				setVisibility(mLoadMore, View.GONE);
+				return ;
+			}
+			
+			if(mLoadMore != null){
+				mLoadMore.setText(mContext.getString(R.string.carddetailsectionheader_loadmore));
+			}
+			
+			setVisibility(mLoadMore, card.comments.values.size() >= ConsumerApi.COUNT_COMMENTS_INT ?View.VISIBLE:View.GONE);
+						
 			for(CardDataCommentsItem commentsItem:card.comments.values){
 				View child = mInflator.inflate(R.layout.carddetailcomment_data, null);
 	//			VerticalLineRelativeLayout timelinelayout = (VerticalLineRelativeLayout)child.findViewById(R.id.timeLineLayout);
@@ -215,21 +227,53 @@ public class CardDetailViewFactory {
 				commentMessage.setText(commentsItem.comment);
 				commentMessage.setTypeface(FontUtil.Roboto_Regular);
 	//			addSpace(layout, 16);
+				
+				if(!TextUtils.isEmpty(commentsItem.name)){
+					Character firstChar = commentsItem.name.trim().charAt(0);
+					ImageView imageView = (ImageView)child.findViewById(R.id.imageView1);
+					imageView.setImageResource(mContext.getResources().getIdentifier(""+Character.toLowerCase(firstChar), "drawable", mContext.getPackageName()));
+					
+				}
 				mCommentContentLayout.addView(child);
 				
 				
 			}
 		}else if(type == COMMENTSECTION_REVIEW){
-			if(card.userReviews == null){return ;}
-			if(card.userReviews.values == null ){return ;}
-			if(card.userReviews.values.size() == 0){return ;}
+			if(card.userReviews == null || card.userReviews.values == null || card.userReviews.values.size() == 0){
+				setVisibility(mLoadMore, View.GONE);
+				return ;
+			}
+			
+			if(mLoadMore != null){
+				mLoadMore.setText(mContext.getString(R.string.carddetailsectionheader_loadmore));
+			}
+			
+			setVisibility(mLoadMore, card.userReviews.values.size() >= ConsumerApi.COUNT_COMMENTS_INT ?View.VISIBLE:View.GONE);
+			
 			for(CardDataUserReviewsItem reviewItem:card.userReviews.values){
 				View child = mInflator.inflate(R.layout.carddetailcomment_data, null);
 	//			VerticalLineRelativeLayout timelinelayout = (VerticalLineRelativeLayout)child.findViewById(R.id.timeLineLayout);
 	//			timelinelayout.setWillNotDrawEnabled(false);
 				TextView personName = (TextView)child.findViewById(R.id.carddetailcomment_personname);
-				personName.setText(reviewItem.username);
+				String name = "";
+
+				if(!TextUtils.isEmpty(reviewItem.username)){
+					name = reviewItem.username;
+					personName.setText(reviewItem.username);
+				}else if (!TextUtils.isEmpty(reviewItem.name)){
+					name = reviewItem.name;
+					personName.setText(reviewItem.name);
+				}
+				
 				personName.setTypeface(FontUtil.Roboto_Regular);
+				
+				if(!TextUtils.isEmpty(name)){
+					Character firstChar = name.trim().charAt(0);
+					ImageView imageView = (ImageView)child.findViewById(R.id.imageView1);
+					imageView.setImageResource(mContext.getResources().getIdentifier(""+Character.toLowerCase(firstChar), "drawable", mContext.getPackageName()));
+					
+				}
+				
 				TextView commentTime = (TextView)child.findViewById(R.id.carddetailcomment_time);
 				commentTime.setText(Util.getDate(reviewItem.timestamp));
 				commentTime.setTypeface(FontUtil.Roboto_Regular);
@@ -299,6 +343,7 @@ public class CardDetailViewFactory {
 	}
 	
 	private LinearLayout mCommentContentLayout;
+	private Button mLoadMore;
 	private int mCurrentCommentViewType = COMMENTSECTION_COMMENTS;
 	private View createCommentsView() {
 		mComments = null;
@@ -333,6 +378,7 @@ public class CardDetailViewFactory {
 		final TextView twitterHeading = (TextView)v.findViewById(R.id.carddetailcomment_twitterheading);
 		reviewHeading.setTypeface(FontUtil.Roboto_Regular);
 		final Button editBox = (Button)v.findViewById(R.id.carddetailcomment_edittext);
+		mLoadMore = (Button)v.findViewById(R.id.button_loadmore);
 		editBox.setTypeface(FontUtil.Roboto_Regular);
 //		Util.showFeedback(editBox);
 		editBox.setOnClickListener(new OnClickListener() {
@@ -355,6 +401,7 @@ public class CardDetailViewFactory {
 								//final String label = (String) editBox.getText();
 								//Toast.makeText(mContext, "Comment has posted successfully.", Toast.LENGTH_SHORT).show();
 								mCurrentCommentViewType = COMMENTSECTION_COMMENTS;
+								mStartIndexComment=1;
 								refreshSection();
 							}else{
 								//remove this
@@ -420,6 +467,7 @@ public class CardDetailViewFactory {
 //				editBox.setOnClickListener(null);
 //				fillCommentSectionData(COMMENTSECTION_COMMENTS,mData);
 				mCurrentCommentViewType = COMMENTSECTION_COMMENTS;
+				mStartIndexComment = 1;
 				refreshSection();
 			}
 		});
@@ -440,6 +488,7 @@ public class CardDetailViewFactory {
 //				editBox.setOnClickListener(mRateListener);
 //				fillCommentSectionData(COMMENTSECTION_REVIEW,mData);
 				mCurrentCommentViewType = COMMENTSECTION_REVIEW;
+				mStartIndexComment = 1;
 				refreshSection();
 			}
 		});
@@ -473,7 +522,17 @@ public class CardDetailViewFactory {
 //		});
 		refreshSection();
 		
-		
+		mLoadMore.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				mStartIndexComment ++;
+				refreshSection();
+				mLoadMore.setText(mContext.getString(R.string.loading));
+				mLoadMore.setClickable(false);
+				
+			}
+		});
 		
 		return v;
 	}
@@ -503,6 +562,7 @@ public class CardDetailViewFactory {
 //		 mCommentRefresh.startAnimation(animation);
 	}
 	private boolean mRefreshInProgress = false;
+	private int mStartIndexComment = 1;
 	private void refreshSection() {
 		mRefreshInProgress = true;
 		rotateRefresh();
@@ -528,21 +588,32 @@ public class CardDetailViewFactory {
 			FieldName = ConsumerApi.FIELD_USERREVIEWS;
 		}
 		
-		FetchCardField fetch = new FetchCardField();
-		fetch.Fetch(mData, FieldName, new FetchComplete() {
+		FetchCommentsField fetch = new FetchCommentsField();
+		fetch.FetchCommentReview(mData, FieldName,mStartIndexComment, new FetchComplete() {
 			
 			@Override
 			public void response(CardResponseData data) {
 				mRefreshInProgress = false;
 				stopRefresh();
-				if(data == null){return;}
-				if(data.results == null){return;}
-				if(data.results.size() == 0 ){return;}
+				if(data == null || data.results == null || data.results.size() == 0 ){
+					mLoadMore.setVisibility(View.GONE);
+					return;
+				}
+				
 				CardData cardData = data.results.get(0);
 				fillCommentSectionData(mCurrentCommentViewType,cardData);
+			
 			}
 		});
 		
+	}
+	
+	private void setVisibility(View view , int visibility){
+		if(view != null){
+			view.setVisibility(visibility);
+			if(visibility == View.VISIBLE)
+				view.setClickable(true);
+		}
 	}
 
 	private View createExtraMultiMediaView() {

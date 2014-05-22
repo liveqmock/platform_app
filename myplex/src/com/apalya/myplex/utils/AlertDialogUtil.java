@@ -2,6 +2,7 @@ package com.apalya.myplex.utils;
 
 import com.apalya.myplex.R;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -43,6 +44,9 @@ public class AlertDialogUtil{
            }
        });
        
+       if(mContext instanceof Activity && ((Activity) mContext).isFinishing()){			
+			return ;
+       }
        
        builder.show(); //To show the AlertDialog
    }

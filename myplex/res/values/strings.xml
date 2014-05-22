@@ -140,6 +140,7 @@
     <string name="iconrate"></string>
     <string name="iconhome">&#x2302;</string>
     <string name="iconmovie">&#xE8B1;</string>
+    <string name="iconrefresh">&#xEB82;</string>
     <string name="iconlivetv">&#xE8C0;</string>
     <string name="icontvshows">&#xE800;</string>
     <string name="iconyoutube">&#x2607;</string>
@@ -169,6 +170,8 @@
      <string name="osname">Android</string>
      
      <!--Login/Singup errors-->
+    <string name="syncing_purchases">syncing purchases..</string>
+    <string name="syncing_purchases_failed_setting_msg">sync purchase failed.you can manually sync in settings.</string>
     <string name="interneterr">internet connection is not active</string>
     <string name="loginerr">unable to login.\n"browse as guest".</string>
     <string name="loginconerr">device registration failed. relaunch myplex.</string>
@@ -272,6 +275,9 @@
     <string name="notification_action">action</string>
     <string name="notification_action_autoplay">autoplay</string>
     <string name="notification_promo">promo</string>
+    <string name="notification_download_complete">Download Complete</string>
+    <string name="notification_download_failed">Download Failed</string>
+    <string name="notification_livetv_message">Watch Now</string>
     
     <!--FIFA related strings  -->
     <string name="iconsoccer">&#x26BD;</string>

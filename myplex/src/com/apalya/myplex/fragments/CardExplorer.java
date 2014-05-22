@@ -69,15 +69,18 @@ import com.apalya.myplex.listboxanimation.OnDismissCallback;
 import com.apalya.myplex.media.VideoViewPlayer.OnLicenseExpiry;
 import com.apalya.myplex.tablet.TabletCardDetails;
 import com.apalya.myplex.utils.AlertDialogUtil;
+import com.apalya.myplex.utils.AlertDialogUtil.NoticeDialogListener;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FavouriteUtil;
+import com.apalya.myplex.utils.LogOutUtil;
 import com.apalya.myplex.utils.FavouriteUtil.FavouriteCallback;
 import com.apalya.myplex.utils.FetchDownloadProgress;
 import com.apalya.myplex.utils.FetchDownloadProgress.DownloadProgressStatus;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
+import com.apalya.myplex.views.CardVideoPlayer;
 import com.apalya.myplex.views.CardView;
 import com.apalya.myplex.views.PackagePopUp;
 import com.apalya.myplex.views.SensorScrollUtil;
@@ -108,6 +111,22 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	//private EasyTracker easyTracker = null;
 	
 
+	NoticeDialogListener mLoginDialogListener = new NoticeDialogListener(){
+
+		@Override
+		public void onDialogOption2Click() {
+			
+			LogOutUtil.onClickLogout(mContext);
+		}
+
+		@Override
+		public void onDialogOption1Click() {
+			
+			
+		}
+		
+	};
+	
 	@Override
 	public void open(CardData object) {
 		
@@ -118,6 +137,20 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		if(object.generalInfo != null 
 				&& object.generalInfo.type != null 
 				&& object.generalInfo.type.equalsIgnoreCase(ConsumerApi.TYPE_YOUTUBE)){
+			
+			// Before playing any video we have to check whether user has logged In
+			// or not.
+			String email = myplexapplication.getUserProfileInstance()
+					.getUserEmail();
+			if (email == null || email.equalsIgnoreCase("NA") || email.equalsIgnoreCase("")) {
+				AlertDialogUtil.showAlert(mContext, mContext.getResources()
+						.getString(R.string.must_logged_in), mContext
+						.getResources().getString(R.string.continiue_as_guest),
+						mContext.getResources().getString(R.string.login_to_play),
+						mLoginDialogListener);
+				return ;
+			}
+			
 			Util.launchYouyubePlayer((Activity) mContext, object._id);
 			return ;
 		}
@@ -316,6 +349,11 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		Log.d(TAG,"onCreateView");
+		
+		if(mMainActivity == null){
+			return null;
+		}
+		
 		System.gc();
 		mAddDataAdded = false;
 		if(isVisible()){
@@ -929,6 +967,10 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			
 			@Override
 			public void response(boolean value) {
+				
+				if(!isAdded())
+					return;
+				
 				String status="";
 				if(value){
 					status="Not Favourite";
@@ -1052,11 +1094,13 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			mCardView.moveTo(mData.currentSelectedCard);
 			
 			Map<String,String> params=new HashMap<String, String>();
-			if(mData.currentSelectedCard <= mData.mMasterEntries.size())
+			if(mData.currentSelectedCard < mData.mMasterEntries.size()){
+				
 				params.put(Analytics.CONTENT_ID_PROPERTY, mData.mMasterEntries.get(mData.currentSelectedCard)._id);
-			if(mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo != null){
-				params.put(Analytics.CONTENT_TYPE_PROPERTY, mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo.type);
-				params.put(Analytics.CONTENT_NAME_PROPERTY, mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo.title);
+				if(mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo != null){
+					params.put(Analytics.CONTENT_TYPE_PROPERTY, mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo.type);
+					params.put(Analytics.CONTENT_NAME_PROPERTY, mData.mMasterEntries.get(mData.currentSelectedCard).generalInfo.title);
+				}
 			}
 			
 		}

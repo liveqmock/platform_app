@@ -22,7 +22,7 @@ import com.google.analytics.tracking.android.Tracker;
 import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.utils.Util;
 import com.crashlytics.android.Crashlytics;
-import com.flurry.android.FlurryAgent;
+
 
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 
@@ -233,7 +233,7 @@ public class myplexapplication extends Application {
 					Crashlytics.setUserEmail(username);
 
 					String userIdSha1 = Util.sha1Hash(username);
-					FlurryAgent.setUserId(userIdSha1);
+				
 					Crashlytics.setUserName(userIdSha1);
 					Crashlytics.setUserIdentifier(userIdSha1);
 
