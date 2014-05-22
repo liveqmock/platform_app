@@ -605,13 +605,17 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 						Crashlytics.setUserIdentifier(userIdSha1);
 						
 						SyncPurchasesUtil syncPurchasesUtil = new SyncPurchasesUtil();
-						if(!syncPurchasesUtil.syncPurchases(0, getApplicationContext()))
+						syncPurchasesUtil.setListener(syncPurchasesCallback);
+						if(syncPurchasesUtil.syncPurchases(0, getApplicationContext()))
 						{
-							finish();
-							Util.launchMainActivity(SignUpActivity.this);
+							if(mProgressDialog != null) mProgressDialog.setMessage(getString(R.string.syncing_purchases));
+							return;
+							
 						}
+						finish();
+						Util.launchMainActivity(SignUpActivity.this);
+						dismissProgressBar();
 						
-						//						Util.launchActivity(MainActivity.class,SignUpActivity.this , null);
 					}
 					else
 					{
@@ -630,13 +634,15 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 							if(!TextUtils.isEmpty(jsonResponse.getString("message")))
 								sendNotification(jsonResponse.getString("message"));
 						}
+						dismissProgressBar();
 					}
 				} catch (JSONException e) {
+					dismissProgressBar();
 					e.printStackTrace();
 				}
 				
 				
-				dismissProgressBar();
+				
 				
 				
 			}

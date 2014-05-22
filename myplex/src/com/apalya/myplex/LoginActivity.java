@@ -76,6 +76,8 @@ import com.apalya.myplex.utils.LocationUtil;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.PlayServicesUtils;
 import com.apalya.myplex.utils.SharedPrefUtils;
+import com.apalya.myplex.utils.SyncPurchasesUtil;
+import com.apalya.myplex.utils.SyncPurchasesUtil.SyncPurchasesCallback;
 import com.apalya.myplex.utils.Twitter11;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.utils.AlertDialogUtil;
@@ -1070,7 +1072,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 				
 				
 				try {	
-					dismissProgressBar();
+					
 					Log.d(TAG, "########################################################");
 					JSONObject jsonResponse= new JSONObject(response);
 					if(jsonResponse.getString("status").equalsIgnoreCase("SUCCESS"))
@@ -1103,12 +1105,20 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 						Log.d(TAG, "########################################################");
 						Log.d(TAG, "---------------------------------------------------------");
 						//sendNotification(jsonResponse.getString("message"));
+						SyncPurchasesUtil syncPurchasesUtil = new SyncPurchasesUtil();
+						syncPurchasesUtil.setListener(syncPurchasesCallback);
+						if(syncPurchasesUtil.syncPurchases(0, getApplicationContext()))
+						{
+							if(mProgressDialog != null) mProgressDialog.setMessage(getString(R.string.syncing_purchases));
+							return;
+						}
+						dismissProgressBar();
 						finish();
 						Util.launchMainActivity(LoginActivity.this);
 					}
 					else
 					{
-
+						dismissProgressBar();
 						if(mUserInfo != null){
 							mUserInfo.setUserEmail("NA");
 							mUserInfo.setGoogleId(null);
@@ -1140,6 +1150,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 					}
 				} catch (JSONException e) {
+					dismissProgressBar();
 					e.printStackTrace();
 				}
 			}
@@ -1328,12 +1339,26 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		};
 	}
 
+	private SyncPurchasesCallback syncPurchasesCallback  = new SyncPurchasesCallback(){
+
+		@Override
+		public void onComplete(boolean value) {
+			
+			dismissProgressBar();
+			finish();
+			Util.launchMainActivity(LoginActivity.this);
+			
+			
+		}
+		
+	};
+
 	protected Listener<String> googleLoginSuccessListener() {
 		//loader.setVisibility(View.GONE);
 		return new Response.Listener<String>() {
 			@Override
 			public void onResponse(String response) {
-				dismissProgressBar();
+				
 								
 				Log.d(TAG,"Response: "+response);
 				try {	
@@ -1364,12 +1389,21 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 						Log.d(TAG, "########################################################");
 						Log.d(TAG, "---------------------------------------------------------");
 						
+						SyncPurchasesUtil syncPurchasesUtil = new SyncPurchasesUtil();
+						syncPurchasesUtil.setListener(syncPurchasesCallback);
+						if(syncPurchasesUtil.syncPurchases(0, getApplicationContext()))
+						{
+							if(mProgressDialog != null) mProgressDialog.setMessage(getString(R.string.syncing_purchases));
+							return;
+						}
+						
+						dismissProgressBar();
 						finish();
 						Util.launchMainActivity(LoginActivity.this);
 					}
 					else
 					{
-
+						dismissProgressBar();
 						if(mUserInfo != null){
 							mUserInfo.setUserEmail("NA");
 							mUserInfo.setGoogleId(null);
@@ -1401,6 +1435,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 						//showToast("Err: "+jsonResponse.getString("code")+" \nErr Msg: "+jsonResponse.getString("message"));
 					}
 				} catch (JSONException e) {
+					dismissProgressBar();
 					e.printStackTrace();
 				}
 			}
