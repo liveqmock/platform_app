@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/carddetails_bg" >
+    android:background="@drawable/carddetails_bg" 
+    android:paddingBottom="4dp">
 
     <LinearLayout
         android:id="@+id/carddetailcomment_commentlayout"
@@ -89,6 +90,21 @@
         android:orientation="vertical" >
     </LinearLayout>
 
+    
+    <Button
+        android:id="@+id/button_loadmore"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/margin_gap_36"
+        android:layout_below="@+id/carddetailcomment_contentlayout"
+        android:layout_alignParentBottom="true"
+		android:layout_margin="14dp"
+        android:background="@drawable/button_selector"
+        android:gravity="center_vertical|center_horizontal"
+        android:text="@string/carddetailsectionheader_loadmore"      
+        android:textSize="@dimen/textsize_12"
+        android:textColor="@color/theme_app_color"
+        android:visibility="visible" />
+    
     <LinearLayout
         android:id="@+id/carddetailcomment_reviewlayout"
         android:layout_width="wrap_content"

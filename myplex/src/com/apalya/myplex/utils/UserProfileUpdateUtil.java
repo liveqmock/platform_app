@@ -45,7 +45,7 @@ public class UserProfileUpdateUtil {
 			protected Map<String, String> getParams() throws AuthFailureError {
 				HashMap<String, String> params = new HashMap<String, String>();
 				 params.put("clientKey", ConsumerApi.DEBUGCLIENTKEY);
-				 params.put("mobile",msisdn.substring(msisdn.length()-10));
+				 params.put("mobile",msisdn.substring(msisdn.length()>10?msisdn.length()-10:0));
 				return params;
 			}
 		};
