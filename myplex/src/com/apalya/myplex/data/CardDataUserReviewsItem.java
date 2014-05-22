@@ -14,5 +14,6 @@ public class CardDataUserReviewsItem implements Serializable{
 	public float rating;
 	public String review;
 	public String timestamp;
+	public String name;
 	public CardDataUserReviewsItem(){}
 }

@@ -30,6 +30,7 @@ public class ReminderReceiver extends BroadcastReceiver {
 					
 				Intent notificationIntent = new Intent(context, LoginActivity.class);
 				notificationIntent.putExtra("_id", extras.getString("_id"));
+				notificationIntent.putExtra("action", "autoplay");
 				PendingIntent contentIntent = PendingIntent.getActivity(context,
 				                0, notificationIntent,
 				                PendingIntent.FLAG_CANCEL_CURRENT);
@@ -41,8 +42,7 @@ public class ReminderReceiver extends BroadcastReceiver {
 				NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
 				
 				builder.setContentIntent(contentIntent)
-				       .setSmallIcon(R.drawable.myplexicon)
-				       .setLargeIcon(BitmapFactory.decodeResource(res, R.drawable.myplexicon))
+				       .setSmallIcon(R.drawable.myplexicon)				       
 				       .setTicker("myplex")
 				       .setWhen(System.currentTimeMillis())
 				       .setAutoCancel(true)
