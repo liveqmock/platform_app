@@ -10,6 +10,7 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.telephony.TelephonyManager;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.android.volley.RequestQueue;
@@ -23,7 +24,7 @@ import com.apalya.myplex.utils.ManageWifiConnection.OnNetworkStateListener;
 public class MsisdnRetrivalEngine {
 	private Context mContext;
 	private static String TAG = "MsisdnRetrivalEngine";
-	private String mUrl = "http://www.myplexnow.tv/SamsungBillingHub/MsisdnRetriever";
+	private String mUrl = "http://www.myplexnow.tv/SamsungBillingHub/MsisdnRetriever";	
 	MsisdnData mData;
 	private static int FETCHINGMSISDN = 1;
 	private static int SENDINGCALLBACK = 2;
@@ -40,6 +41,11 @@ public class MsisdnRetrivalEngine {
 	public void deRegisterCallBacks(){
 		this.mListener = null;
 	}
+	
+	public void setUrl(String mUrl) {
+		this.mUrl = mUrl;
+	}
+	
 	public void getMsisdnData(MsisdnRetrivalEngineListener listener){
 		Log.e(TAG, "getMsisdnData");
 		this.mListener = listener;
@@ -118,7 +124,12 @@ public class MsisdnRetrivalEngine {
 					data.operator = parseStringAttribute(parser,"operator");
 				}
 			}
+			
+			if(data != null && !TextUtils.isEmpty(data.msisdn) && data.msisdn.equalsIgnoreCase("nomsisdn")){
+				data = null;
+			}
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return data;
 	}

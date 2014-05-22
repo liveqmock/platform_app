@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.drm.DrmUtils;
 import android.os.Bundle;
@@ -25,12 +26,15 @@ import com.apalya.myplex.TwitterWebView;
 import com.apalya.myplex.adapters.SettingsAdapter;
 import com.apalya.myplex.data.ApplicationSettings;
 import com.apalya.myplex.data.CardData;
+import com.apalya.myplex.data.MsisdnData;
 import com.apalya.myplex.data.SettingsData;
 import com.apalya.myplex.data.UserProfile;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.DeviceRegUtil;
 import com.apalya.myplex.utils.SharedPrefUtils;
+import com.apalya.myplex.utils.SyncPurchasesUtil;
+import com.apalya.myplex.utils.SyncPurchasesUtil.SyncPurchasesCallback;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.utils.WidevineDrm;
 import com.apalya.myplex.utils.MessagePost.MessagePostCallback;
@@ -57,10 +61,15 @@ public class SetttingsFragment extends BaseFragment {
 	public static final String DRM_STATUS_STRING="WVDRM status";
 	public static final String DRM_LEVAL_STRING="WVDRM statusKey";
 	public static final String ROOT_STATUS_STRING="root status";
-	public static final String DERIGISTER_DEVICE="deRegister device";
+	public static final String DERIGISTER_DEVICE="Deregister device";
 	public static final String SENSOR_SCROLL="Sensor Scroll";
-
+	public static final String SYNC_PURCHASES="Sync Purchases";
+	public static final String MSISDN="MSISDN";
+	
 	private int debug_mode_counter=0;
+	
+	private ProgressDialog mProgressDialog;
+	
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -104,9 +113,28 @@ public class SetttingsFragment extends BaseFragment {
 					return;
 				}
 				
+				if(data.type == SettingsData.ITEM && data.mSettingName.equalsIgnoreCase(SYNC_PURCHASES)){	
+					
+					SyncPurchasesUtil syncPurchasesUtil = new SyncPurchasesUtil();
+					syncPurchasesUtil.setListener(new SyncPurchasesCallback() {
+						
+						@Override
+						public void onComplete(boolean value) {
+							dismissProgressBar();
+						}
+					});
+					
+					if(syncPurchasesUtil.syncPurchases(0, mContext))
+					{
+						mProgressDialog = ProgressDialog.show(mContext,"", mContext.getString(R.string.syncing_purchases), true,false);						
+					}
+					
+					return;
+				}
+				
 				if (data.type == SettingsData.ITEM
-						&& data.mSettingName
-								.contains(DRM_STATUS_STRING)) {					
+						&& (data.mSettingName
+								.contains(DRM_STATUS_STRING) || data.mSettingName.contains(MSISDN) )) {					
 					return;
 				}
 	
@@ -192,8 +220,22 @@ public class SetttingsFragment extends BaseFragment {
 //			mSettingsList.add(new SettingsData(SettingsData.ITEM, DRM_LEVAL_STRING + " : "+widevineDRM.getWVLeval() , 0,SettingsData.VIEWTYPE_NORMAL));
 //			mSettingsList.add(new SettingsData(SettingsData.ITEM, ROOT_STATUS_STRING, 0,SettingsData.VIEWTYPE_NORMAL));
 			mSettingsList.add(new SettingsData(SettingsData.ITEM, DERIGISTER_DEVICE , 0,SettingsData.VIEWTYPE_NORMAL));
+			String msisdnMsg = MSISDN +" (Not Available)";
+			MsisdnData mData = (MsisdnData) Util.loadObject(myplexapplication.getApplicationConfig().msisdnPath);
+			if(mData != null){
+				msisdnMsg = MSISDN +"( " + mData.msisdn +","+mData.operator+" )";
+			}
+			mSettingsList.add(new SettingsData(SettingsData.ITEM, msisdnMsg , 0,SettingsData.VIEWTYPE_NORMAL));
 			
 		}
+		
+		String email = myplexapplication.getUserProfileInstance()
+				.getUserEmail();
+		
+		if (!(email.equalsIgnoreCase("NA") || email.equalsIgnoreCase(""))) {
+			mSettingsList.add(new SettingsData(SettingsData.ITEM, SYNC_PURCHASES, 0,SettingsData.VIEWTYPE_NORMAL));
+		}
+		
 		String version= Util.getAppVersionName(mContext);
 		mSettingsList.add(new SettingsData(SettingsData.SECTION, mContext.getString(R.string.app_name) + " "+version, 0,SettingsData.VIEWTYPE_NORMAL));
 		mSettingsList.add(new SettingsData(SettingsData.ITEM, FEEDBACK, 0,SettingsData.VIEWTYPE_NORMAL));
@@ -207,4 +249,14 @@ public class SetttingsFragment extends BaseFragment {
 		mSettingsListView.setAdapter(mListAdapter);
 	}
 
+	public void dismissProgressBar(){
+		try {
+			if(mProgressDialog != null && mProgressDialog.isShowing()){
+				mProgressDialog.dismiss();
+			}
+		} catch (Throwable e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }

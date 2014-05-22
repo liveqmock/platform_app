@@ -105,6 +105,7 @@ import com.apalya.myplex.data.CardDownloadData;
 import com.apalya.myplex.data.CardDownloadedDataList;
 import com.apalya.myplex.data.CardExplorerData;
 import com.apalya.myplex.data.FetchDownloadData;
+import com.apalya.myplex.data.ValuesResponse;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.receivers.ReminderReceiver;
 import com.apalya.myplex.tablet.MultiPaneActivity;
@@ -120,6 +121,7 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.analytics.tracking.android.EasyTracker;
@@ -972,6 +974,25 @@ public class Util {
 		return false;
 	}
 	
+	public static boolean isMobileDataEnabled(Context mContext)
+	{
+		  boolean mobileDataEnabled = false; // Assume disabled
+	       
+	       try {
+	    	   ConnectivityManager cm = (ConnectivityManager)mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+	           Class cmClass = Class.forName(cm.getClass().getName());
+	           java.lang.reflect.Method method = cmClass.getDeclaredMethod("getMobileDataEnabled");
+	           method.setAccessible(true); // Make the method callable
+	           // get the setting for "mobile data"
+	           mobileDataEnabled = (Boolean)method.invoke(cm);
+	       } catch (Throwable e) {
+	           // Some problem accessible private API
+	           // TODO do whatever error handling you want here
+	       }
+	       
+	       return mobileDataEnabled;
+	}
+	
 	public static void saveObject(Object obj,String path) {		try {			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(new File(path))); 			oos.writeObject(obj); 			oos.flush(); 			oos.close();		} catch (Exception ex) {			if(ex != null){
 //				Log.v("Util", ex.getMessage());				ex.printStackTrace();			}
 		}	}	public static Object loadObject(String path) {		try {			File f = new File(path);			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(f));			Object o = ois.readObject();
@@ -1318,10 +1339,11 @@ public static String getVideoDurationInString(String hhmmssinString) {
 		return expiryMessage;
 	}
 	
-	public static void showNotification(Context context, String title) {	
+	public static void showNotification(Context context, String title, String message, Intent notificationIntent) {	
 		
-		
-		Intent notificationIntent = new Intent(context,	LoginActivity.class);
+		if(notificationIntent ==  null){
+			notificationIntent = new Intent(context,	LoginActivity.class);
+		}
 		PendingIntent contentIntent =  PendingIntent.getActivity(context, 0, notificationIntent, 0);
 		
 		PackageManager manager = context.getPackageManager();
@@ -1336,7 +1358,7 @@ public static String getVideoDurationInString(String hhmmssinString) {
 	            		new NotificationCompat.Builder(context)
 	            .setSmallIcon(notificationIcon)
 	            .setContentTitle(notificationTitle)
-	            .setContentText(title+" Download Complete")
+	            .setContentText(message)
 	            .setContentIntent(contentIntent);
 	            Notification notification = mBuilder.build();
 	            notification.flags = Notification.FLAG_AUTO_CANCEL;
@@ -1492,6 +1514,7 @@ public static String getVideoDurationInString(String hhmmssinString) {
 
 		final Date now = new Date();
 		final Date programmeTime = getUTCDate(dateInString);
+	
 		if(programmeTime == null) {return;}
 		final Calendar prg = Calendar.getInstance();
 		prg.setTimeZone(TimeZone.getDefault());
@@ -1546,6 +1569,77 @@ public static String getVideoDurationInString(String hhmmssinString) {
 		dialog.showDialog();
 	}		
 	
+	public static void showReminder(String contentName, final Date programmeTime,
+			final String notificationTitle, final String _id, final Context context, String alertMessage , final String notificationMessage) {
+
+		final Date now = new Date();
+	
+		if(programmeTime == null) {return;}
+		final Calendar prg = Calendar.getInstance();
+		prg.setTimeZone(TimeZone.getDefault());
+		prg.setTime(programmeTime);
+
+		if (!now.before(programmeTime)) {
+			return;
+		}
+
+		if( alertMessage == null ){
+			alertMessage = "Set reminder for " + contentName + " starting at " + getTimeHHMM(programmeTime);			
+		}
+		
+		 
+		MyplexDialog dialog = new MyplexDialog(context, context.getResources()
+				.getString(R.string.app_name),alertMessage ,
+				"no", "yes", new NoticeDialogListener() {
+
+					@Override
+					public void onDialogOption2Click() {
+
+						String text = null;
+						text = notificationMessage;
+						
+						if(text == null){
+							text = "The programm is scheduled at "
+									+ getTimeHHMM(programmeTime);
+						}
+						
+						Calendar calendar = Calendar.getInstance();
+						calendar.set(Calendar.SECOND, prg.get(Calendar.SECOND));
+						calendar.set(Calendar.MINUTE, prg.get(Calendar.MINUTE));
+						calendar.set(Calendar.HOUR_OF_DAY,
+								prg.get(Calendar.HOUR_OF_DAY));
+						calendar.set(Calendar.DAY_OF_MONTH,
+								prg.get(Calendar.DAY_OF_MONTH));
+
+						Intent alarmintent = new Intent(context,
+								ReminderReceiver.class);
+						alarmintent.putExtra("title", notificationTitle);
+						alarmintent.putExtra("note",text
+								);
+						alarmintent.putExtra("_id", _id);
+
+						PendingIntent sender = PendingIntent.getBroadcast(
+								context, 0, alarmintent,
+								PendingIntent.FLAG_UPDATE_CURRENT
+										| Intent.FILL_IN_DATA);
+
+						AlarmManager am = (AlarmManager) context
+								.getSystemService(Context.ALARM_SERVICE);
+						am.set(AlarmManager.RTC_WAKEUP, prg.getTimeInMillis(),
+								sender);
+					
+					}
+
+					@Override
+					public void onDialogOption1Click() {
+						
+
+					}
+				});
+
+		dialog.showDialog();
+	}		
+	
 
 	public static String getTimeHHMM(Date date)
 	{
@@ -1583,6 +1677,13 @@ public static String getVideoDurationInString(String hhmmssinString) {
 						activity, REQ_RESOLVE_SERVICE_MISSING).show();
 			}
 		}
+	}
+	
+	public static <T> ValuesResponse<T> fromJson(
+			String response,
+			TypeReference<ValuesResponse<T>> typeReference) throws JsonParseException, JsonMappingException, IOException {
+		// TODO Auto-generated method stub
+		return m.readValue(response, typeReference);
 	}
 	
 }
