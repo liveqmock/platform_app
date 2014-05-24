@@ -50,6 +50,9 @@ public class MsisdnRetrivalEngine {
 		Log.e(TAG, "getMsisdnData");
 		this.mListener = listener;
 		String currentImsi = getIMSI();
+		if(myplexapplication.getApplicationConfig().msisdnPath == null){
+			myplexapplication.getApplicationConfig().msisdnPath =  mContext.getFilesDir()+"/"+"msisdn.bin";
+		}
 		mData = (MsisdnData) Util.loadObject(myplexapplication.getApplicationConfig().msisdnPath); 
 		if(mData != null){
 			Log.e(TAG, "already available");
