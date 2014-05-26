@@ -189,7 +189,7 @@
     <string name="must_logged_in">must be logged in to watch</string>
     <string name="login_to_play">login to play</string>
     <string name="continiue_as_guest">continue as guest</string>
-    <string name="error_message_2g_videoplay">cannt play video in 2G network.</string>
+    <string name="error_message_2g_videoplay">can not play video in 2G network.</string>
     <string name="alert_message_3g_movie">playing movie in 3G. data charges may apply.</string>
     <string name="alert_message_3g_trailer">playing trailer in 3G. data charges may apply.</string>
     <string name="lastSharedTime">lastSharedTime</string>

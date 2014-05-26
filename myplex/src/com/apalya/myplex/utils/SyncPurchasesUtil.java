@@ -66,7 +66,9 @@ public class SyncPurchasesUtil {
 		if(!doPurchaseSync) return false;
 		
 		// Skip if mobile data is disabled
-		if(!Util.isMobileDataEnabled(context)) return false;
+		if(!Util.isMobileDataEnabled(context)) {			
+			return false;
+		}
 		
 		
 		msisdnRetrivalEngine.getMsisdnData(new MsisdnRetrivalEngineListener() {
@@ -76,7 +78,6 @@ public class SyncPurchasesUtil {
 				msisdnRetrivalEngine.deRegisterCallBacks();
 				
 				if(data == null || TextUtils.isEmpty(data.msisdn)){
-					Util.showToast(context, context.getString(R.string.syncing_purchases_failed_setting_msg), Util.TOAST_TYPE_ERROR);
 					if(mListener != null){
 						mListener.onComplete(false);
 					}
@@ -90,10 +91,12 @@ public class SyncPurchasesUtil {
 					public void onComplete(boolean status, String message) {
 					
 						if(TextUtils.isEmpty(message)){
-							message = status ? "user profile updated":context.getString(R.string.syncing_purchases_failed_setting_msg);
+							message = status ? "profile update error:"+"user profile updated":"profile update error2:"+context.getString(R.string.syncing_purchases_failed_setting_msg);
 						}
 						
-						Util.showToast(context, message, Util.TOAST_TYPE_ERROR);
+						if(status){
+							Util.showToast(context, message, Util.TOAST_TYPE_ERROR);
+						}
 						
 						if(mListener != null){
 							mListener.onComplete(status);
