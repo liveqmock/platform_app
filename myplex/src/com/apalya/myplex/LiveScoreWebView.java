@@ -23,7 +23,7 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
 import com.apalya.myplex.utils.AlertDialogUtil;
-import com.flurry.android.FlurryAgent;
+
 
 public class LiveScoreWebView extends Activity implements
 		AlertDialogUtil.NoticeDialogListener {
@@ -59,13 +59,11 @@ public class LiveScoreWebView extends Activity implements
 
 	@Override
 	protected void onStart() {
-		super.onStart();
-		FlurryAgent.onStartSession(this, "X6WWX57TJQM54CVZRB3K");
+		super.onStart();	
 	}
 
 	@Override
-	protected void onStop() {
-		FlurryAgent.onEndSession(this);
+	protected void onStop() {		
 		super.onStop();
 	}
 

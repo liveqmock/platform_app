@@ -31,4 +31,10 @@ public class ApplicationSettings {
 	 * @param false - no random selection, live tv as default.
 	 */
 	public static boolean ENABLE_DEFAULT_RANDOM_MENUSELECTION = true;
+	
+	/**
+	 * @param true -  enable reminder alert after live tv play
+	 * @param false - disable reminder alert after live tv play
+	 */
+	public static boolean ENABLE_AUTO_REMINDER_FOR_LIVETV = true;
 }

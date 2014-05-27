@@ -50,6 +50,8 @@ public class ConsumerApi {
 	public static final String QUALIFIERS = "qualifier=";
 	public static final String STARTINDEX = "startIndex=";
 	public static final String COUNT = "count=10";
+	public static final String COUNT_COMMENTS = "count=20";
+	public static final int    COUNT_COMMENTS_INT = 20;
 	public static final String NUMPERQUALIFIER = "numPerQualifier=";
 	public static final String NUMPERLETTERS = "numPerLetter=";
 	public static final String BILLING_TAG = "billing";
@@ -124,7 +126,7 @@ public class ConsumerApi {
 	
 	public static final String  HEADER_RESPONSE_HTTP_SOURCE="http_source";
 	
-	
+	public  static final String AIRTEL_MSISDN_RETRIEVER_URL="http://115.112.238.6:8080/SamsungBillingHub/MsisdnRetriever";
 	
 	public static String getSearch(String queryStr, String level,int startIndex, String searchType) {
 		if(queryStr == null||(queryStr != null && queryStr.length() ==0)){
@@ -148,11 +150,14 @@ public class ConsumerApi {
 	}
 	
 	public static String getBrowse(String type, String level,int startIndex) {
+		
+
+		
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH
 				+ CONTENTLIST + SLASH + QUESTION_MARK /*+ CLIENTKEY + DEBUGCLIENTKEY
 				+  AMPERSAND */+ BROWSETYPE + type + AMPERSAND + STARTINDEX
 				+ startIndex + AMPERSAND + LEVEL 
-				+ level + AMPERSAND+COUNT;
+				+ level + AMPERSAND+COUNT ;
 
 	}
 	
@@ -249,6 +254,13 @@ public class ConsumerApi {
 		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + "unregisterDevice"
 				+ SLASH ;
 	}
+	
+	public static String getUpdateUserProfile()
+	{
+		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + "profile"
+				+ SLASH ;
+	}
+	
 	public static String getPlayerEventDetails(String contentID,String action){
 		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + EVENTS +  SLASH + PLAYERDETAILSACTION
 				+ SLASH + contentID + SLASH + UPDATE_STATUS +	QUESTION_MARK	+	ACTION + action +
@@ -302,5 +314,21 @@ public class ConsumerApi {
 				+ SLASH + QUESTION_MARK+ CLIENTKEY + DEBUGCLIENTKEY + 
 				AMPERSAND + BROWSETYPE + TYPE_TV_EPISODE +  AMPERSAND +"count=-1" 
 				+ "&fields=images,generalInfo,contents,comments,reviews/user,_id,relatedMedia" ;
+	}
+	
+	public static String getComments(String contentID, int startIndex){
+		
+		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH + CONTENT_TAG
+				+ SLASH + contentID + SLASH + FIELD_COMMENTS + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY  + AMPERSAND
+		        + COUNT_COMMENTS + AMPERSAND + STARTINDEX
+				+ startIndex ;
+	}
+	
+	public static String getReviews(String contentID, int startIndex){
+		
+		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH + CONTENT_TAG
+				+ SLASH + contentID + SLASH + "reviews" + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY  + AMPERSAND
+		        + COUNT_COMMENTS + AMPERSAND + STARTINDEX
+				+ startIndex ;
 	}
 }

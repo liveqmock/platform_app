@@ -5,6 +5,7 @@ import java.util.List;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.text.TextUtils;
 
 
 public class SharedPrefUtils {
@@ -19,6 +20,8 @@ public class SharedPrefUtils {
 	public static void writeToSharedPref(Context context, String key,
 			String value) {
 
+		if(TextUtils.isEmpty(key)){ return;}
+		
 		if (myPrefs == null)
 			myPrefs = context.getSharedPreferences(
 					null, Context.MODE_PRIVATE);
@@ -33,6 +36,8 @@ public class SharedPrefUtils {
 	public static void writeToSharedPref(Context context, String key,
 			int value) {
 
+		if(TextUtils.isEmpty(key)){ return;}
+		
 		if (myPrefs == null)
 			myPrefs = context.getSharedPreferences(
 					null, Context.MODE_PRIVATE);
@@ -46,6 +51,8 @@ public class SharedPrefUtils {
 	public static void writeToSharedPref(Context context, String key,
 			Boolean value) {
 
+		if(TextUtils.isEmpty(key)){ return;}
+		
 		if (myPrefs == null)
 			myPrefs = context.getSharedPreferences(
 					null, Context.MODE_PRIVATE);
@@ -56,6 +63,8 @@ public class SharedPrefUtils {
 	public static void writeToSharedPref(Context context, String key,
 			long value) {
 
+		if(TextUtils.isEmpty(key)){ return;}
+		
 		if (myPrefs == null)
 			myPrefs = context.getSharedPreferences(
 					null, Context.MODE_PRIVATE);
@@ -102,6 +111,8 @@ public class SharedPrefUtils {
 	}
 	public static void writeList(Context context, List<String> list, String key)
 	{
+		if(TextUtils.isEmpty(key)){ return;}
+		
 		if (myPrefs == null)
 			myPrefs = context.getSharedPreferences(
 					null, Context.MODE_PRIVATE);

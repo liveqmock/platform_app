@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDownloadData;
@@ -121,6 +122,8 @@ public class FetchDownloadProgress {
 					}else if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_FAILED) {
 						mDownloadData.mCompleted = true;
 						mDownloadData.mPercentage = 0;
+						
+						
 					}
 					else{
 						final int dl_progress = (int) ((bytes_downloaded * 100) / bytes_total);
@@ -138,6 +141,11 @@ public class FetchDownloadProgress {
 					}
 				} catch (Exception e) {
 					Log.d(TAG,"handleMessage4");
+					mDownloadData.mCompleted = true;
+					mDownloadData.mPercentage = 0;
+					if(mListener != null && !mStopPolling){
+						mListener.DownloadProgress(mCardData, mDownloadData);
+					}
 					// TODO: handle exception
 				}
 				if(continuePolling){
@@ -222,5 +230,78 @@ public class FetchDownloadProgress {
 			}
 		}
 	};
+	
+	public String getDownloadFailedReason(int reason) {
+
+		String failedReason = "";
+
+		switch (reason) {
+		case DownloadManager.ERROR_CANNOT_RESUME:
+			failedReason = "ERROR_CANNOT_RESUME";
+			break;
+		case DownloadManager.ERROR_DEVICE_NOT_FOUND:
+			failedReason = "ERROR_DEVICE_NOT_FOUND";
+			break;
+		case DownloadManager.ERROR_FILE_ALREADY_EXISTS:
+			failedReason = "ERROR_FILE_ALREADY_EXISTS";
+			break;
+		case DownloadManager.ERROR_FILE_ERROR:
+			failedReason = "ERROR_FILE_ERROR";
+			break;
+		case DownloadManager.ERROR_HTTP_DATA_ERROR:
+			failedReason = "ERROR_HTTP_DATA_ERROR";
+			break;
+		case DownloadManager.ERROR_INSUFFICIENT_SPACE:
+			failedReason = "ERROR_INSUFFICIENT_SPACE";
+			break;
+		case DownloadManager.ERROR_TOO_MANY_REDIRECTS:
+			failedReason = "ERROR_TOO_MANY_REDIRECTS";
+			break;
+		case DownloadManager.ERROR_UNHANDLED_HTTP_CODE:
+			failedReason = "ERROR_UNHANDLED_HTTP_CODE";
+			break;
+		case DownloadManager.ERROR_UNKNOWN:
+			failedReason = "ERROR_UNKNOWN";
+			break;
+		}
+
+		return failedReason;
+
+	}
+	
+	public int getDownloadStatus(long download_id){
+		
+		try
+		{
+			Log.d(TAG,"handleMessage2");
+			DownloadManager.Query q = new DownloadManager.Query();
+			Log.d(TAG,"Download information for "+download_id);
+			q.setFilterById(download_id);
+			Cursor cursor = mDownloadManager.query(q);
+			if(cursor == null){
+				return 0;
+			}
+			
+			if(cursor.moveToFirst()){
+				
+				if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
+					return DownloadManager.STATUS_SUCCESSFUL;
+					
+				}else if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_FAILED) {
+					
+					int columnReason = cursor.getColumnIndex(DownloadManager.COLUMN_REASON);
+					int reason = cursor.getInt(columnReason);
+					return reason;
+					
+				}
+			}
+		}catch (Exception e){
+			e.printStackTrace();
+			return 0;
+		}
+		
+		return 0;
+	}
+
 
 }
