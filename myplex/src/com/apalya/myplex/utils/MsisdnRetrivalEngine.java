@@ -13,6 +13,7 @@ import android.telephony.TelephonyManager;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -87,6 +88,7 @@ public class MsisdnRetrivalEngine {
 		Log.e(TAG, "fetchMsisdn");
 		RequestQueue queue = MyVolley.getRequestQueue();
 		StringRequest myReg = new StringRequest(mUrl, successListener(), errorListener());
+		myReg.setRetryPolicy(new DefaultRetryPolicy(7 * 1000, 0, 0f));
 		myReg.setShouldCache(false);
 		Log.d(TAG,"Min Request:"+mUrl);
 		queue.add(myReg);
