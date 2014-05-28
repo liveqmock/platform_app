@@ -69,8 +69,7 @@ public class CacheManager {
 					Set<String> keySet = resultMap.keySet();
 					Log.d(TAG,"Number of result found in cache :"+keySet.size());
 					String missingCardId = new String();
-					for(CardData data: Ids){
-						if(data._id.contains("-") || data._id.contains("_")){ continue;}
+					for(CardData data: Ids){						
 						if(!keySet.contains(data._id)){
 							if(missingCardId.length() > 0){
 								missingCardId += ",";
