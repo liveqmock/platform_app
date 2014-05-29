@@ -230,8 +230,10 @@ public class CardDetailViewFactory {
 				
 				if(!TextUtils.isEmpty(commentsItem.name)){
 					Character firstChar = commentsItem.name.trim().charAt(0);
-					ImageView imageView = (ImageView)child.findViewById(R.id.imageView1);
-					imageView.setImageResource(mContext.getResources().getIdentifier(""+Character.toLowerCase(firstChar), "drawable", mContext.getPackageName()));
+					if(Character.isLetter(firstChar)){
+						ImageView imageView = (ImageView)child.findViewById(R.id.imageView1);
+						imageView.setImageResource(mContext.getResources().getIdentifier(""+Character.toLowerCase(firstChar), "drawable", mContext.getPackageName()));
+					}
 					
 				}
 				mCommentContentLayout.addView(child);
@@ -269,8 +271,10 @@ public class CardDetailViewFactory {
 				
 				if(!TextUtils.isEmpty(name)){
 					Character firstChar = name.trim().charAt(0);
-					ImageView imageView = (ImageView)child.findViewById(R.id.imageView1);
-					imageView.setImageResource(mContext.getResources().getIdentifier(""+Character.toLowerCase(firstChar), "drawable", mContext.getPackageName()));
+					if(Character.isLetter(firstChar)){
+						ImageView imageView = (ImageView)child.findViewById(R.id.imageView1);
+						imageView.setImageResource(mContext.getResources().getIdentifier(""+Character.toLowerCase(firstChar), "drawable", mContext.getPackageName()));
+					}
 					
 				}
 				
@@ -737,7 +741,7 @@ public class CardDetailViewFactory {
 		TextView secondaryname = (TextView)similarContentDummyView.findViewById(R.id.carddetailmultimedia_secondaryname);
 		secondaryname.setTypeface(FontUtil.Roboto_Medium);
 		ImageView similarImage  = (ImageView)similarContentDummyView.findViewById(R.id.carddetailmultimedia_stackview);
-		if( mData.images.values != null ||  mData.images.values.size() > 0){
+		if( mData.images.values != null &&  mData.images.values.size() > 0){
 		String link  = mData.images.values.get(0).link;		
 			if(link!=null){
 				CircleImageLoader imageLoader = new CircleImageLoader();
