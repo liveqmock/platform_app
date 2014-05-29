@@ -1588,8 +1588,7 @@ public static String getVideoDurationInString(String hhmmssinString) {
 		}
 		
 		 
-		MyplexDialog dialog = new MyplexDialog(context, context.getResources()
-				.getString(R.string.app_name),alertMessage ,
+		MyplexDialog dialog = new MyplexDialog(context, notificationTitle ,alertMessage ,
 				"no", "yes", new NoticeDialogListener() {
 
 					@Override
