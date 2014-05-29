@@ -121,7 +121,8 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 	private TextView tvOrMovie;
 	private Handler handler= new Handler();
 	private String hintString= null;
-
+	private Boolean searchViewClose=false;
+			
 	NavigationOptionsMenuAdapter mNavigationAdapter;
 	private TextView mFilterLevle;
 	
@@ -898,7 +899,9 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		HideSearchView();
 		HideSearchView();
 		mCurrentFragment = fragment;
-		enableFilterAction(false);
+		if(searchViewClose==false){
+			enableFilterAction(false);
+		}
 		pushFragment();
 	}
 
@@ -1068,7 +1071,11 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 	}
 
 	private void pushFragment() {
-		addFilterData(new ArrayList<FilterMenudata>(), null);		
+		if(searchViewClose==false){
+			addFilterData(new ArrayList<FilterMenudata>(), null);
+		}else {
+			searchViewClose =false ;
+		}	
 		mFragmentStack.push(mCurrentFragment);
 		mCurrentFragment.setContext(this);
 		mCurrentFragment.setActionBar(getActionBar());
@@ -1420,6 +1427,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 //					mSearchView.setIconified(true);
 					if(mSearchSuggestionFrag !=null)
 					{
+						searchViewClose =true ;
 						removeFragment(mSearchSuggestionFrag);
 					}
 				}
