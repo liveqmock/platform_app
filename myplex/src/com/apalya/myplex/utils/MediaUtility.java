@@ -34,12 +34,12 @@ public class MediaUtility {
 
 	public void fetchVideoUrl(String contentID) {
 		this.contentID = contentID;
-		apiUrl = ConsumerApi.getVideosDetail(contentID);
-		Log.d(TAG,"Url  ="+apiUrl);
+		apiUrl = ConsumerApi.getVideosDetail(contentID);		
 		String location_params = myplexapplication.locationUtil.getVideoUrlParams();
 		if (location_params.length() > 0) {
 			apiUrl += location_params;
 		}
+		Log.d(TAG,"Url  ="+apiUrl);
 		RequestQueue queue = MyVolley.getRequestQueue();
 		StringRequest myReq = new StringRequest(apiUrl, new Listener<String>() {
 			@Override
