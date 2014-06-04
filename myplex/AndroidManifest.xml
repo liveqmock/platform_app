@@ -51,7 +51,8 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            
+           
+
         </activity>
         <activity
             android:name=".SearchActivity"
@@ -95,7 +96,39 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar" >
         </activity>
 		
-       
+        <activity
+            android:name=".UrlGatewayActivity"
+            android:screenOrientation="portrait" 
+            android:theme="@android:style/Theme.Black.NoTitleBar">
+             <intent-filter  >
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Accepts URIs that begin with "http://www.myplex.com/watch-movie/*” -->
+            
+               <data
+                    android:host="www.myplex.com"
+                    android:pathPattern="/watch-movie/.*"
+                    android:scheme="http" />    
+                <data
+                    android:host="www.myplex.com"
+                    android:pathPattern="/tv-show/.*"
+                    android:scheme="http" />              
+            </intent-filter>
+            
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />    
+                 <!-- Accepts URIs that begin with "myplex://watch-movie/*” -->           
+               <data
+                    android:host="watch-movie"                    
+                    android:scheme="myplex" /> 
+               <data
+                    android:host="tv-show"                    
+                    android:scheme="myplex" /> 
+            </intent-filter>
+        </activity>
         
         <receiver android:name="com.apalya.myplex.receivers.DownloadManagerReceiver">
   			<intent-filter>
