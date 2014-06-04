@@ -472,6 +472,9 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	@Override
 	public void onResume() {
 		super.onResume();
+		
+		if( mMainActivity == null ){ return;}
+		
 		if(myplexapplication.getCardExplorerData().cardDataToSubscribe != null){
 			mCardView.updateData(myplexapplication.getCardExplorerData().cardDataToSubscribe);
 		}
@@ -721,9 +724,9 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 							return;
 						}
 						
-						mVolleyRequest = null;
+						mVolleyRequest = null;						
 						mCacheManager.getCardDetails(minResultSet.results,IndexHandler.OperationType.IDSEARCH,CardExplorer.this);
-						mArrivedRequestHashSet.add(minResultSet.mStartIndex);
+						mArrivedRequestHashSet.add(minResultSet.mStartIndex);						
 					}
 				} catch (Exception e) {
 					showNoDataMessage(false);
@@ -899,6 +902,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	
 	private void applyData() {
 		
+			
 		if(mData.mMasterEntries == null || mData.mMasterEntries.size() == 0){
 			return;
 		}
@@ -914,12 +918,13 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				mTabletAdapter.setData(mData.mMasterEntries);
 		}else{
 			mCardView.addData(mData.mMasterEntries);
-			mCardView.show();
+			mCardView.show(false);
 			mCardView.sendViewReadyMsg(true);
 		}
 		prepareFilterData();
 		dismissProgressBar();
-		mMainActivity.hideActionBarProgressBar();
+		mMainActivity.hideActionBarProgressBar();		
+		
 	}
 
 	private void showErrorDialog() {
@@ -1109,6 +1114,9 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
     
 	@Override
 	public void OnCacheResults(HashMap<String, CardData> object ,boolean issuedRequest) {
+		
+	
+		
 		if(object == null){
 			showNoDataMessage(issuedRequest);
 			return;
@@ -1180,7 +1188,8 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 			}
 			
 			
-		}
+		}		
+	
 	}
 
 	@Override
