@@ -11,6 +11,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import com.apalya.myplex.R;
 import com.google.android.gms.common.ConnectionResult;
@@ -135,18 +136,22 @@ public class LocationUtil
 				String state  = null;
 				try {
 					
+					String locationParams = "";
 					addresses = geocoder.getFromLocation(loc.getLatitude(),
 							loc.getLongitude(), 1);
 					if (addresses != null && addresses.size() > 0) {
 						Address address = addresses.get(0);					
 							if(address.getCountryCode()!=null)
-								params += "&country="+address.getCountryCode();
+								locationParams += "&country="+address.getCountryCode();
 							if(address.getPostalCode()!=null)
-								params += "&postalCode="+address.getPostalCode();
+								locationParams += "&postalCode="+address.getPostalCode();
 							if(address.getLocality()!=null)
-								params += "&area="+address.getLocality();
+								locationParams += "&area="+address.getLocality();
 							state = address.getAdminArea();
 						}
+					if(!TextUtils.isEmpty(locationParams)){
+						params = locationParams;
+					}
 				} catch (IOException e1) {
 					Log.e("LocationSampleActivity",
 							"IO Exception in getFromLocation()");

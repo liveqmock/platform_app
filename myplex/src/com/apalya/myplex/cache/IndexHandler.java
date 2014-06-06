@@ -85,7 +85,7 @@ public class IndexHandler {
 		try {
 			Analyzer analyzer = new StandardAnalyzer(LuceneVersion);
 			IndexWriterConfig config = new IndexWriterConfig(LuceneVersion, analyzer);
-			config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
+			config.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
 			mIndexWriter = new IndexWriter(mDirectory, config);
 		} catch (IOException e) {
 			Log.e(TAG, e.getMessage());
@@ -217,17 +217,8 @@ public class IndexHandler {
 			if(changedReader != null)
 			{
 				Log.i(TAG,"oldIndexReader"+"numDocs:"+mIndexReader.numDocs() +":: maxDocs:"+mIndexReader.maxDoc() );
-				if(changedReader.numDocs() > mIndexReader.numDocs())
-				{
-					mIndexReader.close(); // close the old Reader.
-					mIndexReader = changedReader;//Assign new reader for further operations.
-				}
-				else
-				{
-					changedReader.close();
-					changedReader = null;
-				}
-				Log.i(TAG,"newIndexReader"+"numDocs:"+mIndexReader.numDocs() +":: maxDocs:"+mIndexReader.maxDoc());
+				mIndexReader.close(); // close the old Reader.
+				mIndexReader = changedReader;//Assign new reader for further operations.
 			}
 			else
 				Log.i(TAG, "changedReader is null");
@@ -408,13 +399,29 @@ public class IndexHandler {
 				int totalHits = topDocs.totalHits;
 				Log.i(TAG,"no. of search result: "+totalHits);
 				Log.i(TAG, "time to get indexSearcher.search : "+params[0]+"::"+(System.currentTimeMillis()-startTime)+" milliseconds");
+				LinkedHashMap<String, CardData> mTempSearchResult = new LinkedHashMap<String, CardData>();
+						
 				for (int i = 0; i < totalHits; i++) {
 					Document document = indexSearcher.doc(scoreDoc[i].doc);
 					CardData data = (CardData) Util.fromJson(document.get(LUCENE_CONTENT_INFO), CardData.class);
 //	                JSONObject resultObj = new JSONObject(document.get(LUCENE_CONTENT_INFO));
 //					data.similarContent=null;
-	                mSearchResult.put(document.get(LUCENE_CONTENT_ID), data);
+					mTempSearchResult.put(document.get(LUCENE_CONTENT_ID), data);
 				}
+				
+				if(mSearchType == OperationType.IDSEARCH){
+					
+					for (CardData card : mCardIds) {
+						if(mTempSearchResult.containsKey(card._id)){
+							mSearchResult.put(card._id, mTempSearchResult.get(card._id));
+						}
+					}
+					
+					return null;
+				}
+				
+				mSearchResult = mTempSearchResult;
+				
 				Log.i(TAG, "time to get Search Results From : "+params[0]+"::"+(System.currentTimeMillis()-startTime)+" milliseconds");
 			} catch (ParseException e) {
 				Log.e(TAG, e.getMessage());

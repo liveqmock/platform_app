@@ -223,14 +223,15 @@ public class CardView extends ScrollView {
 			this.mDataList.add(data);
 		}
 		mNumberofItems = mDataList.size();	
-		show();
+		show(true);
 	}
 	public void addData(CardData data) {
 		this.mDataList.add(data);
 		mNumberofItems = mDataList.size();
 	}
 
-	public void addData(List<CardData> datalist) {
+	public void addData(List<CardData> datalist) {		
+
 		try {
 			if(myplexapplication.mDownloadList == null){
 				myplexapplication.mDownloadList = (CardDownloadedDataList) Util.loadObject(myplexapplication.getApplicationConfig().downloadCardsPath);
@@ -575,11 +576,15 @@ public class CardView extends ScrollView {
 		}
 		updateDownloadStatus(data,null);
 	}
-	public void show() {
+	public void show(boolean doForceUpdate) {
+
 //		Log.e(TAG, "updateCardsPosition show =");
-		mCardsLayout.removeAllViews();
-		mCardsLayout.refresh();
-		mCardsLayout.updateCardsPosition(getScrollY());
+		if(doForceUpdate){
+			mCardsLayout.removeAllViews();
+			mCardsLayout.refresh();
+		}
+		mCardsLayout.updateCardsPosition(getScrollY());	
+	
 	}
 	
 	public void setCurrentSelectedIndex(int currentSelectedIndex) {
