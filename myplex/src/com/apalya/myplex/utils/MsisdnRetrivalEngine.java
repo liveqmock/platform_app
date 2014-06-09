@@ -32,6 +32,9 @@ public class MsisdnRetrivalEngine {
 	private int mState;
 	private MsisdnRetrivalEngineListener mListener;
 	private ManageWifiConnection mNetworkManager;
+	private boolean resumeOldConnection = true;
+	private boolean useOnlyMobileData = false;
+	
 	public interface MsisdnRetrivalEngineListener{
 		public void onMsisdnData(MsisdnData data);
 	}
@@ -47,6 +50,13 @@ public class MsisdnRetrivalEngine {
 		this.mUrl = mUrl;
 	}
 	
+	public void setUseOnlyMobileData(boolean useOnlyMobileData) {
+		this.useOnlyMobileData = useOnlyMobileData;
+	}
+	public void setResumeOldConnection(boolean resumeOldConnection) {
+		this.resumeOldConnection = resumeOldConnection;
+	}
+	
 	public void getMsisdnData(MsisdnRetrivalEngineListener listener){
 		Log.e(TAG, "getMsisdnData");
 		this.mListener = listener;
@@ -55,18 +65,23 @@ public class MsisdnRetrivalEngine {
 			myplexapplication.getApplicationConfig().msisdnPath =  mContext.getFilesDir()+"/"+"msisdn.bin";
 		}
 		mData = (MsisdnData) Util.loadObject(myplexapplication.getApplicationConfig().msisdnPath); 
-		if(mData != null){
+		if(mData != null && !useOnlyMobileData){
 			Log.e(TAG, "already available");
 			sendCallback();
 			return;
 		}
 		// check whether SIM has changed/first launch
-		if(mData == null || mData.imsi == null || mData.imsi.length() == 0 ||!mData.imsi.equalsIgnoreCase(currentImsi)){
+		if(useOnlyMobileData || mData == null || mData.imsi == null || mData.imsi.length() == 0 ||!mData.imsi.equalsIgnoreCase(currentImsi)){
 			Log.e(TAG, "sim has changed");
 			mNetworkManager.changeConnection(new OnNetworkStateListener() {
 				
 				@Override
 				public void networkStateChanged() {
+					if(mData != null && useOnlyMobileData){
+						Log.e(TAG, "already available");
+						sendCallback();
+						return ;
+					}
 					fetchMsisdn();
 					
 				}
@@ -158,6 +173,14 @@ public class MsisdnRetrivalEngine {
 			
 			@Override
 			public void run() {
+				
+				if(!resumeOldConnection){
+					if(mListener != null){
+						mListener.onMsisdnData(mData);	
+					}
+					return;
+				}
+				
 				mNetworkManager.resumeOldConnection(new OnNetworkStateListener() {
 					
 					@Override
@@ -169,5 +192,14 @@ public class MsisdnRetrivalEngine {
 				});
 			}
 		});
+	}
+	
+	public static String format(String msisdn){
+		
+		if(TextUtils.isEmpty(msisdn)){
+			return msisdn;
+		}
+		
+		return msisdn.substring(msisdn.length()>10?msisdn.length()-10:0);
 	}
 }

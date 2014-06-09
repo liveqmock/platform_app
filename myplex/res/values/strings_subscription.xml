@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <string name="subscription_msisdn_failed">unable to connect , Airtel Mobile data connection is required for Airtel payment</string>
+    <string name="subscription_operator_data_disable">Airtel Mobile data connection needs to be enabled for Airtel payment</string>
+    <string name="alert_dataconnection_cancel">cancel</string>
+    <string name="alert_dataconnection_viewsetttings">enable now</string>
+
+</resources>
