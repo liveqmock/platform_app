@@ -30,12 +30,16 @@ import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
+import android.util.Patterns;
 
 import com.apalya.myplex.LoginActivity;
 import com.google.android.gms.auth.*;
 import com.google.android.gms.common.Scopes;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Pattern;
 
 
 
@@ -218,5 +222,21 @@ public class AccountUtils {
         loginFlowIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         loginFlowIntent.putExtra(LoginActivity.EXTRA_FINISH_INTENT, finishIntent);
         context.startActivity(loginFlowIntent);
+    }
+    
+    public List<String> getEmailAccounts(Context context){
+    	List<String> emails = new ArrayList<String>();
+    	
+    	Pattern emailPattern = Patterns.EMAIL_ADDRESS; // API level 8+
+    	Account[] accounts = AccountManager.get(context).getAccounts();
+    	for (Account account : accounts) {
+    	    if (emailPattern.matcher(account.name).matches()) {
+    	        String possibleEmail = account.name;
+    	        emails.add(possibleEmail);
+    	        Log.d("samir", possibleEmail);
+    	    }
+    	}
+    	
+    	return emails;
     }
 }

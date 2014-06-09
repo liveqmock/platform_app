@@ -20,7 +20,7 @@ public class SyncPurchasesUtil {
 
 	private SyncPurchasesCallback mListener;
 	
-	private static final String [] OPERATORS_NAME= {"airtel"};
+	private static final String [] OPERATORS_NAME= {"airtel","vodafone"};
 	
 	public interface SyncPurchasesCallback{
 		public void onComplete(boolean value);
