@@ -815,6 +815,17 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		}
 		
 	}
+	@Override
+	public void onViewChanged(boolean isMinimized) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public void onCloseFragment() {
+		// TODO Auto-generated method stub
+		
+	}
 	
 	
 }

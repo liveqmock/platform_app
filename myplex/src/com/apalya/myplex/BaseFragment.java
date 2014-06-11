@@ -11,6 +11,7 @@ public class BaseFragment extends Fragment {
 	public int mActionBarHeight;
 	public MainBaseOptions mMainActivity;
 	public Object mDataObject;
+	public boolean mEnableMinimizedView = true;
 
 	public Context getContext() {
 		return mContext;
@@ -45,5 +46,9 @@ public class BaseFragment extends Fragment {
 	}
 	public boolean onBackClicked() {
 		return false;
+	}
+	
+	public void setEnableMinimizedView(boolean mEnableMinimizedView) {
+		this.mEnableMinimizedView = mEnableMinimizedView;
 	}
 }

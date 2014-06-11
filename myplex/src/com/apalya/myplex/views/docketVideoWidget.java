@@ -161,6 +161,12 @@ public class docketVideoWidget implements PlayerListener{
 		// TODO Auto-generated method stub
 		
 	}
+	
+	@Override
+	public void onRetry() {
+		// TODO Auto-generated method stub
+		
+	}
 
 
 }
