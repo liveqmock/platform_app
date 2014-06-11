@@ -27,6 +27,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
 import android.view.View.OnSystemUiVisibilityChangeListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewTreeObserver;
 import android.view.View.OnClickListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
@@ -351,6 +352,14 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 				}
 			});
 
+			mEmail.setOnTouchListener(new OnTouchListener() {
+				
+				@Override
+				public boolean onTouch(View v, MotionEvent event) {
+					((AutoCompleteTextView)mEmail).showDropDown();
+					return false;
+				}
+			});
 
 			//signup event triggered
 			mSubmit.setOnClickListener(new OnClickListener() {

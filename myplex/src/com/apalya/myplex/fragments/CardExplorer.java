@@ -18,6 +18,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -163,7 +164,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		}else{
 			BaseFragment fragment = mMainActivity.createFragment(NavigationOptionsMenuAdapter.CARDDETAILS_ACTION);
 			fragment.setDataObject(object);
-			mMainActivity.bringFragment(fragment);	
+			mMainActivity.overlayFragment(fragment);	
 		}
 	}
 	
@@ -176,7 +177,9 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		Analytics.createScreenGA(Analytics.SCREEN_CARD_EXPLORER);
 		mSensorScrollUtil= new SensorScrollUtil();
 		mSensorScrollUtil.register(getContext());
+
 	}
+
 
 	public void showProgressBar() {
 		if(mProgressView != null){
@@ -348,8 +351,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		Log.d(TAG,"onCreateView");
-		
+		Log.d(TAG,"onCreateView");				
 		if(mMainActivity == null){
 			return null;
 		}
@@ -505,7 +507,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 	@Override
 	public void onPause() {
 		// TODO Auto-generated method stub
-		//for analytics
+		//for analytics		
 		CardView cardView = getmCardView();
     	if(cardView != null) {
     		if(cardView.swipeCount > 1) {

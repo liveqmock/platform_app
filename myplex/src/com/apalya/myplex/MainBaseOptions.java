@@ -31,6 +31,10 @@ public interface MainBaseOptions {
 	public void showActionBarProgressBar();
 
 	public void bringFragment(BaseFragment fragment);
+	
+	public void removeFragment(BaseFragment fragment);
+	
+	public void overlayFragment(BaseFragment fragment);
 
 	public void enableFilterAction(boolean b);
 
