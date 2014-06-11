@@ -152,6 +152,7 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 				return ;
 			}
 			
+			mMainActivity.removeCardDetailFragment();
 			Util.launchYouyubePlayer((Activity) mContext, object._id);
 			return ;
 		}

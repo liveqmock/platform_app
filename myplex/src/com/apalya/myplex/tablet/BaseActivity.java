@@ -940,4 +940,9 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		
 	}
 
+	@Override
+	public void removeCardDetailFragment() {
+		// TODO Auto-generated method stub
+		
+	}
 }

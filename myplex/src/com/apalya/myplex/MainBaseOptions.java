@@ -34,6 +34,8 @@ public interface MainBaseOptions {
 	
 	public void removeFragment(BaseFragment fragment);
 	
+	public void removeCardDetailFragment();
+	
 	public void overlayFragment(BaseFragment fragment);
 
 	public void enableFilterAction(boolean b);

@@ -1174,6 +1174,14 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 	}
 	
 	@Override
+	public void removeCardDetailFragment() {
+		if(mCurrentCardDetailFragment != null){
+			removeFragment(mCurrentCardDetailFragment);
+		}
+		
+	}
+	
+	@Override
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
 		// Sync the toggle state after onRestoreInstanceState has occurred.
