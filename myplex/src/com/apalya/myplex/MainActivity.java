@@ -95,8 +95,8 @@ import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.views.CardView;
 import com.apalya.myplex.views.RatingDialog;
+import com.crashlytics.android.Crashlytics;
 import com.facebook.Session;
-
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubeStandalonePlayer;
@@ -921,6 +921,14 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 	private CardDetails mCardDetails;
 	private SearchActivity mSearchActivity;
 	private SetttingsFragment mSettingsScreen;
+	
+	@Override
+	public void selectDefaultPage() {
+		if(mCurrentFragment == null){
+			selectItem(1);
+		}
+		
+	}
 	private void selectItem(int position) {		
 		saveCurrentSessionData();		
 		changeVisibility(mTitleFilterSymbol, View.GONE);
@@ -1108,11 +1116,19 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		mCurrentFragment.setActionBar(getActionBar());
 		mCurrentFragment.setMainActivity(this);
 		
-		FragmentTransaction transaction = fragmentManager.beginTransaction();
-
-		transaction.replace(R.id.content_cardview, mCurrentFragment);
-		transaction.addToBackStack(null);
-		transaction.commit();
+		try {
+			
+		
+			FragmentTransaction transaction = fragmentManager.beginTransaction();
+	
+			transaction.replace(R.id.content_cardview, mCurrentFragment);
+			transaction.addToBackStack(null);
+			transaction.commit();
+		
+		} catch (Throwable e) {
+			e.printStackTrace();
+			Crashlytics.logException(e);
+		}
 	}
 	
 	public void attachFragment(){
@@ -1143,16 +1159,22 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		fragment.setActionBar(getActionBar());
 		fragment.setMainActivity(this);
 		fragment.setContext(this);
-		FragmentManager fragmentManager = getFragmentManager();
-		FragmentTransaction transaction = fragmentManager.beginTransaction();
-		if(fragment instanceof CardDetails){
-			transaction.add(R.id.content_carddetail, fragment);
-		}else {
-			transaction.add(R.id.content_cardview, fragment);
+		try{
+			FragmentManager fragmentManager = getFragmentManager();
+			FragmentTransaction transaction = fragmentManager.beginTransaction();
+			if(fragment instanceof CardDetails){
+				transaction.add(R.id.content_carddetail, fragment);
+			}else {
+				transaction.add(R.id.content_cardview, fragment);
+			}
+		
+			transaction.addToBackStack(null);
+			transaction.commit();
+		
+		} catch (Throwable e) {
+			e.printStackTrace();
+			Crashlytics.logException(e);
 		}
-	
-		transaction.addToBackStack(null);
-		transaction.commit();
 	}
 	
 	@Override

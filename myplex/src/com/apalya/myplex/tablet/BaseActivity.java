@@ -945,4 +945,10 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		// TODO Auto-generated method stub
 		
 	}
+	
+	@Override
+	public void selectDefaultPage() {
+		// TODO Auto-generated method stub
+		
+	}
 }
