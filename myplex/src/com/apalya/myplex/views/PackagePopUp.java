@@ -177,7 +177,12 @@ public class PackagePopUp {
 		mFilterMenuPopupWindowList.add(mFilterMenuPopupWindow);
 		mFilterMenuPopupWindow.setOutsideTouchable(true);
 		mFilterMenuPopupWindow.setBackgroundDrawable(new BitmapDrawable());
-		mFilterMenuPopupWindow.showAsDropDown(anchorView);
+		if(mContext.getResources().getBoolean(R.bool.isTablet)){
+			mFilterMenuPopupWindow.showAsDropDown(anchorView);
+			return;
+		}
+		mFilterMenuPopupWindow.showAtLocation(anchorView.getRootView(),  android.view.Gravity.NO_GRAVITY , 0, 0);
+
 	}
 	public void showPackDialog(CardData data,View anchorView) {
 		View v = mInflater.inflate(R.layout.purchasepopup,null);
