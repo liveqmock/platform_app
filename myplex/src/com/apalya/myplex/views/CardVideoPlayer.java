@@ -325,6 +325,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		
 		View cardmedia_expand_button=  v.findViewById(R.id.cardmedia_expand_button);
 		cardmedia_expand_button.setOnClickListener(mPlayerClickListener);
+		v.findViewById(R.id.cardmedia_expand_text).setOnClickListener(mPlayerClickListener);
 		Util.showFeedback(cardmedia_expand_button);
 		return v;
 	}
@@ -1386,8 +1387,12 @@ private void playVideoFile(CardDownloadData mDownloadData){
 	
 	public void minimize(){
 		isMinimized = true;
-		mWidth = myplexapplication.getApplicationConfig().screenWidth/2;
+		mWidth = (int)(myplexapplication.getApplicationConfig().screenWidth*0.45);
 		mHeight = (mWidth * 9) / 16;
+		
+		if(mData.generalInfo != null && mData.generalInfo.type != null && mData.generalInfo.type.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
+			mHeight = (mWidth * 3) / 4;
+		}
 		
 		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
 				mWidth, mHeight);		

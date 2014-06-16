@@ -221,6 +221,12 @@ public class CardDetails extends BaseFragment implements
 		
 		
 		if(mCardData.generalInfo.type != null && mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
+			String email = myplexapplication.getUserProfileInstance()
+					.getUserEmail();
+			if (!(email.equalsIgnoreCase("NA") || email.equalsIgnoreCase(""))) {
+				mAutoPlay = true;
+			}
+			
 			createEPGView(rootView);
 		}else{
 			if(mEPGLayout!=null)
@@ -1084,10 +1090,10 @@ public class CardDetails extends BaseFragment implements
 					String message = "Set reminder for "+ mCardData.generalInfo.title +" tomorrow at same time";
 					Util.showReminder(mCardData.generalInfo.title, prg.getTime(),mCardData.generalInfo.title , mCardData._id, mContext, message, mContext.getString(R.string.notification_livetv_message));
 					mShowReminder = false;
-					return true;
+					return isMinimized?false:true;
 				}
 				
-				return true;
+				return isMinimized?false:true;
 			}
 			
 			return false;

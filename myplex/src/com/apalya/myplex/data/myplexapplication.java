@@ -13,12 +13,11 @@ import com.apalya.myplex.adapters.NavigationOptionsMenuAdapter;
 import com.apalya.myplex.cache.CacheHolder;
 import com.apalya.myplex.receivers.ConnectivityReceiver;
 import com.apalya.myplex.utils.ConsumerApi;
+import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.LocationUtil;
 import com.apalya.myplex.utils.MyVolley;
-
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.Tracker;
-
 import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.utils.Util;
 import com.crashlytics.android.Crashlytics;
@@ -149,6 +148,7 @@ public class myplexapplication extends Application {
 		// "******************************************************************");
 
 		getDevDetailsInstance();
+		FontUtil.loadFonts(activity.getAssets());
 		mDeviceDetails.setDeviceOs(activity.getString(R.string.osname));
 		mDeviceDetails.setDeviceOsVer(android.os.Build.VERSION.RELEASE);
 		mDeviceDetails.setDeviceModel(android.os.Build.DEVICE);
