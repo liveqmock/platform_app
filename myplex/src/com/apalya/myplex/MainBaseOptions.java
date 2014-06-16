@@ -52,4 +52,6 @@ public interface MainBaseOptions {
 	public void setUpShareButton(String toBeshared);
 
 	public void setUpLivetvOrMovie(boolean isMovie);
+	
+	public void selectDefaultPage();
 }

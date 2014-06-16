@@ -1261,6 +1261,9 @@ public class CardDetails extends BaseFragment implements
 			mMainActivity.setSearchBarVisibilty(View.INVISIBLE);
 			mMainActivity.setSearchViewVisibilty(View.VISIBLE);
 			mMainActivity.showActionBar();
+			if(!mEnableMinimizedView){
+				mMainActivity.selectDefaultPage();
+			}
 			return ;
 		}
 		

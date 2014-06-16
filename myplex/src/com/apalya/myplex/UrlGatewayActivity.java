@@ -18,7 +18,7 @@ public class UrlGatewayActivity extends Activity {
 	private static final String PORTAL_TVSHOW_URLPATH = "tv-show";
 
 	private static enum SchemeType {
-		http, myplex
+		http, myplex, https
 	};
 
 	protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +69,7 @@ public class UrlGatewayActivity extends Activity {
 		switch (scheme) {
 
 		case http:
+		case https:
 				// example url : http://www.myplex.com/watch-movie/415/pacific-rim/
 			if (list != null && list.size() >= 2) {
 				String contentId = list.get(1);
