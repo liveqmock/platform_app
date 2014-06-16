@@ -1026,7 +1026,7 @@ public class CardDetailViewFactory {
 		}
 		TextView relaseDate = (TextView)v.findViewById(R.id.carddetaildesc_releaseDate);
 		if(mData.content != null && mData.content.releaseDate != null){
-			relaseDate.setText(mData.content.releaseDate);
+			relaseDate.setText(Util.getDDMMYYYY(mData.content.releaseDate));
 		}
 		relaseDate.setTypeface(FontUtil.Roboto_Medium);
 		
@@ -1131,7 +1131,7 @@ public class CardDetailViewFactory {
 		
 		TextView relaseDate = (TextView)v.findViewById(R.id.carddetailbriefdescription_releaseDate);
 		if(mData.content != null && mData.content.releaseDate != null){
-			relaseDate.setText(mData.content.releaseDate);
+			relaseDate.setText(Util.getDDMMYYYY(mData.content.releaseDate));
 		}
 		relaseDate.setTypeface(FontUtil.Roboto_Medium);
 		
