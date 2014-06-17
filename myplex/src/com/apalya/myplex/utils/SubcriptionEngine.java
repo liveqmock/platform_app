@@ -370,6 +370,10 @@ public class SubcriptionEngine {
 			return;
 		}
 				
+		if(Util.isWifiEnabled(mContext)){
+			Util.showToast(mContext, mContext.getString(R.string.subscription_operator_data_alert), Util.TOAST_TYPE_ERROR);
+		}
+		
 		final MsisdnRetrivalEngine msisdnRetrivalEngine = new MsisdnRetrivalEngine(mContext);
 		
 		msisdnRetrivalEngine.setResumeOldConnection(false);
