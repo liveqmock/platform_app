@@ -95,7 +95,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 	private LayoutParams mParentLayoutParams;
 	private FadeInNetworkImageView mPreviewImage;
 	private TextView mPlayButton;
-	private TextView mTrailerButton,recordedProgName, mMinimizeButton;
+	private TextView mTrailerButton,recordedProgName, mMinimizeButton, mShareButton;
 	private TextView mBufferPercentage;
 	private RelativeLayout mProgressBarLayout;
 	private RelativeLayout mVideoViewParent;
@@ -196,6 +196,12 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		
 		mTrailerButton = (TextView)v.findViewById(R.id.cardmediasubitemtrailer_play);
 		mTrailerButton.setTypeface(FontUtil.ss_symbolicons_line);
+		
+		mShareButton = (TextView)v.findViewById(R.id.cardmediasubitem_share);
+		mShareButton.setTypeface(FontUtil.ss_symbolicons_line);
+		
+		mShareButton.setOnClickListener(mShareClickListener);
+		Util.showFeedback(mShareButton);
 		recordedProgName = (TextView)v.findViewById(R.id.recordedProgName);
 		
 		mTrailerButton.setVisibility(mTrailerAvailable == true ? View.VISIBLE : View.GONE);
@@ -298,6 +304,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 			mVideoViewParent.setOnClickListener(null);
 			mPlayButton.setVisibility(View.GONE);
 			mTrailerButton.setVisibility(View.GONE);
+			mShareButton.setVisibility(View.GONE);
 			mVideoView.setVisibility(View.INVISIBLE);
 			mProgressBarLayout.setVisibility(View.INVISIBLE);
 			mPreviewImage.setScaleType(ScaleType.CENTER);
@@ -336,7 +343,8 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 
 		recordedProgName.setVisibility(View.GONE);
 		mPlayButton.setVisibility(View.INVISIBLE);			
-		mTrailerButton.setVisibility(View.INVISIBLE);			
+		mTrailerButton.setVisibility(View.INVISIBLE);	
+		mShareButton.setVisibility(View.INVISIBLE);
 		mProgressBarLayout.setVisibility(View.VISIBLE);			
 		mVideoView.setVisibility(View.VISIBLE);			
 		mPreviewImage.setVisibility(View.INVISIBLE);			
@@ -436,6 +444,20 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		}
 	};
 	
+	
+	private OnClickListener mShareClickListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			
+			if(mData == null || mData.generalInfo == null || mData.generalInfo.title == null){
+				return;
+			}
+			Util.shareData(mContext, 3, "",mData.generalInfo.title.toLowerCase());
+
+		}
+	};
+	
 	public void playContent(){
 		
 		if(isMinimized){
@@ -469,6 +491,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		mVideoViewParent.setOnClickListener(mPlayerClickListener);
 		mPlayButton.setVisibility(View.VISIBLE);
 		mTrailerButton.setVisibility(mTrailerAvailable == true ? View.VISIBLE : View.GONE);
+		mShareButton.setVisibility(View.VISIBLE);
 		mProgressBarLayout.setVisibility(View.GONE);
 		mPreviewImage.setVisibility(View.VISIBLE);
 		mVideoView.setVisibility(View.INVISIBLE);
@@ -900,6 +923,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		
 		mPlayButton.setVisibility(View.INVISIBLE);
 		mTrailerButton.setVisibility(View.INVISIBLE);
+		mShareButton.setVisibility(View.INVISIBLE);
 		mProgressBarLayout.setVisibility(View.VISIBLE);
 		mVideoView.setVisibility(View.VISIBLE);
 		mPreviewImage.setVisibility(View.INVISIBLE);
@@ -1033,6 +1057,11 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		mTrailerButton = (TextView)v.findViewById(R.id.cardmediasubitemtrailer_play);
 		mTrailerButton.setTypeface(FontUtil.ss_symbolicons_line);
 		mTrailerButton.setVisibility(mTrailerAvailable == true ? View.VISIBLE : View.GONE);
+		
+		mShareButton = (TextView)v.findViewById(R.id.cardmediasubitem_share);
+		mShareButton.setTypeface(FontUtil.ss_symbolicons_line);
+		mShareButton.setOnClickListener(mShareClickListener);
+		
 		recordedProgName = (TextView)v.findViewById(R.id.recordedProgName);
 		
 		initSportsStatusLayout(v);
@@ -1095,6 +1124,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			mVideoViewParent.setOnClickListener(null);
 			mPlayButton.setVisibility(View.GONE);
 			mTrailerButton.setVisibility(View.GONE);
+			mShareButton.setVisibility(View.GONE);
 			mVideoView.setVisibility(View.INVISIBLE);
 			mProgressBarLayout.setVisibility(View.INVISIBLE);
 			mPreviewImage.setScaleType(ScaleType.CENTER);
@@ -1176,6 +1206,9 @@ private void playVideoFile(CardDownloadData mDownloadData){
 				break;
 		}
 			mPlayerStatusListener.playerStatusUpdate("Play Error :: what = "+what+" extra= "+error);
+		}
+		if(mMinimizeButton != null){
+			mMinimizeButton.setVisibility(View.INVISIBLE);
 		}
 		closePlayer();
 		return false;
@@ -1584,6 +1617,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 	private void initSportsStatusLayout(final View view){
 		if(mData.generalInfo != null && mData.generalInfo.type != null && mData.generalInfo.type.equalsIgnoreCase(ConsumerApi.CONTENT_SPORTS_LIVE)){
 			mTrailerButton.setVisibility(View.GONE);
+			mShareButton.setVisibility(View.GONE);
 			mScoreCardLayout = (LinearLayout)view.findViewById(R.id.cardmedia_scorecard_layout);
 			mScoreCardLayout.setVisibility(View.VISIBLE);
 			mScoreCardLayout.setOnClickListener(mScoreCardClickListener);
@@ -2074,6 +2108,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 				mPreviewImage.setVisibility(View.INVISIBLE);
 				mTrailerButton.setVisibility(View.INVISIBLE);
 				mPlayButton.setVisibility(View.INVISIBLE);
+				mShareButton.setVisibility(View.INVISIBLE);
 //				mPlayButton.setOnClickListener(null);
 //				mVideoViewParent.setEnabled(false);
 				recordedProgName.setVisibility(View.INVISIBLE);
@@ -2095,6 +2130,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		mTrailerButton.setVisibility(View.GONE);
 		recordedProgName.setVisibility(View.GONE);
 		mPlayButton.setVisibility(View.VISIBLE);		
+		mShareButton.setVisibility(View.VISIBLE);
 	}
 	public void removeProgrammeName(){
 		if(mPreviewImage!=null)
