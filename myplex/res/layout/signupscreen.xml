@@ -65,7 +65,7 @@
             android:orientation="vertical"
             android:visibility="gone" >
 
-            <EditText
+            <AutoCompleteTextView
                 android:id="@+id/editEmail"
                 android:layout_width="match_parent"
                 android:layout_height="40dp"

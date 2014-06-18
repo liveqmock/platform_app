@@ -95,8 +95,8 @@ import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.views.CardView;
 import com.apalya.myplex.views.RatingDialog;
+import com.crashlytics.android.Crashlytics;
 import com.facebook.Session;
-
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubeStandalonePlayer;
@@ -110,6 +110,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 	// private CharSequence mTitle;
 	public LayoutInflater mInflater;
 	public BaseFragment mCurrentFragment;
+	public CardDetails mCurrentCardDetailFragment;
 	private boolean mIsUserLoggedIn = true ;
 	public static final String TAG = "MainActivity";
 	private CacheManager mCacheManager = new CacheManager();
@@ -121,7 +122,8 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 	private TextView tvOrMovie;
 	private Handler handler= new Handler();
 	private String hintString= null;
-
+	private Boolean searchViewClose=false;
+			
 	NavigationOptionsMenuAdapter mNavigationAdapter;
 	private TextView mFilterLevle;
 	
@@ -171,7 +173,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		if(actionBar != null){
 			actionBar.show();
 		}
-		changeVisibility(mTitleFilterSymbol,View.GONE);
+		
 	}
 	private List<NavigationOptionsMenu> mMenuItemList = new ArrayList<NavigationOptionsMenu>();
 	private String _id;
@@ -438,7 +440,8 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 								}
 								fragment.setMainActivity(MainActivity.this);
 								fragment.setDataObject(cardData);
-								bringFragment(fragment);
+								fragment.setEnableMinimizedView(false);
+								overlayFragment(fragment);
 								break;
 							}
 						}
@@ -488,9 +491,9 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 						if(!TextUtils.isEmpty(promoText)){
 							data.promoText=promoText;
 						}
-						
+						fragment.setEnableMinimizedView(false);
 						fragment.setDataObject(data);
-						bringFragment(fragment);
+						overlayFragment(fragment);
 					}
 				});
 			}
@@ -662,7 +665,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		tvOrMovie = (TextView)v.findViewById(R.id.livetv);
 		FontUtil.loadFonts(getAssets());
 		tvOrMovie.setTypeface(FontUtil.ss_symbolicons_line);
-		
+	
 	}
 	OnClickListener navigationClickListener = new  OnClickListener() {
 
@@ -794,13 +797,21 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 	
 	@Override
 	public void onBackPressed() {
-		if(mCurrentFragment instanceof CardDetails){
-			if(mCurrentFragment.onBackClicked())
-				return;
-			if(mFragmentStack.size() == 1){				
+		if( mCurrentCardDetailFragment != null && mCurrentCardDetailFragment instanceof CardDetails){
+			if(mCurrentCardDetailFragment.onBackClicked())
+				return; 
+			else {
+				removeFragment(mCurrentCardDetailFragment);
+				mCurrentCardDetailFragment = null;				
+			}
+						
+			if(mCurrentFragment == null && mFragmentStack.size() == 0){		
+				// only detail screen
 				exitApp();				
 				return;
 			}
+			showActionBar();
+			return;
 		}
 		try {
 			if (mDrawerLayout!=null && mNavigationDrawerOpened) {
@@ -842,6 +853,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		switch (fragmentType) {
 		case NavigationOptionsMenuAdapter.CARDDETAILS_ACTION:
 			mCardDetails = new CardDetails();
+//			mCardDetails.setMinimized(true);
 			fragment = mCardDetails;
 			break;
 		case NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION:
@@ -894,6 +906,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		if (fragment == null) {
 			return;
 		}
+		
 		removeLiveTvActionBarIcon();
 		HideSearchView();
 		HideSearchView();
@@ -902,11 +915,20 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		pushFragment();
 	}
 
+	
 
 	private CardExplorer mCardExplorer;
 	private CardDetails mCardDetails;
 	private SearchActivity mSearchActivity;
 	private SetttingsFragment mSettingsScreen;
+	
+	@Override
+	public void selectDefaultPage() {
+		if(mCurrentFragment == null){
+			selectItem(1);
+		}
+		
+	}
 	private void selectItem(int position) {		
 		saveCurrentSessionData();		
 		changeVisibility(mTitleFilterSymbol, View.GONE);
@@ -1068,47 +1090,117 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 	}
 
 	private void pushFragment() {
-		addFilterData(new ArrayList<FilterMenudata>(), null);		
+		
+		if(searchViewClose==false){
+			addFilterData(new ArrayList<FilterMenudata>(), null);
+		}else {
+			searchViewClose =false ;
+		}
+		
+		
+		if( mCurrentCardDetailFragment != null && mCurrentCardDetailFragment instanceof CardDetails
+				&& !mCurrentCardDetailFragment.isMinimized()){
+			if(mCurrentCardDetailFragment.onBackClicked())
+				return; 
+			else {
+				removeFragment(mCurrentCardDetailFragment);
+				mCurrentCardDetailFragment = null;				
+			}
+			showActionBar();
+			
+		}
+		
+		FragmentManager fragmentManager = getFragmentManager();
 		mFragmentStack.push(mCurrentFragment);
 		mCurrentFragment.setContext(this);
 		mCurrentFragment.setActionBar(getActionBar());
 		mCurrentFragment.setMainActivity(this);
-		FragmentManager fragmentManager = getFragmentManager();
-		FragmentTransaction transaction = fragmentManager.beginTransaction();
-		// transaction.setCustomAnimations(android.R.animator.fade_in,
-		// android.R.animator.fade_out);
-		// transaction.
-		transaction.replace(R.id.content_frame, mCurrentFragment);
-		transaction.addToBackStack(null);
-		transaction.commit();
+		
+		try {
+			
+		
+			FragmentTransaction transaction = fragmentManager.beginTransaction();
+	
+			transaction.replace(R.id.content_cardview, mCurrentFragment);
+			transaction.addToBackStack(null);
+			transaction.commit();
+		
+		} catch (Throwable e) {
+			e.printStackTrace();
+			Crashlytics.logException(e);
+		}
 	}
 	
-	private void overlayFragment(BaseFragment fragment) {
+	public void attachFragment(){
+		if(mCurrentFragment != null){
+			FragmentManager fragmentManager = getFragmentManager();
+			FragmentTransaction transaction = fragmentManager.beginTransaction();
+			transaction.attach(mCurrentFragment);
+			transaction.commit();
+		}
+	}
+	public void overlayFragment(BaseFragment fragment) {
 		if(fragment == null)
 			return;
+		
+		if (fragment instanceof CardDetails){
+			if(mCurrentCardDetailFragment != null){
+				removeFragment(mCurrentCardDetailFragment);
+			}
+			mCurrentCardDetailFragment = (CardDetails)fragment;
+			if(mCurrentFragment != null){
+//				FragmentManager fragmentManager = getFragmentManager();
+//				FragmentTransaction transaction = fragmentManager.beginTransaction();
+//				transaction.detach(mCurrentFragment);
+//				transaction.commit();
+			}
+		}
+		
 		fragment.setActionBar(getActionBar());
 		fragment.setMainActivity(this);
-		FragmentManager fragmentManager = getFragmentManager();
-		FragmentTransaction transaction = fragmentManager.beginTransaction();
-		transaction.add(R.id.content_frame, fragment);
-		transaction.addToBackStack(null);
-		transaction.commit();
+		fragment.setContext(this);
+		try{
+			FragmentManager fragmentManager = getFragmentManager();
+			FragmentTransaction transaction = fragmentManager.beginTransaction();
+			if(fragment instanceof CardDetails){
+				transaction.add(R.id.content_carddetail, fragment);
+			}else {
+				transaction.add(R.id.content_cardview, fragment);
+			}
+		
+			transaction.addToBackStack(null);
+			transaction.commit();
+		
+		} catch (Throwable e) {
+			e.printStackTrace();
+			Crashlytics.logException(e);
+		}
 	}
 	
-	private void removeFragment(BaseFragment fragment)
+	@Override
+	public void removeFragment(BaseFragment fragment)
 	{
 		Log.i(TAG, "remove" + fragment);
 		FragmentManager fragmentManager = getFragmentManager();
 		FragmentTransaction transaction = fragmentManager.beginTransaction();
 		transaction.remove(fragment);
 		transaction.commit();
-		mSearchSuggestionFrag = null;
 		
-		if(!mFragmentStack.isEmpty()){			
-			fragment = mFragmentStack.peek();
-			Log.i(TAG, "peeking" + fragment);
-			bringFragment(fragment);
+		if(fragment instanceof SearchSuggestions){
+			mSearchSuggestionFrag = null;
 		}
+		else if (fragment instanceof CardDetails){
+			mCurrentCardDetailFragment = null;
+		}	
+
+	}
+	
+	@Override
+	public void removeCardDetailFragment() {
+		if(mCurrentCardDetailFragment != null){
+			removeFragment(mCurrentCardDetailFragment);
+		}
+		
 	}
 	
 	@Override
@@ -1255,7 +1347,10 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 					});
 					fadeAnim.start();
 					if(mCurrentFragment != null){
-						mCurrentFragment.getView().setDrawingCacheEnabled(false);
+						View view = mCurrentFragment.getView();
+						if(view != null){
+							view.setDrawingCacheEnabled(false);
+						}
 					}
 				}
 			});
@@ -1420,6 +1515,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 //					mSearchView.setIconified(true);
 					if(mSearchSuggestionFrag !=null)
 					{
+						searchViewClose =true ;
 						removeFragment(mSearchSuggestionFrag);
 					}
 				}

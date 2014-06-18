@@ -31,6 +31,12 @@ public interface MainBaseOptions {
 	public void showActionBarProgressBar();
 
 	public void bringFragment(BaseFragment fragment);
+	
+	public void removeFragment(BaseFragment fragment);
+	
+	public void removeCardDetailFragment();
+	
+	public void overlayFragment(BaseFragment fragment);
 
 	public void enableFilterAction(boolean b);
 
@@ -46,4 +52,6 @@ public interface MainBaseOptions {
 	public void setUpShareButton(String toBeshared);
 
 	public void setUpLivetvOrMovie(boolean isMovie);
+	
+	public void selectDefaultPage();
 }

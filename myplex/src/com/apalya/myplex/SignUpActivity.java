@@ -4,6 +4,7 @@ package com.apalya.myplex;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,6 +27,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnFocusChangeListener;
 import android.view.View.OnSystemUiVisibilityChangeListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewTreeObserver;
 import android.view.View.OnClickListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
@@ -34,6 +36,8 @@ import android.view.animation.Animation;
 import android.view.animation.LinearInterpolator;
 import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
@@ -53,6 +57,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.apalya.myplex.data.DeviceDetails;
 import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.utils.AccountUtils;
 import com.apalya.myplex.utils.AlertDialogUtil;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.ConsumerApi;
@@ -73,7 +78,8 @@ import com.mixpanel.android.mpmetrics.MixpanelAPI;
 public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDialogListener{
 
 	private Button mSubmit;
-	private EditText mEmail,/*mPhone,*/mPassword;
+	private EditText mEmail/*mPhone,*/;
+	private EditText mPassword;
 	//private TextView mUserEmail,mUserPhone,mUserPwd,mUserName;
 	//private Switch mSmsUpdates,mMailUpdates;
 	private static final String TAG = "SignUpActivity";
@@ -300,7 +306,7 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 			mFpwd.setVisibility(View.GONE);
 			mTnc.setVisibility(View.VISIBLE);
 			mTnc.setTypeface(FontUtil.Roboto_Medium);
-			mEmail = (EditText) findViewById(R.id.editEmail);
+			mEmail = (AutoCompleteTextView) findViewById(R.id.editEmail);
 			mEmail.setTypeface(FontUtil.Roboto_Regular);
 			mPassword = (EditText) findViewById(R.id.editPassword);
 			mPassword.setTypeface(FontUtil.Roboto_Regular);
@@ -310,6 +316,16 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 			
 			Analytics.mixPanelJoinMyplexInitiated();
 
+			List<String> emailIds = new AccountUtils().getEmailAccounts(getApplicationContext());
+			
+			if(!emailIds.isEmpty()){
+			  ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+		                 android.R.layout.simple_dropdown_item_1line,emailIds );		       
+			  	((AutoCompleteTextView)mEmail).setAdapter(adapter);		    
+			  	((AutoCompleteTextView)mEmail).setThreshold(0);
+			}
+			
+			
 			mEmail.setOnFocusChangeListener(new OnFocusChangeListener() {
 
 				@Override
@@ -330,9 +346,20 @@ public class SignUpActivity extends Activity implements AlertDialogUtil.NoticeDi
 							Log.i("",text+"is not a number");
 						}
 					}
+					if(hasFocus){
+						((AutoCompleteTextView)mEmail).showDropDown();
+					}
 				}
 			});
 
+			mEmail.setOnTouchListener(new OnTouchListener() {
+				
+				@Override
+				public boolean onTouch(View v, MotionEvent event) {
+					((AutoCompleteTextView)mEmail).showDropDown();
+					return false;
+				}
+			});
 
 			//signup event triggered
 			mSubmit.setOnClickListener(new OnClickListener() {

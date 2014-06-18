@@ -14,6 +14,7 @@ import android.animation.Animator.AnimatorListener;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.drm.DrmErrorEvent;
 import android.drm.DrmInfoEvent;
 import android.graphics.Color;
@@ -43,6 +44,7 @@ import android.widget.Scroller;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.CardNetworkImageView;
+import com.apalya.myplex.MainBaseOptions;
 import com.apalya.myplex.R;
 import com.apalya.myplex.adapters.CardActionListener;
 import com.apalya.myplex.adapters.CardItemClickListener;
@@ -132,6 +134,15 @@ public class CardView extends ScrollView {
         mMaxYOverscrollDistance = (int) (MAX_Y_OVERSCROLL_DISTANCE * mContext.getResources().getDisplayMetrics().density);
     }
     
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
+
+		if (((MainBaseOptions) mContext).getOrientation() != Configuration.ORIENTATION_PORTRAIT) {
+			return;
+		}
+
+    	super.onLayout(changed, l, t, r, b);
+    }
     public float getCardHeight() {
     	return mCardHeight;
     }
@@ -223,14 +234,15 @@ public class CardView extends ScrollView {
 			this.mDataList.add(data);
 		}
 		mNumberofItems = mDataList.size();	
-		show();
+		show(true);
 	}
 	public void addData(CardData data) {
 		this.mDataList.add(data);
 		mNumberofItems = mDataList.size();
 	}
 
-	public void addData(List<CardData> datalist) {
+	public void addData(List<CardData> datalist) {		
+
 		try {
 			if(myplexapplication.mDownloadList == null){
 				myplexapplication.mDownloadList = (CardDownloadedDataList) Util.loadObject(myplexapplication.getApplicationConfig().downloadCardsPath);
@@ -575,11 +587,15 @@ public class CardView extends ScrollView {
 		}
 		updateDownloadStatus(data,null);
 	}
-	public void show() {
+	public void show(boolean doForceUpdate) {
+
 //		Log.e(TAG, "updateCardsPosition show =");
-		mCardsLayout.removeAllViews();
-		mCardsLayout.refresh();
-		mCardsLayout.updateCardsPosition(getScrollY());
+		if(doForceUpdate){
+			mCardsLayout.removeAllViews();
+			mCardsLayout.refresh();
+		}
+		mCardsLayout.updateCardsPosition(getScrollY());	
+	
 	}
 	
 	public void setCurrentSelectedIndex(int currentSelectedIndex) {

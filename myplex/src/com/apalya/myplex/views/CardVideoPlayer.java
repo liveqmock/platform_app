@@ -21,6 +21,7 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.location.Location;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -94,7 +95,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 	private LayoutParams mParentLayoutParams;
 	private FadeInNetworkImageView mPreviewImage;
 	private TextView mPlayButton;
-	private TextView mTrailerButton,recordedProgName;
+	private TextView mTrailerButton,recordedProgName, mMinimizeButton, mShareButton;
 	private TextView mBufferPercentage;
 	private RelativeLayout mProgressBarLayout;
 	private RelativeLayout mVideoViewParent;
@@ -127,6 +128,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 
 	private SportsStatusRefresh sportsStatusRefresh;
 	private boolean isFullScreen,isTriler;
+	private boolean isMinimized = false;
 
 	public void setFullScreenListener(PlayerFullScreen mListener){
 		this.mPlayerFullScreen = mListener;
@@ -140,6 +142,8 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 	}
 	public interface PlayerStatusUpdate{
 		public void playerStatusUpdate(String value);
+		public void onViewChanged(boolean isMinimized);
+		public void onCloseFragment();
 	}
 	public CardVideoPlayer(Context context, CardData data) {
 		this.mContext = context;
@@ -163,14 +167,14 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 			}
 		}
 		
-	
+		
 		mInflator = LayoutInflater.from(mContext);
 	}
 
 	public View CreatePlayerView(View parentLayout) {
 		mParentLayout = parentLayout;
 		mParentLayoutParams = (LayoutParams) mParentLayout.getLayoutParams();
-		View v = mInflator.inflate(R.layout.cardmediasubitemvideo, null);
+		final View v = mInflator.inflate(R.layout.cardmediasubitemvideo, null);
 		mVideoViewParent = (RelativeLayout) v;
 
 		mWidth = myplexapplication.getApplicationConfig().screenWidth;
@@ -184,6 +188,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 
 		mVideoView = (VideoViewExtn) v
 				.findViewById(R.id.cardmediasubitemvideo_videopreview);
+		mVideoViewParent.setLayoutParams(params);
 		mVideoView.setLayoutParams(params);
 		mVideoView.resizeVideo(mWidth, mHeight);
 		mPlayButton = (TextView) v .findViewById(R.id.cardmediasubitemvideo_play);
@@ -191,9 +196,18 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		
 		mTrailerButton = (TextView)v.findViewById(R.id.cardmediasubitemtrailer_play);
 		mTrailerButton.setTypeface(FontUtil.ss_symbolicons_line);
+		
+		mShareButton = (TextView)v.findViewById(R.id.cardmediasubitem_share);
+		mShareButton.setTypeface(FontUtil.ss_symbolicons_line);
+		
+		mShareButton.setOnClickListener(mShareClickListener);
+		Util.showFeedback(mShareButton);
 		recordedProgName = (TextView)v.findViewById(R.id.recordedProgName);
 		
 		mTrailerButton.setVisibility(mTrailerAvailable == true ? View.VISIBLE : View.GONE);
+		
+		mMinimizeButton = (TextView)v.findViewById(R.id.cardmedia_minimize);
+		mMinimizeButton.setTypeface(FontUtil.ss_symbolicons_line);
 		
         initSportsStatusLayout(v);
 		int[] location = new int[2];
@@ -207,7 +221,13 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		mTrailerButton.setOnClickListener(new OnClickListener() {
 					
 					@Override
-					public void onClick(View v) {
+					public void onClick(View view) {
+						
+//						if(mPlayerStatusListener != null){
+//							isMinimized =!isMinimized;
+//							mPlayerStatusListener.onViewChanged(isMinimized);							
+//							return;
+//						}
 						if(mTrailerAvailable/*mData !=null && mData.relatedMultimedia !=null &&
 								mData.relatedMultimedia.values !=null
 								 && mData.relatedMultimedia.values.size() >0*/)
@@ -236,6 +256,17 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 						}
 					}
 				});
+		
+		mMinimizeButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				if(mPlayerStatusListener != null){
+					mPlayerStatusListener.onViewChanged(true);
+				}
+				
+			}
+		});
 
 		mBufferPercentage = (TextView) v
 				.findViewById(R.id.carddetaildesc_movename);
@@ -273,6 +304,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 			mVideoViewParent.setOnClickListener(null);
 			mPlayButton.setVisibility(View.GONE);
 			mTrailerButton.setVisibility(View.GONE);
+			mShareButton.setVisibility(View.GONE);
 			mVideoView.setVisibility(View.INVISIBLE);
 			mProgressBarLayout.setVisibility(View.INVISIBLE);
 			mPreviewImage.setScaleType(ScaleType.CENTER);
@@ -280,6 +312,28 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		}else{
 			  Util.showFeedback(mVideoViewParent);
 		}
+		
+		TextView movieTitle = (TextView) v.findViewById(R.id.cardmedia_mini_title);
+		movieTitle.setText(mData.generalInfo.title.toLowerCase());
+		movieTitle.setTypeface(FontUtil.Roboto_Regular);
+		
+		TextView deleteIcon = (TextView) v.findViewById(R.id.card_title_deleteText);
+		deleteIcon.setTypeface(FontUtil.ss_symbolicons_line);
+		deleteIcon.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				if(mPlayerStatusListener != null){
+					mPlayerStatusListener.onCloseFragment();
+				}
+				
+			}
+		});
+		
+		View cardmedia_expand_button=  v.findViewById(R.id.cardmedia_expand_button);
+		cardmedia_expand_button.setOnClickListener(mPlayerClickListener);
+		v.findViewById(R.id.cardmedia_expand_text).setOnClickListener(mPlayerClickListener);
+		Util.showFeedback(cardmedia_expand_button);
 		return v;
 	}
 
@@ -289,7 +343,8 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 
 		recordedProgName.setVisibility(View.GONE);
 		mPlayButton.setVisibility(View.INVISIBLE);			
-		mTrailerButton.setVisibility(View.INVISIBLE);			
+		mTrailerButton.setVisibility(View.INVISIBLE);	
+		mShareButton.setVisibility(View.INVISIBLE);
 		mProgressBarLayout.setVisibility(View.VISIBLE);			
 		mVideoView.setVisibility(View.VISIBLE);			
 		mPreviewImage.setVisibility(View.INVISIBLE);			
@@ -389,8 +444,27 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		}
 	};
 	
+	
+	private OnClickListener mShareClickListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			
+			if(mData == null || mData.generalInfo == null || mData.generalInfo.title == null){
+				return;
+			}
+			Util.shareData(mContext, 3, "",mData.generalInfo.title.toLowerCase());
+
+		}
+	};
+	
 	public void playContent(){
 		
+		if(isMinimized){
+			isMinimized =!isMinimized;
+			mPlayerStatusListener.onViewChanged(isMinimized);	
+			return;
+		}
 		if(canBePlayed(true)){
 			
 			isTriler = false;
@@ -417,6 +491,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		mVideoViewParent.setOnClickListener(mPlayerClickListener);
 		mPlayButton.setVisibility(View.VISIBLE);
 		mTrailerButton.setVisibility(mTrailerAvailable == true ? View.VISIBLE : View.GONE);
+		mShareButton.setVisibility(View.VISIBLE);
 		mProgressBarLayout.setVisibility(View.GONE);
 		mPreviewImage.setVisibility(View.VISIBLE);
 		mVideoView.setVisibility(View.INVISIBLE);
@@ -742,6 +817,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 	}
 	
 	protected void initializeVideoPlay(Uri uri ) {
+
 		VideoViewPlayer.StreamType streamType = StreamType.VOD;
 		if (mVideoViewPlayer == null) {
 			mVideoViewPlayer = new VideoViewPlayer(mVideoView, mContext, uri,streamType);
@@ -758,7 +834,12 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		mVideoView.setOnTouchListener(new OnTouchListener() {
 			@Override
 			public boolean onTouch(View arg0, MotionEvent event) {
-				mVideoViewPlayer.onTouchEvent(event);
+				if(!isMinimized)
+					mVideoViewPlayer.onTouchEvent(event);
+				
+				if(!isFullScreen && mMinimizeButton != null){
+					mMinimizeButton.setVisibility(mVideoViewPlayer.IsMediaControllerVisible()?View.VISIBLE:View.INVISIBLE);
+				}
 				return false;
 			}
 		});
@@ -814,7 +895,9 @@ private void playVideoFile(CardDownloadData mDownloadData){
 
 		@Override
 		public boolean onTouch(View arg0, MotionEvent event) {
-			mVideoViewPlayer.onTouchEvent(event);
+			if(!isMinimized){
+				mVideoViewPlayer.onTouchEvent(event);
+			}
 			return false;
 		}
 	});
@@ -840,6 +923,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		
 		mPlayButton.setVisibility(View.INVISIBLE);
 		mTrailerButton.setVisibility(View.INVISIBLE);
+		mShareButton.setVisibility(View.INVISIBLE);
 		mProgressBarLayout.setVisibility(View.VISIBLE);
 		mVideoView.setVisibility(View.VISIBLE);
 		mPreviewImage.setVisibility(View.INVISIBLE);
@@ -915,7 +999,9 @@ private void playVideoFile(CardDownloadData mDownloadData){
 
 					@Override
 					public boolean onTouch(View arg0, MotionEvent event) {
-						mVideoViewPlayer.onTouchEvent(event);
+						if(!isMinimized){
+							mVideoViewPlayer.onTouchEvent(event);
+						}
 						return false;
 					}
 				});
@@ -971,6 +1057,11 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		mTrailerButton = (TextView)v.findViewById(R.id.cardmediasubitemtrailer_play);
 		mTrailerButton.setTypeface(FontUtil.ss_symbolicons_line);
 		mTrailerButton.setVisibility(mTrailerAvailable == true ? View.VISIBLE : View.GONE);
+		
+		mShareButton = (TextView)v.findViewById(R.id.cardmediasubitem_share);
+		mShareButton.setTypeface(FontUtil.ss_symbolicons_line);
+		mShareButton.setOnClickListener(mShareClickListener);
+		
 		recordedProgName = (TextView)v.findViewById(R.id.recordedProgName);
 		
 		initSportsStatusLayout(v);
@@ -1033,6 +1124,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			mVideoViewParent.setOnClickListener(null);
 			mPlayButton.setVisibility(View.GONE);
 			mTrailerButton.setVisibility(View.GONE);
+			mShareButton.setVisibility(View.GONE);
 			mVideoView.setVisibility(View.INVISIBLE);
 			mProgressBarLayout.setVisibility(View.INVISIBLE);
 			mPreviewImage.setScaleType(ScaleType.CENTER);
@@ -1115,6 +1207,9 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		}
 			mPlayerStatusListener.playerStatusUpdate("Play Error :: what = "+what+" extra= "+error);
 		}
+		if(mMinimizeButton != null){
+			mMinimizeButton.setVisibility(View.INVISIBLE);
+		}
 		closePlayer();
 		return false;
 	}
@@ -1179,6 +1274,14 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		closePlayer();
 	}
 	
+	@Override
+	public void onRetry() {
+		if (mBufferPercentage != null) {
+			mBufferPercentage.setText("retrying");
+		}
+		
+	}
+	
 	public void resumePreviousOrientaionTimer(){
 		if(mTimer != null ){
 			mTimer.cancel();
@@ -1200,6 +1303,9 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			
 			@Override
 			public void run() {
+				if(isMinimized){
+					return;
+				}
 				if(mPlayerState == PLAYER_PLAY){
 					((MainBaseOptions)mContext).setOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR);
 				}else{
@@ -1276,6 +1382,10 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		}
 		// mParentLayout.setLayoutParams(mParentLayoutParams);
 		mParentLayout.setBackgroundColor(Color.BLACK);
+		setFullScreen(true);
+		if(mMinimizeButton != null){
+			mMinimizeButton.setVisibility(View.INVISIBLE);
+		}
 	}
 	public void playInPortrait() {
 		if(mPlayerStatusListener != null){
@@ -1300,12 +1410,57 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		mVideoViewParent.setLayoutParams(params);
 		mVideoView.setLayoutParams(params);
 		mVideoView.resizeVideo(mWidth, mHeight);
-		((MainBaseOptions) mContext).showActionBar();
+//		((MainBaseOptions) mContext).showActionBar();
 		if(mPlayerFullScreen != null){
 			mPlayerFullScreen.playerInFullScreen(false);
 		}
 		// mParentLayout.setLayoutParams(params);
+		setFullScreen(false);
 	}
+	
+	public void minimize(){
+		isMinimized = true;
+		mWidth = (int)(myplexapplication.getApplicationConfig().screenWidth*0.45);
+		mHeight = (mWidth * 9) / 16;
+		
+		if(mData.generalInfo != null && mData.generalInfo.type != null && mData.generalInfo.type.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
+			mHeight = (mWidth * 3) / 4;
+		}
+		
+		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+				mWidth, mHeight);		
+		mPreviewImage.setLayoutParams(params);
+		mVideoViewParent.findViewById(R.id.cardmedia_mini).setVisibility(View.VISIBLE);
+		mVideoView.setLayoutParams(params);
+		mVideoView.resizeVideo(mWidth,mHeight);
+		if(mVideoViewPlayer != null){
+			mVideoViewPlayer.hideMediaController();
+		}
+		if(mMinimizeButton != null){
+			mMinimizeButton.setVisibility(View.INVISIBLE);
+		}
+	}
+	
+	
+	public void maximize(){
+		
+		isMinimized = false;
+		mWidth = myplexapplication.getApplicationConfig().screenWidth;
+		mHeight = (mWidth * 9) / 16;
+		
+		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+				mWidth, mHeight);		
+		mPreviewImage.setLayoutParams(params);
+		mVideoViewParent.findViewById(R.id.cardmedia_mini).setVisibility(View.GONE);
+		mVideoView.setLayoutParams(params);
+		mVideoView.resizeVideo(mWidth,mHeight);
+		
+	}
+	
+	public int getHeight() {
+		return mHeight;
+	}
+	
 	@Override
 	public void onStateChanged(int state , int elapsedTime) 
 	{
@@ -1462,6 +1617,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 	private void initSportsStatusLayout(final View view){
 		if(mData.generalInfo != null && mData.generalInfo.type != null && mData.generalInfo.type.equalsIgnoreCase(ConsumerApi.CONTENT_SPORTS_LIVE)){
 			mTrailerButton.setVisibility(View.GONE);
+			mShareButton.setVisibility(View.GONE);
 			mScoreCardLayout = (LinearLayout)view.findViewById(R.id.cardmedia_scorecard_layout);
 			mScoreCardLayout.setVisibility(View.VISIBLE);
 			mScoreCardLayout.setOnClickListener(mScoreCardClickListener);
@@ -1952,6 +2108,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 				mPreviewImage.setVisibility(View.INVISIBLE);
 				mTrailerButton.setVisibility(View.INVISIBLE);
 				mPlayButton.setVisibility(View.INVISIBLE);
+				mShareButton.setVisibility(View.INVISIBLE);
 //				mPlayButton.setOnClickListener(null);
 //				mVideoViewParent.setEnabled(false);
 				recordedProgName.setVisibility(View.INVISIBLE);
@@ -1973,6 +2130,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		mTrailerButton.setVisibility(View.GONE);
 		recordedProgName.setVisibility(View.GONE);
 		mPlayButton.setVisibility(View.VISIBLE);		
+		mShareButton.setVisibility(View.VISIBLE);
 	}
 	public void removeProgrammeName(){
 		if(mPreviewImage!=null)

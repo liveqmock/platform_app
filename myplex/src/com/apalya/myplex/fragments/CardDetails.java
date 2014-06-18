@@ -18,6 +18,7 @@ import org.apache.lucene.store.ChecksumIndexInput;
 import org.apache.lucene.store.ChecksumIndexOutput;
 
 import android.animation.LayoutTransition;
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -45,6 +46,7 @@ import android.widget.TextView;
 
 import com.android.volley.VolleyError;
 import com.apalya.myplex.BaseFragment;
+import com.apalya.myplex.MainActivity;
 import com.apalya.myplex.MainBaseOptions;
 import com.apalya.myplex.R;
 import com.apalya.myplex.adapters.CacheManagerCallback;
@@ -103,6 +105,8 @@ import com.apalya.myplex.views.TVShowView.TVShowSelectListener;
 import com.apalya.myplex.views.docketVideoWidget;
 
 
+
+
 public class CardDetails extends BaseFragment implements
 		ItemExpandListenerCallBackListener, CardDetailViewFactoryListener,
 		ScrollingDirection, CacheManagerCallback, PlayerStatusUpdate {
@@ -140,6 +144,9 @@ public class CardDetails extends BaseFragment implements
 	private LinearLayout mTvShowLinear;
 
 	private boolean mAutoPlay = false;
+	private boolean isMinimized;
+	
+	private static final boolean SHOW_ACTIONBAR = false;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -158,6 +165,10 @@ public class CardDetails extends BaseFragment implements
 		
 		if(mMainActivity == null){
 			return null;
+		}
+		
+		if(!SHOW_ACTIONBAR){
+			mMainActivity.hideActionBar();
 		}
 		
 		mMainActivity.setOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -193,20 +204,29 @@ public class CardDetails extends BaseFragment implements
 		mCardDetailViewFactory = new CardDetailViewFactory(getContext());
 		mCardDetailViewFactory.setParent(rootView);
 		mCardDetailViewFactory.setOnCardDetailExpandListener(this);
-		mMainActivity.setSearchBarVisibilty(View.INVISIBLE);
-		mMainActivity.setSearchViewVisibilty(View.VISIBLE);
+		if(SHOW_ACTIONBAR){
+			mMainActivity.setSearchBarVisibilty(View.INVISIBLE);
+			mMainActivity.setSearchViewVisibilty(View.VISIBLE);
+			mMainActivity.setUpShareButton(mCardData.generalInfo.title.toLowerCase());
+			if (mCardData.generalInfo != null) {
+				mMainActivity.setActionBarTitle(mCardData.generalInfo.title.toLowerCase());
+			}
+		}
 		Drawable bg = new ColorDrawable(Color.parseColor("#10000000"));
 		mTvShowLinear =(LinearLayout) rootView.findViewById(R.id.tvshow_linear_layout);
 		
-		
-		mMainActivity.setUpShareButton(mCardData.generalInfo.title.toLowerCase());
+
 		Analytics.cardData = mCardData;
 		// prepareContent();
-		if (mCardData.generalInfo != null) {
-			mMainActivity.setActionBarTitle(mCardData.generalInfo.title.toLowerCase());
-		}
+		
 		
 		if(mCardData.generalInfo.type != null && mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
+			String email = myplexapplication.getUserProfileInstance()
+					.getUserEmail();
+			if (!(email.equalsIgnoreCase("NA") || email.equalsIgnoreCase(""))) {
+				mAutoPlay = true;
+			}
+			
 			createEPGView(rootView);
 		}else{
 			if(mEPGLayout!=null)
@@ -306,6 +326,8 @@ public class CardDetails extends BaseFragment implements
 		if(mCardData.httpSource == HTTP_SOURCE.CACHE_REFRESH_NEEDED){
 			updateCardData();
 		}
+		
+		if(isMinimized) onViewChanged(true);
 		return rootView;
 	}
 	private CardVideoPlayer mPlayer;
@@ -839,7 +861,9 @@ public class CardDetails extends BaseFragment implements
 
 		dataBundle.reset();
 		dataBundle.searchQuery = mSearchQuery;
-		mMainActivity.setActionBarTitle(mSearchQuery);
+		if(SHOW_ACTIONBAR){
+			mMainActivity.setActionBarTitle(mSearchQuery);
+		}
 		dataBundle.requestType = CardExplorerData.REQUEST_SEARCH;
 
 		mMainActivity.addFilterData(new ArrayList<FilterMenudata>(), null);
@@ -895,7 +919,7 @@ public class CardDetails extends BaseFragment implements
 		//mixPanelSimilarContent();
 		Analytics.mixPanelSimilarContent(mCardData);
 		mMainActivity.bringFragment(fragment);
-//		mMainActivity.setActionBarTitle("similar content");
+		mMainActivity.setActionBarTitle("similar content");
 		if(mCardData.generalInfo.type != null && mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
 			mMainActivity.setActionBarTitle(mContext.getString(R.string.similar_live_tv));
 		}else if(mCardData.generalInfo.type != null && mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
@@ -1042,6 +1066,15 @@ public class CardDetails extends BaseFragment implements
 				return true;
 			}			
 			
+			if(mEnableMinimizedView && mPlayer.isMediaPlaying() && !isMinimized) {
+				onViewChanged(true);				
+				return true;
+			}
+			
+//			if(isMinimized){
+//				return false;
+//			}
+			
 			if(mPlayer.isMediaPlaying()){
 				mPlayer.onStateChanged(PlayerListener.STATE_PAUSED, mPlayer.getStopPosition());
 				Analytics.stoppedAt();
@@ -1057,11 +1090,12 @@ public class CardDetails extends BaseFragment implements
 					String message = "Set reminder for "+ mCardData.generalInfo.title +" tomorrow at same time";
 					Util.showReminder(mCardData.generalInfo.title, prg.getTime(),mCardData.generalInfo.title , mCardData._id, mContext, message, mContext.getString(R.string.notification_livetv_message));
 					mShowReminder = false;
-					return true;
+					return isMinimized?false:true;
 				}
 				
-				return true;
+				return isMinimized?false:true;
 			}
+			
 			return false;
 		}catch(Throwable e){			
 			return false;
@@ -1205,6 +1239,64 @@ public class CardDetails extends BaseFragment implements
 			}
 		});
 	}
+
+	
+	@Override
+	public void onViewChanged(boolean isMinimized) {
+		
+		if(rootView == null) {return;}
+		this.isMinimized = isMinimized;
+		View view = rootView.findViewById(R.id.draggable_view);		
+
+		if(isMinimized){
+			
+			mScrollView.setVisibility(View.GONE);
+			if(mPlayer != null)
+				mPlayer.minimize();
+			view.getLayoutParams().height = mPlayer.getHeight();
+			
+			mMainActivity.setOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+			view.requestLayout();
+			
+			mMainActivity.setSearchBarVisibilty(View.INVISIBLE);
+			mMainActivity.setSearchViewVisibilty(View.VISIBLE);
+			mMainActivity.showActionBar();
+			if(!mEnableMinimizedView){
+				mMainActivity.selectDefaultPage();
+			}
+			return ;
+		}
+		
+			view.getLayoutParams().height = android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+
+			if(mPlayer != null)
+				mPlayer.maximize();
+			mScrollView.setVisibility(View.VISIBLE);
+			mMainActivity.hideActionBar();
+		
+		
+		
+	}
+	
+	@Override
+	public void onCloseFragment() {
+		
+		if(mMainActivity != null)
+		{
+			mMainActivity.removeFragment(this);
+		}
+	}
+
+	public boolean isMinimized() {
+		return isMinimized;
+	}
+
+	public void setMinimized(boolean isMinimized) {
+		this.isMinimized = isMinimized;
+	}
+	
+	
+	
 	
 }
 

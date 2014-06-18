@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.apache.lucene.index.LogMergePolicy;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -64,6 +65,8 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 	private static final int STATE_SUSPEND = 6;
 	private static final int STATE_RESUME = 7;
 	private static final int STATE_SUSPEND_UNSUPPORTED = 8;
+	
+	private static final int INTERVAL_RETRY = 3*1000;
 
 	private static final String TAG = "VideoViewPlayer";
 	private int mCurrentState = STATE_IDLE;
@@ -478,9 +481,17 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 		if(mAutoStartCount < 3){
 			int value = 0;
 			if(player != null){
-//				player.reset();
-				player.seekTo(mPositionWhenPaused);
-				player.start();
+				
+				mVideoView.postDelayed(new Runnable() {
+
+					@Override
+					public void run() {
+						if(mVideoView != null && mUri != null){
+							mVideoView.setVideoPath(mUri.toString());
+						}
+
+					}
+				}, INTERVAL_RETRY);
 			}
 			else{
 				value = 1;
@@ -491,6 +502,10 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 				mPlayerStatusListener.playerStatusUpdate("Retrying "+mAutoStartCount+" form position "+mPositionWhenPaused+" with error "+arg1+" status "+value);
 			}
 			Util.showToast(mContext, "Retrying "+mAutoStartCount, Util.TOAST_TYPE_INFO);
+			
+			if (mPlayerListener != null) {
+				mPlayerListener.onRetry();
+			}
 			return true;
 		}
 		
@@ -741,6 +756,14 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 			mMediaPlayerController.show();
 		}
 	}
+	
+	public void disableMediaController(){
+		if(mMediaPlayerController != null){
+			mMediaPlayerController.setEnabled(false);
+			mMediaPlayerController.setVisibility(View.INVISIBLE);
+		}
+	}
+	
 	public void setSplashScreenDismissed(boolean value){
 		mSplashScreenDismissed = value;
 	}

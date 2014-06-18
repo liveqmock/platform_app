@@ -930,7 +930,25 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		
 	}
 
+	@Override
+	public void removeFragment(BaseFragment fragment) {
+		
+	}
 	
+	@Override
+	public void overlayFragment(BaseFragment fragment){
+		
+	}
 
-
+	@Override
+	public void removeCardDetailFragment() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public void selectDefaultPage() {
+		// TODO Auto-generated method stub
+		
+	}
 }

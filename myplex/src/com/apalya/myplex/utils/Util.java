@@ -1192,6 +1192,27 @@ public class Util {
 			return "";
 	}
 	
+	public static String getDDMMYYYY(String dateInStringUTC){
+		
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+		format.setTimeZone(TimeZone.getTimeZone("UTC"));
+		Date date = null;
+		try {
+			date = format.parse(dateInStringUTC);
+		} catch (ParseException e) {
+			e.printStackTrace();
+			return "";
+		}
+		if(date!=null){
+			SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");
+			sdf.setTimeZone(TimeZone.getDefault());			
+			return sdf.format(date).toString();
+		}
+		
+		return "";
+		
+	}
+	
 	public static String getUTCtoLocalDate(String dateInStringUTC) {
 		
 		String datetTimeFormat = "";
@@ -1588,8 +1609,7 @@ public static String getVideoDurationInString(String hhmmssinString) {
 		}
 		
 		 
-		MyplexDialog dialog = new MyplexDialog(context, context.getResources()
-				.getString(R.string.app_name),alertMessage ,
+		MyplexDialog dialog = new MyplexDialog(context, notificationTitle ,alertMessage ,
 				"no", "yes", new NoticeDialogListener() {
 
 					@Override

@@ -17,6 +17,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
@@ -94,6 +95,7 @@ public class PackagePopUp {
 	private ScrollView pkgScrollView;
 	private RelativeLayout couponLayout;
 	CardData cardDataAnalytics;
+	TextView mPackageDescription;
 	
 	public PackagePopUp(Context cxt,View background){
 		this.mContext = cxt;
@@ -175,7 +177,12 @@ public class PackagePopUp {
 		mFilterMenuPopupWindowList.add(mFilterMenuPopupWindow);
 		mFilterMenuPopupWindow.setOutsideTouchable(true);
 		mFilterMenuPopupWindow.setBackgroundDrawable(new BitmapDrawable());
-		mFilterMenuPopupWindow.showAsDropDown(anchorView);
+		if(mContext.getResources().getBoolean(R.bool.isTablet)){
+			mFilterMenuPopupWindow.showAsDropDown(anchorView);
+			return;
+		}
+		mFilterMenuPopupWindow.showAtLocation(anchorView.getRootView(),  android.view.Gravity.NO_GRAVITY , 0, 0);
+
 	}
 	public void showPackDialog(CardData data,View anchorView) {
 		View v = mInflater.inflate(R.layout.purchasepopup,null);
@@ -380,6 +387,9 @@ public class PackagePopUp {
 				if(packageitem == null){return;}
 				if(packageitem.priceDetails == null){return;}
 				int count = 0;
+				if( mPackageDescription != null && !TextUtils.isEmpty(packageitem.bbDescription)){
+					mPackageDescription.setText(packageitem.bbDescription);
+				}
 				for(CardDataPackagePriceDetailsItem priceItem:packageitem.priceDetails){
 					if(count == 0){
 						TextView heading = (TextView)mInflater.inflate(R.layout.pricepopmodeheading,null);
@@ -390,10 +400,12 @@ public class PackagePopUp {
 					if(msisdnData != null && priceItem.paymentChannel.equalsIgnoreCase("OP") && (!priceItem.name.equalsIgnoreCase(msisdnData.operator)))
 					{
 						Log.i(TAG, priceItem.name+ "==" +msisdnData.operator);
+						count++;
 						continue;
 					}
 					if(priceItem.paymentChannel.equalsIgnoreCase("INAPP"))
 					{
+						count++;
 						continue;
 					}
 					View paymentModeItem = mInflater.inflate(R.layout.paymentmodeitemlayout,null);
@@ -529,12 +541,12 @@ public class PackagePopUp {
 		if(data.content != null){
 			releaseDate.setText(data.content.releaseDate);
 		}
-		TextView description = (TextView)v.findViewById(R.id.purchasepopup_packsDescription);
-		description.setTypeface(FontUtil.Roboto_Regular);
+		mPackageDescription = (TextView)v.findViewById(R.id.purchasepopup_packsDescription);
+		mPackageDescription.setTypeface(FontUtil.Roboto_Regular);
 		if(data.generalInfo != null){
-			description.setText(data.generalInfo.description);
+			mPackageDescription.setText(data.generalInfo.description);
 		}	
-		 pkgScrollView.scrollTo(0, description.getBottom());	
+		 pkgScrollView.scrollTo(0, mPackageDescription.getBottom());	
 	}
 	private void RegisterUserReq(String contextPath, final Map<String,String> bodyParams) {
 

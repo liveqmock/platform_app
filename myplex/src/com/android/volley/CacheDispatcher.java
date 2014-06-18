@@ -19,6 +19,7 @@ package com.android.volley;
 import android.os.Process;
 import android.util.Log;
 
+import java.util.HashMap;
 import java.util.concurrent.BlockingQueue;
 
 import com.apalya.myplex.data.ApplicationSettings;
@@ -127,7 +128,10 @@ public class CacheDispatcher extends Thread {
                 // We have a cache hit; parse its data for delivery back to the request.
                 request.addMarker("cache-hit");
                 
-               
+                if(entry.responseHeaders.isEmpty()){
+                	entry.responseHeaders = new HashMap<String, String>();
+                }
+                
                 entry.responseHeaders.put(ConsumerApi.HEADER_RESPONSE_HTTP_SOURCE,
                 			entry.refreshNeeded()?CardData.HTTP_SOURCE.CACHE_REFRESH_NEEDED.toString():CardData.HTTP_SOURCE.CACHE.toString());
                 

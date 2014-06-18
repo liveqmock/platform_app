@@ -21,6 +21,7 @@ import com.apalya.myplex.data.CardDataPackages;
 import com.apalya.myplex.data.CardResponseData;
 import com.apalya.myplex.data.MsisdnData;
 import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.utils.AlertDialogUtil.NoticeDialogListener;
 import com.apalya.myplex.utils.FetchCardField.FetchComplete;
 import com.apalya.myplex.utils.MsisdnRetrivalEngine.MsisdnRetrivalEngineListener;
 import com.apalya.myplex.views.CustomDialog;
@@ -35,6 +36,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -52,6 +55,7 @@ public class SubcriptionEngine {
 	private CardDataPackages mSelectedPackageItem;
 	private CustomDialog mAlbumDialog;
 	private String couponCode = "";	
+	private MsisdnData msisdnData;
 	public String getCouponCode() {
 		return couponCode;
 	}
@@ -74,7 +78,7 @@ public class SubcriptionEngine {
 			Log.e(TAG, "processing payment channel "+mSelectedPriceItem.paymentChannel +" webbased = "+mSelectedPriceItem.webBased);
 			if(mSelectedPriceItem.paymentChannel != null && mSelectedPriceItem.paymentChannel.equalsIgnoreCase("OP")){
 				if(mSelectedPriceItem.webBased){
-					launchWebBasedSubscription();
+					launchOperatorWebBasedSubscription();
 				}else{
 					if(mSelectedPriceItem.doubleConfirmation){
 						showConfirmationDialog();
@@ -287,6 +291,11 @@ public class SubcriptionEngine {
 			requestUrl = ConsumerApi.getSusbcriptionRequest(mSelectedPriceItem.paymentChannel, mSelectedPackageItem.packageId);
 		else
 			requestUrl = ConsumerApi.getSusbcriptionRequest(mSelectedPriceItem.paymentChannel, mSelectedPackageItem.packageId,couponCode);
+		
+		if(mSelectedPriceItem.paymentChannel != null && mSelectedPriceItem.paymentChannel.equalsIgnoreCase("OP") 
+				&& msisdnData != null && msisdnData.msisdn != null){			
+			requestUrl = requestUrl +"&operator="+mSelectedPriceItem.name +"&mobile="+MsisdnRetrivalEngine.format(msisdnData.msisdn);
+		}
 		Intent i = new Intent(mContext,SubscriptionView.class);
 		CardData subscribedData = myplexapplication.getCardExplorerData().cardDataToSubscribe;
 		String commercialModel = mSelectedPackageItem.commercialModel; //Rental or Buy
@@ -328,4 +337,69 @@ public class SubcriptionEngine {
 		}
 	}
 	
+	private void launchOperatorWebBasedSubscription(){
+
+		// check mobile data connection status
+		//
+		
+		// Skip if mobile data is disabled
+		if (!Util.isMobileDataEnabled(mContext)) {
+
+			AlertDialogUtil
+					.showAlert(
+							mContext,
+							mContext.getString(R.string.subscription_operator_data_disable),
+							mContext.getString(R.string.alert_dataconnection_cancel), mContext.getString(R.string.alert_dataconnection_viewsetttings),
+							new NoticeDialogListener() {
+
+								@Override
+								public void onDialogOption2Click() {
+
+									Intent intent = new Intent(
+											Settings.ACTION_WIRELESS_SETTINGS);
+									mContext.startActivity(intent);
+
+								}
+
+								@Override
+								public void onDialogOption1Click() {
+
+								}
+
+							});
+			return;
+		}
+				
+		if(Util.isWifiEnabled(mContext)){
+			Util.showToast(mContext, mContext.getString(R.string.subscription_operator_data_alert), Util.TOAST_TYPE_ERROR);
+		}
+		
+		final MsisdnRetrivalEngine msisdnRetrivalEngine = new MsisdnRetrivalEngine(mContext);
+		
+		msisdnRetrivalEngine.setResumeOldConnection(false);
+		
+		msisdnRetrivalEngine.setUrl(ConsumerApi.AIRTEL_MSISDN_RETRIEVER_URL);
+		
+		msisdnRetrivalEngine.setUseOnlyMobileData(true);
+		
+		showProgressBar();
+		
+		msisdnRetrivalEngine.getMsisdnData(new MsisdnRetrivalEngineListener() {
+			
+			@Override
+			public void onMsisdnData(MsisdnData data) {
+				msisdnRetrivalEngine.deRegisterCallBacks();
+				dismissProgressBar();
+				if(data == null || TextUtils.isEmpty(data.msisdn)){
+					
+					Util.showToast(mContext, mContext.getString(R.string.subscription_msisdn_failed), Util.TOAST_TYPE_ERROR);
+					
+					return;
+				}
+				
+				msisdnData = data;
+				launchWebBasedSubscription();
+			}
+		});
+	}
 }

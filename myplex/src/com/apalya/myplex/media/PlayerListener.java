@@ -29,4 +29,6 @@ public interface PlayerListener {
 	public void onDrmError();
 
 	public void onStateChanged(int state, int pos);
+	
+	public void onRetry();
 }
