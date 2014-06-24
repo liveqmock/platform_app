@@ -410,8 +410,7 @@ public class CardDetails extends BaseFragment implements
 	//time analytics
 	@Override
 	public void onPause() {	
-		super.onPause();
-		Log.d("samir", "CardDetails onPause()");
+		super.onPause();		
 		if(mPlayer!=null){
 			if(mPlayer.isMediaPlaying()){
 				mPlayer.onStateChanged(PlayerListener.STATE_PAUSED, mPlayer.getStopPosition());
