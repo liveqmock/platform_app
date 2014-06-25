@@ -35,12 +35,15 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
+import android.widget.Button;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.widget.TextView;
 import android.widget.Toast;
+
+
 
 
 import com.apalya.myplex.LiveScoreWebView;
@@ -58,6 +61,7 @@ import com.apalya.myplex.data.CardDownloadData;
 import com.apalya.myplex.data.MatchStatus;
 import com.apalya.myplex.data.MatchStatus.MATCH_TYPE;
 import com.apalya.myplex.data.Team;
+import com.apalya.myplex.data.VideoInfo;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.media.PlayerListener;
 import com.apalya.myplex.media.VideoViewExtn;
@@ -98,6 +102,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 	private TextView mTrailerButton,recordedProgName, mMinimizeButton, mShareButton;
 	private TextView mBufferPercentage;
 	private RelativeLayout mProgressBarLayout;
+	private RelativeLayout mErrorLayout;
 	private RelativeLayout mVideoViewParent;
 	private VideoViewExtn mVideoView;
 	private LinearLayout mScoreCardLayout;
@@ -111,6 +116,8 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 	private static int PLAYER_PAUSE = 2;
 	private static int PLAYER_STOPPED = 3;
 	private static int PLAYER_BUFFERING = 4;
+	private static final int WAIT_FORRETRY = 99;
+	private static final int STATE_RETRYING = 100;
 	private PlayerFullScreen mPlayerFullScreen;
 	boolean isESTPackPurchased=false;
 	private String drmLicenseType="st";
@@ -125,11 +132,16 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 	private int state=0;
 	int currentDuration = 0;
 	private String  download_link,adaptive_link;
-
+	private String camAngleSelect  , langSelect , profileSelect ;
 	private SportsStatusRefresh sportsStatusRefresh;
 	private boolean isFullScreen,isTriler;
 	private boolean isMinimized = false;
 
+	private static final int INTERVAL_RETRY = 10*1000;
+	
+	private int mAutoRetry = 0;
+	private static final int MAX_AUTO_RETRY = 1;
+	
 	public void setFullScreenListener(PlayerFullScreen mListener){
 		this.mPlayerFullScreen = mListener;
 	}
@@ -281,6 +293,8 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		mProgressBarLayout = (RelativeLayout) v
 				.findViewById(R.id.cardmediasubitemvideo_progressbarLayout);
 
+		mErrorLayout = (RelativeLayout) v
+				.findViewById(R.id.cardmediasubitemvideo_error);
 		if (mData.images != null) {
 			for (CardDataImagesItem imageItem : mData.images.values) {
 				if (imageItem.type != null && imageItem.type.equalsIgnoreCase("coverposter") && imageItem.profile != null
@@ -346,9 +360,13 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		mTrailerButton.setVisibility(View.INVISIBLE);	
 		mShareButton.setVisibility(View.INVISIBLE);
 		mProgressBarLayout.setVisibility(View.VISIBLE);			
-		mVideoView.setVisibility(View.VISIBLE);			
+//		mVideoView.setVisibility(View.VISIBLE);			
 		mPreviewImage.setVisibility(View.INVISIBLE);			
 
+		if(mErrorLayout != null){
+			mErrorLayout.setVisibility(View.GONE);
+		}
+		
 		if(mScoreCardLayout != null){
 			mScoreCardLayout.setVisibility(View.INVISIBLE);
 		}
@@ -1103,6 +1121,9 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		mProgressBarLayout = (RelativeLayout) v
 				.findViewById(R.id.cardmediasubitemvideo_progressbarLayout);
 
+		mErrorLayout = (RelativeLayout) v
+				.findViewById(R.id.cardmediasubitemvideo_error);
+		
 		if (mData.images != null) {
 			for (CardDataImagesItem imageItem : mData.images.values) {
 				if (imageItem.type != null && imageItem.type.equalsIgnoreCase("coverposter") && imageItem.profile != null
@@ -1211,7 +1232,14 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			mMinimizeButton.setVisibility(View.INVISIBLE);
 		}
 		closePlayer();
-		return false;
+		 
+        Analytics.mixPanelUnableToPlayVideo("Cannot play video");
+		Analytics.createExceptionGA("Cannot play video", false);
+		
+		if(mPlayerState == PLAYER_STOPPED){			
+			retryPlayback();
+		}
+		return true;
 	}
 	@Override
 	public boolean onInfo(MediaPlayer mp, int arg1, int arg2) {
@@ -1735,10 +1763,11 @@ private void playVideoFile(CardDownloadData mDownloadData){
 	}
 	
 	@Override
-	public void onUrlFetched(List<CardDataVideosItem> items) 
+	public void onUrlFetched(List<CardDataVideosItem> items ,VideoInfo videoInfo) 
 	{
-		String videoType = mData.generalInfo.type;		
+		String videoType = mData.generalInfo.type;	
 		Log.d(TAG,"Video type "+ videoType);
+		mData.videoInfo = videoInfo;
 		
 //		initPlayBack("https://myplexv2betadrmstreaming.s3.amazonaws.com/813/813_sd_est_1391082325821.wvm");
 		if(videoType.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_MOVIE)){		
@@ -1770,18 +1799,24 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		
 	}*/
 	@Override
-	public void onTrailerUrlFetched(List<CardDataVideosItem> videos) {
+	public void onTrailerUrlFetched(List<CardDataVideosItem> videos, VideoInfo videoInfo) {
 		chooseLiveStreamType(videos,true);
-		
+		mData.videoInfo = videoInfo;
 	}
 	
 	private String getLink(Map<String, String> pMap, String firstPref, String secondPref,String ...profile)
 	{		
 		for(String string : profile){
-			if(pMap.get(string+firstPref)!=null)
-				return pMap.get(string+firstPref);
-			else if(pMap.get(string+secondPref)!=null)
-				return pMap.get(string+secondPref);				
+			if(pMap.get(string+firstPref)!=null){
+				if(profileSelect == null || profileSelect.length()==0)
+				profileSelect=string;
+				return pMap.get(profileSelect+firstPref);
+			}
+			else if(pMap.get(string+secondPref)!=null){
+				if(profileSelect == null || profileSelect.length()==0)
+				profileSelect=string;
+				return pMap.get(profileSelect+secondPref);			
+			}			
 			
 		}
 		return "";
@@ -2146,4 +2181,98 @@ private void playVideoFile(CardDownloadData mDownloadData){
 	public boolean getTrailer(){
 		return isTriler;
 	}
+	
+private void retryPlayback(){
+		
+		if(mData == null || mData.generalInfo == null || mData.generalInfo.type == null){
+			return;
+		}
+		
+		if(isTriler){
+			// No retry screen for trailer
+			return;
+		}
+		
+		if(isMinimized) return;
+		
+		recordedProgName.setVisibility(View.GONE);
+		mPlayButton.setVisibility(View.INVISIBLE);	
+		
+		mTrailerButton.setVisibility(View.INVISIBLE);			
+		mProgressBarLayout.setVisibility(View.VISIBLE);	
+		mPreviewImage.setVisibility(View.INVISIBLE);
+		mPlayerState = WAIT_FORRETRY;		
+		mErrorLayout.setVisibility(View.VISIBLE);		
+		// cardmediasubitem_retryButton
+		Button retryButton = (Button) mErrorLayout.findViewById(R.id.cardmediasubitem_retryButton);
+		retryButton.setOnClickListener(mPlayerClickListener);	
+		
+		// for vod and movies
+		
+		if(!(mData.generalInfo.type.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE) ||
+				mData.generalInfo.type.equalsIgnoreCase(ConsumerApi.CONTENT_SPORTS_LIVE)  ||
+				mData.generalInfo.type.equalsIgnoreCase(ConsumerApi.CONTENT_SPORTS_VOD) )){
+			
+			TextView textView = (TextView) mErrorLayout.findViewById(R.id.cardmediasubitem_retrytext);			
+			textView.setVisibility(View.VISIBLE);
+			textView.setText(mContext.getString(R.string.play_msg_err));	
+			return;
+		}
+		
+		// for live, sports live and sports vod content
+		
+		mAutoRetry ++;
+		
+		
+		
+		if(!TextUtils.isEmpty(profileSelect) && mData.videoInfo != null 
+				&& mData.videoInfo.profiles != null){
+			
+			// re-try with lower bitrate
+			List<String> profiles = mData.videoInfo.profiles;
+			String lowerQuality = null;
+			
+			for (String profile : profiles) {
+				
+				if(profile.equalsIgnoreCase(profileSelect)){
+					profileSelect = lowerQuality;
+					break;
+				}
+				
+				lowerQuality= profile;
+			}
+			
+		}
+
+		camAngleSelect  = langSelect = "";
+		profileSelect = ConsumerApi.VIDEOQUALTYLOW;
+		
+		TextView textView = (TextView) mErrorLayout.findViewById(R.id.cardmediasubitem_retrytext);	
+		
+		if(mAutoRetry > MAX_AUTO_RETRY){
+			
+			textView.setVisibility(View.VISIBLE);
+			textView.setText(mContext.getString(R.string.play_msg_err));					
+			return;
+		}
+		
+		textView.setVisibility(View.VISIBLE);
+		textView.setText(mContext.getString(R.string.play_msg_err_retrying));		
+		
+		mVideoViewParent.postDelayed(new Runnable() {
+			
+			@Override
+			public void run() {
+				if(mPlayerState != WAIT_FORRETRY){
+					return;
+				}
+				mErrorLayout.setVisibility(View.GONE);
+				Util.showToast(mContext, mContext.getString(R.string.play_retry_lower_bitrate), Util.TOAST_TYPE_INFO);	
+				fetchUrl(null);
+				
+			}
+		}, INTERVAL_RETRY);
+
+	}
+
 }

@@ -84,6 +84,9 @@
 -keep class com.nineoldandroids.** { *; }
 -keep class twitter4j.** { *; }
 -keep class android.support.** { *; }
+-keep class com.inmobi.** { *; }
+-keep class info.hoang8f.** { *; }
+-keep class info.hoang8f.widget.FButton
 -keep public class com.android.vending.licensing.ILicensingService
 -dontwarn twitter4j.**
 
