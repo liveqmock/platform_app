@@ -221,13 +221,7 @@ public class CardDetails extends BaseFragment implements
 		// prepareContent();
 		
 		
-		if(mCardData.generalInfo.type != null && mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
-			String email = myplexapplication.getUserProfileInstance()
-					.getUserEmail();
-			if (!(email.equalsIgnoreCase("NA") || email.equalsIgnoreCase("")) && Util.isWifiEnabled(mContext)) {				
-					mAutoPlay = true;
-			}
-			
+		if(mCardData.generalInfo.type != null && mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){			
 			createEPGView(rootView);
 		}else{
 			if(mEPGLayout!=null)
