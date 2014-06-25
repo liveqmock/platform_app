@@ -1,6 +1,7 @@
 package com.apalya.myplex.utils;
 
 import com.apalya.myplex.R;
+import com.apalya.myplex.views.MyplexDialog;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -17,8 +18,22 @@ public class AlertDialogUtil{
         public void onDialogOption1Click();
     }
     
+    public interface ButtonDialogListener {
+        public void onDialogOptionClick();
+    }
+    
     // Use this instance of the interface to deliver action events
     static NoticeDialogListener mListener;
+    
+    static ButtonDialogListener mButtonDialogListener;
+    
+    public static void showNeutralAlert(Context mContext,String aMsg, String aOption2,ButtonDialogListener listener){
+    	mButtonDialogListener = listener;
+    	MyplexDialog dialog = new MyplexDialog(mContext,mContext.getString(R.string.app_name), aMsg,
+				aOption2,mButtonDialogListener);
+ 	   dialog.showDialog();
+
+    }
     
    public static void showAlert(Context mContext,String aMsg, String aOption1, String aOption2,NoticeDialogListener listener){
 	   mListener=listener;

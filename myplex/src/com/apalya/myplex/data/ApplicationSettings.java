@@ -37,4 +37,6 @@ public class ApplicationSettings {
 	 * @param false - disable reminder alert after live tv play
 	 */
 	public static boolean ENABLE_AUTO_REMINDER_FOR_LIVETV = true;
+	
+	public static final boolean ENABLE_APP_UPDATE_CHECK = true;
 }
