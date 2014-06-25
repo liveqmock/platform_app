@@ -39,6 +39,8 @@ public class NavigationOptionsMenuAdapter extends BaseAdapter {
 	public final static String RECOMMENDED = "myplex picks";
 	public final static String DISCOVER = "discover";
 	public final static String MOVIES = "movies";
+	public final static String MOVIES_BOLLYWOOD = "bollywood";
+	public final static String FREE = "free for you";
 	public final static String LIVETV = "live tv";
 	public final static String SPORTS = "IN vs NZ";
 	public final static String PURCHASES = "purchases";
@@ -140,12 +142,12 @@ public class NavigationOptionsMenuAdapter extends BaseAdapter {
 			return 1;
 		}
 		
-		int High = 4;
+		int High = 3;
 		int Low = 1;
 		
 		Random rnd = new Random();
 		int no = rnd.nextInt(High - Low) + Low;
-		if(no == 1 || no == 2 || no == 3){
+		if(no == 1 || no == 2){
 			return no;
 		}
 		return 1;

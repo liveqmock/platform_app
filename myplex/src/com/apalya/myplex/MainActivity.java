@@ -1,6 +1,7 @@
 package com.apalya.myplex;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -23,6 +24,9 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -30,6 +34,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -91,8 +96,9 @@ import com.apalya.myplex.utils.MessagePost.MessagePostCallback;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.LogOutUtil;
-import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.utils.Util;
+import com.apalya.myplex.utils.VersionUpdateUtil;
+import com.apalya.myplex.utils.VersionUpdateUtil.VersionUpdateCallbackListener;
 import com.apalya.myplex.views.CardView;
 import com.apalya.myplex.views.RatingDialog;
 import com.crashlytics.android.Crashlytics;
@@ -194,8 +200,10 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
             screenType = NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION;
     }
     mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LIVETV,R.string.iconlivetv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.MOVIES,R.string.iconmovie, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
     mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.RECOMMENDED,R.string.iconhome, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.MOVIES,R.string.iconmovie, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FREE,R.string.iconfree, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.MOVIES_BOLLYWOOD,R.string.iconbollywood, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));    
     mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.TVSHOWS,R.string.icontvshows, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
     mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.YOUTUBE,R.string.iconyoutube, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 //    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.SPORTS,R.string.iconcricket, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
@@ -397,8 +405,30 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		}*/
 		
 		Util.deserializeData(MainActivity.this);
+		updateClientCheck();
 
 	}
+	
+	private void updateClientCheck() {
+		
+		String url = getResources().getString(R.string.config_url_versionupdate);
+		VersionUpdateUtil versionUpdateUtil = new VersionUpdateUtil(this,new VersionUpdateCallbackListener() {
+			
+			@Override
+			public boolean showUpgradeDialog() {
+			
+				if(myplexapplication.getCardExplorerData().cardDataToSubscribe != null || isFinishing()){
+					return false;
+				}
+				
+				return true;
+			}
+		});
+		
+		versionUpdateUtil.checkIfUpgradeAvailable(url,getResources().getString(R.string.old_date_for_upgrade));
+	}
+
+	
 
 	private boolean onHandleExternalIntent(Intent intent) {
 		if(intent==null)
@@ -509,19 +539,25 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 				selectItem(1);
 				intentHandled=true;
 			}else if(action.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_MOVIE)){
-				selectItem(2);
-				intentHandled=true;
-			}else if(action.equalsIgnoreCase(NavigationOptionsMenuAdapter.RECOMMENDED)){
 				selectItem(3);
 				intentHandled=true;
+			}else if(action.equalsIgnoreCase(NavigationOptionsMenuAdapter.RECOMMENDED)){
+				selectItem(2);
+				intentHandled=true;
 			}else if(action.equalsIgnoreCase(NavigationOptionsMenuAdapter.TVSHOWS)){
-				selectItem(4);
+				selectItem(6);
 				intentHandled=true;
 			}else if(action.equalsIgnoreCase(NavigationOptionsMenuAdapter.YOUTUBE)){
-				selectItem(5);
+				selectItem(7);
 				intentHandled=true;
 			}else if(action.equalsIgnoreCase(NavigationOptionsMenuAdapter.DOWNLOADS)){				
-				selectItem(9);
+				selectItem(10);
+				intentHandled=true;
+			}else if(action.equalsIgnoreCase(Analytics.CONSTANT_FREEFORYOU)){				
+				selectItem(4);
+				intentHandled=true;
+			}else if(action.equalsIgnoreCase(NavigationOptionsMenuAdapter.MOVIES_BOLLYWOOD)){				
+				selectItem(5);
 				intentHandled=true;
 			}
 			return intentHandled;
@@ -991,17 +1027,17 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 				setActionBarTitle("my "+NavigationOptionsMenuAdapter.FAVOURITE);
 				data.requestType = CardExplorerData.REQUEST_FAVOURITE;
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.RECOMMENDED)){
-				showLiveTvOrMovieIcon("recommended");
+				showLiveTvOrMovieIcon(NavigationOptionsMenuAdapter.FREE);
 				data.requestType = CardExplorerData.REQUEST_RECOMMENDATION;
 				setActionBarTitle(mContext.getString(R.string.myplex_home));				
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.MOVIES)){
-				showLiveTvOrMovieIcon("movies");
+				showLiveTvOrMovieIcon(NavigationOptionsMenuAdapter.FREE);
 				data.requestType = CardExplorerData.REQUEST_BROWSE;
 				data.searchQuery ="movie";
 				data.searchScope = "movie";
 				setActionBarTitle(NavigationOptionsMenuAdapter.MOVIES);				
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.LIVETV)){
-				showLiveTvOrMovieIcon("live");
+				showLiveTvOrMovieIcon(NavigationOptionsMenuAdapter.FREE);
 				data.requestType = CardExplorerData.REQUEST_BROWSE;
 				data.searchQuery ="live";
 				data.searchScope = "live";
@@ -1047,6 +1083,19 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 				data.searchScope = ConsumerApi.TYPE_YOUTUBE;
 				setActionBarTitle(NavigationOptionsMenuAdapter.YOUTUBE);
 				setSearchviewHint("search "+NavigationOptionsMenuAdapter.YOUTUBE);
+			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.MOVIES_BOLLYWOOD)){
+				showLiveTvOrMovieIcon("movies");
+				data.requestType = CardExplorerData.REQUEST_BROWSE;
+				data.searchQuery ="movie";
+				data.searchScope = "movie";
+				data.language = "hindi";
+				setActionBarTitle(NavigationOptionsMenuAdapter.MOVIES_BOLLYWOOD);				
+			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.FREE)){
+				removeLiveTvActionBarIcon();
+				data.requestType = CardExplorerData.REQUEST_CAROUSEL;
+				data.searchQuery = "free";
+				setSearchviewHint("search");
+				setActionBarTitle(NavigationOptionsMenuAdapter.FREE);				
 			}
 			else
 			{
@@ -1688,9 +1737,9 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 	@Override
 	public void setUpLivetvOrMovie(boolean isMovie) {
 		if(isMovie)
-			showLiveTvOrMovieIcon("movie");
+			showLiveTvOrMovieIcon(NavigationOptionsMenuAdapter.FREE);
 		else
-			showLiveTvOrMovieIcon("live");
+			showLiveTvOrMovieIcon(NavigationOptionsMenuAdapter.FREE);
 		
 	}
 	private class  LiveTvListener implements OnClickListener{
@@ -1736,6 +1785,21 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 		}		
 	};
 	
+	private class  FreeListener implements OnClickListener{
+		@Override
+		public void onClick(View v) {
+			tvOrMovie.setOnClickListener(null);
+			tvOrMovie.setEnabled(false);
+			handler.postDelayed(new Runnable() {				
+				@Override
+				public void run() {
+					tvOrMovie.setEnabled(true);
+				}
+			}, 3000);
+			selectItem(4);
+		}		
+	};
+	
 	public void showLiveTvOrMovieIcon(String liveTv){
 		if(liveTv.equalsIgnoreCase("live")){
 			tvOrMovie.setVisibility(View.VISIBLE);
@@ -1745,7 +1809,12 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 			tvOrMovie.setVisibility(View.VISIBLE);
 			tvOrMovie.setOnClickListener(new PurchasesListener());
 			tvOrMovie.setText(R.string.iconrefresh);
+		} else if (liveTv.equalsIgnoreCase(NavigationOptionsMenuAdapter.FREE)){
+			tvOrMovie.setVisibility(View.VISIBLE);
+			tvOrMovie.setOnClickListener(new FreeListener());
+			tvOrMovie.setText(R.string.iconfree);
 		}
+		
 		else{
 			tvOrMovie.setVisibility(View.VISIBLE);
 			tvOrMovie.setText(R.string.iconlivetv);

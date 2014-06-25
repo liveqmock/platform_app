@@ -23,6 +23,7 @@ public class CardData implements Serializable{
 	public CardDataRelatedCast relatedCast;
 	public CardDataCurrentUserData currentUserData;
 	public CardDataRelatedContent relatedContent;
+	public VideoInfo videoInfo ;
 	public CardDataComments comments;
 	public List<CardDataPackages> packages;
 	public String _expiresAt;
