@@ -48,6 +48,7 @@ import com.apalya.myplex.MainBaseOptions;
 import com.apalya.myplex.R;
 import com.apalya.myplex.adapters.CardActionListener;
 import com.apalya.myplex.adapters.CardItemClickListener;
+import com.apalya.myplex.adapters.NavigationOptionsMenuAdapter;
 import com.apalya.myplex.data.ApplicationConfig;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDataHolder;
@@ -681,6 +682,9 @@ public class CardView extends ScrollView {
 	private static void setScreenNameForAnalytics() {
 		CardExplorerData data = myplexapplication.getCardExplorerData();
 		String ctype = data.searchQuery;
+		if(!TextUtils.isEmpty(data.language)){
+			ctype = NavigationOptionsMenuAdapter.MOVIES_BOLLYWOOD;
+		}
 		if(ctype == null || ctype.length() == 0) {
 			int requestType = data.requestType;
 			ctype = Analytics.getRequestType(requestType);
@@ -718,7 +722,18 @@ public class CardView extends ScrollView {
 			event = Analytics.EVENT_BROWSED_YOUTUBE;
 		}
 		
-		if(Analytics.CONSTANT_RECOMMENDATIONS.equalsIgnoreCase(ctype) || Analytics.CONSTANT_MOVIE.equalsIgnoreCase(ctype) || Analytics.CONSTANT_LIVE.equalsIgnoreCase(ctype)|| Analytics.CONSTANT_TV_SERIES.equalsIgnoreCase(ctype) || Analytics.CONSTANT_YOUTUBE.equalsIgnoreCase(ctype) ) {
+		if(Analytics.CONSTANT_BOLLYWOOD.equalsIgnoreCase(ctype) )  {
+			params.put(Analytics.NUMBER_OF_CARDS,swipeCount+"");
+			event = Analytics.EVENT_BROWSED_BOLLYWOOD;
+		}
+		
+		if(Analytics.CONSTANT_FREEFORYOU.equalsIgnoreCase(ctype) )  {
+			params.put(Analytics.NUMBER_OF_CARDS,swipeCount+"");
+			event = Analytics.EVENT_BROWSED_FREEFORYOU;
+		}
+		
+		if(Analytics.CONSTANT_RECOMMENDATIONS.equalsIgnoreCase(ctype) || Analytics.CONSTANT_MOVIE.equalsIgnoreCase(ctype) || Analytics.CONSTANT_LIVE.equalsIgnoreCase(ctype)|| Analytics.CONSTANT_TV_SERIES.equalsIgnoreCase(ctype) || Analytics.CONSTANT_YOUTUBE.equalsIgnoreCase(ctype)
+				|| Analytics.CONSTANT_FREEFORYOU.equalsIgnoreCase(ctype) || Analytics.CONSTANT_BOLLYWOOD.equalsIgnoreCase(ctype)	) {
 				Analytics.trackEvent(event,params);
 				Analytics.gaBrowse(ctype,swipeCount);
 				swipeCount = 1;			

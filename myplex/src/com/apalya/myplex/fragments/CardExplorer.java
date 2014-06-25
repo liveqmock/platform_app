@@ -24,6 +24,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v4.widget.DrawerLayout;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -637,6 +638,14 @@ public class CardExplorer extends BaseFragment implements CardActionListener,Cac
 		}else if(mData.requestType == CardExplorerData.REQUEST_BROWSE){
 			screenName="Browse" + mData.searchQuery;
 			requestUrl = ConsumerApi.getBrowse(mData.searchQuery,ConsumerApi.LEVELDYNAMIC, mData.mStartIndex);
+			if(!TextUtils.isEmpty(mData.language)){
+				screenName="Browse" + mData.language;
+				requestUrl = requestUrl+ "&language="+mData.language;
+			}
+		}else if(mData.requestType == CardExplorerData.REQUEST_CAROUSEL){
+			screenName= "Browse" + mData.searchQuery;
+			requestUrl = ConsumerApi.getCarousel(mData.searchQuery,ConsumerApi.LEVELDYNAMIC, mData.mStartIndex);
+			
 		}else if(mData.requestType == CardExplorerData.REQUEST_INLINESEARCH)
 		{
 			screenName = "Inlinesearch";

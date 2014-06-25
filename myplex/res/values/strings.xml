@@ -141,6 +141,8 @@
     <string name="iconrate"></string>
     <string name="iconhome">&#x2302;</string>
     <string name="iconmovie">&#xE8B1;</string>
+    <string name="iconbollywood">&#x266B;</string>
+    <string name="iconfree">&#x263B;</string>
     <string name="iconrefresh">&#xEB82;</string>
     <string name="iconlivetv">&#xE8C0;</string>
     <string name="icontvshows">&#xE800;</string>
@@ -181,6 +183,7 @@
     <string name="usernamehint">username is required</string>
     <string name="passwordhint">password is required</string>
     <string name="wrongcredentials">username and password are required</string>
+    <string name="login_failed_try_myplex_signup">login failed , We recommend to use myplex signup</string>
     <!--Login/Singup errors-->
     <string name="downloadserror">no downloads yet… \nlet\'s start one, can watch it while downloading itself</string>
     <string name="searcherror">unable to find results … \ntry one of our suggested search terms?</string>
@@ -198,7 +201,7 @@
     <string name="transaction_server_error">our server thinks this is a duplicate transaction.if you think not, select ‘continue’, otherwise select ‘cancel’ and retry your transaction again in 60 seconds.</string>
     <string name="retry">continue</string>
     <string name="cancel">cancel</string>
-    
+    <string name="later">later</string>
      <string name="transaction_cancel_msg">Do you really want to cancel the transaction ?</string>
      <string name="transaction_cancel_yes">yes</string>
      <string name="transaction_cancel_no">no</string>
@@ -223,6 +226,9 @@
 	<string name="devclientkeyexp">devClientKeyExp</string>
 	<string name="devusername">username</string>
 	<string name="devpassword">password</string>
+	<string name="old_date_for_upgrade">Update Version</string>
+	<string name="upgrade_now">update now</string>
+    <string name="upgrade_later">update later</string>
 	
 	<!-- P.storage -->
     

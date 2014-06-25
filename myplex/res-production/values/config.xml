@@ -11,4 +11,5 @@
     
     <string name="config.package_name">com.apalya.myplex</string>
     <string name="config.google.developerkey">AIzaSyAOgkb9AWtptd2jULcI3ygeZcIsvZjSbYY</string>
+    <string name="config.url.versionupdate">https://demostb.s3.amazonaws.com/myplex_version_check_optional.txt</string>
 </resources>

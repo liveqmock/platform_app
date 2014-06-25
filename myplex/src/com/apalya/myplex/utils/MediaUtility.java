@@ -17,6 +17,7 @@ import com.apalya.myplex.data.CardDataVideosItem;
 import com.apalya.myplex.data.CardResponseData;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.Util.KeyRenewListener;
+import com.apalya.myplex.data.VideoInfo;
 
 public class MediaUtility {
 	private Context mContext;
@@ -25,6 +26,7 @@ public class MediaUtility {
 	private String TAG = getClass().getSimpleName();
 	private VideoUrlFetchListener listener;
 	private boolean isTrailer = false;
+	private String profile ;
 
 	public MediaUtility(Context context, VideoUrlFetchListener listener,boolean isTrailer) {
 		mContext = context;
@@ -39,6 +41,11 @@ public class MediaUtility {
 		if (location_params.length() > 0) {
 			apiUrl += location_params;
 		}
+		
+		if(profile!= null && profile.length()>0 ){
+			apiUrl= apiUrl + "&profile="+profile ;
+		} 
+		
 		Log.d(TAG,"Url  ="+apiUrl);
 		RequestQueue queue = MyVolley.getRequestQueue();
 		StringRequest myReq = new StringRequest(apiUrl, new Listener<String>() {
@@ -81,9 +88,9 @@ public class MediaUtility {
 						if((!videos.message.equalsIgnoreCase("SUCCESS")) || (videos.values!=null) || (videos.values.size()>0)){
 							//Analytics.startVideoTime();
 							if(isTrailer)	
-								listener.onTrailerUrlFetched(videos.values);
+								listener.onTrailerUrlFetched(videos.values,data.videoInfo);
 							else
-								listener.onUrlFetched(videos.values);
+								listener.onUrlFetched(videos.values,data.videoInfo);
 							return;
 						}else{
 							listener.onUrlFetchFailed(mContext.getString(R.string.canot_fetch_url));
@@ -120,9 +127,13 @@ public class MediaUtility {
 		});
 	}
 
+	public void setProfile(String profile){
+		this.profile  = profile ;
+	}
+	
 	public interface VideoUrlFetchListener {
-		void onUrlFetched(List<CardDataVideosItem> videos);
-		void onTrailerUrlFetched(List<CardDataVideosItem> videos);
+		void onUrlFetched(List<CardDataVideosItem> videos, VideoInfo videoInfo);
+		void onTrailerUrlFetched(List<CardDataVideosItem> videos, VideoInfo videoInfo);
 		void onUrlFetchFailed(String message);
 	}
 }

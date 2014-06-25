@@ -20,6 +20,7 @@ import org.apache.lucene.store.ChecksumIndexOutput;
 import android.animation.LayoutTransition;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -220,13 +221,7 @@ public class CardDetails extends BaseFragment implements
 		// prepareContent();
 		
 		
-		if(mCardData.generalInfo.type != null && mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
-			String email = myplexapplication.getUserProfileInstance()
-					.getUserEmail();
-			if (!(email.equalsIgnoreCase("NA") || email.equalsIgnoreCase(""))) {
-				mAutoPlay = true;
-			}
-			
+		if(mCardData.generalInfo.type != null && mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){			
 			createEPGView(rootView);
 		}else{
 			if(mEPGLayout!=null)
@@ -409,7 +404,7 @@ public class CardDetails extends BaseFragment implements
 	//time analytics
 	@Override
 	public void onPause() {	
-		super.onPause();
+		super.onPause();		
 		if(mPlayer!=null){
 			if(mPlayer.isMediaPlaying()){
 				mPlayer.onStateChanged(PlayerListener.STATE_PAUSED, mPlayer.getStopPosition());

@@ -221,8 +221,10 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 		    		null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		}else{				
 			mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.LIVETV,R.string.iconlivetv, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
-			mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.MOVIES,R.string.iconmovie, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 			mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.RECOMMENDED,R.string.iconhome, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+			mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.MOVIES,R.string.iconmovie, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));			
+			mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.FREE,R.string.iconfree, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
+		    mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.MOVIES_BOLLYWOOD,R.string.iconbollywood, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 			mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.TVSHOWS,R.string.icontvshows, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 			mMenuItemList.add(new NavigationOptionsMenu(NavigationOptionsMenuAdapter.YOUTUBE,R.string.iconyoutube, null, NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION,R.layout.navigation_menuitemsmall));
 		}	
@@ -656,6 +658,18 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 				data.searchScope = ConsumerApi.TYPE_YOUTUBE;
 				setActionBarTitle(NavigationOptionsMenuAdapter.YOUTUBE);
 				
+			}else if(label.equalsIgnoreCase(NavigationOptionsMenuAdapter.MOVIES_BOLLYWOOD)){
+				
+				data.requestType = CardExplorerData.REQUEST_BROWSE;
+				data.searchQuery ="movie";
+				data.searchScope = "movie";
+				data.language = "hindi";
+				setActionBarTitle(NavigationOptionsMenuAdapter.MOVIES_BOLLYWOOD);				
+			}else if(label.equalsIgnoreCase(NavigationOptionsMenuAdapter.FREE)){
+				
+				data.requestType = CardExplorerData.REQUEST_CAROUSEL;
+				data.searchQuery = "free";				
+				setActionBarTitle(NavigationOptionsMenuAdapter.FREE);				
 			}else{
 				setActionBarTitle("myplex");
 				Log.e("", label);
