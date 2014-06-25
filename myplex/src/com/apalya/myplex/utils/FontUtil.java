@@ -35,8 +35,7 @@ public class FontUtil {
 	private static Typeface createFromAsset(AssetManager mgr , String fontPath){
 
 		 try {
-//			 return  Typeface.createFromAsset(mgr, fontPath);	
-			 return Typeface.DEFAULT;
+			 return  Typeface.createFromAsset(mgr, fontPath);				 
 		 }catch(Throwable e){
 			 e.printStackTrace();
 		 }
