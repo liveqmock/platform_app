@@ -120,6 +120,9 @@ public class IndexHandler {
 
 	public void addToIndexAsync(List<CardData> indexableObj, InsertionResult callBack)
 	{
+		if(indexableObj==null || indexableObj.isEmpty())
+			 return;
+		
 		BgUpdateAsyncTask task = new BgUpdateAsyncTask(indexableObj, callBack);
 		task.execute(OperationType.UPDATEDB);
 	}
@@ -164,7 +167,7 @@ public class IndexHandler {
 			Log.i(TAG, "time to complete Commit: " +(System.currentTimeMillis()-startTime)+" milliseconds");
 		} catch (IOException e) {
 			Log.e(TAG, e.getMessage());
-		} catch (JSONException e) {
+		} catch (Throwable e) {
 			Log.e(TAG, e.getMessage());
 		}
 	}
@@ -327,6 +330,7 @@ public class IndexHandler {
 
 		@Override
 		protected Void doInBackground(OperationType... params) {
+			if(this.mLocalcopy!=null);
 			updateDatabase(this.mLocalcopy);
 			return null;
 		}
