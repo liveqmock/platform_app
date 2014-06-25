@@ -1730,7 +1730,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 
 		mDevInfo.setDeviceOs(getString(R.string.osname));
 		mDevInfo.setDeviceOsVer(android.os.Build.VERSION.RELEASE);
-		mDevInfo.setDeviceModel(android.os.Build.DEVICE); 
+		mDevInfo.setDeviceModel(android.os.Build.MODEL); 
 		mDevInfo.setDeviceMake(android.os.Build.MANUFACTURER);
 		mDevInfo.setDeviceSNo(android.os.Build.SERIAL);
 
@@ -1864,7 +1864,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 						SharedPrefUtils.writeToSharedPref(LoginActivity.this,
 								getString(R.string.devclientkeyexp), jsonResponse.getString("expiresAt"));
 
-
+						Util.showPromoDialog(LoginActivity.this);
 					}
 					else
 					{

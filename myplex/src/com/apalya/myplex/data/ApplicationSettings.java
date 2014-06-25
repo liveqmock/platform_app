@@ -39,4 +39,7 @@ public class ApplicationSettings {
 	public static boolean ENABLE_AUTO_REMINDER_FOR_LIVETV = true;
 	
 	public static final boolean ENABLE_APP_UPDATE_CHECK = true;
+	
+	public static final String [] SAMSUNG_PROMO_DEVICE_MODELS = {"SM-T805", "SM-T705","SM-T211"};
+	
 }

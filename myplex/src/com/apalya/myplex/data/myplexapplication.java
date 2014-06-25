@@ -151,7 +151,7 @@ public class myplexapplication extends Application {
 		FontUtil.loadFonts(activity.getAssets());
 		mDeviceDetails.setDeviceOs(activity.getString(R.string.osname));
 		mDeviceDetails.setDeviceOsVer(android.os.Build.VERSION.RELEASE);
-		mDeviceDetails.setDeviceModel(android.os.Build.DEVICE);
+		mDeviceDetails.setDeviceModel(android.os.Build.MODEL);
 		mDeviceDetails.setDeviceMake(android.os.Build.MANUFACTURER);
 		mDeviceDetails.setDeviceSNo(android.os.Build.SERIAL);
 		//

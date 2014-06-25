@@ -334,8 +334,9 @@ public class CardDetails extends BaseFragment implements
 			/*if (mBottomActionBar != null) {
 				mBottomActionBar.setVisibility(View.INVISIBLE);
 			}*/
-			
-			mPlayer.playInLandscape();
+			if(mPlayer != null){
+				mPlayer.playInLandscape();
+			}
 			
 			
 		
@@ -344,7 +345,9 @@ public class CardDetails extends BaseFragment implements
 			/*if (mBottomActionBar != null) {
 				mBottomActionBar.setVisibility(View.VISIBLE);
 			}*/
-			mPlayer.playInPortrait();
+			if(mPlayer != null){
+				mPlayer.playInPortrait();
+			}
 			
 			
 			}

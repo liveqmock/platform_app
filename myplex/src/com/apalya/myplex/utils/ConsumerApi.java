@@ -1,5 +1,6 @@
 package com.apalya.myplex.utils;
 
+import com.apalya.myplex.data.ApplicationSettings;
 import com.apalya.myplex.data.myplexapplication;
 
 public class ConsumerApi {
@@ -342,5 +343,19 @@ public class ConsumerApi {
 				+ SLASH + contentID + SLASH + "reviews" + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY  + AMPERSAND
 		        + COUNT_COMMENTS + AMPERSAND + STARTINDEX
 				+ startIndex ;
+	}
+	
+	public static String getFreeCarouselName(){
+		
+		if(myplexapplication.getDevDetailsInstance().getDeviceModel() != null ){			
+				String model = myplexapplication.getDevDetailsInstance().getDeviceModel();
+				for (String promo_device : ApplicationSettings.SAMSUNG_PROMO_DEVICE_MODELS) {
+					if(promo_device.equalsIgnoreCase(model)){
+						return "freeSamsungTAB";
+					}
+				}
+		}
+		
+		return "free";
 	}
 }

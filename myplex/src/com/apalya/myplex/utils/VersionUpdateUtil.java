@@ -187,7 +187,7 @@ public class VersionUpdateUtil {
 		if (!TextUtils.isEmpty(responseData.app.type)
 				&& (responseData.app.type.equalsIgnoreCase("Mandatory"))
 				&& responseData.app.message != null) {
-			AlertDialogUtil.showNeutralAlert(mContext,
+			AlertDialogUtil.showNeutralAlert(mContext,mContext.getString(R.string.app_name),
 					responseData.app.message, mContext.getResources()
 							.getString(R.string.upgrade_now),
 					new ButtonDialogListener() {

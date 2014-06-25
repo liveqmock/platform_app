@@ -27,9 +27,9 @@ public class AlertDialogUtil{
     
     static ButtonDialogListener mButtonDialogListener;
     
-    public static void showNeutralAlert(Context mContext,String aMsg, String aOption2,ButtonDialogListener listener){
+    public static void showNeutralAlert(Context mContext,String title , String aMsg, String aOption2,ButtonDialogListener listener){
     	mButtonDialogListener = listener;
-    	MyplexDialog dialog = new MyplexDialog(mContext,mContext.getString(R.string.app_name), aMsg,
+    	MyplexDialog dialog = new MyplexDialog(mContext,title, aMsg,
 				aOption2,mButtonDialogListener);
  	   dialog.showDialog();
 

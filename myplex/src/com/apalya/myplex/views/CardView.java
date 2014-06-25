@@ -863,6 +863,7 @@ public class CardView extends ScrollView {
 				return;
 			}
 			int index = mDataList.indexOf(dataHolder.mDataObject);
+			if(index == -1) {return ;}
 			/*****************************DELTEING DOWNLOAD DATA************************************/
 			if(dataHolder.mDataObject != null)
 			mixPanelDeleteCard(dataHolder.mDataObject);
@@ -887,6 +888,7 @@ public class CardView extends ScrollView {
 			mDataList.remove(index);
 			mNumberofItems = mDataList.size();
 			View localv = mCardsLayout.mCardViewReusePool.getView(index);
+			if(localv == null) {return;}
 			AnimatorSet set = new AnimatorSet();
 			set.play(ObjectAnimator.ofFloat(localv, View.TRANSLATION_X, 0,-localv.getWidth()));
 			set.setDuration(500);
