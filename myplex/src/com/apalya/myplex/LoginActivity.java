@@ -20,7 +20,9 @@ import android.accounts.Account;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -68,6 +70,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.apalya.myplex.data.DeviceDetails;
 import com.apalya.myplex.data.UserProfile;
 import com.apalya.myplex.data.myplexapplication;
+import com.apalya.myplex.receivers.ReminderReceiver;
 import com.apalya.myplex.utils.AccountUtils;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.ConsumerApi;
@@ -77,11 +80,13 @@ import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.PlayServicesUtils;
 import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.utils.SyncPurchasesUtil;
+import com.apalya.myplex.utils.AlertDialogUtil.NoticeDialogListener;
 import com.apalya.myplex.utils.SyncPurchasesUtil.SyncPurchasesCallback;
 import com.apalya.myplex.utils.Twitter11;
 import com.apalya.myplex.utils.Util;
 import com.apalya.myplex.utils.AlertDialogUtil;
 import com.apalya.myplex.utils.Util.KeyRenewListener;
+import com.apalya.myplex.views.MyplexDialog;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.FacebookAuthorizationException;
 import com.facebook.FacebookOperationCanceledException;
@@ -901,6 +906,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 	private void onSessionStateChange(Session session, SessionState state, Exception exception) {
 		if (exception instanceof FacebookOperationCanceledException || exception instanceof FacebookAuthorizationException) {		
 			Log.d(TAG,getString(R.string.userCancelled));
+			showSignUpWithmyplexDialog(null);
 		} else {
 
 			updateView();
@@ -944,6 +950,8 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 								Util.showToast(LoginActivity.this, "Login failed",Util.TOAST_TYPE_ERROR);
 								dismissProgressBar();
 							}
+							
+							showSignUpWithmyplexDialog(null);
 							return;
 						}
 						
@@ -2181,5 +2189,29 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		return false;
 	}
 	
+	private void showSignUpWithmyplexDialog(String message){
+
+		if(TextUtils.isEmpty(message)){
+			message = getResources().getString(R.string.login_failed_try_myplex_signup);
+		}
+		
+		MyplexDialog dialog = new MyplexDialog(this, getResources()
+				.getString(R.string.app_name),message,
+				"cancel", "join myplex", new NoticeDialogListener() {
+
+					@Override
+					public void onDialogOption2Click() {
+
+						Util.launchActivity(SignUpActivity.class,LoginActivity.this , null);
+					}
+
+					@Override
+					public void onDialogOption1Click() {
+						
+					}
+				});
+
+		dialog.showDialog();
+	}
 	
 }
