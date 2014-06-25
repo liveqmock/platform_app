@@ -42,7 +42,6 @@ import android.app.DownloadManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
@@ -100,6 +99,7 @@ import com.apalya.myplex.R.color;
 import com.apalya.myplex.cache.CacheManager;
 import com.apalya.myplex.cache.IndexHandler;
 import com.apalya.myplex.data.ApplicationConfig;
+import com.apalya.myplex.data.ApplicationSettings;
 import com.apalya.myplex.data.CardData;
 import com.apalya.myplex.data.CardDownloadData;
 import com.apalya.myplex.data.CardDownloadedDataList;
@@ -109,6 +109,7 @@ import com.apalya.myplex.data.ValuesResponse;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.receivers.ReminderReceiver;
 import com.apalya.myplex.tablet.MultiPaneActivity;
+import com.apalya.myplex.utils.AlertDialogUtil.ButtonDialogListener;
 import com.apalya.myplex.utils.AlertDialogUtil.NoticeDialogListener;
 import com.apalya.myplex.views.MyplexDialog;
 import com.crashlytics.android.Crashlytics;
@@ -1706,5 +1707,38 @@ public static String getVideoDurationInString(String hhmmssinString) {
 		return m.readValue(response, typeReference);
 	}
 	
+	public static boolean isPromoDeviceModel(){
+		
+		if(myplexapplication.getDevDetailsInstance().getDeviceModel() != null ){			
+				String model = myplexapplication.getDevDetailsInstance().getDeviceModel();
+				for (String promo_device : ApplicationSettings.SAMSUNG_PROMO_DEVICE_MODELS) {
+					if(promo_device.equalsIgnoreCase(model)){
+						return true;
+					}
+				}
+		}
+		
+		return false;
+	}
+	
+	public static void showPromoDialog(Context context){
+		
+		if(context == null) return;
+		
+		if(!isPromoDeviceModel()){
+			return;
+		}
+		
+		AlertDialogUtil.showNeutralAlert(context,context.getString(R.string.promo_samsung_title) ,
+				context.getString(R.string.promo_samsung), context.getString(R.string.promo_samsung_ok_button),
+				new ButtonDialogListener() {
+
+					@Override
+					public void onDialogOptionClick() {						
+
+					}
+
+		});
+	}
 }
 

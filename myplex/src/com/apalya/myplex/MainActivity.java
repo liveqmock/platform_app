@@ -1093,7 +1093,7 @@ public class MainActivity extends Activity implements MainBaseOptions, CacheMana
 			}else if(menu.mLabel.equalsIgnoreCase(NavigationOptionsMenuAdapter.FREE)){
 				removeLiveTvActionBarIcon();
 				data.requestType = CardExplorerData.REQUEST_CAROUSEL;
-				data.searchQuery = "free";
+				data.searchQuery = ConsumerApi.getFreeCarouselName();				
 				setSearchviewHint("search");
 				setActionBarTitle(NavigationOptionsMenuAdapter.FREE);				
 			}

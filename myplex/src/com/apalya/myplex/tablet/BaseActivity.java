@@ -526,6 +526,20 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 	private SetttingsFragment mSettingsScreen;
 	
 	protected void createCardExplorer(){
+		
+		if(myplexapplication.mSelectedCard == null &&
+				Util.isPromoDeviceModel()){
+			
+			new Handler().post(new Runnable() {
+			    @Override
+			    public void run() {
+			    	int selection= 4;
+			        mDrawerList.performItemClick(mDrawerList.getChildAt(selection),selection,selection);
+			    }
+			});
+			return;
+		}
+		
 		mCardExplorer = (CardExplorer) createFragment(NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION);
 		mCurrentFragment = mCardExplorer;
 		pushFragment();
@@ -668,7 +682,7 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 			}else if(label.equalsIgnoreCase(NavigationOptionsMenuAdapter.FREE)){
 				
 				data.requestType = CardExplorerData.REQUEST_CAROUSEL;
-				data.searchQuery = "free";				
+				data.searchQuery = ConsumerApi.getFreeCarouselName();			
 				setActionBarTitle(NavigationOptionsMenuAdapter.FREE);				
 			}else{
 				setActionBarTitle("myplex");

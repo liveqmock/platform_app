@@ -119,6 +119,7 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 		enableFilterAction(true);
 		onHandleExternalIntent(getIntent());
 		updateClientCheck();
+		createCardExplorer();
 	}
 	
 	private void updateClientCheck() {
@@ -142,7 +143,7 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 
 	@Override
 	protected void onResume() {
-		createCardExplorer();
+		
 /*
 		
 		if(myplexapplication.mSelectedOption_Tablet != NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION){
