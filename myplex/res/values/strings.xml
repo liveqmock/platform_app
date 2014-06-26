@@ -188,7 +188,7 @@
     <string name="downloadserror">no downloads yet… \nlet\'s start one, can watch it while downloading itself</string>
     <string name="searcherror">unable to find results … \ntry one of our suggested search terms?</string>
     <string name="purchaseserror">no purchases yet … \nlet\'s change that!</string>
-    <string name="promo_samsung">Sign in with myplex and use coupon code \'SAMSUNG-FREE\' to unlock your 10 free movies!</string>
+    <string name="promo_samsung">Sign in with myplex and use coupon code \'samsung\' to unlock your 10 free movies!</string>
     <string name="promo_samsung_title">Samsung Offer</string>
     <string name="promo_samsung_ok_button">sign into myplex</string>
     

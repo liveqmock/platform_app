@@ -378,6 +378,10 @@ public class CardDetails extends BaseFragment implements
 		if(mAutoPlay && mPlayer != null){
 			mPlayer.playContent();
 		}
+		
+		if(mPlayer != null){
+			mPlayer.onResume();
+		}
 	}
 	
 	private void checkForSurvey(){
@@ -409,8 +413,9 @@ public class CardDetails extends BaseFragment implements
 	public void onPause() {	
 		super.onPause();		
 		if(mPlayer!=null){
-			if(mPlayer.isMediaPlaying()){
+			if(mPlayer.isMediaPlaying()){				
 				mPlayer.onStateChanged(PlayerListener.STATE_PAUSED, mPlayer.getStopPosition());
+				mPlayer.onPause();
 				Analytics.stoppedAt();
 				Analytics.gaStopPauseMediaTime("stop",mPlayer.getStopPosition(),mCardData);
 				Analytics.mixPanelVideoTimeCalculation(mCardData);

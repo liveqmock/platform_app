@@ -482,7 +482,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 			return true;
 		}
 		mAutoStartCount++;
-		if(mAutoStartCount < 2){
+		if(mStreamProtocol == StreamProtocol.HTTP_PROGRESSIVEPLAY && mAutoStartCount < 2){
 			int value = 0;
 			if(player != null){
 				mCurrentState = STATE_RETRYING;
@@ -932,4 +932,10 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 	public void setmPositionWhenPaused(int mPositionWhenPaused) {
 		this.mPositionWhenPaused = mPositionWhenPaused;
 	}
+	
+	public boolean wasPlayingWhenPaused() {
+		return mWasPlayingWhenPaused;
+	}
+	
+	
 }

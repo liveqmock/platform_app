@@ -137,6 +137,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 	private boolean isFullScreen,isTriler;
 	private boolean isMinimized = false;
 
+	
 	private static final int INTERVAL_RETRY = 10*1000;
 	
 	private int mAutoRetry = 0;
@@ -835,7 +836,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 	}
 	
 	protected void initializeVideoPlay(Uri uri ) {
-
+		
 		VideoViewPlayer.StreamType streamType = StreamType.VOD;
 		if (mVideoViewPlayer == null) {
 			mVideoViewPlayer = new VideoViewPlayer(mVideoView, mContext, uri,streamType);
@@ -2182,7 +2183,33 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		return isTriler;
 	}
 	
-private void retryPlayback(){
+	private OnClickListener mResumeClickListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			if(mErrorLayout == null || mVideoViewPlayer == null){
+				return;
+			}
+				
+			mErrorLayout.setVisibility(View.GONE);
+			mVideoViewPlayer.onResume();
+
+		}
+	};
+	
+	private void showPlayButton(){
+		
+		mErrorLayout.setVisibility(View.VISIBLE);
+		
+		TextView textView = (TextView) mErrorLayout.findViewById(R.id.cardmediasubitem_retrytext);			
+		textView.setVisibility(View.GONE);
+		
+		Button retryButton = (Button) mErrorLayout.findViewById(R.id.cardmediasubitem_retryButton);
+		retryButton.setOnClickListener(mResumeClickListener);
+		retryButton.setText("resume");
+	}	
+	
+	private void retryPlayback(){
 		
 		if(mData == null || mData.generalInfo == null || mData.generalInfo.type == null){
 			return;
@@ -2206,7 +2233,7 @@ private void retryPlayback(){
 		// cardmediasubitem_retryButton
 		Button retryButton = (Button) mErrorLayout.findViewById(R.id.cardmediasubitem_retryButton);
 		retryButton.setOnClickListener(mPlayerClickListener);	
-		
+		retryButton.setText(mContext.getString(R.string.play_button_retry));
 		// for vod and movies
 		
 		if(!(mData.generalInfo.type.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE) ||
@@ -2215,7 +2242,10 @@ private void retryPlayback(){
 			
 			TextView textView = (TextView) mErrorLayout.findViewById(R.id.cardmediasubitem_retrytext);			
 			textView.setVisibility(View.VISIBLE);
-			textView.setText(mContext.getString(R.string.play_msg_err));	
+			textView.setText(mContext.getString(R.string.play_msg_err));
+			if(isLocalPlayback){
+				textView.setText(mContext.getString(R.string.play_msg_err_local_file));
+			}
 			return;
 		}
 		
@@ -2274,5 +2304,17 @@ private void retryPlayback(){
 		}, INTERVAL_RETRY);
 
 	}
+
+    public void onPause(){
+    	if(mVideoViewPlayer != null){
+    		mVideoViewPlayer.onPause();
+    	}
+    }
+    
+    public void onResume(){
+    	if(mVideoViewPlayer != null && mVideoViewPlayer.wasPlayingWhenPaused()){
+    		showPlayButton();    		
+    	}
+    }
 
 }
