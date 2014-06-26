@@ -65,7 +65,7 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 	private static final int STATE_SUSPEND = 6;
 	private static final int STATE_RESUME = 7;
 	private static final int STATE_SUSPEND_UNSUPPORTED = 8;
-	
+	private static final int STATE_RETRYING = 100;
 	private static final int INTERVAL_RETRY = 3*1000;
 
 	private static final String TAG = "VideoViewPlayer";
@@ -477,17 +477,28 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 
 	public boolean onError(MediaPlayer player, int arg1, int arg2) {
 		Log.d("PlayerScreen", "VideoViewPlayer onError End");
+		if(mCurrentState == STATE_RETRYING){
+			Log.d("PlayerScreen", "VideoViewPlayer STATE_RETRYING");
+			return true;
+		}
 		mAutoStartCount++;
-		if(mAutoStartCount < 3){
+		if(mStreamProtocol == StreamProtocol.HTTP_PROGRESSIVEPLAY && mAutoStartCount < 2){
 			int value = 0;
 			if(player != null){
-				
+				mCurrentState = STATE_RETRYING;
 				mVideoView.postDelayed(new Runnable() {
 
 					@Override
 					public void run() {
 						if(mVideoView != null && mUri != null){
-							mVideoView.setVideoPath(mUri.toString());
+							try {
+								mCurrentState = STATE_PREPARING;
+								mVideoView.setVideoPath(mUri.toString());								
+							} catch (IllegalStateException e) {
+								mAutoStartCount = 3;
+								Crashlytics.logException(e);
+								e.printStackTrace();
+							}
 						}
 
 					}
@@ -921,4 +932,15 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 	public void setmPositionWhenPaused(int mPositionWhenPaused) {
 		this.mPositionWhenPaused = mPositionWhenPaused;
 	}
+	
+	public boolean wasPlayingWhenPaused() {
+		return mWasPlayingWhenPaused;
+	}
+	
+	public void setFullScreenTooggle(int visibility){
+	    	if(mMediaPlayerController != null){
+	    		mMediaPlayerController.setFullScreenTooggle(visibility);
+	    	}
+	}
+	
 }

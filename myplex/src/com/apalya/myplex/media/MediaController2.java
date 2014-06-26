@@ -751,4 +751,10 @@ public class MediaController2 extends LinearLayout {
 //         mProgress.setProgress( (int) pos);
          mPlayer.seekTo( (int)pos);
     }
+    
+    public void setFullScreenTooggle(int visibility){
+    	if(mFullScreenTooggle != null){
+    		mFullScreenTooggle.setVisibility(visibility);
+    	}
+    }
 }

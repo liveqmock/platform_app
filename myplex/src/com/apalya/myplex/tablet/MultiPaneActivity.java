@@ -73,6 +73,8 @@ import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
 import com.apalya.myplex.utils.Util;
+import com.apalya.myplex.utils.VersionUpdateUtil;
+import com.apalya.myplex.utils.VersionUpdateUtil.VersionUpdateCallbackListener;
 import com.apalya.myplex.views.FlowLayout;
 import com.apalya.myplex.views.PinnedSectionListView;
 
@@ -116,10 +118,32 @@ public class MultiPaneActivity extends BaseActivity implements OpenCallBackListe
 		prepareCustomActionBar();
 		enableFilterAction(true);
 		onHandleExternalIntent(getIntent());
+		updateClientCheck();
+		createCardExplorer();
 	}
+	
+	private void updateClientCheck() {
+		
+		String url = getResources().getString(R.string.config_url_versionupdate);
+		VersionUpdateUtil versionUpdateUtil = new VersionUpdateUtil(this,new VersionUpdateCallbackListener() {
+			
+			@Override
+			public boolean showUpgradeDialog() {
+			
+				if(myplexapplication.getCardExplorerData().cardDataToSubscribe != null || isFinishing()){
+					return false;
+				}
+				
+				return true;
+			}
+		});
+		
+		versionUpdateUtil.checkIfUpgradeAvailable(url,getResources().getString(R.string.old_date_for_upgrade));
+	}
+
 	@Override
 	protected void onResume() {
-		createCardExplorer();
+		
 /*
 		
 		if(myplexapplication.mSelectedOption_Tablet != NavigationOptionsMenuAdapter.CARDEXPLORER_ACTION){

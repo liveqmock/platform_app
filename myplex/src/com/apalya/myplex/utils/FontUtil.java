@@ -19,17 +19,29 @@ public class FontUtil {
 	
 	
 	public static void loadFonts(AssetManager mgr){
-		Roboto_Bold = Typeface.createFromAsset(mgr, "fonts/Roboto-Bold.ttf");
-		Roboto_Medium = Typeface.createFromAsset(mgr, "fonts/Roboto-Medium.ttf");
-		Roboto_Regular = Typeface.createFromAsset(mgr, "fonts/Roboto-Regular.ttf");
-		Roboto_Thin = Typeface.createFromAsset(mgr, "fonts/Roboto-Thin.ttf");
-		RobotoCondensed_BoldItalic = Typeface.createFromAsset(mgr, "fonts/RobotoCondensed-BoldItalic.ttf");
-		RobotoCondensed_Light = Typeface.createFromAsset(mgr, "fonts/RobotoCondensed-Light.ttf");
-		Roboto_Light = Typeface.createFromAsset(mgr, "fonts/Roboto-Light.ttf");
-		ss_gizmo = Typeface.createFromAsset(mgr, "fonts/ss-gizmo.ttf");
-		ss_symbolicons_line = Typeface.createFromAsset(mgr, "fonts/ss-symbolicons-line.ttf");
-		digital = Typeface.createFromAsset(mgr, "fonts/digital_7.ttf");
+		Roboto_Bold = createFromAsset(mgr, "fonts/Roboto-Bold.ttf");
+		Roboto_Medium = createFromAsset(mgr, "fonts/Roboto-Medium.ttf");
+		Roboto_Regular = createFromAsset(mgr, "fonts/Roboto-Regular.ttf");
+		Roboto_Thin = createFromAsset(mgr, "fonts/Roboto-Thin.ttf");
+		RobotoCondensed_BoldItalic = createFromAsset(mgr, "fonts/RobotoCondensed-BoldItalic.ttf");
+		RobotoCondensed_Light = createFromAsset(mgr, "fonts/RobotoCondensed-Light.ttf");
+		Roboto_Light = createFromAsset(mgr, "fonts/Roboto-Light.ttf");
+		ss_gizmo = createFromAsset(mgr, "fonts/ss-gizmo.ttf");
+		ss_symbolicons_line = createFromAsset(mgr, "fonts/ss-symbolicons-line.ttf");
+		digital = createFromAsset(mgr, "fonts/digital_7.ttf");
 		isFontsLoaded = true;
 	}
+
+	private static Typeface createFromAsset(AssetManager mgr , String fontPath){
+
+		 try {
+			 return  Typeface.createFromAsset(mgr, fontPath);				 
+		 }catch(Throwable e){
+			 e.printStackTrace();
+		 }
+
+		return Typeface.DEFAULT;
+	}
+
 
 }

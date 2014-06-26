@@ -242,6 +242,19 @@ public class PackagePopUp {
 										//Analytics.mixPanelCouponEntered(COUPON_CODE);
 										Analytics.priceTobecharged = coupon.priceTobeCharged;//for analytics
 										applyCoupon(coupon.packageId,coupon.priceTobeCharged);
+										if(coupon.priceTobeCharged==0.0f){
+											CardDataPackages packageitem =null;
+											for(CardDataPackages pkg: cardDataAnalytics.packages){
+												if(coupon.packageId.equalsIgnoreCase(pkg.packageId))
+													packageitem =pkg;
+											}
+											if(packageitem!=null){
+												mSubscriptionEngine.setCouponCode(COUPON_CODE);
+												mSubscriptionEngine.doSubscription(packageitem, 0);
+												dismissFilterMenuPopupWindow();
+												break;
+											}
+										}
 										coupanCodes.put(coupon.packageId, COUPON_CODE);
 										if(!coupon.message.equalsIgnoreCase(""))
 											message = coupon.message;

@@ -11,4 +11,5 @@
     
     <string name="config.package_name">com.apalya.myplex</string>
     <string name="config.google.developerkey">AIzaSyD0rBK1E3lPvyCFET8wQ4SWDqW8582qBu0</string>
+    <string name="config.url.versionupdate">http://www.myplex.com/myplex_android_versioncheck.txt</string>
 </resources>

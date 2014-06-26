@@ -1,5 +1,6 @@
 package com.apalya.myplex.utils;
 
+import com.apalya.myplex.data.ApplicationSettings;
 import com.apalya.myplex.data.myplexapplication;
 
 public class ConsumerApi {
@@ -26,6 +27,7 @@ public class ConsumerApi {
 	public static final String FIELD_CURRENTUSERDATA = "user/currentdata";
 	public static final String FIELD_USERREVIEWS = "reviews/user";
 	public static final String FIELD_VIDEOS = "videos";
+	public static final String FIELD_VIDEO_INFO = "videoInfo";
 	public static final String FIELD_CURRENTUSERDATA_PACKAGES = "user/currentdata,packages";
 	public static final String PAYMENTCHANNEL = "paymentChannel=";
 	public static final String PACKAGEID = "packageId=";
@@ -161,6 +163,17 @@ public class ConsumerApi {
 
 	}
 	
+	public static String getCarousel(String name, String level,int startIndex) {
+		
+
+		
+		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH
+				+ "carousel" + SLASH +  name + QUESTION_MARK  + STARTINDEX
+				+ startIndex + AMPERSAND + LEVEL 
+				+ level + AMPERSAND+COUNT ;
+
+	}
+	
 	public static String getRecommendation(String level,int startIndex) {
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT + SLASH
 				+ RECOMMENDATIONS_ACTION + SLASH + QUESTION_MARK /*+ CLIENTKEY + DEBUGCLIENTKEY
@@ -215,7 +228,7 @@ public class ConsumerApi {
 	public static String getVideosDetail(String contentID){
 		return SCHEME + DOMAIN + SLASH + CONTENT_CONTEXT_V3 +  SLASH + CONTENTDETAILS_ACTION
 				+ SLASH + contentID + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY  + AMPERSAND
-		        + FIELDS + FIELD_VIDEOS;
+		        + FIELDS + FIELD_VIDEOS+","+FIELD_VIDEO_INFO;
 	}
 	public static String getBillingMode(String contentID) {
 		return SCHEME + DOMAIN + SLASH + USER_CONTEXT + SLASH + BILLING_TAG
@@ -330,5 +343,19 @@ public class ConsumerApi {
 				+ SLASH + contentID + SLASH + "reviews" + SLASH + QUESTION_MARK + CLIENTKEY + DEBUGCLIENTKEY  + AMPERSAND
 		        + COUNT_COMMENTS + AMPERSAND + STARTINDEX
 				+ startIndex ;
+	}
+	
+	public static String getFreeCarouselName(){
+		
+		if(myplexapplication.getDevDetailsInstance().getDeviceModel() != null ){			
+				String model = myplexapplication.getDevDetailsInstance().getDeviceModel();
+				for (String promo_device : ApplicationSettings.SAMSUNG_PROMO_DEVICE_MODELS) {
+					if(promo_device.equalsIgnoreCase(model)){
+						return "freeSamsungTAB";
+					}
+				}
+		}
+		
+		return "free";
 	}
 }

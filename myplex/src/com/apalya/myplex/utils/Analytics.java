@@ -93,6 +93,8 @@ public class Analytics {
 	public static String EVENT_BROWSED_LIVE_TV_GA = "browsed live tv";
 	public static String EVENT_BROWSED_SETTINGS = "browsed settings";
 	public static String EVENT_BROWSED_YOUTUBE = "browsed breaking news";
+	public static String EVENT_BROWSED_BOLLYWOOD = "browsed bollywood";
+	public static String EVENT_BROWSED_FREEFORYOU = "browsed free";
 	//public static String EVENT_SELECTED_FEEDBACK = "selected feedback option";
 	public static String EVENT_INITIATING_FEEDBACK = "initiating feedback";
 	public static String EVENT_PROVIDED_FEEDBACK = "provided feedback";
@@ -283,6 +285,7 @@ public class Analytics {
 	public static String PEOPLE_JOINING_DATE = "joining date";
 	public static String PEOPLE_FAVORITES = "favorites";
 	public static String PEOPLE_DEFAULT_NAME = "Guest";
+	public static String PEOPLE_DEVICE_NAME = "android model";
 	
 	
 	//Google Analytics
@@ -325,6 +328,8 @@ public class Analytics {
 	public static String TRAILER_BITRATE = "trailer_bitrate_";
 	
 	public static String CONSTANT_RECOMMENDATIONS = "recommendations";
+	public static String CONSTANT_FREEFORYOU= "free";
+	public static String CONSTANT_BOLLYWOOD = "bollywood";
 	public static String CONSTANT_MOVIE = "movie";
 	public static String CONSTANT_MOVIES = "movies";
 	public static String CONSTANT_DOWNLOADED = "downloaded";

@@ -20,6 +20,7 @@ import org.apache.lucene.store.ChecksumIndexOutput;
 import android.animation.LayoutTransition;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
@@ -220,13 +221,7 @@ public class CardDetails extends BaseFragment implements
 		// prepareContent();
 		
 		
-		if(mCardData.generalInfo.type != null && mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){
-			String email = myplexapplication.getUserProfileInstance()
-					.getUserEmail();
-			if (!(email.equalsIgnoreCase("NA") || email.equalsIgnoreCase(""))) {
-				mAutoPlay = true;
-			}
-			
+		if(mCardData.generalInfo.type != null && mCardData.generalInfo.type.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE)){			
 			createEPGView(rootView);
 		}else{
 			if(mEPGLayout!=null)
@@ -339,8 +334,9 @@ public class CardDetails extends BaseFragment implements
 			/*if (mBottomActionBar != null) {
 				mBottomActionBar.setVisibility(View.INVISIBLE);
 			}*/
-			
-			mPlayer.playInLandscape();
+			if(mPlayer != null){
+				mPlayer.playInLandscape();
+			}
 			
 			
 		
@@ -349,7 +345,9 @@ public class CardDetails extends BaseFragment implements
 			/*if (mBottomActionBar != null) {
 				mBottomActionBar.setVisibility(View.VISIBLE);
 			}*/
-			mPlayer.playInPortrait();
+			if(mPlayer != null){
+				mPlayer.playInPortrait();
+			}
 			
 			
 			}
@@ -380,6 +378,10 @@ public class CardDetails extends BaseFragment implements
 		if(mAutoPlay && mPlayer != null){
 			mPlayer.playContent();
 		}
+		
+		if(mPlayer != null){
+			mPlayer.onResume();
+		}
 	}
 	
 	private void checkForSurvey(){
@@ -409,10 +411,11 @@ public class CardDetails extends BaseFragment implements
 	//time analytics
 	@Override
 	public void onPause() {	
-		super.onPause();
+		super.onPause();		
 		if(mPlayer!=null){
-			if(mPlayer.isMediaPlaying()){
+			if(mPlayer.isMediaPlaying()){				
 				mPlayer.onStateChanged(PlayerListener.STATE_PAUSED, mPlayer.getStopPosition());
+				mPlayer.onPause();
 				Analytics.stoppedAt();
 				Analytics.gaStopPauseMediaTime("stop",mPlayer.getStopPosition(),mCardData);
 				Analytics.mixPanelVideoTimeCalculation(mCardData);

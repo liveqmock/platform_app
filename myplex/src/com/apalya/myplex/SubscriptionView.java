@@ -442,6 +442,7 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 	
 	private void mixPanelPayFailure(String error) {
 		CardData subscribedData = myplexapplication.getCardExplorerData().cardDataToSubscribe;
+		if(subscribedData == null) {return;}
 		Map<String,String> params=new HashMap<String, String>();
 		params.put(Analytics.CONTENT_ID_PROPERTY, subscribedData._id);
 		params.put(Analytics.CONTENT_NAME_PROPERTY, subscribedData.generalInfo.title);
