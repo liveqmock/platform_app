@@ -850,6 +850,13 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 		mVideoViewPlayer.setOnLicenseExpiryListener(onLicenseExpiryListener);		
 		mVideoViewPlayer.hideMediaController();
 		mVideoViewPlayer.setPlayerStatusUpdateListener(mPlayerStatusListener);
+		
+		if (mData != null && mData.generalInfo!= null &&  mData.generalInfo.type != null &&
+				mData.generalInfo.type.equalsIgnoreCase(ConsumerApi.VIDEO_TYPE_LIVE) && Util.isPromoDeviceModel()){
+			// Samsung tab crashes with live tv full screen
+			mVideoViewPlayer.setFullScreenTooggle(View.INVISIBLE);
+		}
+		
 		mVideoView.setOnTouchListener(new OnTouchListener() {
 			@Override
 			public boolean onTouch(View arg0, MotionEvent event) {
@@ -873,7 +880,8 @@ private void playVideoFile(CardDownloadData mDownloadData){
 
 	if(mData.content !=null && mData.content.drmEnabled)
 	{
-		String licenseData="clientkey:"+myplexapplication.getDevDetailsInstance().getClientKey()+",contentid:"+mData._id+",type:"+drmLicenseType+",profile:0";
+		
+		String licenseData="clientkey:"+myplexapplication.getDevDetailsInstance().getClientKey()+",contentid:"+mData._id+",type:"+drmLicenseType+","+getDrmProfileString();
 		
 		byte[] data;
 		try {
@@ -2315,6 +2323,22 @@ private void playVideoFile(CardDownloadData mDownloadData){
     	if(mVideoViewPlayer != null && mVideoViewPlayer.wasPlayingWhenPaused()){
     		showPlayButton();    		
     	}
+    }
+    
+    private String getDrmProfileString(){
+    	
+    	if(mData != null && mData.currentUserData != null && mData.currentUserData.purchase != null)
+        {    
+			for(CardDataPurchaseItem data:mData.currentUserData.purchase)
+            {
+                if(data.contentType != null && data.contentType.equalsIgnoreCase("HD") ){
+                	return "profile:1";
+                }               
+            }
+        }
+    	
+    	return "profile:0";
+    	
     }
 
 }

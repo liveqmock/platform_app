@@ -937,5 +937,10 @@ public class VideoViewPlayer implements MediaPlayer.OnErrorListener,MediaPlayer.
 		return mWasPlayingWhenPaused;
 	}
 	
+	public void setFullScreenTooggle(int visibility){
+	    	if(mMediaPlayerController != null){
+	    		mMediaPlayerController.setFullScreenTooggle(visibility);
+	    	}
+	}
 	
 }
