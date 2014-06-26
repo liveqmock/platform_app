@@ -285,6 +285,7 @@ public class Analytics {
 	public static String PEOPLE_JOINING_DATE = "joining date";
 	public static String PEOPLE_FAVORITES = "favorites";
 	public static String PEOPLE_DEFAULT_NAME = "Guest";
+	public static String PEOPLE_DEVICE_NAME = "android model";
 	
 	
 	//Google Analytics

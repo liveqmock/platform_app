@@ -239,6 +239,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 		mMixpanel.getPeople().initPushHandling(getString(R.string.config_android_push_senderid));
 		mMixpanel.getPeople().set("android app version.release", Util.getAppVersionNumber(this));
 		
+		
 		if(TextUtils.isEmpty(username)){
 			Analytics.setMixPanelFirstName(Analytics.PEOPLE_DEFAULT_NAME);
 		}
@@ -1863,7 +1864,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 								getString(R.string.devclientdevid), jsonResponse.getString("deviceId"));
 						SharedPrefUtils.writeToSharedPref(LoginActivity.this,
 								getString(R.string.devclientkeyexp), jsonResponse.getString("expiresAt"));
-
+						mMixpanel.getPeople().append("android model", android.os.Build.MODEL);
 						Util.showPromoDialog(LoginActivity.this);
 					}
 					else
