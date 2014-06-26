@@ -1864,7 +1864,7 @@ GooglePlayServicesClient.OnConnectionFailedListener, PlusClient.OnPersonLoadedLi
 								getString(R.string.devclientdevid), jsonResponse.getString("deviceId"));
 						SharedPrefUtils.writeToSharedPref(LoginActivity.this,
 								getString(R.string.devclientkeyexp), jsonResponse.getString("expiresAt"));
-						mMixpanel.getPeople().append("android model", android.os.Build.MODEL);
+						mMixpanel.getPeople().append(Analytics.PEOPLE_DEVICE_NAME, android.os.Build.MODEL);
 						Util.showPromoDialog(LoginActivity.this);
 					}
 					else
