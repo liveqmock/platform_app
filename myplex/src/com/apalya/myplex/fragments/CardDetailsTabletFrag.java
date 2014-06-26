@@ -215,6 +215,7 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		super.onPause();
 		if(mPlayer!=null){
 			if(mPlayer.isMediaPlaying()){
+				mPlayer.onPause();
 				mPlayer.onStateChanged(PlayerListener.STATE_PAUSED, mPlayer.getStopPosition());
 				Analytics.stoppedAt(); //when back button clicked
 				Analytics.mixPanelVideoTimeCalculation(mCardData);
@@ -247,6 +248,12 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 			mCardDetailViewFactory.UpdateSubscriptionStatus(mCardData);
 		}
 		checkForSurvey();
+		
+		if(mPlayer!=null){
+			
+			mPlayer.onResume();
+			
+		}
 	}
 	
 	private void checkForSurvey(){
