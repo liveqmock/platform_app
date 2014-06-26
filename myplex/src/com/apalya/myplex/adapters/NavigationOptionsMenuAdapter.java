@@ -21,6 +21,7 @@ import com.apalya.myplex.data.NavigationOptionsMenu;
 import com.apalya.myplex.data.myplexapplication;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.MyVolley;
+import com.apalya.myplex.utils.Util;
 
 public class NavigationOptionsMenuAdapter extends BaseAdapter {
 	private List<NavigationOptionsMenu> mMenuItemList = new ArrayList<NavigationOptionsMenu>();
@@ -40,7 +41,15 @@ public class NavigationOptionsMenuAdapter extends BaseAdapter {
 	public final static String DISCOVER = "discover";
 	public final static String MOVIES = "movies";
 	public final static String MOVIES_BOLLYWOOD = "bollywood";
-	public final static String FREE = "free for you";
+	public final static String FREE;
+	
+	static {
+		if(Util.isPromoDeviceModel()){
+			FREE = "Samsung Free Offer";		
+		}else {
+			FREE = "free for you";
+		}
+	}
 	public final static String LIVETV = "live tv";
 	public final static String SPORTS = "IN vs NZ";
 	public final static String PURCHASES = "purchases";
