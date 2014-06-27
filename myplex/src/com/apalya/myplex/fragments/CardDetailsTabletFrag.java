@@ -536,9 +536,7 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 			mCommentsContentLayout.addView(v);	
 		}
 		
-		if(mSeasonData != null){
-			mCardDetailViewFactory.UpdateSubscriptionStatus(mSeasonData);
-		}
+	
 	}
 	@Override
 	public void onDescriptionCollapsed() {
@@ -548,6 +546,10 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		if(v != null){
 			mDescriptionContentLayout.addView(v);
 		}		
+		
+		if(mSeasonData != null){
+			mCardDetailViewFactory.UpdateSubscriptionStatus(mSeasonData);
+		}
 	}
 	@Override
 	public void OnCacheResults(HashMap<String, CardData> obj,boolean issuedRequest) {
