@@ -512,6 +512,10 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		if(v != null){
 			mDescriptionContentLayout.addView(v);
 		}
+		
+		if(mSeasonData != null){
+			mCardDetailViewFactory.UpdateSubscriptionStatus(mSeasonData);
+		}
 	}
 	
 	@Override
@@ -530,7 +534,11 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		if(v != null){
 			addSpace();
 			mCommentsContentLayout.addView(v);	
-		}			
+		}
+		
+		if(mSeasonData != null){
+			mCardDetailViewFactory.UpdateSubscriptionStatus(mSeasonData);
+		}
 	}
 	@Override
 	public void onDescriptionCollapsed() {
