@@ -1441,13 +1441,14 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			LinearLayout.LayoutParams layoutparams = new LinearLayout.LayoutParams(mWidth,mHeight);
 			layoutparams.setMargins(marginleft, marginleft, marginleft, marginleft);
 			mParentLayout.setLayoutParams(layoutparams);
+			((MainBaseOptions) mContext).showActionBar();
 		}
 
 		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(mWidth, mHeight);
 		mVideoViewParent.setLayoutParams(params);
 		mVideoView.setLayoutParams(params);
 		mVideoView.resizeVideo(mWidth, mHeight);
-//		((MainBaseOptions) mContext).showActionBar();
+
 		if(mPlayerFullScreen != null){
 			mPlayerFullScreen.playerInFullScreen(false);
 		}
