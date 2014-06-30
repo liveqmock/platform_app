@@ -1,5 +1,7 @@
 package com.apalya.myplex.utils;
 
+import java.util.Map;
+
 import com.apalya.myplex.data.ApplicationSettings;
 import com.apalya.myplex.data.myplexapplication;
 
@@ -43,6 +45,7 @@ public class ConsumerApi {
 	public static final String SLASH = "/";
 	public static final String QUESTION_MARK = "?";
 	public static final String AMPERSAND = "&";
+	public static final String EQUAL = "=";
 	public static final String QUERY = "query=";
 	public static final String BROWSETYPE = "type=";
 	public static final String CLIENTKEY = "clientKey=";
@@ -129,6 +132,9 @@ public class ConsumerApi {
 	public static final String  HEADER_RESPONSE_HTTP_SOURCE="http_source";
 	
 	public  static final String AIRTEL_MSISDN_RETRIEVER_URL="http://115.112.238.6:8080/SamsungBillingHub/MsisdnRetriever";
+	
+	public static final String DEVICE_OEM ="deviceOem";
+	public static final String DEVICE_MODEL ="deviceModel";
 	
 	public static String getSearch(String queryStr, String level,int startIndex, String searchType) {
 		if(queryStr == null||(queryStr != null && queryStr.length() ==0)){
@@ -358,4 +364,24 @@ public class ConsumerApi {
 		
 		return "free";
 	}
+	
+	public static String getDeviceParams(){
+		String params=  DEVICE_OEM + EQUAL + android.os.Build.MODEL + AMPERSAND + DEVICE_OEM + EQUAL + android.os.Build.MANUFACTURER;
+		return params.replace(" ", "%20");
+	}
+	
+	public static String getDRMDeviceParams(){
+		String params=  DEVICE_MODEL + ":" + android.os.Build.MODEL + "," + DEVICE_OEM + ":" + android.os.Build.MANUFACTURER;
+		return params.replace(" ", "");
+	}
+	
+	public static void addDeviceHeaders(Map<String, String> headers){
+		if(headers == null){
+			return;
+		}
+		headers.put(DEVICE_MODEL, android.os.Build.MODEL);
+		headers.put(DEVICE_OEM, android.os.Build.MANUFACTURER);		
+	}
+	
+	
 }
