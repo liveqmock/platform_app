@@ -96,10 +96,12 @@
 	<string name="continieu">continue</string>			
 	<string name="dont_ask_again">Don\'t ask again</string>			
 	<string name="dont_ask_again_msg">(you may change the options in settings)</string>			
-	<string name="best_option">best: download to watch offline</string>			
+	<string name="best_option">best: download to watch offline</string>	
+	<string name="best_option_hd">best : download HD, watch offline</string>			
 	<string name="best_option_msg">highest quality SD video and audio \nwatch offline for 48 hrs; \nunlimited views</string>
 	<string name="best_option_msg_hd">highest quality HD video and audio \nwatch offline for 48 hrs; \nunlimited views</string>				   
-	<string name="good_option">good : stream online (SD)</string>
+	<string name="good_option">good : stream online</string>
+	<string name="good_option_hd">good : stream SD online</string>
 	<string name="always_ask">always ask</string>			
 	<string name="good_option_msg">384-1664kbps, adaptive bit rate streaming buffering possible due to network conditions</string>			
 	<string name="is_dont_ask_again">is_dont_ask_again</string>			
@@ -189,7 +191,7 @@
     <string name="downloadserror">no downloads yet… \nlet\'s start one, can watch it while downloading itself</string>
     <string name="searcherror">unable to find results … \ntry one of our suggested search terms?</string>
     <string name="purchaseserror">no purchases yet … \nlet\'s change that!</string>
-    <string name="promo_samsung">Sign into myplex and use coupon code \'samsung\' to unlock your 10 free movies!</string>
+    <string name="promo_samsung">Sign into myplex and use coupon code \"samsung\" to unlock your free movies! available under Samsung TAB S Offer section in the app.</string>
     <string name="promo_samsung_title">Samsung TAB S Offer</string>
     <string name="promo_samsung_ok_button">sign into myplex</string>
     
