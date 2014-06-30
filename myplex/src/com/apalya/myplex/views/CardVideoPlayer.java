@@ -881,7 +881,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 	if(mData.content !=null && mData.content.drmEnabled)
 	{
 		
-		String licenseData="clientkey:"+myplexapplication.getDevDetailsInstance().getClientKey()+",contentid:"+mData._id+",type:"+drmLicenseType+","+getDrmProfileString();
+		String licenseData="clientkey:"+myplexapplication.getDevDetailsInstance().getClientKey()+",contentid:"+mData._id+",type:"+drmLicenseType+","+getDrmProfileString() +","+ ConsumerApi.getDRMDeviceParams();
 		
 		byte[] data;
 		try {
@@ -1441,13 +1441,14 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			LinearLayout.LayoutParams layoutparams = new LinearLayout.LayoutParams(mWidth,mHeight);
 			layoutparams.setMargins(marginleft, marginleft, marginleft, marginleft);
 			mParentLayout.setLayoutParams(layoutparams);
+			((MainBaseOptions) mContext).showActionBar();
 		}
 
 		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(mWidth, mHeight);
 		mVideoViewParent.setLayoutParams(params);
 		mVideoView.setLayoutParams(params);
 		mVideoView.resizeVideo(mWidth, mHeight);
-//		((MainBaseOptions) mContext).showActionBar();
+
 		if(mPlayerFullScreen != null){
 			mPlayerFullScreen.playerInFullScreen(false);
 		}
@@ -1937,7 +1938,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 					initPlayBack(download_link);
 			}
 		}else if(download_link!=null && adaptive_link!=null){
-				DownloadStreamDialog dialog = new DownloadStreamDialog(mContext,mData.generalInfo.title+" rental options");
+				DownloadStreamDialog dialog = new DownloadStreamDialog(mContext,mData.generalInfo.title+" rental options", getContentType());
 				dialog.setListener(new DownloadListener() {			
 					@Override
 					public void onOptionSelected(boolean isDownload) {
@@ -2048,7 +2049,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 
 		if(mData.content !=null && mData.content.drmEnabled)
 		{
-			String licenseData="clientkey:"+myplexapplication.getDevDetailsInstance().getClientKey()+",contentid:"+mData._id+",type:"+drmLicenseType+",profile:0";
+			String licenseData="clientkey:"+myplexapplication.getDevDetailsInstance().getClientKey()+",contentid:"+mData._id+",type:"+drmLicenseType+",profile:0,"+ConsumerApi.getDRMDeviceParams();
 
 			byte[] data;
 			try {
@@ -2325,13 +2326,26 @@ private void playVideoFile(CardDownloadData mDownloadData){
     	}
     }
     
+    private String  getContentType(){
+    	if(mData != null && mData.currentUserData != null && mData.currentUserData.purchase != null)
+        {    
+			for(CardDataPurchaseItem data:mData.currentUserData.purchase)
+            {
+                if(data.contentType != null ){
+                	return data.contentType;
+                }               
+            }
+        }
+    	
+    	return null;
+    }
     private String getDrmProfileString(){
     	
     	if(mData != null && mData.currentUserData != null && mData.currentUserData.purchase != null)
         {    
 			for(CardDataPurchaseItem data:mData.currentUserData.purchase)
             {
-                if(data.contentType != null && data.contentType.equalsIgnoreCase("HD") ){
+                if(data.contentType != null && data.contentType.equalsIgnoreCase(ConsumerApi.VIDEOQUALTYHD) ){
                 	return "profile:1";
                 }               
             }

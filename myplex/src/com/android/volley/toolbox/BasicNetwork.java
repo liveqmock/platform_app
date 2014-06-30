@@ -31,6 +31,7 @@ import com.android.volley.ServerError;
 import com.android.volley.TimeoutError;
 import com.android.volley.VolleyError;
 import com.android.volley.VolleyLog;
+import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.Util;
 
 import org.apache.http.Header;
@@ -91,6 +92,7 @@ public class BasicNetwork implements Network {
             try {
                 // Gather headers.
                 Map<String, String> headers = new HashMap<String, String>();
+                ConsumerApi.addDeviceHeaders(headers);
                 addCacheHeaders(headers, request.getCacheEntry());
                 httpResponse = mHttpStack.performRequest(request, headers);
                 StatusLine statusLine = httpResponse.getStatusLine();

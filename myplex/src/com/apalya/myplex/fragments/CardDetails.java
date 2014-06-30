@@ -814,6 +814,9 @@ public class CardDetails extends BaseFragment implements
 			Map<String, String> params = new HashMap<String, String>();
 			mDescriptionContentLayout.addView(v);
 		}
+		if(mSeasonData != null){
+			mCardDetailViewFactory.UpdateSubscriptionStatus(mSeasonData);
+		}
 		// prepareFilterData();
 	}
 
@@ -850,6 +853,10 @@ public class CardDetails extends BaseFragment implements
 		if (v != null) {
 			mDescriptionContentLayout.addView(v);
 			
+		}
+		
+		if(mSeasonData != null){
+			mCardDetailViewFactory.UpdateSubscriptionStatus(mSeasonData);
 		}
 		// prepareFilterData();
 	}
