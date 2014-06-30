@@ -164,7 +164,7 @@ public class SetttingsFragment extends BaseFragment {
 						
 					}, profileData);
 				}else if(data.mSettingName.contains(DOWNLOAD_OR_STREAM_MSG)){	
-				DownloadStreamDialog dialog = new DownloadStreamDialog(mContext, "Movie rental options");	
+				DownloadStreamDialog dialog = new DownloadStreamDialog(mContext, "Movie rental options", null);	
 				dialog.setAlwaysAskAsDefault();
 				dialog.showAlwaysAskOption();	
 				dialog.setListener(new DownloadListener() {                                                			

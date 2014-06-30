@@ -296,6 +296,9 @@ public class SubcriptionEngine {
 				&& msisdnData != null && msisdnData.msisdn != null){			
 			requestUrl = requestUrl +"&operator="+mSelectedPriceItem.name +"&mobile="+MsisdnRetrivalEngine.format(msisdnData.msisdn);
 		}
+		
+		requestUrl = requestUrl + ConsumerApi.AMPERSAND + ConsumerApi.getDeviceParams();
+		
 		Intent i = new Intent(mContext,SubscriptionView.class);
 		CardData subscribedData = myplexapplication.getCardExplorerData().cardDataToSubscribe;
 		String commercialModel = mSelectedPackageItem.commercialModel; //Rental or Buy

@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Handler;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -17,6 +18,7 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.apalya.myplex.R;
+import com.apalya.myplex.utils.ConsumerApi;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.utils.Util;
@@ -33,7 +35,7 @@ public class DownloadStreamDialog  implements OnClickListener
 	private LinearLayout dontAskLayout,alwaysAskLayout;
 	private Handler handler = new Handler();
 	
-	public DownloadStreamDialog(Context context,String title) 
+	public DownloadStreamDialog(Context context,String title , String contentType) 
 	{
 		this.context = context;
 		dialog = new Dialog(context);
@@ -56,6 +58,9 @@ public class DownloadStreamDialog  implements OnClickListener
 		titleTV.setText(title.toLowerCase());
 		bestTvMsg = ((TextView)dialog.findViewById(R.id.best_tv_msg));
 		bestTvMsg.setTypeface(FontUtil.Roboto_Light);
+		if(!TextUtils.isEmpty(contentType) && contentType.equalsIgnoreCase(ConsumerApi.VIDEOQUALTYHD)){
+			bestTvMsg.setText(context.getString(R.string.best_option_msg_hd));
+		}
 		((TextView)dialog.findViewById(R.id.good_tv_msg)).setTypeface(FontUtil.Roboto_Light);
 		best.setTypeface(FontUtil.Roboto_Regular);
 		good.setTypeface(FontUtil.Roboto_Regular);
