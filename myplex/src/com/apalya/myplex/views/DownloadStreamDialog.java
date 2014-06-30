@@ -60,6 +60,8 @@ public class DownloadStreamDialog  implements OnClickListener
 		bestTvMsg.setTypeface(FontUtil.Roboto_Light);
 		if(!TextUtils.isEmpty(contentType) && contentType.equalsIgnoreCase(ConsumerApi.VIDEOQUALTYHD)){
 			bestTvMsg.setText(context.getString(R.string.best_option_msg_hd));
+			best.setText(context.getString(R.string.best_option_hd));
+			good.setText(context.getString(R.string.good_option_hd));
 		}
 		((TextView)dialog.findViewById(R.id.good_tv_msg)).setTypeface(FontUtil.Roboto_Light);
 		best.setTypeface(FontUtil.Roboto_Regular);
