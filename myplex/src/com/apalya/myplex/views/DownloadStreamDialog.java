@@ -77,7 +77,7 @@ public class DownloadStreamDialog  implements OnClickListener
 	}
 
 	private void initValues() {
-		if(Util.getSpaceAvailable()<1){
+		if(Util.getSpaceAvailable()<1.5){
 			bestTvMsg.setText(context.getString(R.string.unable_download_msg));
 			best.setOnCheckedChangeListener(new OnCheckedChangeListener() {				
 				@Override
