@@ -366,7 +366,7 @@ public class ConsumerApi {
 	}
 	
 	public static String getDeviceParams(){
-		String params=  DEVICE_OEM + EQUAL + android.os.Build.MODEL + AMPERSAND + DEVICE_OEM + EQUAL + android.os.Build.MANUFACTURER;
+		String params=  DEVICE_MODEL + EQUAL + android.os.Build.MODEL + AMPERSAND + DEVICE_OEM + EQUAL + android.os.Build.MANUFACTURER;
 		return params.replace(" ", "%20");
 	}
 	
