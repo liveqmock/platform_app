@@ -3,11 +3,14 @@ package com.apalya.myplex;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+
+import org.apache.http.client.utils.URIUtils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -17,8 +20,10 @@ import android.content.DialogInterface.OnCancelListener;
 import android.content.DialogInterface.OnClickListener;
 import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.webkit.JsPromptResult;
@@ -43,7 +48,6 @@ import com.apalya.myplex.utils.FetchCardField;
 import com.apalya.myplex.utils.SharedPrefUtils;
 import com.apalya.myplex.utils.FetchCardField.FetchComplete;
 import com.apalya.myplex.utils.Util;
-
 import com.google.analytics.tracking.android.EasyTracker;
 import com.google.analytics.tracking.android.MapBuilder;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
@@ -514,6 +518,7 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 						status = paramMap.get(statusString);
 					if(paramMap.containsKey(messageString))
 						message = paramMap.get(messageString);
+						message = URLDecoder.decode(message);
 					if(paramMap.containsKey(transactionString)) { //the python server must return transaction-id
 						transactionid = paramMap.get(transactionString);
 					}else {
@@ -528,8 +533,8 @@ public class SubscriptionView extends Activity implements AlertDialogUtil.Notice
 								,getResources().getString(R.string.retry)
 								, getResources().getString(R.string.cancel)
 								, SubscriptionView.this);
-					}else{
-						Util.showToast(SubscriptionView.this, "Subscription: "+ status,Util.TOAST_TYPE_ERROR);
+					}else{						
+						Util.showToast(SubscriptionView.this, "Subscription: "+ message,Util.TOAST_TYPE_ERROR);
 						dofinish(ConsumerApi.SUBSCRIPTIONERROR);
 					}
 					
