@@ -379,9 +379,7 @@ public class CardDetails extends BaseFragment implements
 			mPlayer.playContent();
 		}
 		
-		if(mPlayer != null){
-			mPlayer.onResume();
-		}
+		
 	}
 	
 	private void checkForSurvey(){
@@ -414,8 +412,7 @@ public class CardDetails extends BaseFragment implements
 		super.onPause();		
 		if(mPlayer!=null){
 			if(mPlayer.isMediaPlaying()){				
-				mPlayer.onStateChanged(PlayerListener.STATE_PAUSED, mPlayer.getStopPosition());
-				mPlayer.onPause();
+				mPlayer.onStateChanged(PlayerListener.STATE_PAUSED, mPlayer.getStopPosition());				
 				Analytics.stoppedAt();
 				Analytics.gaStopPauseMediaTime("stop",mPlayer.getStopPosition(),mCardData);
 				Analytics.mixPanelVideoTimeCalculation(mCardData);
