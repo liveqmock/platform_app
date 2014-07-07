@@ -276,6 +276,8 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		});
 		
 		SurveyUtil.getInstance().checkForSurvey(getActivity());
+		
+		myplexapplication.getMixPanel().getPeople().showNotificationIfAvailable(getActivity());
 	}
 	private void prepareContent() {
 		fillData();
