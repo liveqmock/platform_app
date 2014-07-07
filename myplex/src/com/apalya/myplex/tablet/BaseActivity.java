@@ -683,7 +683,8 @@ public class BaseActivity extends Activity implements MainBaseOptions{
 				
 				data.requestType = CardExplorerData.REQUEST_CAROUSEL;
 				data.searchQuery = ConsumerApi.getFreeCarouselName();			
-				setActionBarTitle(NavigationOptionsMenuAdapter.FREE);				
+				setActionBarTitle(NavigationOptionsMenuAdapter.FREE);		
+				Util.showPromoDialog(this);
 			}else{
 				setActionBarTitle("myplex");
 				Log.e("", label);
