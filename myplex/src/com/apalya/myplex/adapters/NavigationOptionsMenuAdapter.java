@@ -45,7 +45,7 @@ public class NavigationOptionsMenuAdapter extends BaseAdapter {
 	
 	static {
 		if(Util.isPromoDeviceModel()){
-			FREE = "Tab S HD Movies";		
+			FREE = "Tab S Free HD Movies";		
 		}else {
 			FREE = "free for you";
 		}
