@@ -1,3 +1,4 @@
+
 package com.apalya.myplex.utils;
 
 import java.io.File;
@@ -408,6 +409,34 @@ public class Util {
 	    return bytes;
 	}
 	
+	public static CardDownloadData saveExternalDownloadInfo(CardData aMovieData){
+		
+		CardDownloadedDataList downloadlist =  null;
+		try {
+			downloadlist = (CardDownloadedDataList) Util.loadObject(myplexapplication.getApplicationConfig().downloadCardsPath);	
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		
+		if(downloadlist==null)
+		{
+			downloadlist= new CardDownloadedDataList();
+			downloadlist.mDownloadedList=new HashMap<String, CardDownloadData>();
+		}
+		
+		CardDownloadData downloadData= new CardDownloadData();
+		downloadData.mDownloadId=-1;
+		downloadData.mDownloadPath=downloadStoragePath+aMovieData._id+".wvm";
+		downloadData.mCompleted = true;
+		downloadData.mPercentage = 100;
+		//downloadData.mDownloadPath=mContext.getExternalFilesDir(null).getPath() +"/"+aMovieName+".wvm";
+		downloadlist.mDownloadedList.put(aMovieData._id, downloadData);
+		myplexapplication.mDownloadList=downloadlist;
+		Util.saveObject(downloadlist, myplexapplication.getApplicationConfig().downloadCardsPath);
+		
+		return downloadData;
+	}
+	
 	public static String startDownload(String aUrl,CardData aMovieData,Context mContext)
 	{
 		long downloadStartTime = System.currentTimeMillis();
@@ -446,7 +475,7 @@ public class Util {
 							.setAllowedOverRoaming(false)
 							.setTitle("myplex")
 							.setDescription(aMovieName)
-							.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN)
+							.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
 							.setDestinationInExternalFilesDir(mContext, "", aFileName+".wvm"));
 			}catch(Throwable t){
 				lastDownloadId=0;
@@ -1729,8 +1758,18 @@ public static String getVideoDurationInString(String hhmmssinString) {
 			return;
 		}
 		
+		String email = myplexapplication.getUserProfileInstance()
+				.getUserEmail();
+		String msg = context.getString(R.string.promo_samsung);
+		String ok_button = context.getString(R.string.promo_samsung_ok_button);
+		
+		if (email != null && !(email.equalsIgnoreCase("NA") || email.equalsIgnoreCase(""))) {
+			 msg = context.getString(R.string.promo_samsung_login_user);
+			 ok_button = context.getString(R.string.promo_samsung_ok_button_login);
+		}
+		
 		AlertDialogUtil.showNeutralAlert(context,context.getString(R.string.promo_samsung_title) ,
-				context.getString(R.string.promo_samsung), context.getString(R.string.promo_samsung_ok_button),
+				msg, ok_button,
 				new ButtonDialogListener() {
 
 					@Override
