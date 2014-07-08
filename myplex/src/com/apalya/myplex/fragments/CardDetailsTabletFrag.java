@@ -215,8 +215,8 @@ ItemExpandListenerCallBackListener,CardDetailViewFactoryListener,ScrollingDirect
 		super.onPause();
 		if(mPlayer!=null){
 			if(mPlayer.isMediaPlaying()){
-				mPlayer.onPause();
 				mPlayer.onStateChanged(PlayerListener.STATE_PAUSED, mPlayer.getStopPosition());
+				mPlayer.onPause();				
 				Analytics.stoppedAt(); //when back button clicked
 				Analytics.mixPanelVideoTimeCalculation(mCardData);
 			}
