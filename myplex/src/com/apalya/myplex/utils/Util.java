@@ -475,7 +475,7 @@ public class Util {
 							.setAllowedOverRoaming(false)
 							.setTitle("myplex")
 							.setDescription(aMovieName)
-							.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
+							.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN)
 							.setDestinationInExternalFilesDir(mContext, "", aFileName+".wvm"));
 			}catch(Throwable t){
 				lastDownloadId=0;
