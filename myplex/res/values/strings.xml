@@ -192,8 +192,10 @@
     <string name="searcherror">unable to find results … \ntry one of our suggested search terms?</string>
     <string name="purchaseserror">no purchases yet … \nlet\'s change that!</string>
     <string name="promo_samsung">Sign into myplex and use coupon code \"samsung\" to unlock your free movies! available under Samsung TAB S Offer section in the app.</string>
-    <string name="promo_samsung_title">Samsung TAB S Offer</string>
+    <string name="promo_samsung_login_user">Apply coupon code \"samsung\" after selecting play option for any movie available under \"Tab S Free HD Movies\" section</string>
+    <string name="promo_samsung_title">Tab S Free HD Movies</string>
     <string name="promo_samsung_ok_button">sign into myplex</string>
+    <string name="promo_samsung_ok_button_login">ok</string>
     
  
     <!-- Player Errors -->
