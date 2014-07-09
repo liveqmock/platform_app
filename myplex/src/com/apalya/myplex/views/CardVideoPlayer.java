@@ -2017,7 +2017,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 		{
 			url=url.replace("widevine:", "http:");			
 			closePlayer();
-			if(Util.getSpaceAvailable()>=1)
+			if(Util.hasSpaceAvailabeToDownload(getContentType(), mContext))
 			{
 				if(Util.isWifiEnabled(mContext))
 				{

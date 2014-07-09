@@ -75,11 +75,11 @@ public class DownloadStreamDialog  implements OnClickListener
 		best.setOnClickListener(this);
 		good.setOnClickListener(this);		
 		continuee.setOnClickListener(this);		
-		initValues();
+		initValues(contentType);
 	}
 
-	private void initValues() {
-		if(Util.getSpaceAvailable()<1.5){
+	private void initValues(String contentType) {
+		if(!Util.hasSpaceAvailabeToDownload(contentType, context)){
 			bestTvMsg.setText(context.getString(R.string.unable_download_msg));
 			best.setOnCheckedChangeListener(new OnCheckedChangeListener() {				
 				@Override
@@ -215,7 +215,7 @@ public class DownloadStreamDialog  implements OnClickListener
 	public void showAlwaysAskOption(){
 		dontAskLayout.setVisibility(View.GONE);
 		alwaysAskLayout.setVisibility(View.VISIBLE);
-		initValues();
+		initValues(null);
 	}
 
 	public interface DownloadListener{
