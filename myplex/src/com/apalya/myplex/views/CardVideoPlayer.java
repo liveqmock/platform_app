@@ -2039,7 +2039,12 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			}
 			else
 			{
-				Util.showToast(mContext, "Download failed due to insufficent memory, please free space up to 1GB to start download", Util.TOAST_TYPE_INFO);
+				String msg = mContext.getString(R.string.play_download_insufficent_memory);
+				String contentType = getContentType();
+				if(!TextUtils.isEmpty(contentType) && contentType.equalsIgnoreCase(ConsumerApi.VIDEOQUALTYHD)){
+					msg = mContext.getString(R.string.play_download_insufficent_memory_hd);
+				}
+				Util.showToast(mContext, msg, Util.TOAST_TYPE_INFO);
 			}
 			return;
 		}				
