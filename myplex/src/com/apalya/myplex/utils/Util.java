@@ -434,7 +434,7 @@ public class Util {
 			return freeSpaceGb > 4;
 		}
 		
-		return freeSpace > 1.5;
+		return freeSpaceGb > 1.5;
 		
 	}
 	
