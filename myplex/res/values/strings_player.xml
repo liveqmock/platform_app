@@ -7,5 +7,6 @@
     <string name="play_retry_lower_bitrate">Retrying with lower bitrate</string>
     <string name="play_msg_err_retrying">retrying in 10 sec</string>
     
-
+	<string name="play_download_insufficent_memory"> Download failed due to insufficent memory, please free space up to 1.5GB to start download</string>
+	<string name="play_download_insufficent_memory_hd"> Download failed due to insufficent memory, please free space up to 4GB to start download</string>
 </resources>

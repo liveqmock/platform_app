@@ -64,6 +64,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore.Audio;
 import android.support.v4.app.NotificationCompat;
 import android.telephony.TelephonyManager;
 import android.text.TextUtils;
@@ -397,6 +398,44 @@ public class Util {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	public static boolean hasSpaceAvailabeToDownload(String contentType, Context context){
+		
+		long gb=1024L*1024L*1024L;
+		double freeSpace = 0;
+		
+		File file = new File(Environment.getExternalStorageDirectory().getPath());
+	    if (file != null) {	    	
+	    	freeSpace=file.getFreeSpace();
+	    }
+	    
+		
+		CardDownloadedDataList downloadlist =  null;
+		try {
+			downloadlist = (CardDownloadedDataList) Util.loadObject(myplexapplication.getApplicationConfig().downloadCardsPath);	
+		} catch (Throwable e) {
+			downloadlist = null;
+		}
+		
+		if(downloadlist != null){
+			FetchDownloadProgress fetchDownloadProgress = new FetchDownloadProgress(context);
+			
+			for (CardDownloadData cardDownloadData : downloadlist.mDownloadedList.values()) {
+				if(cardDownloadData.mDownloadId > 1){
+					freeSpace = freeSpace - fetchDownloadProgress.getSpaceRequired(cardDownloadData.mDownloadId);
+				}
+			}
+		}
+		
+		double freeSpaceGb=freeSpace/gb;
+		
+		if(contentType != null && contentType.equalsIgnoreCase(ConsumerApi.VIDEOQUALTYHD)){
+			return freeSpaceGb > 4;
+		}
+		
+		return freeSpaceGb > 1.5;
+		
 	}
 	
 	public static long getSpaceAvailable(){

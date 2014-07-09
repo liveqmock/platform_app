@@ -303,5 +303,44 @@ public class FetchDownloadProgress {
 		return 0;
 	}
 
+	public long getSpaceRequired(long download_id){
+		
+		try
+		{
+			Log.d(TAG,"handleMessage2");
+			DownloadManager.Query q = new DownloadManager.Query();
+			Log.d(TAG,"Download information for "+download_id);
+			q.setFilterById(download_id);
+			Cursor cursor = mDownloadManager.query(q);
+			if(cursor == null){
+				return 0;
+			}
+			
+			if(cursor.moveToFirst()){
+				
+				long bytes_downloaded = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+				long bytes_total = cursor.getLong(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+				
+				if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
+					return 0;
+					
+				}else if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_FAILED) {
+					
+					
+					return 0;
+					
+				}
+				
+				long bytesToBeDownload = bytes_total - bytes_downloaded;
+				
+				return bytesToBeDownload;
+			}
+		}catch (Throwable e){
+			e.printStackTrace();
+			return 0;
+		}
+		
+		return 0;
+	}
 
 }
