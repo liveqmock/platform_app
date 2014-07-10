@@ -46,6 +46,7 @@ import android.widget.Toast;
 
 
 
+
 import com.apalya.myplex.LiveScoreWebView;
 import com.apalya.myplex.MainBaseOptions;
 import com.apalya.myplex.R;
@@ -71,6 +72,7 @@ import com.apalya.myplex.media.VideoViewPlayer.StreamType;
 import com.apalya.myplex.utils.AlertDialogUtil;
 import com.apalya.myplex.utils.Analytics;
 import com.apalya.myplex.utils.ConsumerApi;
+import com.apalya.myplex.utils.FetchDownloadProgress;
 import com.apalya.myplex.utils.FontUtil;
 import com.apalya.myplex.utils.LogOutUtil;
 import com.apalya.myplex.utils.MediaUtil;
@@ -136,7 +138,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 	private SportsStatusRefresh sportsStatusRefresh;
 	private boolean isFullScreen,isTriler;
 	private boolean isMinimized = false;
-
+    private CardDownloadData mDownloadData = null;
 	
 	private static final int INTERVAL_RETRY = 10*1000;
 	
@@ -409,7 +411,7 @@ public class CardVideoPlayer implements PlayerListener, AlertDialogUtil.NoticeDi
 			return false;
 		}
 
-		CardDownloadData mDownloadData = myplexapplication.mDownloadList.mDownloadedList
+		mDownloadData = myplexapplication.mDownloadList.mDownloadedList
 				.get(mData._id);
 
 		if (mDownloadData == null) {
@@ -2258,7 +2260,26 @@ private void playVideoFile(CardDownloadData mDownloadData){
 			textView.setVisibility(View.VISIBLE);
 			textView.setText(mContext.getString(R.string.play_msg_err));
 			if(isLocalPlayback){
+				int duration = mVideoView.getCachedDuration();				
+				if(mDownloadData != null && mDownloadData.mDownloadId != -1)
+				{
+					FetchDownloadProgress fetchDownloadProgress = new FetchDownloadProgress(mContext);
+					int dl_percentage = fetchDownloadProgress.getDownloadPercentage(mDownloadData.mDownloadId);
+					if(dl_percentage > 1 && duration > 1){
+						int durationDownloaded = (duration*dl_percentage)/100;
+						String play_duration_available = Util.stringForTime(durationDownloaded);
+						if(play_duration_available != null){
+							textView.setText(mContext.getString(R.string.play_msg_download_inprogress)
+									+ " "+play_duration_available + " only.");
+							return;
+						}
+					}else if (dl_percentage  == 0 || duration == -1){
+						textView.setText(mContext.getString(R.string.play_msg_download_not_enough));
+						return;
+					}
+				}
 				textView.setText(mContext.getString(R.string.play_msg_err_local_file));
+				
 			}
 			return;
 		}

@@ -342,5 +342,46 @@ public class FetchDownloadProgress {
 		
 		return 0;
 	}
+	
+	
+	public int getDownloadPercentage(long download_id) {
+
+		int dl_percentage = -1;
+
+		try {
+			DownloadManager.Query q = new DownloadManager.Query();
+			Log.d(TAG, "Download information for " + download_id);
+			q.setFilterById(download_id);
+			Cursor cursor = mDownloadManager.query(q);
+			if (cursor == null) {
+				return dl_percentage;
+			}
+			cursor.moveToFirst();
+			long bytes_downloaded = cursor
+					.getLong(cursor
+							.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+			
+			long bytes_total = cursor.getLong(cursor
+					.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+
+			if (cursor.getInt(cursor
+					.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
+				dl_percentage = 100;
+			} else if (cursor.getInt(cursor
+					.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_FAILED) {
+				dl_percentage = 0;
+			}
+
+			dl_percentage = (int) ((bytes_downloaded * 100) / bytes_total);
+			cursor.close();
+			return dl_percentage;
+
+		} catch (Throwable e) {
+			Log.d(TAG, "handleMessage4" + e);
+
+		}
+
+		return dl_percentage;
+	}
 
 }
