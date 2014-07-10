@@ -573,13 +573,21 @@ public class VideoView extends SurfaceView implements MediaPlayerControl {
 
    // cache duration as mDuration for faster access
     public int getDuration() {
-        if (isInPlaybackState()) {
-            return mMediaPlayer.getDuration();
+        if (isInPlaybackState() && mDuration <= 0) {
+        	mDuration = mMediaPlayer.getDuration();
+            
         }
+        
+        if(mDuration > 0)
+        	return mDuration;
 
         return -1;
     }
-
+   
+    public int getCachedDuration(){
+    	 return mDuration;
+    }
+    
     public int getCurrentPosition() {
         if (isInPlaybackState()) {
         	return mMediaPlayer.getCurrentPosition();

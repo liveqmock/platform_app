@@ -18,6 +18,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Formatter;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -1818,5 +1819,29 @@ public static String getVideoDurationInString(String hhmmssinString) {
 
 		});
 	}
+	
+	
+	public static  String stringForTime(int timeMs) {
+		
+		StringBuilder mFormatBuilder = new StringBuilder();
+		Formatter   mFormatter = new Formatter(mFormatBuilder, Locale.getDefault());
+		
+        int totalSeconds = timeMs / 1000;
+
+        int seconds = totalSeconds % 60;
+        int minutes = (totalSeconds / 60) % 60;
+        int hours   = totalSeconds / 3600;
+
+        mFormatBuilder.setLength(0);
+        if (hours > 0) {
+            return mFormatter.format("%d hr %02d minutes", hours, minutes).toString();
+        } else if(minutes > 0){
+            return mFormatter.format(minutes>9?"%02d minutes":"%d minutes", minutes).toString();
+        } else if (seconds > 0){
+        	 return mFormatter.format("%02d seconds", seconds).toString();
+        }
+        
+        return null;
+    }
 }
 
