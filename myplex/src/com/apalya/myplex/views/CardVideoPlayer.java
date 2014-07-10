@@ -2270,7 +2270,7 @@ private void playVideoFile(CardDownloadData mDownloadData){
 						String play_duration_available = Util.stringForTime(durationDownloaded);
 						if(play_duration_available != null){
 							textView.setText(mContext.getString(R.string.play_msg_download_inprogress)
-									+ " "+play_duration_available);
+									+ " "+play_duration_available + " only.");
 							return;
 						}
 					}else if (dl_percentage  == 0 || duration == -1){
