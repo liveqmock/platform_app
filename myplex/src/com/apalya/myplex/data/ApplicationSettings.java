@@ -40,6 +40,6 @@ public class ApplicationSettings {
 	
 	public static final boolean ENABLE_APP_UPDATE_CHECK = true;
 	
-	public static final String [] SAMSUNG_PROMO_DEVICE_MODELS = {"SM-T805", "SM-T705"};
+	public static final String [] SAMSUNG_PROMO_DEVICE_MODELS = {"SM-T805", "SM-T705" , "SM-T800", "SM-T800X"};
 	
 }
